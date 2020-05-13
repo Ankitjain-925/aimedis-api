@@ -1,0 +1,354 @@
+var express = require('express');
+var router = express.Router();
+const multer = require("multer");
+var user = require('../schema/user');
+var jwtconfig = require('../jwttoken');
+const uuidv1 = require('uuid/v1');
+
+//multer for upload the image
+var storage = multer.diskStorage(
+    {
+        destination: function (req, file, cb) {
+            cb(null, 'public/uploads/Trackrecord')
+        },
+        filename: function (req, file, cb) {
+            console.log('filesss', file),
+                cb(null, Date.now() + '-' + file.originalname)
+        }
+
+    })
+
+var upload = multer({ storage: storage }).single("UploadTrackImage");
+var upload1 = multer({ storage: storage }).array("UploadTrackImageMulti", 5);
+//Temprary for add the User
+// router.post('/AddUser', function (req, res, next) {
+//     console.log('second file');
+//     var data = req.body;
+//     var users = new user(data);
+//     users.save(function (err, AddUser) {
+//         if (err) return next(err);
+//         res.json({ status: 200, hassuccessed: true, msg: 'User is created' });
+//     });
+// });
+
+
+//Edit track record
+router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        // var track_id = {track_id : req.params.TrackId}
+        var data = req.body.data
+        user.findOneAndUpdate(
+            {
+                '_id': req.params.UserId,
+                'track_record.track_id': req.params.TrackId
+            },
+            {
+                $set: {
+                    'track_record.$': data
+                }
+            },
+            function (err, doc) {
+                if (err && !doc) {
+                    res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                } else {
+                    console.log('doc', doc);
+                    if (doc.nModified == '0') {
+                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                    }
+                    else {
+                        res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                    }
+                }
+            });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+//Add the track record
+router.put('/AddTrack/:UserId', function (req, res, next) {
+    console.log('req.body', req.body);
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        var ids = { track_id: uuidv1() };
+        var full_record = { ...ids, ...req.body.data }
+        user.updateOne({ _id: req.params.UserId },
+            { $push: { track_record: full_record } },
+            { safe: true, upsert: true },
+            function (err, doc) {
+                if (err && !doc) {
+                    res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                } else {
+                    if (doc.nModified == '0') {
+                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                    }
+                    else {
+                        res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                    }
+                }
+            });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+//remove track record
+router.delete('/AddTrack/:UserId/:TrackId', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        user.updateOne({ _id: req.params.UserId },
+            { $pull: { track_record: { track_id: req.params.TrackId } } },
+            { multi: true },
+            function (err, doc) {
+                if (err && !doc) {
+                    res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                } else {
+                    console.log('doc', doc);
+                    if (doc.nModified == '0') {
+                        res.json({ status: 200, hassuccessed: false, msg: 'Track record is not found' })
+                    }
+                    else {
+                        res.json({ status: 200, hassuccessed: true, msg: 'track is deleted' })
+                    }
+                }
+            });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+
+//for upload the image 
+router.post('/AddTrack/TrackUploadImage', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    console.log('req.params.TrackId', req.params.TrackId)
+    if (legit) {
+        upload(req, res, function (err) {
+            if (err instanceof multer.MulterError) {
+                console.log('dddddd');
+                res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
+            } else if (err) {
+                console.log('eeeeeee');
+                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+            }
+            else {
+                var file_entry = [{ filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }]
+                res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+router.post('/AddTrack/TrackUploadImageMulti', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    console.log('req.params.TrackId', req.params.TrackId)
+    if (legit) {
+        upload1(req, res, function (err) {
+            if (err instanceof multer.MulterError) {
+                console.log('dddddd');
+                res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
+            } else if (err) {
+                console.log('eeeeeee');
+                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+            }
+            else {
+                var file_entry = [];
+                res.req.files.forEach((item, index) => {
+                    file_entry.push({ filename: item.filename, filetype: item.mimetype, url: item.destination + '/' + item.filename })
+                })
+                res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+//for emergency access by doctor
+router.get('/getUser/:UserId', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+            user.find({ _id: req.params.UserId },
+                function (err, doc) {
+                    if (err && !doc) {
+                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+                    } else {
+                        if (doc[0].family_doc.includes(legit.id)) {
+                            console.log('in family doctor')
+                            doc[0].track_record.sort(mySorter);
+                            res.json({ status: 200, hassuccessed: true, msg: 'User is found'})
+                        }
+                        else {
+                            console.log(req.query.pin, 'req.query.pin')
+                            if (req.query.pin) {
+                                console.log('doc[0].pin', doc[0].pin)
+                                if (req.query.pin == doc[0].pin) {
+                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found' })
+                                }
+                                else {
+                                    res.json({ status: 200, hassuccessed: false, msg: 'Pin is not Correct' })
+                                }
+                            }
+                            else {
+                                res.json({ status: 200, hassuccessed: false, msg: 'Please Enter the Pin' })
+                            }
+                        }
+                    }
+                });
+        }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+//Get the track record
+router.get('/AddTrack/:UserId', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        if (req.params.UserId === legit.id) {
+            console.log('its patient');
+            user.find({ _id: req.params.UserId },
+                function (err, doc) {
+                    if (err && !doc) {
+                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+                    } else {
+                        doc[0].track_record.sort(mySorter);
+                        var trackrecord1 = []
+                        if (doc[0].track_record.length > 0) {
+                            doc[0].track_record.forEach((item, index) => {
+                                console.log('its patient');
+                                user.find({ _id: item.created_by}, function (err, doc3) {
+                                    if (err && !doc3) {
+                                    } else {
+                                        console.log('in date1111', doc3)
+                                        let promise = new Promise(function (resolve, reject) {
+                                        if(doc3[0].last_name)
+                                        {
+                                            item.created_by = doc3[0].first_name+' '+doc3[0].last_name;
+                                        }
+                                        else
+                                        {
+                                            item.created_by = doc3[0].first_name;
+                                        }
+                                        setTimeout(() => resolve(item), 1000);
+                                        });
+                                        promise.then(
+                                            console.log('items', item),
+                                            trackrecord1.push(item)
+                                        )
+                                    } 
+                            });
+                            })
+                        }
+                        console.log('its patient222');
+                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord1 })
+                    }
+                });
+        }
+        else {
+            user.find({ _id: req.params.UserId },
+                function (err, doc) {
+                    if (err && !doc) {
+                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+                    } else {
+                        if (doc[0].family_doc.includes(legit.id)) {
+                            console.log('in family doctor')
+                            doc[0].track_record.sort(mySorter);
+                            var trackrecord2 = []
+                            if (doc[0].track_record.length > 0) {
+                                doc[0].track_record.forEach((item, index) => {
+                                    user.find({ _id: item.created_by}, function (err, doc5) {
+                                        if (err && !doc3) {
+                                        } else {
+                                            console.log('in date2222', doc5)
+                                            if(doc3[0].last_name)
+                                            {
+                                                item.created_by = doc5[0].first_name+' '+doc5[0].last_name;
+                                            }
+                                            else
+                                            {
+                                                item.created_by = doc5[0].first_name;
+                                            }
+                                            trackrecord2.push(item)
+                                        }
+                                    });
+                                })
+                            }
+                            res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord2 })
+                        }
+                        else {
+                            console.log(req.query.pin, 'req.query.pin')
+                            if (req.query.pin) {
+                                console.log('doc[0].pin', doc[0].pin)
+                                if (req.query.pin == doc[0].pin) {
+                                    var finaloutput = [];
+                                    doc[0].track_record.sort(mySorter);
+                                    if (doc[0].track_record.length > 0) {
+                                        doc[0].track_record.forEach((item, index) => {
+                                            user.find({ _id: item.created_by}, function (err, doc3) {
+                                                if (err && !doc3) {
+                                                } else {
+                                                    console.log('in date', doc3)
+                                                    if(doc3[0].last_name)
+                                                    {
+                                                        item.created_by = doc3[0].first_name+' '+doc3[0].last_name;
+                                                    }
+                                                    else
+                                                    {
+                                                        item.created_by = doc3[0].first_name;
+                                                    }
+                                                }
+                                            });
+                                            if (item.public == '') { }
+                                            else if (item.public == 'always') {
+                                                finaloutput.push(item);
+                                            }
+                                            else {
+                                                var d1 = new Date();
+                                                var d2 = new Date(item.public);
+                                                console.log('item.public', item.public);
+                                                if (d1.getTime() <= d2.getTime()) {
+                                                    finaloutput.push(item);
+                                                }
+                                            }
+                                        })
+                                    }
+                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: finaloutput })
+                                }
+                                else {
+                                    res.json({ status: 200, hassuccessed: false, msg: 'Pin is not Correct' })
+                                }
+                            }
+                            else {
+                                res.json({ status: 200, hassuccessed: false, msg: 'Please Enter the Pin' })
+                            }
+                        }
+                    }
+                });
+        }
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+function mySorter(a, b) {
+    var x = a.datetime_on.toLowerCase();
+    var y = b.datetime_on.toLowerCase();
+    return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+}
+
+module.exports = router;

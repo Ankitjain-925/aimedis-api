@@ -1,0 +1,40 @@
+{
+  "name": "qmcrm",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "app": "nodemon app.js"
+  },
+  "dependencies": {
+    "authy-client": "^1.1.4",
+    "base-64": "^0.1.0",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.19.0",
+    "connect-multiparty": "^2.2.0",
+    "cors": "^2.8.5",
+    "csv-parser": "^2.3.0",
+    "debug": "~2.6.9",
+    "dynamic-html-pdf": "^1.0.1",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.4",
+    "handlebars": "^4.0.6",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "mongoose": "^5.4.20",
+    "morgan": "~1.9.0",
+    "multer": "^1.4.1",
+    "node-datetime": "^2.1.2",
+    "nodemailer": "^6.1.1",
+    "shortid": "^2.2.15",
+    "stripe": "^7.5.0",
+    "swagger-ui-express": "^4.0.2",
+    "uuid": "^3.3.2"
+  },
+  "main": "app",
+  "typings": "app",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "description": ""
+}
