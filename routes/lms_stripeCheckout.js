@@ -4,7 +4,7 @@ let router = express.Router();
 var Payment = require("../schema/payment_schema");
 var jwtconfig = require('../jwttoken');
 const configureStripe = require('stripe');
-const STRIPE_SECRET_KEY = 'sk_test_KsH7d3wHXvP6dZB2bANsQzSm00p6sewr4X'
+const STRIPE_SECRET_KEY = 'sk_live_T9Hsupvqoz7exnMc3N1Kw8md'
 const stripe = configureStripe(STRIPE_SECRET_KEY);
 var moment = require('moment');
 
