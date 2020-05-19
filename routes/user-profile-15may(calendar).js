@@ -400,11 +400,14 @@ router.post('/AddUser', function (req, res, next) {
                         countryCode: req.body.country_code,
                         email: req.body.email,
                         phone: req.body.mobile
-                    })
-                    .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
-                    .then(regRes=>{
+                    }, function (err, regRes) {
+                        if (err) {
+                            console.log('Error Registering User with Account Security');
+                            res.json({ status: 200, message: 'Something went wrong.', error: err, hassuccessed: false });
+                        }
+                        else {
+                            console.log('try', regRes)
                             if (regRes && regRes.success) {
-                                console.log('I am here', regRes)
                                 var authyId = { authyId: regRes.user.id };
                                 datas = { ...authyId, ...profile_id, ...req.body, ...isblock, ...createdate, ...createdby, ...usertoken, ...verified }
                                 var users = new User(datas);
@@ -421,7 +424,7 @@ router.post('/AddUser', function (req, res, next) {
                                             from: "contact@aimedis.com",
                                             to: req.body.email,
                                             //to      :  'navdeep.webnexus@gmail.com',
-                                            subject: 'Aimedis Registrastion',
+                                            subject: 'Aimedis Registration',
                                             html: dhtml
                                         };
                                         let sendmail = transporter.sendMail(mailOptions)
@@ -432,7 +435,9 @@ router.post('/AddUser', function (req, res, next) {
                             else {
                                 res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false });
                             }
-                            })
+                        }
+                        // })
+                    })
 
                 }
                 else {
@@ -778,13 +783,12 @@ router.post('/Prescription', function (req, res, next) {
         if (err && !data) {
             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
         } else {
-
             if (req.body.lan === 'de') {
                 var dhtml = 'Sie haben ein Rezept (prescription) von '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' beantragt.<br/>'+ 
                 req.body.docProfile.first_name+' '+req.body.docProfile.last_name + ' ( '+req.body.docProfile.email+' ) ' +'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>'+ 
                 'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>'+ 
                 '<b>Ihr Aimedis Team </b>'
-            
+
             }
             else {
                 var dhtml = 'You have requested a prescription from '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
@@ -793,12 +797,12 @@ router.post('/Prescription', function (req, res, next) {
                 '<b>Your Aimedis team </b>'
             }
             if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von '+req.body.patient_info.patient_id+' erhalten. '+ 
+                var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von '+req.body.patient_info.patient_id+' AND '+req.body.patient_info.first_name +' '+ req.body.patient_info.last_name+' erhalten. '+ 
                 'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>'+
                 '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml2 = 'You have received a prescription inquiry from '+req.body.patient_info.patient_id+'<br/>'+ 
+                var dhtml2 = 'You have received a prescription inquiry from '+req.body.patient_info.patient_id+' AND '+req.body.patient_info.first_name +' '+ req.body.patient_info.last_name+'<br/>'+ 
                 'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> '+
                 '<b>Your Aimedis team </b>'
             }
@@ -816,22 +820,21 @@ router.post('/Prescription', function (req, res, next) {
             };
             var sendmail = transporter.sendMail(mailOptions)
             var sendmail2 = transporter.sendMail(mailOptions2)
-
             res.json({ status: 200, hassuccessed: true, message: "success" })
         }
     })
 })
-// router.post('/Prescription', function (req, res, next) {
-//     console.log('I am here tooo')
-//     var prescription = new Prescription(req, body)
-//     prescription.save(function (err, data) {
-//         if (err && !data) {
-//             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
-//         } else {
-//             res.json({ status: 200, hasssuccessed: true, message: "no success" })
-//         }
-//     })
-// })
+router.post('/Prescription', function (req, res, next) {
+    console.log('I am here tooo')
+    var prescription = new Prescription(req, body)
+    prescription.save(function (err, data) {
+        if (err && !data) {
+            res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
+        } else {
+            res.json({ status: 200, hasssuccessed: true, message: "no success" })
+        }
+    })
+})
 
 router.get('/Prescription/:Prescription_id', function (req, res, next) {
     const token = (req.headers.token)
@@ -983,12 +986,12 @@ router.post('/SickCertificate', function (req, res, next) {
                 '<b>Your Aimedis team </b>'
             }
             if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von '+req.body.patient_info.patient_id+' erhalten. '+ 
+                var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von '+req.body.patient_info.patient_id+' AND '+req.body.patient_info.first_name +' '+ req.body.patient_info.last_name+' erhalten. '+ 
                 'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>'+
                 '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml2 = 'You have received an AU (sick certificate) inquiry from '+req.body.patient_info.patient_id+'<br/>'+ 
+                var dhtml2 = 'You have received an AU (sick certificate) inquiry from '+req.body.patient_info.patient_id+' AND '+req.body.patient_info.first_name +' '+ req.body.patient_info.last_name+'<br/>'+ 
                 'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> '+
                 '<b>Your Aimedis team </b>'
             }
@@ -1220,51 +1223,58 @@ router.post('/Mypatients/create_patient', function (req, res, next) {
     }
 })
 
-router.post('/second_opinion', function (req, res, next) {
-    var Second_opinions = new Second_opinion(req.body);
-    Second_opinions.save(function (err, user_data) {
-        if (err && !user_data) {
-            res.json({ status: 200, message: 'Something went wrong.', error: err });
-        } else {
-            if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben eine Zweitmeinung (second opinion) von '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' beantragt.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name + ' ( '+req.body.docProfile.email+' ) ' +'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>'+ 
-                'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>'+ 
-                '<b>Ihr Aimedis Team </b>'
+router.post('/Second_opinion', function (req, res, next) {
+    count = token = req.headers.token
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        var user_id = { user_id: legit.id }
+        datas = { ...req.body, ...user_id }
+        var Second_opinions = new Second_opinion(datas);
+        Second_opinions.save(function (err, user_data) {
+            if (err && !user_data) {
+                res.json({ status: 200, message: 'Something went wrong.', error: err });
+            } else {
+                if (req.body.lan === 'de') {
+                    var dhtml = 'Sie haben eine Zweitmeinung (second opinion) von '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' beantragt.<br/>'+ 
+                    req.body.docProfile.first_name+' '+req.body.docProfile.last_name + ' ( '+req.body.docProfile.email+' ) ' +'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>'+ 
+                    'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>'+ 
+                    '<b>Ihr Aimedis Team </b>'
+    
+                }
+                else {
+                    var dhtml = 'You have requested a second opinion from '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
+                    req.body.docProfile.first_name+' '+req.body.docProfile.last_name+ ' ( '+req.body.docProfile.email+' )' + ' will take care of the matter and contact you via email.<br/>'+ 
+                    'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> '+
+                    '<b>Your Aimedis team </b>'
+                }
+                if (req.body.lan === 'de') {
+                    var dhtml2 = ' Sie haben eine Zweitmeinung (second opinion) Anfrage von '+req.body.patient_info.patient_id+' AND '+req.body.patient_info.first_name +' '+ req.body.patient_info.last_name+' erhalten. '+ 
+                    'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>'+
+                    '<b>Ihr Aimedis Team </b>'
+                }
+                else {
+                    var dhtml2 = 'You have received a second opinion inquiry from '+req.body.patient_info.patient_id+' AND '+req.body.patient_info.first_name +' '+ req.body.patient_info.last_name+'<br/>'+ 
+                    'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> '+
+                    '<b>Your Aimedis team </b>'
+                }
+                var mailOptions = {
+                    from: "contact@aimedis.com",
+                    to:req.body.patient_info.email ,
+                    subject: 'Second Opinion Request',
+                    html: dhtml
+                };
+                var mailOptions2 = {
+                    from: "contact@aimedis.com",
+                    to: req.body.docProfile.email,
+                    subject: 'Second Opinion Request',
+                    html: dhtml2
+                };
+                var sendmail = transporter.sendMail(mailOptions)
+                var sendmail2 = transporter.sendMail(mailOptions2)
+                res.json({ status: 200, message: 'Added Successfully', hassuccessed: true, data: user_data });
             }
-            else {
-                var dhtml = 'You have requested a second opinion from '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name+ ' ( '+req.body.docProfile.email+' )' + ' will take care of the matter and contact you via email.<br/>'+ 
-                'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
-            }
-            if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben eine Zweitmeinung (second opinion) Anfrage von '+req.body.patient_info.patient_id+' erhalten. '+ 
-                'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>'+
-                '<b>Ihr Aimedis Team </b>'
-            }
-            else {
-                var dhtml2 = 'You have received a second opinion inquiry from '+req.body.patient_info.patient_id+'<br/>'+ 
-                'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
-            }
-            var mailOptions = {
-                from: "contact@aimedis.com",
-                to:req.body.patient_info.email ,
-                subject: 'Second Opinion Request',
-                html: dhtml
-            };
-            var mailOptions2 = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: 'Second Opinion Request',
-                html: dhtml2
-            };
-            var sendmail = transporter.sendMail(mailOptions)
-            var sendmail2 = transporter.sendMail(mailOptions2)
-            res.json({ status: 200, message: 'Added Successfully', hassuccessed: true, data: user_data });
-        }
-    })
+        })
+    }
 })
 
 router.post('/Second_opinion/UploadDocument', function (req, res, next) {
@@ -1758,7 +1768,6 @@ router.get('/DoctorAppointments', function (req, res, next) {
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
-                    var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
@@ -1807,35 +1816,10 @@ router.get('/DoctorAppointments', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
-                    for (let l = 0; l < Userinfo[i]. days_for_practices.length; l++) {
-                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i]. days_for_practices[l].duration_of_timeslots) {
-                            monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            wednesday = getTimeStops(Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            friday = getTimeStops(Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            saturday = getTimeStops(Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
-                    }
                     finalArray.push({
                         data: Userinfo[i],
                         appointments: user,
-                        online_appointment: online_users,
-                        practice_days : Practices
+                        online_appointment: online_users
                     })
                 }
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -1865,7 +1849,6 @@ router.get('/getLocation/:radius', function (req, res, next) {
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
-                    var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
@@ -1914,35 +1897,10 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
-                    for (let l = 0; l < Userinfo[i]. days_for_practices.length; l++) {
-                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i]. days_for_practices[l].duration_of_timeslots) {
-                            monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            wednesday = getTimeStops(Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            friday = getTimeStops(Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            saturday = getTimeStops(Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
-                    }
                     finalArray.push({
                         data: Userinfo[i],
                         appointments: user,
-                        online_appointment: online_users,
-                        practice_days : Practices
+                        online_appointment: online_users
                     })
                 }
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -1968,7 +1926,6 @@ router.get('/getLocation/:radius', function (req, res, next) {
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
-                    var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
@@ -2017,35 +1974,10 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
-                    for (let l = 0; l < Userinfo[i]. days_for_practices.length; l++) {
-                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i]. days_for_practices[l].duration_of_timeslots) {
-                            monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            wednesday = getTimeStops(Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            friday = getTimeStops(Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            saturday = getTimeStops(Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
-                        }
-                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
-                    }
                     finalArray.push({
                         data: Userinfo[i],
                         appointments: user,
-                        online_appointment: online_users,
-                        practice_days : Practices
+                        online_appointment: online_users
                     })
                 }
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -2396,12 +2328,10 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
                             html: dhtml
                         };
                        
-                      if(req.body.comefrom === 'pharmacy')
+                      if(req.body.pin)
                       {
-                        console.log('I here', req.body.pin)
-                        if(req.body.pin && req.body.pin == doc.pin && req.body.pin !== "" )
+                        if(req.body.pin == doc.pin )
                         {
-                            console.log('I here2', req.body.pin)
                             var sendmail = transporter.sendMail(mailOptions)
                             if(doc.emergency_email && doc.emergency_email!=='')
                             {

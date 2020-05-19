@@ -5,6 +5,7 @@ var User = require('../schema/user');
 var message = require('../schema/message');
 var Topic = require('../schema/topic');
 var Institute = require('../schema/institute');
+var Wishlist = require('../schema/wishlist_schema')
 var jwtconfig = require('../jwttoken');
 const uuidv1 = require('uuid/v1');
 const { join } = require('path');
@@ -68,182 +69,183 @@ router.post('/Addadminuser', function (req, res, next) {
                 res.json({ status: 200, msg: 'Email is Already exist', success: false });
             }
             else {
-                console.log('sdss', req.body);
                 if(req.body.lan==='de') 
-                {
-                    var  dhtml = '<b>Herzlich Willkommen bei Aimedis – Ihrer Gesundheitsplattform.</b><br/>' +
-                    'Mit Aimedis stehen Sie immer an der Seite Ihrer Patienten. Bieten Sie online Termine und Videosprechstunden an, stellen Sie Rezepte und Arbeitsunfähigkeitsbescheinigungen aus oder bieten Sie Zweitmeinungen über die Plattform an, alles bis auf Weiteres kostenfrei.<br/>'+
-                    'Sobald Sie sich als medizinische Fachkraft legitimiert haben, schalten wir Ihren Zugang frei.<br/>'+  
-                    'In Anbetracht der aktuellen Lage und Problematik durch das SARS Coronavirus stellt Aimedis sowohl für Patienten und Behandler ein entsprechendes Tagebuch zur Verfügung.<br/>'+
-                    'Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>'+
-                    'Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen.<br/><br/>'+
-                    '<b>Ihr Aimedis Team</b><br/>'+
-                    '<b>Jetzt einloggen: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>'+ 
-                    '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
+        {
+            var  dhtml = '<b>Herzlich Willkommen bei Aimedis – Ihrer Gesundheitsplattform.</b><br/>' +
+            'Mit Aimedis stehen Sie immer an der Seite Ihrer Patienten. Bieten Sie online Termine und Videosprechstunden an, stellen Sie Rezepte und Arbeitsunfähigkeitsbescheinigungen aus oder bieten Sie Zweitmeinungen über die Plattform an, alles bis auf Weiteres kostenfrei.<br/>'+
+            'Sobald Sie sich als medizinische Fachkraft legitimiert haben, schalten wir Ihren Zugang frei.<br/>'+  
+            'In Anbetracht der aktuellen Lage und Problematik durch das SARS Coronavirus stellt Aimedis sowohl für Patienten und Behandler ein entsprechendes Tagebuch zur Verfügung.<br/>'+
+            'Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>'+
+            'Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen.<br/><br/>'+
+            '<b>Ihr Aimedis Team</b><br/>'+
+            '<b>Jetzt einloggen: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>'+ 
+            '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
 
-                    if(req.body.type=='patient')
-                    {
-                        dhtml = '<b>Herzlich Willkommen bei Aimedis – Ihrer Gesundheitsplattform.</b><br/>' +
-                        'Mit Aimedis sind Sie immer auf der sicheren Seite, denn nicht nur Ihre medizinischen Daten sondern auch die Ärzte Ihres Vertrauens begleiten Sie ab sofort weltweit und 24 Stunden am Tag.<br/>' +
-                        'Bei Aimedis speichern Sie und Ihre Ärzte, Therapeuten und Kliniken Ihre Daten, Sie teilen wichtige Informationen mit Ihren Behandlern und greifen jederzeit auf diese zu. Vereinbaren Sie Termine, erhalten Sie einen Krankenschein, holen Sie eine Zweitmeinung zu einer geplanten OP ein oder sprechen Sie zu jeder Tag- und Nachtzeit mit einem Arzt Ihrer Wahl.<br/>' +
-                        'Dabei profitieren Sie nicht nur von höchster Datensicherheit sondern auch der Aimedis eigenen Blockchain anhand derer Sie jederzeit sicherstellen können, dass Ihre Daten nur durch Sie und einen Behandler IHRER Wahl eingesehen werden können. Ihre Daten, Ihre Entscheidung. <br/>' +
-                        'In Anbetracht der aktuellen Lage und Problematik durch das SARS Coronavirus stellt Aimedis sowohl für Patienten und Behandler ein entsprechendes Tagebuch zur Verfügung. <br/>' +
-                        'Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>' + 
-                        'Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen. <br/><br/><br/>' +
-                        '<b>Ihr Aimedis Team</b><br/>' +
-                        '<b>Jetzt einloggen: </b>  <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                        '<b>Der Aimedis Blog:</b> <a href="https://sys.aimedis.io">https://blog.aimedis.com</a><br/>'; 
-                    }
-                } 
-                else
-                {
-                    var dhtml =  '<b>Welcome to Aimedis - your health platform.</b><br/>' +
-                        'With Aimedis you are always at your patients’ side. Offer online appointments and video consultations, issue prescriptions and sick certificates or offer second opinions via the platform, all free of charge until further notice. <br/>' +
-                        'As soon as you have legitimized yourself as a medical specialist, we will activate your access. <br/>' +
-                        'In view of the current situation and problems caused by the SARS coronavirus, Aimedis provides a corresponding diary for both patients and practitioners. <br/>' +
-                        'In the attachment to this email you will find the terms and conditions as well as the data protection regulations. <br/>' +
-                        'You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>' + 
-                        '<b>Your Aimedis team</b><br/>' +
-                        '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                        '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
+            if(req.body.type=='patient')
+            {
+                dhtml = '<b>Herzlich Willkommen bei Aimedis – Ihrer Gesundheitsplattform.</b><br/>' +
+                'Mit Aimedis sind Sie immer auf der sicheren Seite, denn nicht nur Ihre medizinischen Daten sondern auch die Ärzte Ihres Vertrauens begleiten Sie ab sofort weltweit und 24 Stunden am Tag.<br/>' +
+                'Bei Aimedis speichern Sie und Ihre Ärzte, Therapeuten und Kliniken Ihre Daten, Sie teilen wichtige Informationen mit Ihren Behandlern und greifen jederzeit auf diese zu. Vereinbaren Sie Termine, erhalten Sie einen Krankenschein, holen Sie eine Zweitmeinung zu einer geplanten OP ein oder sprechen Sie zu jeder Tag- und Nachtzeit mit einem Arzt Ihrer Wahl.<br/>' +
+                'Dabei profitieren Sie nicht nur von höchster Datensicherheit sondern auch der Aimedis eigenen Blockchain anhand derer Sie jederzeit sicherstellen können, dass Ihre Daten nur durch Sie und einen Behandler IHRER Wahl eingesehen werden können. Ihre Daten, Ihre Entscheidung. <br/>' +
+                'In Anbetracht der aktuellen Lage und Problematik durch das SARS Coronavirus stellt Aimedis sowohl für Patienten und Behandler ein entsprechendes Tagebuch zur Verfügung. <br/>' +
+                'Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>' + 
+                'Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen. <br/><br/><br/>' +
+                '<b>Ihr Aimedis Team</b><br/>' +
+                '<b>Jetzt einloggen: </b>  <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                '<b>Der Aimedis Blog:</b> <a href="https://sys.aimedis.io">https://blog.aimedis.com</a><br/>'; 
+            }
+        } 
+        else
+        {
+            var dhtml =  '<b>Welcome to Aimedis - your health platform.</b><br/>' +
+                'With Aimedis you are always at your patients’ side. Offer online appointments and video consultations, issue prescriptions and sick certificates or offer second opinions via the platform, all free of charge until further notice. <br/>' +
+                'As soon as you have legitimized yourself as a medical specialist, we will activate your access. <br/>' +
+                'In view of the current situation and problems caused by the SARS coronavirus, Aimedis provides a corresponding diary for both patients and practitioners. <br/>' +
+                'In the attachment to this email you will find the terms and conditions as well as the data protection regulations. <br/>' +
+                'You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>' + 
+                '<b>Your Aimedis team</b><br/>' +
+                '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
 
-                    if(req.body.type=='patient')
-                    {
-                        dhtml =  '<b>Welcome to Aimedis - your health platform.</b><br/>' +
-                        'With Aimedis you are always on the safe side, because not only your medical data but also the doctors you trust will accompany you worldwide and 24 hours a day.<br/>' +
-                        'At Aimedis you and your doctors, therapists and clinics save your data, you share important information with your healthcare professionals and access them at any time. Make appointments, get a sick certificate, get a second opinion on a planned operation or speak to a doctor of your choice at any time of the day or night.<br/>' +
-                        'You benefit not only from the highest level of data security, but also from Aimedis’ own blockchain, which you can use to ensure at any time that your data can only be viewed by you and a healthcare provider of your choice. Your data, your decision.<br/>' +
-                        'In view of the current situation and problems caused by the SARS coronavirus, Aimedis provides a corresponding diary for both patients and practitioners.<br/>' +
-                        'In the attachment to this email you will find the terms and conditions as well as the data protection regulations.<br/>' +
-                        'You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>' + 
-                        '<b>Your Aimedis team</b><br/><br/><br/><br/>' +
-                        '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                        '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
-                    }
-                }  
-                var ids= shortid.generate();
-                        if(req.body.type=='patient')
-                        {
-                            var profile_id =  'P_'+ids;
-                        }
-                        else if(req.body.type=='nurse')
-                        { 
-                            var profile_id = 'N_'+ids;
-                        }
-                        else if(req.body.type=='pharmacy')
-                        {
-                            var profile_id = 'PH'+ids;
-                        }
-                        else if(req.body.type=='paramedic')
-                        {
-                            var profile_id = 'PA'+ids;
-                        }
-                        else if(req.body.type=='insurance')
-                        {
-                            var profile_id = 'I_'+ids;
-                        }
-                        else if(req.body.type=='hospitaladmin')
-                        {
-                            var profile_id = 'HA'+ids;
-                        }
-                        else if(req.body.type=='doctor')
-                        {
-                            var profile_id =  'D_'+ids;
-                        }
-                var isblock = { isblock: false }
-                var dt = dateTime.create();
-                var createdate = { createdate: dt.format('Y-m-d H:M:S') }
-                var enpassword = base64.encode(req.body.password);
-                var usertoken = { usertoken: uuidv1() }
-                var verified = { verified: 'true' }
-                // var parent_id = { parent_id: legit.id }
-                var profile_id    = {profile_id: profile_id}
-                if (req.body.institute_id) {
-                    institute_id = { institute_id: req.body.institute_id }
+            if(req.body.type=='patient')
+            {
+                dhtml =  '<b>Welcome to Aimedis - your health platform.</b><br/>' +
+                'With Aimedis you are always on the safe side, because not only your medical data but also the doctors you trust will accompany you worldwide and 24 hours a day.<br/>' +
+                'At Aimedis you and your doctors, therapists and clinics save your data, you share important information with your healthcare professionals and access them at any time. Make appointments, get a sick certificate, get a second opinion on a planned operation or speak to a doctor of your choice at any time of the day or night.<br/>' +
+                'You benefit not only from the highest level of data security, but also from Aimedis’ own blockchain, which you can use to ensure at any time that your data can only be viewed by you and a healthcare provider of your choice. Your data, your decision.<br/>' +
+                'In view of the current situation and problems caused by the SARS coronavirus, Aimedis provides a corresponding diary for both patients and practitioners.<br/>' +
+                'In the attachment to this email you will find the terms and conditions as well as the data protection regulations.<br/>' +
+                'You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>' + 
+                '<b>Your Aimedis team</b><br/><br/><br/><br/>' +
+                '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
+            }
+        }  
+        var ids= shortid.generate();
+                if(req.body.type=='patient')
+                {
+                    var profile_id =  'P_'+ids;
                 }
-                console.log('inst_id', institute_id);
-                req.body.password = enpassword;
+                else if(req.body.type=='nurse')
+                { 
+                    var profile_id = 'N_'+ids;
+                }
+                else if(req.body.type=='pharmacy')
+                {
+                    var profile_id = 'PH'+ids;
+                }
+                else if(req.body.type=='paramedic')
+                {
+                    var profile_id = 'PA'+ids;
+                }
+                else if(req.body.type=='insurance')
+                {
+                    var profile_id = 'I_'+ids;
+                }
+                else if(req.body.type=='hospitaladmin')
+                {
+                    var profile_id = 'HA'+ids;
+                }
+                else if(req.body.type=='doctor')
+                {
+                    var profile_id =  'D_'+ids;
+                }
+        var isblock = { isblock: false }
+        var dt = dateTime.create();
+        var createdate = { createdate: dt.format('Y-m-d H:M:S') }
+        var enpassword = base64.encode(req.body.password);
+        var usertoken = { usertoken: uuidv1() }
+        var verified = { verified: 'true' }
+        // var parent_id = { parent_id: legit.id }
+        var profile_id    = {profile_id: profile_id}
+        if (req.body.institute_id) {
+            institute_id = { institute_id: req.body.institute_id }
+        }
+        console.log('inst_id', institute_id);
+        req.body.password = enpassword;
 
-                console.log('country_code', req.body)
-                authy.registerUser({
-                    countryCode: req.body.country_code,
-                    email: req.body.email,
-                    phone: req.body.mobile
-                }, function (err, regRes) {
-                    if (err) {
-                        console.log('Error Registering User with Account Security');
-                        res.json({ status: 200, message: 'Something went wrong.', error: err, hassuccessed: false });
+        console.log('country_code', req.body)
+        if (req.body.country_code && req.body.mobile) {
+            authy.registerUser({
+                countryCode: req.body.country_code,
+                email: req.body.email,
+                phone: req.body.mobile
+            })
+            .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
+            .then(regRes=>{
+                var authyId = {authyId: regRes.user.id};
+            datas = { ...authyId, ...profile_id, ...req.body, ...institute_id, ...isblock, ...createdate, ...usertoken, ...verified }
+            var users = new User(datas);
+            users.save((err, user_data) => {
+            if (err && !user_data) {
+                console.log('ddsds');
+                res.json({ status: 200, message: 'Something went wrong.', error: err });
+            } else {
+                if (user_data) {
+                    console.log(user_data, 'kkkkk')
+                    user_id = user_data._id;
+                    let token = user_data.usertoken;
+                    if(user_data.type =='hospitaladmin')
+                    {
+                         var link = 'https://sys.aimedis.io/admin/';
                     }
-                    var authyId = {authyId: regRes.user.id};
-                    datas = { ...authyId, ...profile_id, ...req.body, ...institute_id, ...isblock, ...createdate, ...usertoken, ...verified }
-                    var users = new User(datas);
-                    users.save((err, user_data) => {
-                    if (err && !user_data) {
-                        console.log('ddsds');
-                        res.json({ status: 200, message: 'Something went wrong.', error: err });
-                    } else {
-                        console.log(req.body, 'req.body')
-                        if (user_data) {
-                            console.log(user_data, 'kkkkk')
-                            user_id = user_data._id;
-                            let token = user_data.usertoken;
-                            if(user_data.type =='hospitaladmin')
-                            {
-                                 var link = 'https://sys.aimedis.io/admin/';
-                            }
-                            else
-                            {
-                                var link = 'https://sys.aimedis.io/';
-                            }
-                            let mailOptions = {
-                                from    :  "contact@aimedis.com",
-                                to      :  req.body.email,
-                                //to      :  'navdeep.webnexus@gmail.com',
-                                subject : 'Aimedis Registeration',
-                                html    : dhtml
-                            };
-                            let sendmail = transporter.sendMail(mailOptions)
-                            
-                            if (!req.body.institute_id && req.body.institute_name!="") {
-                                console.log('inside_ifff')
-                                var fullInstitute = { institute_name: req.body.institute_name, created_by: user_id }
-                                var Institutes = new Institute(fullInstitute);
-                                Institutes.save((err, inst) => {
-                                    if (err && !inst) {
-                                        console.log('ds');
-                                        res.json({ status: 200, message: 'Something went wrong on Institute creation', error: err });
-                                    } else {
-                                        if (inst) {
-                                            console.log('fdsfd');
-                                            User.updateOne({ _id: user_id },
-                                                { institute_id: inst._id },
-                                                function (err, doc) {
-                                                    if (err && !doc) {
-                                                        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err });
-                                                    }
-                                                    else {
-                                                        res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
-                                                    }
-                                                })
-                                        }
-                                        else {
-                                            console.log('fdedadasfd');
-                                            res.json({ status: 200, hassuccessed: false, message: 'Problem with assign the Institute', error: err });
-                                        }
-                                    }
-                                })
-                            }
-                            else {
-                                res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
-                            }
-                        }
-                        else {
-                            console.log('tttttttttt');
-                            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-                        }
+                    else
+                    {
+                        var link = 'https://sys.aimedis.io/';
                     }
-                })
-                })
+                    let mailOptions = {
+                        from    :  "contact@aimedis.com",
+                        to      :  req.body.email,
+                        //to      :  'navdeep.webnexus@gmail.com',
+                        subject : 'Aimedis Registeration',
+                        html    : dhtml
+                    };
+                    let sendmail = transporter.sendMail(mailOptions)
+                    
+                    if (!req.body.institute_id && req.body.institute_name!="") {
+                        console.log('inside_ifff')
+                        var fullInstitute = { institute_name: req.body.institute_name, created_by: user_id }
+                        var Institutes = new Institute(fullInstitute);
+                        Institutes.save((err, inst) => {
+                            if (err && !inst) {
+                                console.log('ds');
+                                res.json({ status: 200, message: 'Something went wrong on Institute creation', error: err });
+                            } else {
+                                if (inst) {
+                                    console.log('fdsfd');
+                                    User.updateOne({ _id: user_id },
+                                        { institute_id: inst._id },
+                                        function (err, doc) {
+                                            if (err && !doc) {
+                                                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err });
+                                            }
+                                            else {
+                                                res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
+                                            }
+                                        })
+                                }
+                                else {
+                                    console.log('fdedadasfd');
+                                    res.json({ status: 200, hassuccessed: false, message: 'Problem with assign the Institute', error: err });
+                                }
+                            }
+                        })
+                    }
+                    else {
+                        res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
+                    }
+                }
+                else {
+                    console.log('tttttttttt');
+                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                }
+            }
+        })
+            })
+        }
+        else {
+            res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false });
+        }
             }
         })
     }
@@ -871,6 +873,20 @@ router.delete('/topic/:id', function (req, res, next) {
             res.json({ status: 200, hassuccessed: true, msg: 'User is Deleted' });
         }
     })
+});
+
+router.delete('/removeWishlist/:id', function (req, res) {
+    let legit = jwtconfig.verify(req.headers.token)
+    if (legit) {
+    Wishlist.findOneAndRemove({ _id: req.params.id }, function (err, data12) {
+        if (err) {
+            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
+        } else {
+            res.json({ status: 200, hassuccessed: true, msg: 'Wishlist is Deleted' });
+        }
+    })
+}
+else { res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' }) }
 });
 
 router.put('/topic/:id', function (req, res, next) {

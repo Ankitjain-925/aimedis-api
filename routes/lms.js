@@ -6,9 +6,6 @@ let express = require("express"),
     Schema = require("../schema/lms_schema");
     Wishlist = require("../schema/wishlist_schema");
     var Payment             = require("../schema/payment_schema");
-var lmsSchema = new Schema();
-
-
 
 var lmsStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -212,7 +209,7 @@ router.get("/getWishlist", (req, res) => {
 })
 
 
-router.delete('/removeLms/:Id', function (req, res, next) {
+router.delete('/removeLms/:Id', function (req, res) {
     let legit = jwtconfig.verify(req.headers.token)
     if (legit) {
         console.log('console params', req.params)
@@ -227,6 +224,7 @@ router.delete('/removeLms/:Id', function (req, res, next) {
 else { res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' }) }
 
 })
+
 
 router.get("/getOrderHistory/:id", (req, res, next) => {
     const token = (req.headers.token)
@@ -278,6 +276,8 @@ router.get("/getOrderHistory", (req, res, next) => {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 })
+
+
 
 
 module.exports = router;

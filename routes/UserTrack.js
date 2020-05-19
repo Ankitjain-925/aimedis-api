@@ -432,68 +432,64 @@ router.post('/AddTrack/TrackUploadImageMulti', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
-router.post('/appointment', function (req, res, next) {
-    count = token = req.headers.token
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        var Appointments = new Appointment(req.body);
-        Appointments.save(function (err, user_data) {
-            if (err && !user_data) {
-                res.json({ status: 200, message: 'Something went wrong.', error: err });
-            } else {
-                if (req.body.lan === 'de') {
-                    var dhtml = 'Sie haben am   DATE'+ req.body.date + 'um TIME '+req.body.time+' einen Termin bei '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' ONLINE/OFFLINE vereinbart. .<br/>'+ 
-                    'Sollten Sie den Termin nicht wahrnehmen können, sagen Sie den Termin bitte spätestens 24 Stunden vor Terminbeginn ab. <br/>'+
-                    'Kontaktieren Sie bei Fragen Ihren behandelnden Arzt unter PRACTICE PHONE NUMBER. <br/>'+
-                    'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten. '+
+router.post('/appointment', function (req, res) {
+    var Appointments = new Appointment(req.body);
+    Appointments.save(function (err, user_data) {
+        if (err && !user_data) {
+            res.json({ status: 200, message: 'Something went wrong.', error: err });
+        } else {
+            if (req.body.lan === 'de') {
+                var dhtml = 'Sie haben am   DATE'+ req.body.date + 'um TIME '+req.body.time+' einen Termin bei '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' ONLINE/OFFLINE vereinbart. .<br/>'+ 
+                'Sollten Sie den Termin nicht wahrnehmen können, sagen Sie den Termin bitte spätestens 24 Stunden vor Terminbeginn ab. <br/>'+
+                'Kontaktieren Sie bei Fragen Ihren behandelnden Arzt unter PRACTICE PHONE NUMBER. <br/>'+
+                'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten. '+
             
-                    '<b>Ihr Aimedis Team </b>'
-    
-                }
-                else {
-                    var dhtml = 'You have got an ONLINE / OFFLINE appointment with'+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+req.body.date +'at TIME'+ req.body.time+'.<br/>'+ 
-                    'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins. <br/>'+
-                    'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>'+
-                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
-                   
-                    '<b>Your Aimedis team </b>'
-
-                }
-                if (req.body.lan === 'de') {
- 
-                    var dhtml2 = ' Sie haben für den  DATE'+ req.body.date + 'um TIME '+req.body.time+' einen Termin bei '+req.body.patient_info.first_name +' '+ req.body.patient_info.last_name+'ONLINE/OFFLINE vereinbart. .<br/>'+ 
-                    'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>'+
-                    'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an'+req.body.patient_info.email+'. <br/>'+
-                    'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> '+
+                '<b>Ihr Aimedis Team </b>'
             
-                    '<b>Ihr Aimedis Team </b>'
-                }
-                else {
-                    var dhtml2 ='You have got an ONLINE / OFFLINE appointment with'+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+req.body.date +'at TIME'+ req.body.time+'.<br/>'+ 
-                    'Please accept the appointment inside the system.<br/>'+ 
-                    'If you have any questions, contact the patient via '+req.body.patient_info.email+'.<br/>'+ 
-                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
-                   
-                    '<b>Your Aimedis team </b>'
-                }
-                var mailOptions = {
-                    from: "contact@aimedis.com",
-                    to:req.body.patient_info.email ,
-                    subject: 'Second Opinion Request',
-                    html: dhtml
-                };
-                var mailOptions2 = {
-                    from: "contact@aimedis.com",
-                    to: req.body.docProfile.email,
-                    subject: 'Second Opinion Request',
-                    html: dhtml2
-                };
-                var sendmail = transporter.sendMail(mailOptions)
-                var sendmail2 = transporter.sendMail(mailOptions2)
-                res.json({ status: 200, message: 'Added Successfully', hassuccessed: true, data: user_data });
             }
-        })
-    }
+            else {
+                var dhtml = 'You have got an ONLINE / OFFLINE appointment with'+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+req.body.date +'at TIME'+ req.body.time+'.<br/>'+ 
+                'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins. <br/>'+
+                'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>'+
+                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
+                
+                '<b>Your Aimedis team </b>'
+            
+            }
+            if (req.body.lan === 'de') {
+            
+                var dhtml2 = ' Sie haben für den  DATE'+ req.body.date + 'um TIME '+req.body.time+' einen Termin bei '+req.body.patient_info.patient_id+'ONLINE/OFFLINE vereinbart. .<br/>'+ 
+                'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>'+
+                'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an'+req.body.patient_info.email+'. <br/>'+
+                'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> '+
+            
+                '<b>Ihr Aimedis Team </b>'
+            }
+            else {
+                var dhtml2 ='You have got an ONLINE / OFFLINE appointment with'+ req.body.patient_info.patient_id+' on DATE '+req.body.date +'at TIME'+ req.body.time+'.<br/>'+ 
+                'Please accept the appointment inside the system.<br/>'+ 
+                'If you have any questions, contact the patient via '+req.body.patient_info.email+'.<br/>'+ 
+                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
+                
+                '<b>Your Aimedis team </b>'
+            }
+            var mailOptions = {
+                from: "contact@aimedis.com",
+                to:req.body.patient_info.email ,
+                subject: 'Appointment Request',
+                html: dhtml
+            };
+            var mailOptions2 = {
+                from: "contact@aimedis.com",
+                to: req.body.docProfile.email,
+                subject: 'Appointment Request',
+                html: dhtml2
+            };
+            var sendmail = transporter.sendMail(mailOptions)
+            var sendmail2 = transporter.sendMail(mailOptions2)
+            res.json({ status: 200, message: 'Added Successfully', hassuccessed: true, data: user_data });
+        }
+    })
 })
 //for emergency access by doctor
 router.get('/getUser/:UserId', function (req, res, next) {
