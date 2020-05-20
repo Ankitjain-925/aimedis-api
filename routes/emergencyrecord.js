@@ -386,26 +386,47 @@ function getAlltrack(data) {
                     var created_by = doc3.first_name;
                 }
                 new_data.created_by_temp = created_by;
-                new_data.creted_profile_temp = doc3.profile_id;
                 return new_data;
              
             }).then(function(new_data){
-                    console.log('comehere')
-                     user.findOne({profile_id: data.patient_id}).exec()
+                if(data.review_by)
+                {
+                     user.findOne({_id: data.review_by}).exec()
                     .then(function(doc5){
                         var new_data = data;
                         if (doc5.last_name) {
-                            var s_patient_name = doc5.first_name + ' ' + doc5.last_name;
+                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
                         }
                         else {
-                            var s_patient_name = doc5.first_name;
+                            var reviewed_by = doc5.first_name;
                         }
-                        new_data.s_patient_name = s_patient_name;
+                        new_data.review_by_temp = reviewed_by;
                         return new_data;
                     
                     })
+                }
+                if(data.emergency_by)
+                {
+                    user.findOne({_id: data.emergency_by}).exec()
+                    .then(function(doc5){
+                        console.log('ttttt112',doc5);
+                        var new_data = data;
+                        if (doc5.last_name) {
+                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                        }
+                        else {
+                            var emergency1_by = doc5.first_name;
+                        }
+                        new_data.emergency_by_temp = emergency1_by;
+                        return new_data;
+                    })
+                    
+                } 
+                if(!data.archive)
+                {
+                    trackrecord1.push(new_data);
+                }
                 
-                trackrecord1.push(new_data);
                 resolve(trackrecord1);
             })
         });

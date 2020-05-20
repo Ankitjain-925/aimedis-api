@@ -680,8 +680,11 @@ function getAlltrack(data) {
                     })
                     
                 } 
+                if(!data.archive)
+                {
+                    trackrecord1.push(new_data);
+                }
                 
-                trackrecord1.push(new_data);
                 resolve(trackrecord1);
             })
         });
@@ -737,7 +740,13 @@ function getAlltrack1(data) {
                     
                 } 
                 if (!new_data.public || new_data.public == '') {
-                    trackrecord1.push(new_data);
+                    if(data.archive)
+                    {}
+                    else
+                    {
+                        trackrecord1.push(new_data);
+                    }
+                   
                  }
                 else if (new_data.public == 'always') {
                     // trackrecord1.push(new_data);
@@ -750,7 +759,12 @@ function getAlltrack1(data) {
                     //     trackrecord1.push(new_data);
                     // }
                     if (d1.getTime() >= d2.getTime()) {
-                        trackrecord1.push(new_data);
+                        if(data.archive)
+                        {}
+                        else
+                        {
+                            trackrecord1.push(new_data);
+                        }
                     }
                 }
                 resolve(trackrecord1);
