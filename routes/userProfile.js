@@ -1754,12 +1754,16 @@ router.get('/DoctorAppointments', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
                 var finalArray = [];
-                let monday, tuesday, wednesday, thursday, friday, saturday, sunday
+                let monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text;
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
+                        if(Userinfo[i].private_appointments[j].custom_text)
+                        {  
+                            custom_text = Userinfo[i].private_appointments[j].custom_text;
+                        }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
@@ -1781,7 +1785,7 @@ router.get('/DoctorAppointments', function (req, res, next) {
                         if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })
                     }
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
                         if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
@@ -1835,7 +1839,8 @@ router.get('/DoctorAppointments', function (req, res, next) {
                         data: Userinfo[i],
                         appointments: user,
                         online_appointment: online_users,
-                        practice_days : Practices
+                        practice_days : Practices,
+                        
                     })
                 }
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -1861,12 +1866,17 @@ router.get('/getLocation/:radius', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, error: error })
             } else {
                 var finalArray = [];
-                let monday, tuesday, wednesday, thursday, friday, saturday, sunday
+                let monday, tuesday, wednesday, thursday, friday, saturday, sunday,custom_text
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
+                        console.log('try', Userinfo[i].private_appointments[j].custom_text)
+                        if(Userinfo[i].private_appointments[j].custom_text)
+                        {  
+                            custom_text = Userinfo[i].private_appointments[j].custom_text;
+                        }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
@@ -1888,7 +1898,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })
                     }
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
                         if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
@@ -1964,12 +1974,17 @@ router.get('/getLocation/:radius', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, error: error })
             } else {
                 var finalArray = [];
-                let monday, tuesday, wednesday, thursday, friday, saturday, sunday
+                let monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
+                        console.log('try11', Userinfo[i].private_appointments[j].custom_text)
+                        if(Userinfo[i].private_appointments[j].custom_text)
+                        {  
+                            custom_text = Userinfo[i].private_appointments[j].custom_text;
+                        }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
@@ -1991,7 +2006,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })
                     }
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
                         if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {

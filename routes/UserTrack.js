@@ -12,7 +12,7 @@ const moment = require('moment');
 const {promisify} = require('util');
 const read = promisify(require('fs').readFile);
 const handlebars = require('handlebars');
-var nodemailer          = require('nodemailer');
+var nodemailer = require('nodemailer');
 
 
 // var transporter = nodemailer.createTransport({
@@ -432,6 +432,54 @@ router.post('/AddTrack/TrackUploadImageMulti', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+
+router.get('/AppointOfDate/:date', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        console.log('Params', req.params.date )
+        Appointment.find({ doctor_id: legit.id, date: req.params.date }, function (err, Userinfo) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: Userinfo });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+router.get('/AppointmentByDate', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Appointment.aggregate(
+            [
+                { 
+                    $match: {
+                        doctor_id : legit.id,
+                        status: 'accept'
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$date",
+                        count: { $sum: 1 }
+                    }
+                }
+            ],
+            function(err,results) {
+                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
+                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            }
+        )
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 router.post('/appointment', function (req, res) {
     var Appointments = new Appointment(req.body);
     Appointments.save(function (err, user_data) {
@@ -638,10 +686,10 @@ function getAlltrack(data) {
             .then(function(doc3){
                 var new_data = data;
                 if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name;
+                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 }
                 else {
-                    var created_by = doc3.first_name;
+                    var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 }
                 new_data.created_by_temp = created_by;
                 return new_data;
@@ -698,10 +746,10 @@ function getAlltrack1(data) {
             .then(function(doc3){
                 var new_data = data;
                 if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name;
+                    var created_by = doc3.first_name + ' ' + doc3.last_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 }
                 else {
-                    var created_by = doc3.first_name;
+                    var created_by = doc3.first_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 }
                 new_data.created_by_temp = created_by;
                 return new_data;

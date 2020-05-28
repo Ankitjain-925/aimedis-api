@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var appointmentsSchema = new Schema({
-    patient_id:{
+    patient:{
         type:String,
         required:false,
         unique:false
@@ -12,17 +12,7 @@ var appointmentsSchema = new Schema({
         required:false,
         unique:false
     },
-    name:{
-        type:String,
-        required:false,
-        unique:false
-    },
-    first_name:{
-        type:String,
-        required:false,
-        unique:false
-    },
-    last_name:{
+    appointment_type : {
         type:String,
         required:false,
         unique:false
@@ -32,17 +22,12 @@ var appointmentsSchema = new Schema({
         required:false,
         unique:false
     },
-    time:{
+    start_time:{
         type:String,
         required:false,
         unique:false
     },
-    email:{
-        type:String,
-        required:false,
-        unique:false
-    },
-    birthday:{
+    end_time:{
         type:String,
         required:false,
         unique:false
@@ -57,11 +42,6 @@ var appointmentsSchema = new Schema({
         required:false,
         unique:false
     },
-    pin:{
-        type:String,
-        required:false,
-        unique:false
-    },
     status:{
         type:String,
         required:false,
@@ -72,11 +52,7 @@ var appointmentsSchema = new Schema({
         required:false,
         unique:false
     },
-    image:{
-        type:String,
-        required:false,
-        unique:false
-    }
+    patient_info :{}
 });
 
 var Appointments = mongoose.model('Appointments', appointmentsSchema);
