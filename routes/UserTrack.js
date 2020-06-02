@@ -126,7 +126,8 @@ var transporter = nodemailer.createTransport({
 
 
 var trackrecord1 = [];
-var pankaj = [];
+var track2 = [];
+
 //var paths= "http:/localhost:5000/uploads/Trackrecord"
  var paths= "https://aimedis1.com/public/uploads/Trackrecord"
 var storage = multer.diskStorage(
@@ -235,7 +236,7 @@ router.post('/Uploadkyc', function (req, res, next) {
     if (legit) {
         upload2(req, res, function (err) {
             if (err instanceof multer.MulterError) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
+                res.json({ status: 200, hassuccessed: false, msg: 'Please upload images less than 6', error: err })
             } else if (err) {
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
             }
@@ -590,7 +591,6 @@ router.get('/getUser/:UserId', function (req, res, next) {
 });
 //Get the track record
 router.get('/AddTrack/:UserId', function (req, res, next) {
-    pankaj = [];
     trackrecord1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -670,6 +670,44 @@ router.get('/AddTrack/:UserId', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+router.get('/ArchivedTrack/:UserId', function (req, res, next) {
+    track2 = [];
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+    user.find({ _id: req.params.UserId },
+        function (err, doc) {
+            if (err && !doc) {
+                res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+            } else {
+                if(doc && doc.length>0)
+                {
+                    doc[0].track_record.sort(mySorter);
+                    if (doc[0].track_record.length > 0) {
+
+                        forEachPromise(doc[0].track_record, getAlltrack2)
+                            .then((result) => {
+                                res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: track2 })
+                            })
+
+                    }
+                    else {
+                        res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                    }  
+                }
+                else {
+                    res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                }  
+            
+            }
+        })
+        
+        
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
 
 function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
@@ -738,6 +776,67 @@ function getAlltrack(data) {
         });
     });
 }
+
+function getAlltrack2(data) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+            user.findOne({_id: data.created_by}).exec()
+            .then(function(doc3){
+                var new_data = data;
+                if (doc3.last_name) {
+                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                }
+                else {
+                    var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                }
+                new_data.created_by_temp = created_by;
+                return new_data;
+             
+            }).then(function(new_data){
+                if(data.review_by)
+                {
+                     user.findOne({_id: data.review_by}).exec()
+                    .then(function(doc5){
+                        var new_data = data;
+                        if (doc5.last_name) {
+                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                        }
+                        else {
+                            var reviewed_by = doc5.first_name;
+                        }
+                        new_data.review_by_temp = reviewed_by;
+                        return new_data;
+                    
+                    })
+                }
+                if(data.emergency_by)
+                {
+                    user.findOne({_id: data.emergency_by}).exec()
+                    .then(function(doc5){
+                        console.log('ttttt112',doc5);
+                        var new_data = data;
+                        if (doc5.last_name) {
+                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                        }
+                        else {
+                            var emergency1_by = doc5.first_name;
+                        }
+                        new_data.emergency_by_temp = emergency1_by;
+                        return new_data;
+                    })
+                    
+                } 
+                if(data.archive)
+                {
+                    track2.push(new_data);
+                }
+                
+                resolve(track2);
+            })
+        });
+    });
+}
+
 function getAlltrack1(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
@@ -788,13 +887,37 @@ function getAlltrack1(data) {
                     
                 } 
                 if (!new_data.public || new_data.public == '') {
-                    if(data.archive)
-                    {}
-                    else
-                    {
-                        trackrecord1.push(new_data);
+                    if(!data.archive)
+                    { 
+                        if(data.opt && data.opt==='in')
+                        {
+                            if(data.opt_set && data.opt_set==='until')
+                            {
+                                var d1 = new Date();
+                                var d2 = new Date(new_data.opt_until);
+                                if (d1.getTime() >= d2.getTime()) {
+                                    trackrecord1.push(new_data);    
+                                }
+                            } 
+                        }
+                        else if(data.opt && data.opt==='out')
+                        {
+                            if(data.opt_set && data.opt_set==='until')
+                            {
+                                var d1 = new Date();
+                                var d2 = new Date(new_data.opt_until);
+                                if (d1.getTime() <= d2.getTime()) {
+                                    trackrecord1.push(new_data);    
+                                }
+                            } 
+                            else
+                            {
+                                trackrecord1.push(new_data); 
+                            }
+                        }
+                        else
+                        {}
                     }
-                   
                  }
                 else if (new_data.public == 'always') {
                     // trackrecord1.push(new_data);
@@ -807,9 +930,7 @@ function getAlltrack1(data) {
                     //     trackrecord1.push(new_data);
                     // }
                     if (d1.getTime() >= d2.getTime()) {
-                        if(data.archive)
-                        {}
-                        else
+                        if(!data.archive)
                         {
                             trackrecord1.push(new_data);
                         }
