@@ -45,6 +45,16 @@ var lms = require('./routes/lms')
 var certificate = require('./routes/certificate')
 var adminse = require('./routes/superadmin')
 
+var UserData2    = require('./routesV2/UserTrack');
+var UserProfile2 = require('./routesV2/userProfile');
+var SaveCSV2    = require('./routesV2/saveCsv');
+var emergency_record2 = require('./routesV2/emergencyrecord');
+var rightinfo2   = require('./routesV2/rightsideinfo');
+var stripeCheckout2 = require('./routesV2/stripeCheckout')
+var lms_stripeCheckout2 = require('./routesV2/lms_stripeCheckout')
+var lms2 = require('./routesV2/lms')
+var certificate2 = require('./routesV2/certificate')
+var adminse2 = require('./routesV2/superadmin')
 
 app.use('/api/v1/User', UserData);
 app.use('/api/v1/UserProfile', UserProfile);
@@ -54,9 +64,20 @@ app.use('/api/v1/lms_stripeCheckout', lms_stripeCheckout);
 app.use('/api/v1/emergency_record', emergency_record);
 app.use('/api/v1/rightinfo', rightinfo);
 app.use('/api/v1/lms', lms);
-
 app.use('/api/v1/certificate', certificate);
 app.use('/api/v1/admin', adminse);
+
+app.use('/api/v2/User', UserData2);
+app.use('/api/v2/UserProfile', UserProfile2);
+app.use('/api/v2/SaveCSV', SaveCSV2);
+app.use('/api/v2/stripeCheckout', stripeCheckout2);
+app.use('/api/v2/lms_stripeCheckout', lms_stripeCheckout2);
+app.use('/api/v2/emergency_record', emergency_record2);
+app.use('/api/v2/rightinfo', rightinfo2);
+app.use('/api/v2/lms', lms2);
+app.use('/api/v2/certificate', certificate2);
+app.use('/api/v2/admin', adminse2);
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////

@@ -29,7 +29,7 @@ var phoneReg = require('../lib/phone_verification')(API_KEY);
 const Client = require('authy-client').Client;
 const authy = new Client({ key: API_KEY });
 
-
+var Mypat = [];
 // var transporter = nodemailer.createTransport({
 //     service: 'gmail',
 //     auth: {
@@ -1160,22 +1160,83 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
 })
 
 /*----------M-Y---P-A-T-I-E-N-T-S----------*/
-router.get('/Mypatients', function (req, res, next) {
+
+router.post('/AddtoPatientList/:id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.find({ parent_id: legit.id, type: 'patient' }, function (err, Userinfo) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+        console.log('myPaitent', req.body)
+        User.findOneAndUpdate({ profile_id: req.params.id },{ $push: { myPatient: req.body} }, function (err2, updatedata) {
+            if (err2 && !updatedata) {
+                res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
             } else {
-                res.json({ status: 200, hassuccessed: true, data: Userinfo });
+                res.json({ status: 200, hassuccessed: true, message: "Add to Patient list", data: updatedata })
             }
-        });
+        })
     }
     else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
+
+router.get('/Mypatients', function (req, res, next) {
+    Mypat = [];
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.find({ _id: legit.id },
+            function (err, doc) {
+                if (err && !doc) {
+                    res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+                } else {
+                    if(doc && doc.length>0)
+                    {
+                        if (doc[0].myPatient.length > 0) {
+                            forEachPromise(doc[0].myPatient, getMyPat)
+                                .then((result) => {
+                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: Mypat })
+                                })
+                        }
+                        else {
+                            res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                        }  
+                    }
+                    else {
+                        res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                    }  
+               
+                }
+            })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+function forEachPromise(items, fn) {
+    return items.reduce(function (promise, item) {
+        return promise.then(function () {
+            return fn(item);
+        });
+    }, Promise.resolve());
+}
+function getMyPat(data) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+            User.findOne({profile_id: data.profile_id}).exec()
+            .then(function(doc3){
+                if(doc3)
+                {
+                    Mypat.push(doc3)
+                    resolve(Mypat);
+                }
+                else{
+                    resolve(Mypat);
+                }  
+            })    
+        });
+    });
+}
 
 router.delete('/Mypatients/:patient_id', function (req, res, next) {
     const token = (req.headers.token)
@@ -1668,13 +1729,13 @@ router.put('/AddFavTDoc/:id', function (req, res, next) {
         })
     }
     else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+        res.json({ status: 200, hassuccessed: false, message: 'A uthentication required.' })
     } 
 })
 
 /*-----------------------D-E-L-E-T-E---F-A-V-O-U-R-I-T-E---D-O-C-T-O-R-------------------------*/
 
-router.delete('/favDocs/:User_id', function (req, res, next) {
+router.delete('/favDocs/:User_id/:patient_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -1684,7 +1745,17 @@ router.delete('/favDocs/:User_id', function (req, res, next) {
                 if (err) {
                     res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
                 } else {
-                    res.json({ status: 200, hassuccessed: true, message: 'Deleted Successfully' });
+                    console.log('user_data',userdata)
+                    User.update({ profile_id: req.params.User_id }, { $pull: { myPatient: { profile_id: req.params.patient_id} } },
+                    { multi: true },
+                    function (err, userdata2) {
+                        if (err) {
+                            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                        } else {
+                            res.json({ status: 200, hassuccessed: true, message: 'Deleted Successfully' });
+                        }
+                    })
+                  
                 }
             })
     } else {

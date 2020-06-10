@@ -7,6 +7,11 @@ var sickCertificateSchema = new Schema({
         required:false,
         unique:false
     },
+    patient_email : {
+        type:String,
+        required:false,
+        unique:false
+    },
     doctor_id : {
         type:String,
         required:false,

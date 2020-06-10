@@ -228,13 +228,20 @@ var UserSchema = new Schema({
       required: false,
       unique: false  
   },
-    is2fa: {
-      type: Boolean,
-      required: false,
-      unique: false
-    }
+   is2fa: {
+   type: Boolean,
+   required: false,
+   unique: false
+   },
+   myPatient: {
+   type: Array,
+   required: false,
+   unique: false
+   }
 },
-{ timestamps : true });
+{ strict: false },
+{ timestamps : true }
+);
 
 UserSchema.index({ area : '2dsphere' });
 var User = mongoose.model('User', UserSchema);
