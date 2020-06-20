@@ -527,38 +527,22 @@ router.post('/Messages', function (req, res, next) {
 
 //add document
 router.post('/Document', function (req, res, next) {
-    console.log('dddddd', req.file);
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        upload(req, res, function (err) {
-            if (err instanceof multer.MulterError) {
-                console.log('dddddd');
-                res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
-            } else if (err) {
-                console.log('eeeeeee');
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-            }
-            else {
-                var data = { DocumentId: uuidv1(), version: 1, status: true };
-                var file_entry = { filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }
-                full_entry = { ...data, ...file_entry }
-                User.findByIdAndUpdate(legit.id,
-                    { $push: { documents: full_entry } },
-                    { safe: true, upsert: true },
-                    function (err, doc) {
-                        if (err && !doc) {
-                            console.log('ffffffff');
-                            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
-                        } else {
-                            console.log('mmmmmm', req.file);
-                            res.json({ status: 200, hassuccessed: true, msg: 'Document is added Successfully' });
-                        }
-                    });
-            }
+      console.log('req.query', req.query)
+      var data = { DocumentId: uuidv1(), version: 1, status: true, filename : req.query.filename, url : req.query.url };
 
-        })
-
+    User.findByIdAndUpdate(legit.id,
+    { $push: { documents: data } },
+    { safe: true, upsert: true },
+    function (err, doc) {
+        if (err && !doc) {
+            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
+        } else {
+            res.json({ status: 200, hassuccessed: true, msg: 'Document is added Successfully' });
+        }
+    })
     }
     else {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })

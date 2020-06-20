@@ -55,6 +55,7 @@ var lms_stripeCheckout2 = require('./routesV2/lms_stripeCheckout')
 var lms2 = require('./routesV2/lms')
 var certificate2 = require('./routesV2/certificate')
 var adminse2 = require('./routesV2/superadmin')
+var Uploadcerts = require('./routesV2/uploadcerts')
 
 app.use('/api/v1/User', UserData);
 app.use('/api/v1/UserProfile', UserProfile);
@@ -77,6 +78,8 @@ app.use('/api/v2/rightinfo', rightinfo2);
 app.use('/api/v2/lms', lms2);
 app.use('/api/v2/certificate', certificate2);
 app.use('/api/v2/admin', adminse2);
+app.use('/api/v2/aws', Uploadcerts);
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

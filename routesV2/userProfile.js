@@ -196,9 +196,7 @@ router.post('/UserLogin', function (req, res, next) {
     if (req.body.email == '' || req.body.password == '') {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
     } else {
-        User.findOne({
-            email: req.body.email,
-        }).exec()
+        User.findOne({email:  {$regex: req.body.email, $options: "i"}}).exec()
             .then((user_data) => {
                 if (user_data) {
                     if (user_data.isblock === true) {
@@ -421,7 +419,7 @@ router.post('/AddUser', function (req, res, next) {
                                             from: "contact@aimedis.com",
                                             to: req.body.email,
                                             //to      :  'navdeep.webnexus@gmail.com',
-                                            subject: 'Aimedis Registrastion',
+                                            subject: 'Aimedis Registration',
                                             html: dhtml
                                         };
                                         let sendmail = transporter.sendMail(mailOptions)

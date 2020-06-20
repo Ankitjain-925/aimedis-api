@@ -10,7 +10,7 @@ var KYCschema = new Schema({
     country:{
       type: String,
       required: false,
-      unique: true
+      unique: false
     },
     number: {
        type: String,

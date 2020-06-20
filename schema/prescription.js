@@ -17,7 +17,11 @@ var PrescriptionSchema = new Schema({
         required:false,
         unique:false
     },
-
+    patient_profile_id: {
+        type:String,
+        required:false,
+        unique:false
+    },
     first_name : {
         type:String,
         required:false,
@@ -200,7 +204,7 @@ var PrescriptionSchema = new Schema({
         required:false,
         unique:false
     }
-})
+}, { strict: false })
 
 var Prescription = mongoose.model('prescription',PrescriptionSchema);
 

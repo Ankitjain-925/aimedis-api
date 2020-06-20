@@ -640,7 +640,7 @@ router.get('/AddTrack/:UserId', function (req, res, next) {
                                     doc[0].track_record.sort(mySorter);
                                     if (doc[0].track_record.length > 0) {
                                         if (doc[0].track_record.length > 0) {
-                                            forEachPromise(doc[0].track_record, getAlltrack1)
+                                            forEachPromises(doc[0].track_record, doc[0].Rigt_management[0], getAlltrack1)
                                                 .then((result) => {
                                                     res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord1 })
                                                 })
@@ -714,6 +714,14 @@ function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
         return promise.then(function () {
             return fn(item);
+        });
+    }, Promise.resolve());
+}
+
+function forEachPromises(items, right_management,fn) {
+    return items.reduce(function (promise, item) {
+        return promise.then(function () {
+            return fn(item, right_management);
         });
     }, Promise.resolve());
 }
@@ -838,10 +846,10 @@ function getAlltrack2(data) {
     });
 }
 
-function getAlltrack1(data) {
+function getAlltrack1(data, right_management) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            console.log('data.created_by', data.created_by)
+            console.log('right_management', right_management)
             user.findOne({_id: data.created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
@@ -890,23 +898,23 @@ function getAlltrack1(data) {
                 if (!new_data.public || new_data.public == '') {
                     if(!data.archive)
                     { 
-                        if(data.opt && data.opt==='in')
+                        if(right_management && right_management.opt && right_management.opt==='in')
                         {
-                            if(data.opt_set && data.opt_set==='until')
+                            if(right_management.opt_set && right_management.opt_set==='until')
                             {
                                 var d1 = new Date();
-                                var d2 = new Date(new_data.opt_until);
+                                var d2 = new Date(right_management.opt_until);
                                 if (d1.getTime() >= d2.getTime()) {
                                     trackrecord1.push(new_data);    
                                 }
                             } 
                         }
-                        else if(data.opt && data.opt==='out')
+                        else if(right_management && right_management.opt && right_management.opt==='out')
                         {
-                            if(data.opt_set && data.opt_set==='until')
+                            if(right_management.opt_set && right_management.opt_set==='until')
                             {
                                 var d1 = new Date();
-                                var d2 = new Date(new_data.opt_until);
+                                var d2 = new Date(right_management.opt_until);
                                 if (d1.getTime() <= d2.getTime()) {
                                     trackrecord1.push(new_data);    
                                 }
@@ -920,8 +928,8 @@ function getAlltrack1(data) {
                         {}
                     }
                  }
-                else if (new_data.public == 'always') {
-                    // trackrecord1.push(new_data);
+                else if (new_data.visible== 'show' && new_data.public == 'always') {
+                     trackrecord1.push(new_data);
                 }
                 else {
                     var d1 = new Date();
@@ -930,10 +938,22 @@ function getAlltrack1(data) {
                     // if (d1.getTime() <= d2.getTime()) {
                     //     trackrecord1.push(new_data);
                     // }
-                    if (d1.getTime() >= d2.getTime()) {
-                        if(!data.archive)
-                        {
-                            trackrecord1.push(new_data);
+                    if(new_data.visible == 'show')
+                    {
+                        if (d1.getTime() <= d2.getTime()) {
+                            if(!data.archive)
+                            {
+                                trackrecord1.push(new_data);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (d1.getTime() >= d2.getTime()) {
+                            if(!data.archive)
+                            {
+                                trackrecord1.push(new_data);
+                            }
                         }
                     }
                 }

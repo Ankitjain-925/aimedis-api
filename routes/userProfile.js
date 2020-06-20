@@ -197,8 +197,7 @@ router.post('/UserLogin', function (req, res, next) {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
     } else {
         User.findOne({
-            email: req.body.email,
-        }).exec()
+            email:  {$regex: req.body.email, $options: "i"}}).exec()
             .then((user_data) => {
                 if (user_data) {
                     if (user_data.isblock === true) {
@@ -404,7 +403,6 @@ router.post('/AddUser', function (req, res, next) {
                     .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
                     .then(regRes=>{
                             if (regRes && regRes.success) {
-                                console.log('I am here', regRes)
                                 var authyId = { authyId: regRes.user.id };
                                 datas = { ...authyId, ...profile_id, ...req.body, ...isblock, ...createdate, ...createdby, ...usertoken, ...verified }
                                 var users = new User(datas);
@@ -412,7 +410,6 @@ router.post('/AddUser', function (req, res, next) {
                                     if (err && !user_data) {
                                         res.json({ status: 200, message: 'Something went wrong.', error: err, hassuccessed: false });
                                     } else {
-                                        console.log(user_data, 'kkkkk')
                                         user_id = user_data._id;
                                         let token = user_data.usertoken;
                                         //let link = 'http://localhost:3000/';
@@ -421,7 +418,7 @@ router.post('/AddUser', function (req, res, next) {
                                             from: "contact@aimedis.com",
                                             to: req.body.email,
                                             //to      :  'navdeep.webnexus@gmail.com',
-                                            subject: 'Aimedis Registrastion',
+                                            subject: 'Aimedis Registration',
                                             html: dhtml
                                         };
                                         let sendmail = transporter.sendMail(mailOptions)

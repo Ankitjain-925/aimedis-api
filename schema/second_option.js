@@ -57,7 +57,7 @@ var second_optionschema = new Schema({
         required:false,
         unique:false
     }
-});
+}, { strict: false });
 
 var Second_option = mongoose.model('Second_option', second_optionschema);
 

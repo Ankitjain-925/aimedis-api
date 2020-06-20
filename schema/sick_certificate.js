@@ -92,6 +92,11 @@ var sickCertificateSchema = new Schema({
         required:false,
         unique:false
     },
+    patient_profile_id: {
+        type:String,
+        required:false,
+        unique:false
+    },
     first_name : {
         type:String,
         required:false,
@@ -129,7 +134,7 @@ var sickCertificateSchema = new Schema({
         required:false,
         unique:false
     }
-});
+}, { strict: false });
 
 var Sick_certificate = mongoose.model('Sick_certificate', sickCertificateSchema);
 
