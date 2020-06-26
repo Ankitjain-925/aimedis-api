@@ -18,6 +18,7 @@ var moment = require('moment');
 var message = require('../schema/message');
 const {join} = require('path');
 var shortid = require('shortid');
+var aws = require('aws-sdk');
 var fs= require("fs")
 var pdf = require('dynamic-html-pdf');
 var html = fs.readFileSync(join(`${__dirname}/Userdata.html`), 'utf8');
@@ -237,7 +238,6 @@ router.post('/UserLogin', function (req, res, next) {
                                         res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                     }
                                     else {
-                                        console.log('come here one')
                                         if (user_data.authyId) {
                                             authy.requestSms({ authyId: user_data.authyId }, { force: true }, function (err, smsRes) {
                                                 if (err) {
@@ -404,6 +404,7 @@ router.post('/AddUser', function (req, res, next) {
                             if (regRes && regRes.success) {
                                 console.log('I am here', regRes)
                                 var authyId = { authyId: regRes.user.id };
+                                req.body.mobile = req.body.country_code.toUpperCase()+'-'+req.body.mobile;
                                 datas = { ...authyId, ...profile_id, ...req.body, ...isblock, ...createdate, ...createdby, ...usertoken, ...verified }
                                 var users = new User(datas);
                                 users.save(function (err, user_data) {
@@ -459,7 +460,47 @@ router.put('/Bookservice', (req, res) => {
   });
 
 /*-----------------------D-E-L-E-T-E---P-A-R-T-I-C-U-L-A-R---U-S-E-R-------------------------*/
+function emptyBucket(bucketName, foldername){
+    aws.config.update({
+        region: 'ap-south-1', // Put your aws region here
+        accessKeyId: 'AKIASQXDNWERH3C6MMP5',
+        secretAccessKey: 'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC'
+      })
 
+      var s3 = new aws.S3({apiVersion: '2006-03-01'});
+    var params = {
+      Bucket: bucketName,
+      Prefix: foldername
+    };
+
+    s3.listObjects(params, function(err, data) {
+      if (err) return err;
+
+
+      console.log("RESPONSE FROM S3" , data)
+
+      if (data.Contents.length == 0) {
+        console.log("Bucket is empty!");
+      }
+
+      else{
+        params = {Bucket: bucketName};
+      params.Delete = {Objects:[]};
+
+      data.Contents.forEach(function(content) {
+        params.Delete.Objects.push({Key: content.Key});
+      });
+
+      s3.deleteObjects(params, function(err, data) {
+        if (err) return err;
+        if(data && data.Contents && data.Contents.length != 0 )emptyBucket(bucketName, foldername);
+
+      });
+      }
+
+
+    });
+  }
 router.delete('/Users/:User_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -468,6 +509,7 @@ router.delete('/Users/:User_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
+                emptyBucket('aimedisfirstbucket', data.profile_id)
                 res.json({ status: 200, hassuccessed: true, message: 'User is Deleted Successfully' });
             }
         });
@@ -512,7 +554,6 @@ router.get('/Users/getDoc', function (req, res, next) {
 })
 
 /*------U-P-D-A-T-E---U-S-E-R------*/
-
 router.put('/Users/update', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -524,7 +565,49 @@ router.put('/Users/update', function (req, res, next) {
             if (changeStatus) {
                 var enpassword = base64.encode(req.body.password);
                 req.body.password = enpassword;
-                User.findByIdAndUpdate({ _id: changeStatus._id },
+                if(req.body.mobile)
+                {
+                    var country_code = '';
+                    var mob =  req.body.mobile && req.body.mobile.split("-")
+                    var mob1 = mob.pop()
+                    if(mob && mob.length>0 && mob[0] && mob[0].length==2)
+                    {
+                        country_code =   mob[0]
+                       if(country_code && country_code === '')
+                       {
+                           let tt = changeStatus.mobile.split("-")
+                           if(tt && tt.length>0 && tt[0] && tt[0].length==2)
+                           {
+                              country_code === tt[0]
+                           }
+                       }
+                    } 
+                    console.log('my tern ', country_code, mob1 )
+                     authy.registerUser({
+                        countryCode: country_code,
+                        email: changeStatus.email,
+                        phone: mob1
+                    })
+                    .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
+                    .then(regRes=>{
+                        if (regRes && regRes.success) {
+                            var authyId = { authyId: regRes.user.id };
+                                datas = { ...authyId, ...req.body }
+                                User.findByIdAndUpdate({ _id: changeStatus._id },
+                                datas,
+                                function (err, doc) {
+                                    if (err && !doc) {
+                                        res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
+                                    } else {
+                                        res.json({ status: 200, hassuccessed: true, message: 'Updated' })
+                                    }
+                                });
+                        }
+                    })
+                }
+                else 
+                {   
+                    User.findByIdAndUpdate({ _id: changeStatus._id },
                     req.body,
                     function (err, doc) {
                         if (err && !doc) {
@@ -532,7 +615,10 @@ router.put('/Users/update', function (req, res, next) {
                         } else {
                             res.json({ status: 200, hassuccessed: true, message: 'Updated' })
                         }
-                    });
+                                
+                    })
+                }
+                
             }
         })
     }
@@ -540,6 +626,34 @@ router.put('/Users/update', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
+
+// router.put('/Users/update', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         User.findOne({ _id: legit.id }, function (err, changeStatus) {
+//             if (err) {
+//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err })
+//             }
+//             if (changeStatus) {
+//                 var enpassword = base64.encode(req.body.password);
+//                 req.body.password = enpassword;
+//                 User.findByIdAndUpdate({ _id: changeStatus._id },
+//                     req.body,
+//                     function (err, doc) {
+//                         if (err && !doc) {
+//                             res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
+//                         } else {
+//                             res.json({ status: 200, hassuccessed: true, message: 'Updated' })
+//                         }
+//                     });
+//             }
+//         })
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+//     }
+// })
 
 router.put('/Users/updateImage', function (req, res, next) {
     const token = (req.headers.token)

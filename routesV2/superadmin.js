@@ -16,6 +16,8 @@ var nodemailer = require('nodemailer');
 const read = promisify(require('fs').readFile);
 const handlebars = require('handlebars');
 var dateTime = require('node-datetime');
+var aws = require('aws-sdk');
+var fs = require('fs');
 var base64 = require('base-64');
 var shortid = require('shortid');
 var API_KEY = 'rZ1SMhOZguUluAw1c1iFrMSdVNgxoFYK'
@@ -174,6 +176,7 @@ router.post('/Addadminuser', function (req, res, next) {
             .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
             .then(regRes=>{
                 var authyId = {authyId: regRes.user.id};
+                req.body.mobile = req.body.country_code.toUpperCase()+'-'+req.body.mobile;
             datas = { ...authyId, ...profile_id, ...req.body, ...institute_id, ...isblock, ...createdate, ...usertoken, ...verified }
             var users = new User(datas);
             users.save((err, user_data) => {
@@ -322,12 +325,53 @@ router.get('/messageUsers', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+function emptyBucket(bucketName, foldername){
+    aws.config.update({
+        region: 'ap-south-1', // Put your aws region here
+        accessKeyId: 'AKIASQXDNWERH3C6MMP5',
+        secretAccessKey: 'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC'
+      })
 
+      var s3 = new aws.S3({apiVersion: '2006-03-01'});
+    var params = {
+      Bucket: bucketName,
+      Prefix: foldername
+    };
+
+    s3.listObjects(params, function(err, data) {
+      if (err) return err;
+
+
+      console.log("RESPONSE FROM S3" , data)
+
+      if (data.Contents.length == 0) {
+        console.log("Bucket is empty!");
+      }
+
+      else{
+        params = {Bucket: bucketName};
+      params.Delete = {Objects:[]};
+
+      data.Contents.forEach(function(content) {
+        params.Delete.Objects.push({Key: content.Key});
+      });
+
+      s3.deleteObjects(params, function(err, data) {
+        if (err) return err;
+        if(data && data.Contents && data.Contents.length != 0 )emptyBucket(bucketName, foldername);
+
+      });
+      }
+
+
+    });
+  }
 router.delete('/deleteUser/:UserId', function (req, res, next) {
     User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
         if (err) {
             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
         } else {
+            emptyBucket('aimedisfirstbucket', data12.profile_id)
             res.json({ status: 200, hassuccessed: true, msg: 'User is Deleted' });
         }
     })

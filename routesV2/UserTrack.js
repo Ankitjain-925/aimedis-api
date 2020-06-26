@@ -733,12 +733,13 @@ function getAlltrack(data) {
             .then(function(doc3){
                 var new_data = data;
                 if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'; 
                 }
                 else {
                     var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 }
                 new_data.created_by_temp = created_by;
+                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
                 return new_data;
              
             }).then(function(new_data){
@@ -799,6 +800,7 @@ function getAlltrack2(data) {
                     var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 }
                 new_data.created_by_temp = created_by;
+                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
                 return new_data;
              
             }).then(function(new_data){
@@ -860,6 +862,7 @@ function getAlltrack1(data, right_management) {
                     var created_by = doc3.first_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 }
                 new_data.created_by_temp = created_by;
+                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
                 return new_data;
              
             }).then(function(new_data){
