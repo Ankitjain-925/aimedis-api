@@ -293,7 +293,7 @@ router.get('/Get_patient_gender/:UserId', function (req, res, next) {
     }
 });
 
-//Edit track record
+//Edit track records
 router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)

@@ -62,6 +62,6 @@ var lmsSchema= new Schema({
         required: false,
         unique: false
     }
-}) 
+},{ strict: false }) 
 
 module.exports = mongoose.model('Lms', lmsSchema); 

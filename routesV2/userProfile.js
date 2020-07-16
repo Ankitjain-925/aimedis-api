@@ -9,6 +9,7 @@ var DoctrorAppointment = require('../schema/doctor_appointment')
 var Prescription = require('../schema/prescription')
 var Second_opinion = require('../schema/second_option')
 var Sick_certificate = require('../schema/sick_certificate')
+const sendSms =require("./sendSms")
 var jwtconfig = require('../jwttoken');
 var base64 = require('base-64');
 var dateTime = require('node-datetime');
@@ -19,7 +20,9 @@ var message = require('../schema/message');
 const {join} = require('path');
 var shortid = require('shortid');
 var aws = require('aws-sdk');
+const axios = require("axios");
 var fs= require("fs")
+var converter = require('json-2-csv');
 var pdf = require('dynamic-html-pdf');
 var html = fs.readFileSync(join(`${__dirname}/Userdata.html`), 'utf8');
 //for authy
@@ -31,6 +34,7 @@ const Client = require('authy-client').Client;
 const authy = new Client({ key: API_KEY });
 
 var Mypat = [];
+var GetResult1 = [],GetResult2 = [], GetResult3 = [];;
 // var transporter = nodemailer.createTransport({
 //     service: 'gmail',
 //     auth: {
@@ -115,6 +119,26 @@ router.post('/uploadCertificate', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+
+// For landing pages
+router.post('/SupportMail', function (req, res) {
+    let mailOptions = {
+        from: req.body.email,
+        to: "contact@aimedis.com",
+        subject: 'Contact and Support Message',
+        html: '<div>This is -</b> '+req.body.name +' </b></div><div>'+req.body.msg+'</div>'
+    };
+    let sendmail = transporter.sendMail(mailOptions)
+    if(sendmail)
+    {
+        res.json({ status: 200, message: 'Mail sent Successfully', hassuccessed: true});
+    }
+    else
+    {
+        res.json({ status: 200, msg: 'Mail is not sent',  hassuccessed: false })
+    } 
+})
+
 
 router.post('/sendRegisterationMail', function (req, res, next) {
     const token = (req.headers.token)
@@ -1056,7 +1080,7 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                                         }
                                         else {
                                             var dhtml = 'Your Prescription Request Accepted.<br/>'+ 
-                                                'And sick certifiace added in to your timeline.<br/>'+ 
+                                                'And prescription added in to your timeline.<br/>'+ 
                                                 '<b>Your Aimedis team </b>'
                                                 var mailOptions = {
                                                 from: "contact@aimedis.com",
@@ -1142,6 +1166,71 @@ router.get('/SickCertificate/:sick_certificate_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
+                res.json({ status: 200, hassuccessed: true, data: data });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.get('/RequestedSickCertificate', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    getResult1 = [];
+    if (legit) {
+        Sick_certificate.find({patient_id : legit.id, $or: [{status:'accept'}, {status: 'decline'}] }, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                // console.log('data21', data)
+                // forEachPromise(data, getMyResult1)
+                // .then((result) => {
+                //     res.json({ status: 200, hassuccessed: true, msg: 'Appointments are found', data: getResult1 })
+                // })
+                res.json({ status: 200, hassuccessed: true, data: data });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.get('/RequestedAppointment', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    getResult3 = [];
+    if (legit) {
+        Appointment.find({patient : legit.id,  $or: [{status:'accept'}, {status: 'decline'}]}, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                // console.log('data22', data)
+                // forEachPromise(data, getMyResult3)
+                // .then((result) => {
+                //     res.json({ status: 200, hassuccessed: true, msg: 'Appointments are found', data: getResult3 })
+                // })
+                res.json({ status: 200, hassuccessed: true, data: data });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.get('/RequestedPrescription', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    getResult2 = [];
+    if (legit) {
+        Prescription.find({patient_id : legit.id, $or: [{status:'accept'}, {status: 'decline'}] }, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+               
                 res.json({ status: 200, hassuccessed: true, data: data });
             }
         });
@@ -1244,7 +1333,7 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                                         }
                                         else {
                                             var dhtml = 'Your Sick certificate Request Accepted.<br/>'+ 
-                                            'And sick certifiace added in to your timeline.<br/>'+ 
+                                            'And sick certificate added in to your timeline.<br/>'+ 
                                             '<b>Your Aimedis team </b>'
                                         var mailOptions = {
                                             from: "contact@aimedis.com",
@@ -1349,6 +1438,7 @@ function getMyPat(data) {
         });
     });
 }
+
 
 router.delete('/Mypatients/:patient_id', function (req, res, next) {
     const token = (req.headers.token)
@@ -1631,6 +1721,23 @@ router.get('/PatientUsersChat', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         User.find({ type: 'patient'}, function (err, Userinfo) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: Userinfo });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+router.get('/NursePharmaChat', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.find({$or: [{type: 'nurse'}, 
+        {type: 'pharmacy'}, {type : 'therapist'}]}, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1964,7 +2071,8 @@ router.put('/GetAppointment/:GetAppointment_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
-                Appointment.findOneAndUpdate({ _id: userdata._id }, { $set: { status: req.body.status } }, { new: true }, function (err, updatedata) {
+                var dt = dateTime.create();
+                Appointment.findOneAndUpdate({ _id: userdata._id }, { $set: { status: req.body.status, accept_datetime: dt.format('Y-m-d H:M:S') } }, { new: true }, function (err, updatedata) {
                     if (err && !updatedata) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
@@ -2628,7 +2736,7 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         User.findOne({ profile_id: req.params.UserId })
-        .select('profile_id first_name last_name _id email pin emergency_email')
+        .select('profile_id first_name last_name _id email pin emergency_email mobile')
         .exec(function(err, doc) { 
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
@@ -2683,7 +2791,12 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
                             subject: 'Emergency Access',
                             html: dhtml
                         };
-                       
+                        sendSms(doc.mobile,'There was emergency access to the data in your Aimedis profile ( '+doc.profile_id+' ) by Doctor - '+req.body.current_info.profile_id + ' - '+req.body.current_info.first_name+' '+req.body.current_info.last_name+' on ' + dateString).then(result=>{
+                           console.log('Message is sent')
+                        }).catch(e=>{
+                            console.log('Message is not sent', e)
+                        })
+
                       if(req.body.comefrom === 'pharmacy')
                       {
                         console.log('I here', req.body.pin)
@@ -2757,6 +2870,10 @@ router.post('/forgotPassword', function (req, res, next) {
     promise.then((token) => {
         if (token !== '') {
             var link = 'https://sys.aimedis.io/change-password';
+            if(req.body.passFrom === 'landing')
+            {
+                link = 'https://aimedis.io/phase2/change-password'
+            }
             // var link = 'http://localhost:3000/change-password';
             console.log('sdfsdf', req.body.lan)
             if (req.body.lan === 'de') {
@@ -2841,23 +2958,45 @@ if (legit) {
         res.status(401).json({ status: 401, success: false,  message: 'Authentication required.' })
     }  
 })
+router.get('/AskPatientProfile/:id', function (req, res, next) {
+    const token = (req.headers.token);
+let legit = jwtconfig.verify(token)
+if (legit) {
+        User.findOne({$or: [{ email: req.params.id },{
+            profile_id: req.params.id,}]}).exec()
+            .then((user_data1) => {
+                if (user_data1) {
+                        res.json({ status: 200, hassuccessed: true, msg: 'Data is exist', data : user_data1 })
+                }
+                else { 
+                    res.json({ status: 450,  hassuccessed: false,  msg: 'User does not exist' })
+                }
+            })
+             
+}
+    else {
+        res.status(401).json({ status: 401, success: false,  message: 'Authentication required.' })
+    }  
+})
 
     router.post('/AskPatient/:id', function (req, res, next) {
         const token = (req.headers.token);
     let legit = jwtconfig.verify(token)
     if (legit) {
-            User.findOne({$or: [{ email: req.params.id },{
-                profile_id: req.params.id,}]}).exec()
+            User.findOne({ profile_id: req.params.id}).exec()
                 .then((user_data1) => {
                     if (user_data1) {
+                        var Link1 = 'https://sys.aimedis.io/patient/mydoctors'
                         if (req.body.lan === 'de') {
-                            var dhtml = 'Sie haben eine Anfrage zum Hinzufügen eines Lieblingsarztes vom DOKTOR ('+req.body.first_name + ' ' +req.body.last_name +').<br/><br/><br/>'+
+                            var dhtml = 'Sie haben eine Anfrage zum Hinzufügen eines Lieblingsarztes vom DOKTOR ('+req.body.first_name + ' ' +req.body.last_name +').<br/>'+
+                            'Für <b> Akzeptieren / Löschen </b> gehen Sie zu <a target="_blank" href="'+ Link1 +'">LINK</a>.<br/><br/><br/> ' +
                             '<b>Ihr Aimedis Team</b><br/>' +
                             '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
                             '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
                         }
                         else {
-                            var dhtml = 'You have got a request to add favorite doctor from the DOCTOR ('+req.body.first_name + ' ' +req.body.last_name +') .<br/><br/><br/> ' +
+                            var dhtml = 'You have got a request to add favorite doctor from the DOCTOR ('+req.body.first_name + ' ' +req.body.last_name +').<br/>'+
+                            'For <b>Accept / Delete</b> the request go to the <a target="_blank" href="'+ Link1 +'">LINK</a>.<br/><br/><br/> ' +
                             '<b>Your Aimedis team</b><br/>' +
                             '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
                             '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>'; 
@@ -2911,6 +3050,146 @@ if (legit) {
 
 ///Add by Ankita (17-04-2020)
 
+//Add by Ankita (01-07-2020)
+// For landing pages
+router.post('/requireCSV', function (req, res, next) {
+    const todos = req.body.Content; 
+    // convert JSON array to CSV string
+    var config1 = {
+        method: 'get',
+        url: 'https://aimedis.agilecrm.com/dev/api/contacts/search/email/'+req.body.Content.email,
+        headers: { 
+          'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==', 
+        }
+      };
+      axios(config1)
+      .then(function (response) {
+            if(response.data.id)
+            {
+                res.json({ status: 200, hassuccessed: false, msg: 'User already exist' })  
+            }
+            else
+            {
+                if(req.body.Subject==="Aimedis Staff Recruitment")
+                {
+                    var staff = req.body.Content.staff;
+                    staff.push(req.body.Content.industry)
+                    var data = {tags:staff , type:"PERSON",properties:[{type:"SYSTEM",name:"first_name","value":req.body.Content.first_name},{type:"SYSTEM", name:"last_name",value:req.body.Content.last_name},{type:"SYSTEM",name:"email",subtype:"",value:req.body.Content.email},{type:"SYSTEM",name:"company",value:req.body.Content.company},{name:"phone",value:req.body.Content.phone, subtype:""}]};
+                    var config = {
+                        method: 'post',
+                        url: 'https://aimedis.agilecrm.com/dev/api/contacts',
+                        headers: { 
+                          'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==', 
+                          'Content-Type': 'application/json'
+                        },
+                        data : data
+                      };
+                    axios(config)
+                    .then(function (response) {
+                        converter.json2csv(todos, (err, csv) => {
+                            console.log('cominsid1e')
+                            if (err) {
+                                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.55', error: err });
+                            }
+                            var mailOptions = {
+                                from: "contact@aimedis.com",
+                                to: "contact@aimedis-staff.com",
+                                subject: req.body.Subject,
+                                html: 'Here the Attach file related to the ' + req.body.Subject +' <br/><br/>'+
+                                '<b>Your Aimedis team </b>',
+                                attachments: [{filename: 'Reqested.csv',
+                                content: csv,
+                                contentType: 'text/csv' }]
+                            
+                            };
+                        var sendmail = transporter.sendMail(mailOptions)
+                        res.json({ status: 200, hassuccessed: true, msg: 'Added in to CRM' }) 
+                        }) 
+                    })
+                    .catch(function (error) {
+                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong1' })
+                    });
+                }
+                else
+                { 
+                    var staff = []
+                    staff.push(req.body.Content.qualification)
+                    staff.push(req.body.Content.specilization)
+                    staff.push(req.body.Content.profession)
+                    var data = {tags:staff , type:"PERSON",properties:[{type:"SYSTEM",name:"first_name","value":req.body.Content.first_name},{type:"SYSTEM", name:"last_name",value:req.body.Content.last_name},{type:"SYSTEM",name:"email",subtype:"",value:req.body.Content.email},{name:"phone",value:req.body.Content.phone, subtype:""}]};
+                    console.log('dataa', data)
+                    var config = {
+                        method: 'post',
+                        url: 'https://aimedis.agilecrm.com/dev/api/contacts',
+                        headers: { 
+                          'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==', 
+                          'Content-Type': 'application/json'
+                        },
+                        data : data
+                      };
+                    axios(config)
+                    .then(function (response) {
+                        converter.json2csv(todos, (err, csv) => {
+                            console.log('cominside')
+                            var mailOptions = {
+                                from: "contact@aimedis.com",
+                                to: "contact@aimedis-staff.com",
+                                subject: req.body.Subject,
+                                html: 'Here the Attach file related to the ' + req.body.Subject +' <br/><br/>'+
+                                '<b>Your Aimedis team </b>',
+                                attachments: [{filename: 'Reqested.csv',
+                                content: csv,
+                                contentType: 'text/csv' }]
+                            
+                            };
+                            if (err) {
+                                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.45', error: err });
+                            }
+                        var sendmail = transporter.sendMail(mailOptions)
+                        res.json({ status: 200, hassuccessed: true, msg: 'Added in to CRM' }) 
+                        })
+                    })
+                    .catch(function (error) {
+                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong2', err: error })
+                    }); 
+            }
+        }
+      })
+      .catch(function (error) {
+            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong3' })
+      }); 
+});
+// router.post('/requireCSV', function (req, res, next) {
+//     const todos = req.body.Content; 
+//     // convert JSON array to CSV string
+
+//     converter.json2csv(todos, (err, csv) => {
+//         if (err) {
+//             res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+//         }
+//         var mailOptions = {
+//             from: "contact@aimedis.com",
+//             to: "ankita.webnexus@gmail.com",
+//             subject: req.body.Subject,
+//             html: 'Here the Attach file related to the ' + req.body.Subject +' <br/><br/>'+
+//             '<b>Your Aimedis team </b>',
+//             attachments: [{filename: 'Reqested.csv',
+//             content: csv,
+//             contentType: 'text/csv' }]
+        
+//         };
+        
+//         var sendmail = transporter.sendMail(mailOptions)
+//         if(sendmail)
+//         {
+//             res.json({ status: 200, hassuccessed: true, msg: 'Mail sent successfully' })
+//         }
+//         else
+//         {
+//             res.json({ status: 200, hassuccessed: false, message: 'Something went wrong22.' })
+//         }  
+//     });    
+// });
 
 router.post('/downloadPdf', function (req, res, next) {
     const token = (req.headers.token)

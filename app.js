@@ -56,6 +56,7 @@ var lms2 = require('./routesV2/lms')
 var certificate2 = require('./routesV2/certificate')
 var adminse2 = require('./routesV2/superadmin')
 var Uploadcerts = require('./routesV2/uploadcerts')
+var bloackchain = require("./routesV2/blockchain");
 
 app.use('/api/v1/User', UserData);
 app.use('/api/v1/UserProfile', UserProfile);
@@ -79,6 +80,7 @@ app.use('/api/v2/lms', lms2);
 app.use('/api/v2/certificate', certificate2);
 app.use('/api/v2/admin', adminse2);
 app.use('/api/v2/aws', Uploadcerts);
+app.use("/api/v2/blockchain", bloackchain);
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

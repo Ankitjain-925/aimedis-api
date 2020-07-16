@@ -28,7 +28,7 @@ var MessageSchema = new Schema ({
         unique: false
     },
     attachment: {}
-});
+},{ strict: false });
 
 
 module.exports =  mongoose.model('message',MessageSchema);

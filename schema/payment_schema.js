@@ -29,5 +29,5 @@ var payment = new Schema({
         required: false,
         unique:false
     }
-})
+},{ strict: false })
 module.exports = mongoose.model('payment', payment);

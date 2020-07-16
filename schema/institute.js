@@ -13,7 +13,7 @@ var Institutes = new Schema({
        required: false,
        unique: false
    }
-});
+},{ strict: false });
 
 var Institute = mongoose.model('Institute', Institutes);
 module.exports = Institute;

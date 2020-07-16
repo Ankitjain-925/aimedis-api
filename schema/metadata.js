@@ -27,7 +27,7 @@ var metadataSchema = new Schema({
         required : false,
         unique : false
     }
-});
+},{ strict: false });
 
 var Metadata = mongoose.model('Metadata', metadataSchema);
 // make this available to our users in our Node applications

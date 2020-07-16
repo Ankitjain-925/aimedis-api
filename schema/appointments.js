@@ -52,8 +52,13 @@ var appointmentsSchema = new Schema({
         required:false,
         unique:false
     },
+    accept_datetime: {
+        type: String,
+        required:false,
+        unique:false
+    },
     patient_info :{}
-});
+},{ strict: false });
 
 var Appointments = mongoose.model('Appointments', appointmentsSchema);
 

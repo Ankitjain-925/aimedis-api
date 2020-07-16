@@ -8,6 +8,7 @@ var base64 = require('base-64');
 const uuidv1 = require('uuid/v1');
 var dateTime = require('node-datetime');
 var trackrecord1 = [];
+var trackrecord2 = [];
 //get the emergency record of the patient
 router.get('/:UserId', function (req, res, next) {
     const token = (req.headers.token)
@@ -255,6 +256,44 @@ router.get('/getTrack/:UserId', function (req, res, next) {
     }
 });
 
+router.get('/ArchivegetTrack/:UserId', function (req, res, next) {
+    trackrecord2 = [];
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+            user.find({ _id: req.params.UserId },
+                function (err, doc) {
+                    if (err && !doc) {
+                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+                    } else {
+                        if(doc && doc.length>0)
+                        {
+                            doc[0].track_record.sort(mySorter);
+                            if (doc[0].track_record.length > 0) {
+                                forEachPromise(doc[0].track_record, getArAlltrack)
+                                    .then((result) => {
+                                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord2 })
+                                    })
+    
+                            }
+                            else {
+                                res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                            }  
+                        }
+                        else {
+                            res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                        }  
+                   
+                    }
+                })
+        
+       
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 router.put('/AddstoredPre/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -371,6 +410,66 @@ function forEachPromise(items, fn) {
             return fn(item);
         });
     }, Promise.resolve());
+}
+
+function getArAlltrack(data) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+            user.findOne({_id: data.created_by}).exec()
+            .then(function(doc3){
+                var new_data = data;
+                if (doc3.last_name) {
+                    var created_by = doc3.first_name + ' ' + doc3.last_name;
+                }
+                else {
+                    var created_by = doc3.first_name;
+                }
+                new_data.created_by_temp = created_by;
+                return new_data;
+             
+            }).then(function(new_data){
+                if(data.review_by)
+                {
+                     user.findOne({_id: data.review_by}).exec()
+                    .then(function(doc5){
+                        var new_data = data;
+                        if (doc5.last_name) {
+                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                        }
+                        else {
+                            var reviewed_by = doc5.first_name;
+                        }
+                        new_data.review_by_temp = reviewed_by;
+                        return new_data;
+                    
+                    })
+                }
+                if(data.emergency_by)
+                {
+                    user.findOne({_id: data.emergency_by}).exec()
+                    .then(function(doc5){
+                        console.log('ttttt112',doc5);
+                        var new_data = data;
+                        if (doc5.last_name) {
+                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                        }
+                        else {
+                            var emergency1_by = doc5.first_name;
+                        }
+                        new_data.emergency_by_temp = emergency1_by;
+                        return new_data;
+                    })
+                    
+                } 
+                if(data.archive)
+                {
+                    trackrecord2.push(new_data);
+                }
+                
+                resolve(trackrecord2);
+            })
+        });
+    });
 }
 
 function getAlltrack(data) {

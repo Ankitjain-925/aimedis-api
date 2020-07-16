@@ -28,7 +28,7 @@ var KYCschema = new Schema({
        unique: false
     }
     
-});
+},{ strict: false });
 
 var kyc = mongoose.model('kyc', KYCschema);
 module.exports = kyc;

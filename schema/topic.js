@@ -8,7 +8,7 @@ var Topic = new Schema({
         required: false,
         unique: false
    },
-});
+},{ strict: false });
 
 var Topic = mongoose.model('Topic', Topic);
 module.exports = Topic;

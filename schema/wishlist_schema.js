@@ -76,6 +76,6 @@ var wishlist = new Schema({
         required: false,
         unique: false
     }
-})
+},{ strict: false })
 
 module.exports = mongoose.model('wishlist', wishlist);
