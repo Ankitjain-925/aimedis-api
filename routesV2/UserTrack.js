@@ -8,20 +8,11 @@ var jwtconfig = require('../jwttoken');
 const uuidv1 = require('uuid/v1');
 const {join} = require('path');
 const moment = require('moment');
-// const pdf = require('html-pdf');
 const {promisify} = require('util');
 const read = promisify(require('fs').readFile);
 const handlebars = require('handlebars');
 var nodemailer = require('nodemailer');
 
-
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//     user: 'ankita.webnexus@gmail.com',
-//     pass: 'ankita@30webnexus'
-//     }
-// });
 var transporter = nodemailer.createTransport({
     host : "vwp3097.webpack.hosteurope.de",
     port : 25,
@@ -31,98 +22,6 @@ var transporter = nodemailer.createTransport({
         pass: "DyNaMiTe=2008"
     }
 });
-
-// PDF Options
-// const pdf_options = {format: 'A4', quality: 300,  
-// phantomPath: "../node_modules/phantomjs-prebuilt/bin/phantomjs", // PhantomJS binary which should get downloaded automatically
-// phantomArgs: [], // array of strings used as phantomjs args e.g. ["--ignore-ssl-errors=yes"]
-// script: '../node_modules/phantomjs-prebuilt/lib/phantomjs.js',           // Absolute path to a custom phantomjs script, use the file in lib/scripts as example
-// timeout: 90000,           // Timeout that will cancel phantomjs, in milliseconds
-
-// // Time we should wait after window load
-// // accepted values are 'manual', some delay in milliseconds or undefined to wait for a render event
-// renderDelay: 3000,
-// };
-
-// GeneratePDF
-// async function generatePDF () {
-//     // Data we're going to pass to Handlebars
-//     const data = {
-//         mycompany: {
-//             name: 'GeeX1',
-//             address: 'Street 1',
-//             city: 'Amsterdam',
-//             zipcode: '1000 AA'
-//         },
-//         customer: {},
-//         invoice_no: generateInvoiceNo(),
-//         date_created: moment().format('DD/MM/YYYY'),
-//         date_due: moment().add(14, 'days').format('DD/MM/YYYY')
-//     };
-
-//     // Add customer data
-//     data.customer = {
-//         org: 'Your Org',
-//         name: 'Foo Bar',
-//         email: 'mail@domain.com'
-//     };
-
-//     data.products = [
-//         {
-//             name: 'Database development',
-//             price: 2410.00
-//         },
-//         {
-//             name: 'Creating memes',
-//             price: 0.00
-//         },
-//         {
-//             name: 'Domain registration (1 year)',
-//             price: 9.95
-//         },
-//         {
-//             name: 'Integrating Mollie in e-commerce platform(Node.js)',
-//             price: 0.00
-//         },
-//         {
-//             name: 'Hosting (3 months)',
-//             price: 75
-//         }
-//     ];
-
-//     const total = data.products.map(product => product.price).reduce((a,b) => a + b , 0);
-
-//     data.exvat = (total - (total / 1.21)).toFixed(2);
-
-//     data.total = total.toFixed(2);
-
-//     data.products.forEach(product => product.price = product.price.toFixed(2));
-
-//     // Read source template
-    // const source = await read(join(`${__dirname}/template.html`), 'utf-8');
-
-//     handlebars.registerHelper('ifCond', function(v1, v2, options) {
-//         if(v1 === v2) {
-//           return options.fn(this);
-//         }
-//         return options.inverse(this);
-//       });
-
-//     // Convert to Handlebars template and add the data
-//     const template = handlebars.compile(source);
-//     const html = template(data);
-
-//     // Generate PDF and promisify the toFile function
-//     const p = pdf.create(html, pdf_options);
-//     p.toFile = promisify(p.toFile);
-//     // Saves the file to the File System as invoice.pdf in the current directory
-//     return p.toFile(`${join('invoice24.pdf')}`);
-
-// };
-
-// function generateInvoiceNo() {
-//     return moment().format('YYYYMMDD');
-// }
 
 
 var trackrecord1 = [];
@@ -966,99 +865,22 @@ function getAlltrack1(data, right_management) {
     });
 }
 
-// router.post('/DowloadTrack/:Patientid', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         user.findOne({ '_id': req.params.Patientid, type: 'patient' }, function (err, data) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
-//             }
-//             else {
-//             //var dataa= generatePDF();
-//                 // res.json({ status: 200, hassuccessed: true, msg: 'done' ,datam : dataa,
-//                 // data : 'invoice24.pdf'})
-//                 var report_data = req.body.data;
-                
-
-//                 var options = {
-//                     format: "A4",
-//                     orientation: "portrait",
-//                     border: "10mm"
-//                 };
-//                 report_data.type = report_data.type.toString();
-//                 if(report_data.interval && report_data.interval.length>0)
-//                 {
-//                     report_data.interval = Array.prototype.map.call(report_data.interval, s => s.label).toString().split(/[,]+/).join(',  ')
-//                 }
-//                 if(report_data.time_taken && report_data.time_taken.length>0)
-//                 {
-//                     report_data.time_taken = Array.prototype.map.call(report_data.time_taken, s => s.label).toString().split(/[,]+/).join(',  ')
-//                 }
-//                 if(report_data.reminders && report_data.reminders.length>0)
-//                 {
-//                     report_data.reminders = Array.prototype.map.call(report_data.reminders, s => s.label).toString().split(/[,]+/).join(',  ')
-//                 }
-//                 if(report_data.reminder_time_taken && report_data.reminder_time_taken.length>0)
-//                 {
-//                     report_data.reminder_time_taken = Array.prototype.map.call(report_data.reminder_time_taken, s => s.label).toString().split(/[,]+/).join(',  ')
-//                 }
-//                 if(report_data.attachfile && report_data.attachfile.length>0)
-//                 {
-//                     report_data.attachfile.forEach((item, index) => {
-//                          item.url = paths + '/' + item.filename })
-//                 }
-//                 if(report_data.height && report_data.weight)
-//                 {
-//                     report_data.BMI = (report_data.weight/(report_data.height * report_data.height)*10000).toFixed(2)
-//                 }
-//                 if(report_data.type == 'medication')
-//                 {
-//                     if(report_data.lifelong)
-//                     {
-//                         report_data.until = report_data.lifelong
-//                     }
-//                     else if(report_data.until)
-//                     {
-//                         report_data.until = report_data.until
-//                     }
-//                     else
-//                     {
-//                         report_data.until = 'Not Available'
-//                     }
-//                 }
-//                 var dynamic = { report_data: report_data, data: data };
-//                 var document = {
-//                     template: html,
-//                     context: {
-//                         dynamic: dynamic
-//                     },
-//                      path: 'public/uploads/reports/reports'+report_data.type + data._id+'.pdf'    // it is not required if type is buffer
-//                 };
-
-//                 pdf.registerHelper('ifCond', function (v1, v2, options) {
-//                     if (v1 === v2) {
-//                         return options.fn(this);
-//                     }
-//                     return options.inverse(this);
-//                 })
-                
-//                 pdf.create(document, options)
-//                     .then(res23 => {
-//                         res.json({ status: 200, hassuccessed: true, msg: 'Report is generated', data : 'reports'+report_data.type + data._id+'.pdf'})
-//                     })
-//                     .catch(error => {
-//                         console.log(error, 'error')
-//                         res.json({ status: 200, hassuccessed: false, msg: 'something went wrong', err: error })
-//                     });
-//             }
-//         })
-                
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-//     }
-// })
+router.post('/DowloadTrack/:Patientid', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        user.findOne({ '_id': req.params.Patientid, type: 'patient' }, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+            }
+            else {
+            }
+        })      
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+})
 
 //for second opinion mailss
 router.post('/mailenglish',function (req,res,next){

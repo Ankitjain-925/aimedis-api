@@ -9,7 +9,7 @@ var DoctrorAppointment = require('../schema/doctor_appointment')
 var Prescription = require('../schema/prescription')
 var Second_opinion = require('../schema/second_option')
 var Sick_certificate = require('../schema/sick_certificate')
-const sendSms =require("./sendSms")
+const sendSms = require("./sendSms")
 var jwtconfig = require('../jwttoken');
 var base64 = require('base-64');
 var dateTime = require('node-datetime');
@@ -17,13 +17,14 @@ var nodemailer = require('nodemailer');
 var uuidv1 = require('uuid/v1');
 var moment = require('moment');
 var message = require('../schema/message');
-const {join} = require('path');
+const { join } = require('path');
 var shortid = require('shortid');
 var aws = require('aws-sdk');
 const axios = require("axios");
-var fs= require("fs")
+var fs = require("fs")
 var converter = require('json-2-csv');
 var pdf = require('dynamic-html-pdf');
+const { FieldValueContext } = require('twilio/lib/rest/preview/understand/assistant/fieldType/fieldValue');
 var html = fs.readFileSync(join(`${__dirname}/Userdata.html`), 'utf8');
 //for authy
 // https://github.com/seegno/authy-client
@@ -34,7 +35,7 @@ const Client = require('authy-client').Client;
 const authy = new Client({ key: API_KEY });
 
 var Mypat = [];
-var GetResult1 = [],GetResult2 = [], GetResult3 = [];;
+var GetResult1 = [], GetResult2 = [], GetResult3 = [];;
 // var transporter = nodemailer.createTransport({
 //     service: 'gmail',
 //     auth: {
@@ -126,17 +127,15 @@ router.post('/SupportMail', function (req, res) {
         from: req.body.email,
         to: "contact@aimedis.com",
         subject: 'Contact and Support Message',
-        html: '<div>This is -</b> '+req.body.name +' </b></div><div>'+req.body.msg+'</div>'
+        html: '<div>This is -</b> ' + req.body.name + ' </b></div><div>' + req.body.msg + '</div>'
     };
     let sendmail = transporter.sendMail(mailOptions)
-    if(sendmail)
-    {
-        res.json({ status: 200, message: 'Mail sent Successfully', hassuccessed: true});
+    if (sendmail) {
+        res.json({ status: 200, message: 'Mail sent Successfully', hassuccessed: true });
     }
-    else
-    {
-        res.json({ status: 200, msg: 'Mail is not sent',  hassuccessed: false })
-    } 
+    else {
+        res.json({ status: 200, msg: 'Mail is not sent', hassuccessed: false })
+    }
 })
 
 
@@ -221,7 +220,7 @@ router.post('/UserLogin', function (req, res, next) {
     if (req.body.email == '' || req.body.password == '') {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
     } else {
-        User.findOne({email:  {$regex: req.body.email, $options: "i"}}).exec()
+        User.findOne({ email: { $regex: req.body.email, $options: "i" } }).exec()
             .then((user_data) => {
                 if (user_data) {
                     if (user_data.isblock === true) {
@@ -322,8 +321,8 @@ router.post('/AddUser', function (req, res, next) {
     if (req.body.email == '' || req.body.email == undefined || req.body.password == '' || req.body.password == undefined) {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
     } else {
-       
-        User.findOne( {$or: [{ email: req.body.email }, {email: req.body.email.toLowerCase()}, {email: req.body.email.toUpperCase()}]}).exec().then((data1) => {
+
+        User.findOne({ $or: [{ email: req.body.email }, { email: req.body.email.toLowerCase() }, { email: req.body.email.toUpperCase() }] }).exec().then((data1) => {
             console.log('here', data1)
             if (data1) {
                 res.json({ status: 200, message: 'Email is Already exist', hassuccessed: false });
@@ -423,12 +422,12 @@ router.post('/AddUser', function (req, res, next) {
                         email: req.body.email,
                         phone: req.body.mobile
                     })
-                    .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
-                    .then(regRes=>{
+                        .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false }))
+                        .then(regRes => {
                             if (regRes && regRes.success) {
                                 console.log('I am here', regRes)
                                 var authyId = { authyId: regRes.user.id };
-                                req.body.mobile = req.body.country_code.toUpperCase()+'-'+req.body.mobile;
+                                req.body.mobile = req.body.country_code.toUpperCase() + '-' + req.body.mobile;
                                 datas = { ...authyId, ...profile_id, ...req.body, ...isblock, ...createdate, ...createdby, ...usertoken, ...verified }
                                 var users = new User(datas);
                                 users.save(function (err, user_data) {
@@ -455,7 +454,7 @@ router.post('/AddUser', function (req, res, next) {
                             else {
                                 res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false });
                             }
-                            })
+                        })
 
                 }
                 else {
@@ -470,61 +469,61 @@ router.put('/Bookservice', (req, res) => {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     var paymentData = {
-      created        : moment(new Date()).format("MM/DD/YYYY"),
-      description    : req.body.description,
+        created: moment(new Date()).format("MM/DD/YYYY"),
+        description: req.body.description,
     }
-    User.updateOne({ _id: legit.id },{ $push: { paid_services: paymentData } },
-      { safe: true, upsert: true },  function (err, doc) {   
-        if (err && !doc) {
-            res.json({ status : 200, hassuccessed : false, message : 'something went wrong' ,error : err})
+    User.updateOne({ _id: legit.id }, { $push: { paid_services: paymentData } },
+        { safe: true, upsert: true }, function (err, doc) {
+            if (err && !doc) {
+                res.json({ status: 200, hassuccessed: false, message: 'something went wrong', error: err })
             } else {
-            res.json({ status : 200, hassuccessed : true, message : 'booked sucessfully',data : doc})
-        }
-      });
-  });
+                res.json({ status: 200, hassuccessed: true, message: 'booked sucessfully', data: doc })
+            }
+        });
+});
 
 /*-----------------------D-E-L-E-T-E---P-A-R-T-I-C-U-L-A-R---U-S-E-R-------------------------*/
-function emptyBucket(bucketName, foldername){
+function emptyBucket(bucketName, foldername) {
     aws.config.update({
         region: 'ap-south-1', // Put your aws region here
         accessKeyId: 'AKIASQXDNWERH3C6MMP5',
         secretAccessKey: 'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC'
-      })
+    })
 
-      var s3 = new aws.S3({apiVersion: '2006-03-01'});
+    var s3 = new aws.S3({ apiVersion: '2006-03-01' });
     var params = {
-      Bucket: bucketName,
-      Prefix: foldername
+        Bucket: bucketName,
+        Prefix: foldername
     };
 
-    s3.listObjects(params, function(err, data) {
-      if (err) return err;
-
-
-      console.log("RESPONSE FROM S3" , data)
-
-      if (data.Contents.length == 0) {
-        console.log("Bucket is empty!");
-      }
-
-      else{
-        params = {Bucket: bucketName};
-      params.Delete = {Objects:[]};
-
-      data.Contents.forEach(function(content) {
-        params.Delete.Objects.push({Key: content.Key});
-      });
-
-      s3.deleteObjects(params, function(err, data) {
+    s3.listObjects(params, function (err, data) {
         if (err) return err;
-        if(data && data.Contents && data.Contents.length != 0 )emptyBucket(bucketName, foldername);
 
-      });
-      }
+
+        console.log("RESPONSE FROM S3", data)
+
+        if (data.Contents.length == 0) {
+            console.log("Bucket is empty!");
+        }
+
+        else {
+            params = { Bucket: bucketName };
+            params.Delete = { Objects: [] };
+
+            data.Contents.forEach(function (content) {
+                params.Delete.Objects.push({ Key: content.Key });
+            });
+
+            s3.deleteObjects(params, function (err, data) {
+                if (err) return err;
+                if (data && data.Contents && data.Contents.length != 0) emptyBucket(bucketName, foldername);
+
+            });
+        }
 
 
     });
-  }
+}
 router.delete('/Users/:User_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -589,60 +588,55 @@ router.put('/Users/update', function (req, res, next) {
             if (changeStatus) {
                 var enpassword = base64.encode(req.body.password);
                 req.body.password = enpassword;
-                if(req.body.mobile)
-                {
+                if (req.body.mobile) {
                     var country_code = '';
-                    var mob =  req.body.mobile && req.body.mobile.split("-")
+                    var mob = req.body.mobile && req.body.mobile.split("-")
                     var mob1 = mob.pop()
-                    if(mob && mob.length>0 && mob[0] && mob[0].length==2)
-                    {
-                        country_code =   mob[0]
-                       if(country_code && country_code === '')
-                       {
-                           let tt = changeStatus.mobile.split("-")
-                           if(tt && tt.length>0 && tt[0] && tt[0].length==2)
-                           {
-                              country_code === tt[0]
-                           }
-                       }
-                    } 
-                    console.log('my tern ', country_code, mob1 )
-                     authy.registerUser({
+                    if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
+                        country_code = mob[0]
+                        if (country_code && country_code === '') {
+                            let tt = changeStatus.mobile.split("-")
+                            if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
+                                country_code === tt[0]
+                            }
+                        }
+                    }
+                    console.log('my tern ', country_code, mob1)
+                    authy.registerUser({
                         countryCode: country_code,
                         email: changeStatus.email,
                         phone: mob1
                     })
-                    .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
-                    .then(regRes=>{
-                        if (regRes && regRes.success) {
-                            var authyId = { authyId: regRes.user.id };
+                        .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false }))
+                        .then(regRes => {
+                            if (regRes && regRes.success) {
+                                var authyId = { authyId: regRes.user.id };
                                 datas = { ...authyId, ...req.body }
                                 User.findByIdAndUpdate({ _id: changeStatus._id },
-                                datas,
-                                function (err, doc) {
-                                    if (err && !doc) {
-                                        res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
-                                    } else {
-                                        res.json({ status: 200, hassuccessed: true, message: 'Updated' })
-                                    }
-                                });
-                        }
-                    })
+                                    datas,
+                                    function (err, doc) {
+                                        if (err && !doc) {
+                                            res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
+                                        } else {
+                                            res.json({ status: 200, hassuccessed: true, message: 'Updated' })
+                                        }
+                                    });
+                            }
+                        })
                 }
-                else 
-                {   
+                else {
                     User.findByIdAndUpdate({ _id: changeStatus._id },
-                    req.body,
-                    function (err, doc) {
-                        if (err && !doc) {
-                            res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
-                        } else {
-                            res.json({ status: 200, hassuccessed: true, message: 'Updated' })
-                        }
-                                
-                    })
+                        req.body,
+                        function (err, doc) {
+                            if (err && !doc) {
+                                res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
+                            } else {
+                                res.json({ status: 200, hassuccessed: true, message: 'Updated' })
+                            }
+
+                        })
                 }
-                
+
             }
         })
     }
@@ -916,31 +910,31 @@ router.post('/Prescription', function (req, res, next) {
         } else {
 
             if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben ein Rezept (prescription) von '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' beantragt.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name + ' ( '+req.body.docProfile.email+' ) ' +'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>'+ 
-                'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>'+ 
-                '<b>Ihr Aimedis Team </b>'
-            
+                var dhtml = 'Sie haben ein Rezept (prescription) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+                    'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+                    '<b>Ihr Aimedis Team </b>'
+
             }
             else {
-                var dhtml = 'You have requested a prescription from '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name+ ' ( '+req.body.docProfile.email+' )' + ' will take care of the matter and contact you via email.<br/>'+ 
-                'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
+                var dhtml = 'You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+                    'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+                    '<b>Your Aimedis team </b>'
             }
             if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von '+req.body.patient_info.patient_id+' erhalten. '+ 
-                'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>'+
-                '<b>Ihr Aimedis Team </b>'
+                var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+                    'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+                    '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml2 = 'You have received a prescription inquiry from '+req.body.patient_info.patient_id+'<br/>'+ 
-                'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
+                var dhtml2 = 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+                    'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+                    '<b>Your Aimedis team </b>'
             }
             var mailOptions = {
                 from: "contact@aimedis.com",
-                to:req.body.patient_info.email ,
+                to: req.body.patient_info.email,
                 subject: 'Prescription Request',
                 html: dhtml
             };
@@ -1079,16 +1073,16 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                                             res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                                         }
                                         else {
-                                            var dhtml = 'Your Prescription Request Accepted.<br/>'+ 
-                                                'And prescription added in to your timeline.<br/>'+ 
+                                            var dhtml = 'Your Prescription Request Accepted.<br/>' +
+                                                'And prescription added in to your timeline.<br/>' +
                                                 '<b>Your Aimedis team </b>'
-                                                var mailOptions = {
+                                            var mailOptions = {
                                                 from: "contact@aimedis.com",
-                                                to:updatedata.patient_email ,
+                                                to: updatedata.patient_email,
                                                 subject: 'Prescription Accepted',
                                                 html: dhtml
-                                                };
-                                                var sendmail = transporter.sendMail(mailOptions)
+                                            };
+                                            var sendmail = transporter.sendMail(mailOptions)
                                             res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                                         }
                                     }
@@ -1116,31 +1110,31 @@ router.post('/SickCertificate', function (req, res, next) {
             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
         } else {
             if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben eine AU (sick certificate) von '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' beantragt.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name + ' ( '+req.body.docProfile.email+' ) ' +'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>'+ 
-                'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>'+ 
-                '<b>Ihr Aimedis Team </b>'
+                var dhtml = 'Sie haben eine AU (sick certificate) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+                    'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+                    '<b>Ihr Aimedis Team </b>'
 
             }
             else {
-                var dhtml = 'You have requested an AU (sick certificate) from '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name+ ' ( '+req.body.docProfile.email+' )' + ' will take care of the matter and contact you via email.<br/>'+ 
-                'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
+                var dhtml = 'You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+                    'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+                    '<b>Your Aimedis team </b>'
             }
             if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von '+req.body.patient_info.patient_id+' erhalten. '+ 
-                'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>'+
-                '<b>Ihr Aimedis Team </b>'
+                var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+                    'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+                    '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml2 = 'You have received an AU (sick certificate) inquiry from '+req.body.patient_info.patient_id+'<br/>'+ 
-                'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
+                var dhtml2 = 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+                    'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+                    '<b>Your Aimedis team </b>'
             }
             var mailOptions = {
                 from: "contact@aimedis.com",
-                to:req.body.patient_info.email ,
+                to: req.body.patient_info.email,
                 subject: 'Sick Certificate Request',
                 html: dhtml
             };
@@ -1180,7 +1174,7 @@ router.get('/RequestedSickCertificate', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     getResult1 = [];
     if (legit) {
-        Sick_certificate.find({patient_id : legit.id, $or: [{status:'accept'}, {status: 'decline'}] }, function (err, data) {
+        Sick_certificate.find({ patient_id: legit.id, $or: [{ status: 'accept' }, { status: 'decline' }] }, function (err, data) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1203,7 +1197,7 @@ router.get('/RequestedAppointment', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     getResult3 = [];
     if (legit) {
-        Appointment.find({patient : legit.id,  $or: [{status:'accept'}, {status: 'decline'}]}, function (err, data) {
+        Appointment.find({ patient: legit.id, $or: [{ status: 'accept' }, { status: 'decline' }] }, function (err, data) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1226,11 +1220,11 @@ router.get('/RequestedPrescription', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     getResult2 = [];
     if (legit) {
-        Prescription.find({patient_id : legit.id, $or: [{status:'accept'}, {status: 'decline'}] }, function (err, data) {
+        Prescription.find({ patient_id: legit.id, $or: [{ status: 'accept' }, { status: 'decline' }] }, function (err, data) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
-               
+
                 res.json({ status: 200, hassuccessed: true, data: data });
             }
         });
@@ -1332,16 +1326,16 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                                             res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                                         }
                                         else {
-                                            var dhtml = 'Your Sick certificate Request Accepted.<br/>'+ 
-                                            'And sick certificate added in to your timeline.<br/>'+ 
-                                            '<b>Your Aimedis team </b>'
-                                        var mailOptions = {
-                                            from: "contact@aimedis.com",
-                                            to:updatedata.patient_email ,
-                                            subject: 'Sick certificate Accepted',
-                                            html: dhtml
-                                        };
-                                        var sendmail = transporter.sendMail(mailOptions)
+                                            var dhtml = 'Your Sick certificate Request Accepted.<br/>' +
+                                                'And sick certificate added in to your timeline.<br/>' +
+                                                '<b>Your Aimedis team </b>'
+                                            var mailOptions = {
+                                                from: "contact@aimedis.com",
+                                                to: updatedata.patient_email,
+                                                subject: 'Sick certificate Accepted',
+                                                html: dhtml
+                                            };
+                                            var sendmail = transporter.sendMail(mailOptions)
                                             res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                                         }
                                     }
@@ -1367,7 +1361,7 @@ router.post('/AddtoPatientList/:id', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         console.log('myPaitent', req.body)
-        User.findOneAndUpdate({ profile_id: req.params.id },{ $push: { myPatient: req.body} }, function (err2, updatedata) {
+        User.findOneAndUpdate({ profile_id: req.params.id }, { $push: { myPatient: req.body } }, function (err2, updatedata) {
             if (err2 && !updatedata) {
                 res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
             } else {
@@ -1390,8 +1384,7 @@ router.get('/Mypatients', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                 } else {
-                    if(doc && doc.length>0)
-                    {
+                    if (doc && doc.length > 0) {
                         if (doc[0].myPatient.length > 0) {
                             forEachPromise(doc[0].myPatient, getMyPat)
                                 .then((result) => {
@@ -1400,12 +1393,12 @@ router.get('/Mypatients', function (req, res, next) {
                         }
                         else {
                             res.json({ status: 200, hassuccessed: false, msg: 'No data' })
-                        }  
+                        }
                     }
                     else {
                         res.json({ status: 200, hassuccessed: false, msg: 'No data' })
-                    }  
-               
+                    }
+
                 }
             })
     }
@@ -1424,17 +1417,16 @@ function forEachPromise(items, fn) {
 function getMyPat(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            User.findOne({profile_id: data.profile_id}).exec()
-            .then(function(doc3){
-                if(doc3)
-                {
-                    Mypat.push(doc3)
-                    resolve(Mypat);
-                }
-                else{
-                    resolve(Mypat);
-                }  
-            })    
+            User.findOne({ profile_id: data.profile_id }).exec()
+                .then(function (doc3) {
+                    if (doc3) {
+                        Mypat.push(doc3)
+                        resolve(Mypat);
+                    }
+                    else {
+                        resolve(Mypat);
+                    }
+                })
         });
     });
 }
@@ -1480,7 +1472,7 @@ router.get('/PatientAcceptAppointments', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Appointment.find({ patient: legit.id, status : 'accept' }, function (err, userdata) {
+        Appointment.find({ patient: legit.id, status: 'accept' }, function (err, userdata) {
             if (err && !userdata) {
                 res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
             } else {
@@ -1526,30 +1518,30 @@ router.post('/second_opinion', function (req, res, next) {
             res.json({ status: 200, message: 'Something went wrong.', error: err });
         } else {
             if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben eine Zweitmeinung (second opinion) von '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' beantragt.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name + ' ( '+req.body.docProfile.email+' ) ' +'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>'+ 
-                'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>'+ 
-                '<b>Ihr Aimedis Team </b>'
+                var dhtml = 'Sie haben eine Zweitmeinung (second opinion) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+                    'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+                    '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml = 'You have requested a second opinion from '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
-                req.body.docProfile.first_name+' '+req.body.docProfile.last_name+ ' ( '+req.body.docProfile.email+' )' + ' will take care of the matter and contact you via email.<br/>'+ 
-                'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
+                var dhtml = 'You have requested a second opinion from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+                    'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+                    '<b>Your Aimedis team </b>'
             }
             if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben eine Zweitmeinung (second opinion) Anfrage von '+req.body.patient_info.patient_id+' erhalten. '+ 
-                'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>'+
-                '<b>Ihr Aimedis Team </b>'
+                var dhtml2 = ' Sie haben eine Zweitmeinung (second opinion) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+                    'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+                    '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml2 = 'You have received a second opinion inquiry from '+req.body.patient_info.patient_id+'<br/>'+ 
-                'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> '+
-                '<b>Your Aimedis team </b>'
+                var dhtml2 = 'You have received a second opinion inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+                    'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+                    '<b>Your Aimedis team </b>'
             }
             var mailOptions = {
                 from: "contact@aimedis.com",
-                to:req.body.patient_info.email ,
+                to: req.body.patient_info.email,
                 subject: 'Second Opinion Request',
                 html: dhtml
             };
@@ -1684,7 +1676,7 @@ router.get('/DoctorUsersChat', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.find({ type: 'doctor'}, function (err, Userinfo) {
+        User.find({ type: 'doctor' }, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1707,9 +1699,9 @@ router.get('/UserlistSize', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
                 var count = results.length
-            res.json({ status: 200, hassuccessed: true, data: count });
+                res.json({ status: 200, hassuccessed: true, data: count });
             }
-          });
+        });
     }
     else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
@@ -1720,7 +1712,7 @@ router.get('/PatientUsersChat', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.find({ type: 'patient'}, function (err, Userinfo) {
+        User.find({ type: 'patient' }, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1736,8 +1728,10 @@ router.get('/NursePharmaChat', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.find({$or: [{type: 'nurse'}, 
-        {type: 'pharmacy'}, {type : 'therapist'}]}, function (err, Userinfo) {
+        User.find({
+            $or: [{ type: 'nurse' },
+            { type: 'pharmacy' }, { type: 'therapist' }]
+        }, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1849,7 +1843,7 @@ router.put('/AddFavDoc', function (req, res, next) {
                                     if (userdata2.length != 0) {
                                         res.json({ status: 200, hassuccessed: false, message: "Doctor already exists", error: err })
                                     } else {
-                                        User.findByIdAndUpdate({ _id: userdata._id },{parent_id:  userdata1._id, $push: { fav_doctor: req.body} }, function (err2, updatedata) {
+                                        User.findByIdAndUpdate({ _id: userdata._id }, { parent_id: userdata1._id, $push: { fav_doctor: req.body } }, function (err2, updatedata) {
                                             if (err2 && !updatedata) {
                                                 res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
                                             } else {
@@ -1891,16 +1885,18 @@ router.put('/AddRecDoc', function (req, res, next) {
                                 if (err2) {
                                     res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                                 } else {
-                                        User.findOneAndUpdate({ _id: userdata._id, 'fav_doctor.profile_id' : req.body.doctor}, {$set: {
-                                            'fav_doctor.$.type' : 'active',
-                                            parent_id:  userdata1._id
-                                        }}, function (err2, updatedata) {
-                                            if (err2 && !updatedata) {
-                                                res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
-                                            } else {
-                                                res.json({ status: 200, hassuccessed: true, message: "user updated", data: userdata })
-                                            }
-                                        })
+                                    User.findOneAndUpdate({ _id: userdata._id, 'fav_doctor.profile_id': req.body.doctor }, {
+                                        $set: {
+                                            'fav_doctor.$.type': 'active',
+                                            parent_id: userdata1._id
+                                        }
+                                    }, function (err2, updatedata) {
+                                        if (err2 && !updatedata) {
+                                            res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
+                                        } else {
+                                            res.json({ status: 200, hassuccessed: true, message: "user updated", data: userdata })
+                                        }
+                                    })
                                 }
                             })
                         }
@@ -1929,12 +1925,12 @@ router.put('/AddFavTDoc/:id', function (req, res, next) {
                 User.find({ profile_id: req.params.id, fav_doctor: { $elemMatch: { doctor: userdata.profile_id } } }, function (err2, userdata2) {
                     if (err2) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
-                    } else{
+                    } else {
                         if (userdata2.length != 0) {
                             res.json({ status: 200, hassuccessed: false, message: "Doctor already exists", error: err })
                         } else {
-                            var data = {doctor : userdata.profile_id, profile_id : userdata.profile_id, type: 'recommended' };
-                            User.findOneAndUpdate({ profile_id: req.params.id }, { $push: { fav_doctor: data} },{upsert:true}, function (err2, updatedata) {
+                            var data = { doctor: userdata.profile_id, profile_id: userdata.profile_id, type: 'recommended' };
+                            User.findOneAndUpdate({ profile_id: req.params.id }, { $push: { fav_doctor: data } }, { upsert: true }, function (err2, updatedata) {
                                 if (err2 && !updatedata) {
                                     res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                                 } else {
@@ -1943,13 +1939,13 @@ router.put('/AddFavTDoc/:id', function (req, res, next) {
                             })
                         }
                     }
-                }) 
+                })
             }
         })
     }
     else {
         res.json({ status: 200, hassuccessed: false, message: 'A uthentication required.' })
-    } 
+    }
 })
 
 /*-----------------------D-E-L-E-T-E---F-A-V-O-U-R-I-T-E---D-O-C-T-O-R-------------------------*/
@@ -1958,23 +1954,23 @@ router.delete('/favDocs/:User_id/:patient_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.update({ _id: legit.id }, {parent_id: "0", $pull: { fav_doctor: { doctor: req.params.User_id } } },
+        User.update({ _id: legit.id }, { parent_id: "0", $pull: { fav_doctor: { doctor: req.params.User_id } } },
             { multi: true },
             function (err, userdata) {
                 if (err) {
                     res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
                 } else {
-                    console.log('user_data',userdata)
-                    User.update({ profile_id: req.params.User_id }, { $pull: { myPatient: { profile_id: req.params.patient_id} } },
-                    { multi: true },
-                    function (err, userdata2) {
-                        if (err) {
-                            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-                        } else {
-                            res.json({ status: 200, hassuccessed: true, message: 'Deleted Successfully' });
-                        }
-                    })
-                  
+                    console.log('user_data', userdata)
+                    User.update({ profile_id: req.params.User_id }, { $pull: { myPatient: { profile_id: req.params.patient_id } } },
+                        { multi: true },
+                        function (err, userdata2) {
+                            if (err) {
+                                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                            } else {
+                                res.json({ status: 200, hassuccessed: true, message: 'Deleted Successfully' });
+                            }
+                        })
+
                 }
             })
     } else {
@@ -2076,23 +2072,22 @@ router.put('/GetAppointment/:GetAppointment_id', function (req, res, next) {
                     if (err && !updatedata) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
-                        if(req.body.status ==='accept')
-                        {
+                        if (req.body.status === 'accept') {
                             console.log('come inside')
                             if (req.body.lan === 'de') {
-                                var dhtml = 'Ihre Terminanfrage wurde von '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
-                                '<b>Ihr Aimedis Team </b>'
-                            
+                                var dhtml = 'Ihre Terminanfrage wurde von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                                    '<b>Ihr Aimedis Team </b>'
+
                             }
                             else {
-                                var dhtml = 'Your Appointment Request Accepted by '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+'.<br/>'+ 
-                                '<b>Your Aimedis team </b>'
-                            
+                                var dhtml = 'Your Appointment Request Accepted by ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                                    '<b>Your Aimedis team </b>'
+
                             }
-                            
+
                             var mailOptions = {
                                 from: "contact@aimedis.com",
-                                to:req.body.email ,
+                                to: req.body.email,
                                 subject: 'Appointment Accepted',
                                 html: dhtml
                             };
@@ -2141,8 +2136,7 @@ router.get('/DoctorAppointments', function (req, res, next) {
                     var online_users = [];
                     var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
-                        if(Userinfo[i].private_appointments[j].custom_text)
-                        {  
+                        if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
                         }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
@@ -2192,15 +2186,15 @@ router.get('/DoctorAppointments', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
-                    for (let l = 0; l < Userinfo[i]. days_for_practices.length; l++) {
-                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i]. days_for_practices[l].duration_of_timeslots) {
+                    for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
                         if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
-                        if (Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            wednesday = getTimeStops(Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                        if (Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+                            wednesday = getTimeStops(Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
                         if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
@@ -2220,8 +2214,8 @@ router.get('/DoctorAppointments', function (req, res, next) {
                         data: Userinfo[i],
                         appointments: user,
                         online_appointment: online_users,
-                        practice_days : Practices,
-                        
+                        practice_days: Practices,
+
                     })
                 }
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -2247,15 +2241,14 @@ router.get('/getLocation/:radius', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, error: error })
             } else {
                 var finalArray = [];
-                let monday, tuesday, wednesday, thursday, friday, saturday, sunday,custom_text
+                let monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         console.log('try', Userinfo[i].private_appointments[j].custom_text)
-                        if(Userinfo[i].private_appointments[j].custom_text)
-                        {  
+                        if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
                         }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
@@ -2305,15 +2298,15 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
-                    for (let l = 0; l < Userinfo[i]. days_for_practices.length; l++) {
-                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i]. days_for_practices[l].duration_of_timeslots) {
+                    for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
                         if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
-                        if (Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            wednesday = getTimeStops(Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                        if (Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+                            wednesday = getTimeStops(Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
                         if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
@@ -2333,7 +2326,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         data: Userinfo[i],
                         appointments: user,
                         online_appointment: online_users,
-                        practice_days : Practices
+                        practice_days: Practices
                     })
                 }
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -2362,8 +2355,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                     var Practices = [];
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         console.log('try11', Userinfo[i].private_appointments[j].custom_text)
-                        if(Userinfo[i].private_appointments[j].custom_text)
-                        {  
+                        if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
                         }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
@@ -2413,15 +2405,15 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
-                    for (let l = 0; l < Userinfo[i]. days_for_practices.length; l++) {
-                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i]. days_for_practices[l].duration_of_timeslots) {
+                    for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+                        if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
                         if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
-                        if (Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
-                            wednesday = getTimeStops(Userinfo[i]. days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                        if (Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+                            wednesday = getTimeStops(Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
                         if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
@@ -2441,7 +2433,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         data: Userinfo[i],
                         appointments: user,
                         online_appointment: online_users,
-                        practice_days : Practices
+                        practice_days: Practices
                     })
                 }
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -2736,76 +2728,88 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         User.findOne({ profile_id: req.params.UserId })
-        .select('profile_id first_name last_name _id email pin emergency_email mobile')
-        .exec(function(err, doc) { 
+            .select('profile_id first_name last_name _id email pin emergency_email mobile')
+            .exec(function (err, doc) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                 } else {
-                    if(doc == null || doc =='undefined' )
-                    {
+                    if (doc == null || doc == 'undefined') {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not exist' })
-                      
+
                     }
-                    else
-                    {
+                    else {
                         var m = new Date();
-                        var dateString = m.getUTCFullYear() +"/"+ (m.getUTCMonth()+1) +"/"+ m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
+                        var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
                         console.log('data', req.body)
                         if (req.body.lan === 'de') {
-                        
 
-                            var dhtml = 
-                            'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profil.<br/>'+
-                            'Der Notfallzugriff erfolgte durch <b>'+ req.body.current_info.profile_id + ' - '+req.body.current_info.first_name+' '+req.body.current_info.last_name+' am ' + dateString+ '</b>.<br/>'+
-                            'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>'+
-                            'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>'+
-                            'Herzliche Grüße und alles Gute<br/>'+
-                            '<b>Ihr Aimedis Team </b>'
-            
+
+                            var dhtml =
+                                'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profil.<br/>' +
+                                'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
+                                'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
+                                'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
+                                'Herzliche Grüße und alles Gute<br/>' +
+                                '<b>Ihr Aimedis Team </b>'
+
                         }
                         else {
-                            var dhtml = 'There was emergency access to the data in your Aimedis profile.<br/>'+ 
-                            'The emergency access was made by <b>'+ req.body.current_info.profile_id + ' - '+req.body.current_info.first_name+' '+req.body.current_info.last_name+' on ' + dateString+'</b>.<br/>'+ 
-                            'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
-                            'Best regards<br/>'+
-                            '<b>Your Aimedis team </b>'
+                            var dhtml = 'There was emergency access to the data in your Aimedis profile.<br/>' +
+                                'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
+                                'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
+                            'Best regards<br/>' +
+                                '<b>Your Aimedis team </b>'
                         }
                         if (req.body.lan === 'de') {
-                            var dhtml2 =   'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profils von </b>' + doc.first_name +' '+ doc.last_name + ' ( '+ doc.profile_id+' ).</b><br/>'+
-                            'Der Notfallzugriff erfolgte durch <b>'+ req.body.current_info.profile_id + ' - '+req.body.current_info.first_name+' '+req.body.current_info.last_name+' am ' + dateString+ '</b>.<br/>'+
-                            'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>'+
-                            'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>'+
-                            'Herzliche Grüße und alles Gute<br/>'+
-                            '<b>Ihr Aimedis Team </b>'
+                            var dhtml2 = 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profils von </b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' ).</b><br/>' +
+                                'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
+                                'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
+                                'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
+                                'Herzliche Grüße und alles Gute<br/>' +
+                                '<b>Ihr Aimedis Team </b>'
                         }
                         else {
-                            var dhtml2 = 'There was emergency access to the data in your Aimedis profile of <b>' + doc.first_name +' '+ doc.last_name + ' ( '+ doc.profile_id+' )</b><br/>'+ 
-                            'The emergency access was made by <b>'+ req.body.current_info.profile_id + ' - '+req.body.current_info.first_name+' '+req.body.current_info.last_name+' on ' + dateString+'</b>.<br/>'+ 
-                            'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
-                            'Best regards<br/>'+
-                            '<b>Your Aimedis team </b>'
+                            var dhtml2 = 'There was emergency access to the data in your Aimedis profile of <b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' )</b><br/>' +
+                                'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
+                                'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
+                            'Best regards<br/>' +
+                                '<b>Your Aimedis team </b>'
                         }
                         var mailOptions = {
                             from: "contact@aimedis.com",
-                            to:doc.email ,
+                            to: doc.email,
                             subject: 'Emergency Access',
                             html: dhtml
                         };
-                        sendSms(doc.mobile,'There was emergency access to the data in your Aimedis profile ( '+doc.profile_id+' ) by Doctor - '+req.body.current_info.profile_id + ' - '+req.body.current_info.first_name+' '+req.body.current_info.last_name+' on ' + dateString).then(result=>{
-                           console.log('Message is sent')
-                        }).catch(e=>{
+                        sendSms(doc.mobile, 'There was emergency access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
+                            console.log('Message is sent')
+                        }).catch(e => {
                             console.log('Message is not sent', e)
                         })
 
-                      if(req.body.comefrom === 'pharmacy')
-                      {
-                        console.log('I here', req.body.pin)
-                        if(req.body.pin && req.body.pin == doc.pin && req.body.pin !== "" )
-                        {
-                            console.log('I here2', req.body.pin)
+                        if (req.body.comefrom === 'pharmacy') {
+                            console.log('I here', req.body.pin)
+                            if (req.body.pin && req.body.pin == doc.pin && req.body.pin !== "") {
+                                console.log('I here2', req.body.pin)
+                                var sendmail = transporter.sendMail(mailOptions)
+                                if (doc.emergency_email && doc.emergency_email !== '') {
+                                    var mailOptions2 = {
+                                        from: "contact@aimedis.com",
+                                        to: doc.emergency_email,
+                                        subject: 'Emergency Access',
+                                        html: dhtml2
+                                    };
+                                    var sendmail2 = transporter.sendMail(mailOptions2)
+                                }
+                                res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
+                            }
+                            else {
+                                res.json({ status: 200, hassuccessed: false, msg: 'Pin is not correct' })
+                            }
+                        }
+                        else {
                             var sendmail = transporter.sendMail(mailOptions)
-                            if(doc.emergency_email && doc.emergency_email!=='')
-                            {
+                            if (doc.emergency_email && doc.emergency_email !== '') {
                                 var mailOptions2 = {
                                     from: "contact@aimedis.com",
                                     to: doc.emergency_email,
@@ -2814,27 +2818,8 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
                                 };
                                 var sendmail2 = transporter.sendMail(mailOptions2)
                             }
-                            res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id : doc._id  })
+                            res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
                         }
-                        else{
-                            res.json({ status: 200, hassuccessed: false, msg: 'Pin is not correct' })
-                        }
-                      }
-                      else
-                      {
-                        var sendmail = transporter.sendMail(mailOptions)
-                        if(doc.emergency_email && doc.emergency_email!=='')
-                        {
-                            var mailOptions2 = {
-                                from: "contact@aimedis.com",
-                                to: doc.emergency_email,
-                                subject: 'Emergency Access',
-                                html: dhtml2
-                            };
-                            var sendmail2 = transporter.sendMail(mailOptions2)
-                        }
-                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id : doc._id  })
-                      } 
                     }
                 }
             });
@@ -2870,8 +2855,7 @@ router.post('/forgotPassword', function (req, res, next) {
     promise.then((token) => {
         if (token !== '') {
             var link = 'https://sys.aimedis.io/change-password';
-            if(req.body.passFrom === 'landing')
-            {
+            if (req.body.passFrom === 'landing') {
                 link = 'https://aimedis.io/phase2/change-password'
             }
             // var link = 'http://localhost:3000/change-password';
@@ -2923,128 +2907,130 @@ router.post('/forgotPassword', function (req, res, next) {
 
 router.post('/AskPatient1/:id', function (req, res, next) {
     const token = (req.headers.token);
-let legit = jwtconfig.verify(token)
-if (legit) {
-        
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+
+        if (req.body.lan === 'de') {
+            var dhtml = 'Der Doktor (' + req.body.first_name + ' ' + req.body.last_name + ') Ich möchte, dass Sie Aimedis beitreten. Schickte auch diese Nachricht an Sie- <br/>' +
+                '<b>' + req.body.message + '</b><br/><br/><br/>' +
+                '<b>Ihr Aimedis Team</b><br/>' +
+                '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
+        }
+        else {
+            var dhtml = 'The doctor (' + req.body.first_name + ' ' + req.body.last_name + ') want to you join Aimedis. Also sent this message to you - <br/> . ' +
+                '<b>' + req.body.message + '</b><br/><br/><br/>' +
+                '<b>Ihr Aimedis Team</b><br/>' +
+                '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
+        }
+        var mailOptions = {
+            from: "contact@aimedis.com",
+            to: req.params.id,
+            subject: 'Invitation for the join Aimedis',
+            html: dhtml
+        };
+        var sendmail = transporter.sendMail(mailOptions)
+        if (sendmail) {
+            res.json({ status: 200, hassuccessed: true, msg: 'Mail is sent' })
+        }
+        else {
+            console.log('there is errro', err); res.json({ status: 200, hassuccessed: false, msg: 'Mail is not sent' })
+        }
+    }
+    else {
+        res.status(401).json({ status: 401, success: false, message: 'Authentication required.' })
+    }
+})
+router.get('/AskPatientProfile/:id', function (req, res, next) {
+    const token = (req.headers.token);
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.findOne({
+            $or: [{ email: req.params.id }, {
+                profile_id: req.params.id,
+            }]
+        }).exec()
+            .then((user_data1) => {
+                if (user_data1) {
+                    res.json({ status: 200, hassuccessed: true, msg: 'Data is exist', data: user_data1 })
+                }
+                else {
+                    res.json({ status: 450, hassuccessed: false, msg: 'User does not exist' })
+                }
+            })
+    }
+    else {
+        res.status(401).json({ status: 401, success: false, message: 'Authentication required.' })
+    }
+})
+
+router.post('/AskPatient/:id', function (req, res, next) {
+    const token = (req.headers.token);
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.findOne({ profile_id: req.params.id }).exec()
+            .then((user_data1) => {
+                if (user_data1) {
+                    var Link1 = 'https://sys.aimedis.io/patient/mydoctors'
                     if (req.body.lan === 'de') {
-                        var dhtml = 'Der Doktor ('+req.body.first_name + ' ' +req.body.last_name +') Ich möchte, dass Sie Aimedis beitreten. Schickte auch diese Nachricht an Sie- <br/>'+
-                        '<b>'+req.body.message+'</b><br/><br/><br/>'+
-                        '<b>Ihr Aimedis Team</b><br/>' +
-'<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-'<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
+                        var dhtml = 'Sie haben eine Anfrage zum Hinzufügen eines Lieblingsarztes vom DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ').<br/>' +
+                            'Für <b> Akzeptieren / Löschen </b> gehen Sie zu <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                            '<b>Ihr Aimedis Team</b><br/>' +
+                            '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                            '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
                     }
                     else {
-                        var dhtml = 'The doctor ('+req.body.first_name + ' ' +req.body.last_name +') want to you join Aimedis. Also sent this message to you - <br/> . ' +
-                        '<b>'+req.body.message+'</b><br/><br/><br/>'+
-                        '<b>Ihr Aimedis Team</b><br/>' +
-                        '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                        '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
+                        var dhtml = 'You have got a request to add favorite doctor from the DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ').<br/>' +
+                            'For <b>Accept / Delete</b> the request go to the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                            '<b>Your Aimedis team</b><br/>' +
+                            '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                            '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
                     }
+
                     var mailOptions = {
                         from: "contact@aimedis.com",
-                        to: req.params.id,
-                        subject: 'Invitation for the join Aimedis',
+                        to: user_data1.email,
+                        subject: 'Ask for become favorite doctor',
                         html: dhtml
-                    }; 
+                    };
                     var sendmail = transporter.sendMail(mailOptions)
                     if (sendmail) {
                         res.json({ status: 200, hassuccessed: true, msg: 'Mail is sent' })
                     }
                     else {
                         console.log('there is errro', err); res.json({ status: 200, hassuccessed: false, msg: 'Mail is not sent' })
-                    } 
-}
-    else {
-        res.status(401).json({ status: 401, success: false,  message: 'Authentication required.' })
-    }  
-})
-router.get('/AskPatientProfile/:id', function (req, res, next) {
-    const token = (req.headers.token);
-let legit = jwtconfig.verify(token)
-if (legit) {
-        User.findOne({$or: [{ email: req.params.id },{
-            profile_id: req.params.id,}]}).exec()
-            .then((user_data1) => {
-                if (user_data1) {
-                        res.json({ status: 200, hassuccessed: true, msg: 'Data is exist', data : user_data1 })
+                    }
                 }
-                else { 
-                    res.json({ status: 450,  hassuccessed: false,  msg: 'User does not exist' })
+                else {
+                    res.json({ status: 450, hassuccessed: false, msg: 'User does not exist' })
                 }
             })
-             
-}
-    else {
-        res.status(401).json({ status: 401, success: false,  message: 'Authentication required.' })
-    }  
-})
 
-    router.post('/AskPatient/:id', function (req, res, next) {
-        const token = (req.headers.token);
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-            User.findOne({ profile_id: req.params.id}).exec()
-                .then((user_data1) => {
-                    if (user_data1) {
-                        var Link1 = 'https://sys.aimedis.io/patient/mydoctors'
-                        if (req.body.lan === 'de') {
-                            var dhtml = 'Sie haben eine Anfrage zum Hinzufügen eines Lieblingsarztes vom DOKTOR ('+req.body.first_name + ' ' +req.body.last_name +').<br/>'+
-                            'Für <b> Akzeptieren / Löschen </b> gehen Sie zu <a target="_blank" href="'+ Link1 +'">LINK</a>.<br/><br/><br/> ' +
-                            '<b>Ihr Aimedis Team</b><br/>' +
-                            '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                            '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
-                        }
-                        else {
-                            var dhtml = 'You have got a request to add favorite doctor from the DOCTOR ('+req.body.first_name + ' ' +req.body.last_name +').<br/>'+
-                            'For <b>Accept / Delete</b> the request go to the <a target="_blank" href="'+ Link1 +'">LINK</a>.<br/><br/><br/> ' +
-                            '<b>Your Aimedis team</b><br/>' +
-                            '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                            '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>'; 
-                        }
-                       
-                        var mailOptions = {
-                            from: "contact@aimedis.com",
-                            to: user_data1.email,
-                            subject: 'Ask for become favorite doctor',
-                            html: dhtml
-                        }; 
-                        var sendmail = transporter.sendMail(mailOptions)
-                        if (sendmail) {
-                            res.json({ status: 200, hassuccessed: true, msg: 'Mail is sent' })
-                        }
-                        else {
-                            console.log('there is errro', err); res.json({ status: 200, hassuccessed: false, msg: 'Mail is not sent' })
-                        }
-                    }
-                    else { 
-                        res.json({ status: 450,  hassuccessed: false,  msg: 'User does not exist' })
-                    }
-                })
-                 
     }
-        else {
-            res.status(401).json({ status: 401, success: false,  message: 'Authentication required.' })
-        }  
+    else {
+        res.status(401).json({ status: 401, success: false, message: 'Authentication required.' })
+    }
 })
 
 router.get('/AllusersMessages', function (req, res, next) {
     const token = (req.headers.token);
-let legit = jwtconfig.verify(token)
-if (legit) {
-    User.find()
-        .select('profile_id first_name last_name _id email')
-        .exec(function(err, Userinfo) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-            } else {
-                res.json({ status: 200, hassuccessed: true, data: Userinfo });
-            }
-});
-        
-}
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.find()
+            .select('profile_id first_name last_name _id email')
+            .exec(function (err, Userinfo) {
+                if (err) {
+                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                } else {
+                    res.json({ status: 200, hassuccessed: true, data: Userinfo });
+                }
+            });
+
+    }
     else {
-        res.status(401).json({ status: 401, success: false,  message: 'Authentication required.' })
-    }  
+        res.status(401).json({ status: 401, success: false, message: 'Authentication required.' })
+    }
 }
 )
 
@@ -3053,193 +3039,213 @@ if (legit) {
 //Add by Ankita (01-07-2020)
 // For landing pages
 router.post('/requireCSV', function (req, res, next) {
-    const todos = req.body.Content; 
+    const todos = req.body.Content;
     // convert JSON array to CSV string
     var config1 = {
         method: 'get',
-        url: 'https://aimedis.agilecrm.com/dev/api/contacts/search/email/'+req.body.Content.email,
-        headers: { 
-          'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==', 
+        url: 'https://aimedis.agilecrm.com/dev/api/contacts/search/email/' + req.body.Content.email,
+        headers: {
+            'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==',
         }
-      };
-      axios(config1)
-      .then(function (response) {
-            if(response.data.id)
-            {
-                res.json({ status: 200, hassuccessed: false, msg: 'User already exist' })  
+    };
+    axios(config1)
+        .then(function (response) {
+            if (response.data.id) {
+                res.json({ status: 200, hassuccessed: false, msg: 'User already exist' })
             }
-            else
-            {
-                if(req.body.Subject==="Aimedis Staff Recruitment")
-                {
+            else {
+                if (req.body.Subject === "Aimedis Staff Recruitment") {
                     var staff = req.body.Content.staff;
                     staff.push(req.body.Content.industry)
-                    var data = {tags:staff , type:"PERSON",properties:[{type:"SYSTEM",name:"first_name","value":req.body.Content.first_name},{type:"SYSTEM", name:"last_name",value:req.body.Content.last_name},{type:"SYSTEM",name:"email",subtype:"",value:req.body.Content.email},{type:"SYSTEM",name:"company",value:req.body.Content.company},{name:"phone",value:req.body.Content.phone, subtype:""}]};
+                    var data = { tags: staff, type: "PERSON", properties: [{ type: "SYSTEM", name: "first_name", "value": req.body.Content.first_name }, { type: "SYSTEM", name: "last_name", value: req.body.Content.last_name }, { type: "SYSTEM", name: "email", subtype: "", value: req.body.Content.email }, { type: "SYSTEM", name: "company", value: req.body.Content.company }, { name: "phone", value: req.body.Content.phone, subtype: "" }] };
                     var config = {
                         method: 'post',
                         url: 'https://aimedis.agilecrm.com/dev/api/contacts',
-                        headers: { 
-                          'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==', 
-                          'Content-Type': 'application/json'
+                        headers: {
+                            'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==',
+                            'Content-Type': 'application/json'
                         },
-                        data : data
-                      };
+                        data: data
+                    };
                     axios(config)
-                    .then(function (response) {
-                        converter.json2csv(todos, (err, csv) => {
-                            console.log('cominsid1e')
-                            if (err) {
-                                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.55', error: err });
-                            }
-                            var mailOptions = {
-                                from: "contact@aimedis.com",
-                                to: "contact@aimedis-staff.com",
-                                subject: req.body.Subject,
-                                html: 'Here the Attach file related to the ' + req.body.Subject +' <br/><br/>'+
-                                '<b>Your Aimedis team </b>',
-                                attachments: [{filename: 'Reqested.csv',
-                                content: csv,
-                                contentType: 'text/csv' }]
-                            
-                            };
-                        var sendmail = transporter.sendMail(mailOptions)
-                        res.json({ status: 200, hassuccessed: true, msg: 'Added in to CRM' }) 
-                        }) 
-                    })
-                    .catch(function (error) {
-                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong1' })
-                    });
+                        .then(function (response) {
+                            converter.json2csv(todos, (err, csv) => {
+                                console.log('cominsid1e')
+                                if (err) {
+                                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.55', error: err });
+                                }
+                                var mailOptions = {
+                                    from: "contact@aimedis.com",
+                                    to: "contact@aimedis.com",
+                                    subject: req.body.Subject,
+                                    html: 'Here the Attach file related to the ' + req.body.Subject + ' <br/><br/>' +
+                                        '<b>Your Aimedis team </b>',
+                                    attachments: [{
+                                        filename: 'Reqested.csv',
+                                        content: csv,
+                                        contentType: 'text/csv'
+                                    }]
+
+                                };
+                                var sendmail = transporter.sendMail(mailOptions)
+                                res.json({ status: 200, hassuccessed: true, msg: 'Added in to CRM' })
+                            })
+                        })
+                        .catch(function (error) {
+                            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong1' })
+                        });
                 }
-                else
-                { 
+                else {
                     var staff = []
                     staff.push(req.body.Content.qualification)
                     staff.push(req.body.Content.specilization)
                     staff.push(req.body.Content.profession)
-                    var data = {tags:staff , type:"PERSON",properties:[{type:"SYSTEM",name:"first_name","value":req.body.Content.first_name},{type:"SYSTEM", name:"last_name",value:req.body.Content.last_name},{type:"SYSTEM",name:"email",subtype:"",value:req.body.Content.email},{name:"phone",value:req.body.Content.phone, subtype:""}]};
+                    var data = { tags: staff, type: "PERSON", properties: [{ type: "SYSTEM", name: "first_name", "value": req.body.Content.first_name }, { type: "SYSTEM", name: "last_name", value: req.body.Content.last_name }, { type: "SYSTEM", name: "email", subtype: "", value: req.body.Content.email }, { name: "phone", value: req.body.Content.phone, subtype: "" }] };
                     console.log('dataa', data)
                     var config = {
                         method: 'post',
                         url: 'https://aimedis.agilecrm.com/dev/api/contacts',
-                        headers: { 
-                          'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==', 
-                          'Content-Type': 'application/json'
+                        headers: {
+                            'Authorization': 'Basic bWljaGFlbC5rYWxkYXNjaEBhaW1lZGlzLmNvbTo2MnR0Y2lma2xucXZyY3Q2YXBrNjBlbzhlag==',
+                            'Content-Type': 'application/json'
                         },
-                        data : data
-                      };
+                        data: data
+                    };
                     axios(config)
-                    .then(function (response) {
-                        converter.json2csv(todos, (err, csv) => {
-                            console.log('cominside')
-                            var mailOptions = {
-                                from: "contact@aimedis.com",
-                                to: "contact@aimedis-staff.com",
-                                subject: req.body.Subject,
-                                html: 'Here the Attach file related to the ' + req.body.Subject +' <br/><br/>'+
-                                '<b>Your Aimedis team </b>',
-                                attachments: [{filename: 'Reqested.csv',
-                                content: csv,
-                                contentType: 'text/csv' }]
-                            
-                            };
-                            if (err) {
-                                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.45', error: err });
-                            }
-                        var sendmail = transporter.sendMail(mailOptions)
-                        res.json({ status: 200, hassuccessed: true, msg: 'Added in to CRM' }) 
-                        })
-                    })
-                    .catch(function (error) {
-                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong2', err: error })
-                    }); 
-            }
-        }
-      })
-      .catch(function (error) {
-            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong3' })
-      }); 
-});
-// router.post('/requireCSV', function (req, res, next) {
-//     const todos = req.body.Content; 
-//     // convert JSON array to CSV string
+                        .then(function (response) {
+                            converter.json2csv(todos, (err, csv) => {
+                                console.log('cominside')
+                                var mailOptions = {
+                                    from: "contact@aimedis.com",
+                                    to: "contact@aimedis.com",
+                                    subject: req.body.Subject,
+                                    html: 'Here the Attach file related to the ' + req.body.Subject + ' <br/><br/>' +
+                                        '<b>Your Aimedis team </b>',
+                                    attachments: [{
+                                        filename: 'Reqested.csv',
+                                        content: csv,
+                                        contentType: 'text/csv'
+                                    }]
 
-//     converter.json2csv(todos, (err, csv) => {
-//         if (err) {
-//             res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//         }
-//         var mailOptions = {
-//             from: "contact@aimedis.com",
-//             to: "ankita.webnexus@gmail.com",
-//             subject: req.body.Subject,
-//             html: 'Here the Attach file related to the ' + req.body.Subject +' <br/><br/>'+
-//             '<b>Your Aimedis team </b>',
-//             attachments: [{filename: 'Reqested.csv',
-//             content: csv,
-//             contentType: 'text/csv' }]
-        
-//         };
-        
-//         var sendmail = transporter.sendMail(mailOptions)
-//         if(sendmail)
-//         {
-//             res.json({ status: 200, hassuccessed: true, msg: 'Mail sent successfully' })
-//         }
-//         else
-//         {
-//             res.json({ status: 200, hassuccessed: false, message: 'Something went wrong22.' })
-//         }  
-//     });    
-// });
+                                };
+                                if (err) {
+                                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.45', error: err });
+                                }
+                                var sendmail = transporter.sendMail(mailOptions)
+                                res.json({ status: 200, hassuccessed: true, msg: 'Added in to CRM' })
+                            })
+                        })
+                        .catch(function (error) {
+                            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong2', err: error })
+                        });
+                }
+            }
+        })
+        .catch(function (error) {
+            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong3' })
+        });
+});
+
+
+// router.post('/downloadPdf', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let   legit = jwtconfig.verify(token)
+//     if (legit) {
+//         var patientData= req.body
+//         var trackID = patientData.Dieseases
+//         delete trackID["track_id"];
+//         delete trackID["created_by"];
+//         trackID["created_by"] = trackID["created_by_temp"]
+//         delete trackID["created_by_temp"];
+
+//             var patient=[
+//                 {
+//                     name:  patientData.patientData.name,
+//                     email: patientData.patientData.email,
+//                     DOB: patientData.patientData.birthday,
+//                     Mobile: patientData.patientData.mobile
+//                 }
+//             ]
+//             let dignoseKeys= Object.keys(patientData.Dieseases),
+//                 dignoseValues= Object.values(patientData.Dieseases)
+//             var filename= patientData.Dieseases.type+uuidv1()+'.pdf'
+//             var document = { 
+//                 type: 'file',
+//                 template: html,
+//                 context: {
+//                     type: patientData.Dieseases.type,
+//                     patient: patient,
+//                     Dignose_Key: dignoseKeys,
+//                     Dignose_Value: dignoseValues
+//                 },
+//                 path: 'public/uploads/pdfs/'+ filename
+//             };
+
+//             var options = {
+//                 format: "A4",
+//                 orientation: "portrait",
+//                 border: "10mm"
+//             };
+
+//             pdf.create(document, options).then(res4 => {
+//                     res.json({ status: 200, hassuccessed: true, data: filename });
+//                 }).catch(error => {
+//                     res.json({ status: 200, hassuccessed: false, message: error });
+//             });
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+//     }
+// })
 
 router.post('/downloadPdf', function (req, res, next) {
-    const token = (req.headers.token)
-    let   legit = jwtconfig.verify(token)
-    if (legit) {
-        var patientData= req.body
-        var trackID = patientData.Dieseases
-        delete trackID["track_id"];
-        delete trackID["created_by"];
-        trackID["created_by"] = trackID["created_by_temp"]
-        delete trackID["created_by_temp"];
-      
-            var patient=[
-                {
-                    name:  patientData.patientData.name,
-                    email: patientData.patientData.email,
-                    DOB: patientData.patientData.birthday,
-                    Mobile: patientData.patientData.mobile
-                }
-            ]
-            let dignoseKeys= Object.keys(patientData.Dieseases),
-                dignoseValues= Object.values(patientData.Dieseases)
-            var filename= patientData.Dieseases.type+uuidv1()+'.pdf'
-            var document = { 
-                type: 'file',
-                template: html,
-                context: {
-                    type: patientData.Dieseases.type,
-                    patient: patient,
-                    Dignose_Key: dignoseKeys,
-                    Dignose_Value: dignoseValues
-                },
-                path: 'public/uploads/pdfs/'+ filename
-            };
-            
-            var options = {
-                format: "A4",
-                orientation: "portrait",
-                border: "10mm"
-            };
-            
-            pdf.create(document, options).then(res4 => {
-                    res.json({ status: 200, hassuccessed: true, data: filename });
-                }).catch(error => {
-                    res.json({ status: 200, hassuccessed: false, message: error });
+        // Custom handlebar helper
+        pdf.registerHelper('ifCond', function (v1, v2, options) {
+            if (v1 === v2) {
+                return options.fn(this);
+            }
+            return options.inverse(this);
+        })
+
+        var options = {
+            format: "A3",
+            orientation: "portrait",
+            border: "10mm"
+        };
+        var Data = [];
+        {
+            Object.entries(req.body.Dieseases).map(([key, value]) => {
+                if (key !== 'attachfile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'datetime_on' && key !== 'publicdatetime' && key !== 'track_id') { 
+                    if(Array.isArray(value)){
+                        Data.push({ 'k': key.replace('_', ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ')})
+                    }
+                    else if(typeof value === 'string'){
+                        Data.push({ 'k': key.replace('_', ' '), 'v': value }) }}
+                if (key === 'created_by_temp') { Data.push({ 'k': 'Created by', 'v': value }) }
+            }) 
+        }
+        var filename = 'GeneratedReport.pdf'
+        var document = {
+            type: 'file',     // 'file' or 'buffer'
+            template: html,
+            context: {
+                Dieseases: Data,
+                pat_info: req.body.patientData,
+                type: req.body.Dieseases.type.replace('_', ' ')
+            },
+            path: `${__dirname}/${filename}`  // it is not required if type is buffer
+        };
+        pdf.create(document, options)
+            .then(res22 => {
+                const file = `${__dirname}/${filename}`;
+                console.log(file)
+                res.download(file); // Set disposition and send it.
+                
+            })
+            .catch(error => {
+                res.json({ status: 200, hassuccessed: true, filename: filename });
             });
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-    }
+    
 })
 
 

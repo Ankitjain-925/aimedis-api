@@ -1,17 +1,29 @@
 
 var aws = require('aws-sdk');
 var express = require('express');
+var re = require('../regions.json')
 let router = express.Router();
 
 router.get('/sign_s3', (req, res) => {
-
+  console.log('req.query get', req.query)
+if(req.query.bucket && req.query.bucket!=='undefined' && req.query.bucket !=='')
+{
+  var bucket = req.query.bucket;
+}
+else 
+{
+  var bucket = 'aimedisfirstbucket';
+}
+console.log('bucket', bucket)
+var data = re.regions && re.regions.length>0 && re.regions.filter((value, key) =>
+value.bucket === bucket);
 var params = {
-  Bucket: 'aimedisfirstbucket', // your bucket name,
+  Bucket:bucket, // your bucket name,
   Key: req.query.find // path to the object you're looking for
 }
 
 aws.config.update({
-  region: 'ap-south-1',
+  region: data[0].region,
   accessKeyId: 'AKIASQXDNWERH3C6MMP5',
   secretAccessKey: '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'
 })
@@ -32,14 +44,27 @@ s3.getSignedUrl('getObject', params, function(err, url){
 
 
 router.post('/sign_s3', (req, res) => {
+
+  if(req.body.bucket && req.body.bucket!=='undefined' && req.body.bucket !=='')
+  {
+    var bucket = req.body.bucket;
+  }
+  else 
+  {
+    var bucket = 'aimedisfirstbucket';
+  }
+  var data1 = re.regions && re.regions.length>0 && re.regions.filter((value, key) =>
+  value.bucket === bucket);
+  console.log(data1[0].region)
   // Configure aws with your accessKeyId and your secretAccessKey
   aws.config.update({
-    region: 'ap-south-1', // Put your aws region here
+    region: data1[0].region, // Put your aws region here
     accessKeyId: 'AKIASQXDNWERH3C6MMP5',
-    secretAccessKey: 'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC'
+    secretAccessKey:
+     'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC'
   })
 
-  const S3_BUCKET = 'aimedisfirstbucket'
+  const S3_BUCKET = bucket
   var fileName = Date.now()+'-'+ req.body.fileName;
   if(req.body.folders)
   {

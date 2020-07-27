@@ -575,7 +575,7 @@ router.post('/Document', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
       console.log('req.query', req.query)
-      var data = { DocumentId: uuidv1(), version: 1, status: true, filename : req.query.filename, url : req.query.url };
+      var data = { DocumentId: uuidv1(), version: 1, status: true, filename : req.query.filename, url : req.query.url+'&bucket='+req.query.bucket };
 
     User.findByIdAndUpdate(legit.id,
     { $push: { documents: data } },
