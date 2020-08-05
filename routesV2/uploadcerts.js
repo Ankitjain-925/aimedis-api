@@ -60,8 +60,8 @@ router.post('/sign_s3', (req, res) => {
   aws.config.update({
     region: data1[0].region, // Put your aws region here
     accessKeyId: 'AKIASQXDNWERH3C6MMP5',
-    secretAccessKey:
-     'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC'
+    secretAccessKey:'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC',
+     signatureVersion: "v4",
   })
 
   const S3_BUCKET = bucket
