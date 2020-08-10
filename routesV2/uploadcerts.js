@@ -3,7 +3,7 @@ var aws = require('aws-sdk');
 var express = require('express');
 var re = require('../regions.json')
 let router = express.Router();
-
+const axios = require("axios");
 router.get('/sign_s3', (req, res) => {
   console.log('req.query get', req.query)
 if(req.query.bucket && req.query.bucket!=='undefined' && req.query.bucket !=='')
@@ -61,7 +61,7 @@ router.post('/sign_s3', (req, res) => {
     region: data1[0].region, // Put your aws region here
     accessKeyId: 'AKIASQXDNWERH3C6MMP5',
     secretAccessKey:'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC',
-     signatureVersion: "v4",
+    signatureVersion: "v4",
   })
 
   const S3_BUCKET = bucket
@@ -100,4 +100,8 @@ const returnData = {
     res.json({success:true, data:{returnData}});
   });
 })
+
+
+
+
 module.exports = router;

@@ -371,7 +371,13 @@ router.delete('/deleteUser/:UserId', function (req, res, next) {
         if (err) {
             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
         } else {
-            emptyBucket('aimedisfirstbucket', data12.profile_id)
+            if(req.query.bucket)
+            {  console.log('data122', req.query.bucket)
+                var buck =  req.query.bucket }
+            else
+            { console.log('data121', req.query.bucket)
+                var buck =  'aimedisfirstbucket' }
+            emptyBucket(buck, data12.profile_id)
             res.json({ status: 200, hassuccessed: true, msg: 'User is Deleted' });
         }
     })

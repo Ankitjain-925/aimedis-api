@@ -60,7 +60,7 @@ router.get('/:UserId', function (req, res, next) {
                                 setTimeout(() => resolve(), 500);
                             });
                             promise.then(() => {
-                                var personal_info = {_id: doc._id, profile_id: doc.profile_id, first_name: doc.first_name, last_name: doc.last_name, birthday: doc.birthday}
+                                var personal_info = {_id: doc._id, profile_id: doc.profile_id, first_name: doc.first_name, last_name: doc.last_name, birthday: doc.birthday, email : doc.email, mobile : doc.mobile}
                                 var contact_partner ={name : doc.emergency_contact_name, number: doc.emergency_number,email: doc.emergency_email}
                                 var statusbyp, remarksbyp, options;
                                 console.log('dddd')

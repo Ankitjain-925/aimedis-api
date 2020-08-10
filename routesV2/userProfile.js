@@ -532,7 +532,13 @@ router.delete('/Users/:User_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
-                emptyBucket('aimedisfirstbucket', data.profile_id)
+                if(req.query.bucket)
+                {  console.log('data122', req.query.bucket)
+                    var buck =  req.query.bucket }
+                else
+                { console.log('data121', req.query.bucket)
+                    var buck =  'aimedisfirstbucket' }
+                emptyBucket(buck, data.profile_id)
                 res.json({ status: 200, hassuccessed: true, message: 'User is Deleted Successfully' });
             }
         });
@@ -3239,8 +3245,7 @@ router.post('/downloadPdf', function (req, res, next) {
             .then(res22 => {
                 const file = `${__dirname}/${filename}`;
                 console.log(file)
-                res.download(file); // Set disposition and send it.
-                
+                res.download(file); // Set disposition and send it.  
             })
             .catch(error => {
                 res.json({ status: 200, hassuccessed: true, filename: filename });
