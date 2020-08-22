@@ -482,6 +482,48 @@ router.put('/Bookservice', (req, res) => {
         });
 });
 
+router.delete('/Bookservice/:description', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.updateOne({ _id: legit.id },
+            { $pull: { paid_services: { description: req.params.description } } },
+            { multi: true },
+            function (err, doc) {
+                if (err && !doc) {
+                    res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                } else {
+                    console.log('doc', doc);
+                    if (doc.nModified == '0') {
+                        res.json({ status: 200, hassuccessed: false, msg: 'Services not deactivate' })
+                    }
+                    else {
+                        res.json({ status: 200, hassuccessed: true, msg: 'services is deactivated' })
+                    }
+                }
+            });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+// router.put('/Bookservice', (req, res) => {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     var paymentData = {
+//         created: moment(new Date()).format("MM/DD/YYYY"),
+//         description: req.body.description,
+//     }
+//     User.updateOne({ _id: legit.id }, { $push: { paid_services: paymentData } },
+//         { safe: true, upsert: true }, function (err, doc) {
+//             if (err && !doc) {
+//                 res.json({ status: 200, hassuccessed: false, message: 'something went wrong', error: err })
+//             } else {
+//                 res.json({ status: 200, hassuccessed: true, message: 'booked sucessfully', data: doc })
+//             }
+//         });
+// });
+
 /*-----------------------D-E-L-E-T-E---P-A-R-T-I-C-U-L-A-R---U-S-E-R-------------------------*/
 function emptyBucket(bucketName, foldername) {
     aws.config.update({
@@ -590,7 +632,7 @@ router.put('/Users/update', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err })
             }
             if (changeStatus) {
-                   if(req.body.password)
+                if(req.body.password)
                 {
                     var enpassword = base64.encode(req.body.password);
                     req.body.password = enpassword;
@@ -651,6 +693,34 @@ router.put('/Users/update', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
+
+
+// For check alies profile id 
+
+router.get('/checkAlies', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        console.log('req.params.alies_id', req.query.alies_id)
+        User.find({  $or:[{alies_id: req.query.alies_id}, {profile_id: req.query.alies_id}] }, function (err, changeStatus) {
+            console.log('changeStatus', changeStatus)
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err })
+            }
+            if (changeStatus && changeStatus.length>0) {
+                res.json({ status: 200, hassuccessed: true, message: 'Already exist' })
+            }
+            else {
+                res.json({ status: 200, hassuccessed: false, message: 'No Data exist' })
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+
 
 // router.put('/Users/update', function (req, res, next) {
 //     const token = (req.headers.token)

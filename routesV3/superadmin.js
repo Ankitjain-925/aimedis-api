@@ -159,7 +159,7 @@ router.post('/Addadminuser', function (req, res, next) {
         var usertoken = { usertoken: uuidv1() }
         var verified = { verified: 'true' }
         // var parent_id = { parent_id: legit.id }
-        var profile_id    = {profile_id: profile_id, alies_id : profile_id}
+        var profile_id = { profile_id: profile_id, alies_id : profile_id }
         if (req.body.institute_id) {
             institute_id = { institute_id: req.body.institute_id }
         }
