@@ -9,6 +9,7 @@ var DoctrorAppointment = require('../schema/doctor_appointment')
 var Prescription = require('../schema/prescription')
 var Second_opinion = require('../schema/second_option')
 var Sick_certificate = require('../schema/sick_certificate')
+var Settings = require('../schema/settings')
 const sendSms = require("./sendSms")
 var jwtconfig = require('../jwttoken');
 var base64 = require('base-64');
@@ -411,7 +412,7 @@ router.post('/AddUser', function (req, res, next) {
                 var enpassword = base64.encode(req.body.password);
                 var usertoken = { usertoken: uuidv1() }
                 var verified = { verified: 'true' }
-                var profile_id = { profile_id: profile_id, alies_id : profile_id }
+                var profile_id = { profile_id: profile_id, alies_id: profile_id }
                 req.body.password = enpassword;
 
                 var user_id;
@@ -434,7 +435,7 @@ router.post('/AddUser', function (req, res, next) {
                                     if (err && !user_data) {
                                         res.json({ status: 200, message: 'Something went wrong.', error: err, hassuccessed: false });
                                     } else {
-                                        
+
                                         user_id = user_data._id;
                                         let token = user_data.usertoken;
                                         //let link = 'http://localhost:3000/';
@@ -572,12 +573,14 @@ router.delete('/Users/:User_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
-                if(req.query.bucket)
-                {  console.log('data122', req.query.bucket)
-                    var buck =  req.query.bucket }
-                else
-                { console.log('data121', req.query.bucket)
-                    var buck =  'aimedisfirstbucket' }
+                if (req.query.bucket) {
+                    console.log('data122', req.query.bucket)
+                    var buck = req.query.bucket
+                }
+                else {
+                    console.log('data121', req.query.bucket)
+                    var buck = 'aimedisfirstbucket'
+                }
                 emptyBucket(buck, data.profile_id)
                 res.json({ status: 200, hassuccessed: true, message: 'User is Deleted Successfully' });
             }
@@ -632,8 +635,7 @@ router.put('/Users/update', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err })
             }
             if (changeStatus) {
-                if(req.body.password)
-                {
+                if (req.body.password) {
                     var enpassword = base64.encode(req.body.password);
                     req.body.password = enpassword;
                 }
@@ -694,6 +696,45 @@ router.put('/Users/update', function (req, res, next) {
     }
 })
 
+//For change setting 
+router.put('/updateSetting', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        // Find the document
+        Settings.updateOne({ user_id: req.body.user_id }, req.body, { upsert: true, new: true, setDefaultsOnInsert: true }, function (error, result) {
+            if (error) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: error })
+            }
+            else {
+                res.json({ status: 200, hassuccessed: true, message: 'Setting Updated' })
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+//For get setting 
+router.get('/updateSetting', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        // Find the document
+        Settings.findOne({ user_id: legit.id }, function (error, result) {
+            if (error) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: error })
+            }
+            else {
+                res.json({ status: 200, hassuccessed: true, message: 'get Settings', data :  result})
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
 
 // For check alies profile id 
 
@@ -702,12 +743,12 @@ router.get('/checkAlies', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         console.log('req.params.alies_id', req.query.alies_id)
-        User.find({  $or:[{alies_id: req.query.alies_id}, {profile_id: req.query.alies_id}] }, function (err, changeStatus) {
+        User.find({ $or: [{ alies_id: req.query.alies_id }, { profile_id: req.query.alies_id }] }, function (err, changeStatus) {
             console.log('changeStatus', changeStatus)
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err })
             }
-            if (changeStatus && changeStatus.length>0) {
+            if (changeStatus && changeStatus.length > 0) {
                 res.json({ status: 200, hassuccessed: true, message: 'Already exist' })
             }
             else {
@@ -1251,15 +1292,10 @@ router.get('/RequestedSickCertificate', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     getResult1 = [];
     if (legit) {
-        Sick_certificate.find({ patient_id: legit.id, $or: [{ status: 'accept' }, { status: 'decline' }] }, function (err, data) {
+        Sick_certificate.find({ patient_id: legit.id }, function (err, data) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
-                // console.log('data21', data)
-                // forEachPromise(data, getMyResult1)
-                // .then((result) => {
-                //     res.json({ status: 200, hassuccessed: true, msg: 'Appointments are found', data: getResult1 })
-                // })
                 res.json({ status: 200, hassuccessed: true, data: data });
             }
         });
@@ -1274,7 +1310,7 @@ router.get('/RequestedAppointment', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     getResult3 = [];
     if (legit) {
-        Appointment.find({ patient: legit.id, $or: [{ status: 'accept' }, { status: 'decline' }] }, function (err, data) {
+        Appointment.find({ patient: legit.id }, function (err, data) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1297,7 +1333,28 @@ router.get('/RequestedPrescription', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     getResult2 = [];
     if (legit) {
-        Prescription.find({ patient_id: legit.id, $or: [{ status: 'accept' }, { status: 'decline' }] }, function (err, data) {
+        Prescription.find({ patient_id: legit.id }, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+
+                res.json({ status: 200, hassuccessed: true, data: data });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+
+//For requested Second opinion
+router.get('/RequestedSecond', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    getResult2 = [];
+    if (legit) {
+        Second_opinion.find({ patient_id: legit.id }, function (err, data) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1431,6 +1488,79 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
     }
 })
 
+
+//Add bY Ankita to update the Second opinion
+router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        console.log('req.body,12', req.body)
+        Second_opinion.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, msg: 'Sick certificate is uodated', data: userdata })
+            }
+        })
+          
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+//Add bY Ankita to update the Sick certificate
+router.put('/UpdateSickcertificate/:sick_certificate_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        console.log('req.body,11', req.body)
+        Sick_certificate.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, msg: 'Sick certificate is uodated', data: userdata })
+            }
+        })
+          
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+//Add bY Ankita to update the Prescription
+router.put('/UpdatePrescription/:sick_certificate_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        console.log('req.body,11', req.body)
+        Prescription.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, msg: 'Prescription is uodated', data: userdata })
+            }
+        })    
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+//Add bY Ankita to update the Second Opinion
+router.put('/UpdateSecond/:sick_certificate_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        console.log('req.body,11', req.body)
+        Second_opinion.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, msg: 'Second Opinion is uodated', data: userdata })
+            }
+        })    
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
 /*----------M-Y---P-A-T-I-E-N-T-S----------*/
 
 router.post('/AddtoPatientList/:id', function (req, res, next) {
@@ -3276,52 +3406,54 @@ router.post('/requireCSV', function (req, res, next) {
 // })
 
 router.post('/downloadPdf', function (req, res, next) {
-        // Custom handlebar helper
-        pdf.registerHelper('ifCond', function (v1, v2, options) {
-            if (v1 === v2) {
-                return options.fn(this);
-            }
-            return options.inverse(this);
-        })
-
-        var options = {
-            format: "A3",
-            orientation: "portrait",
-            border: "10mm"
-        };
-        var Data = [];
-        {
-            Object.entries(req.body.Dieseases).map(([key, value]) => {
-                if (key !== 'attachfile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'datetime_on' && key !== 'publicdatetime' && key !== 'track_id') { 
-                    if(Array.isArray(value)){
-                        Data.push({ 'k': key.replace('_', ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ')})
-                    }
-                    else if(typeof value === 'string'){
-                        Data.push({ 'k': key.replace('_', ' '), 'v': value }) }}
-                if (key === 'created_by_temp') { Data.push({ 'k': 'Created by', 'v': value }) }
-            }) 
+    // Custom handlebar helper
+    pdf.registerHelper('ifCond', function (v1, v2, options) {
+        if (v1 === v2) {
+            return options.fn(this);
         }
-        var filename = 'GeneratedReport.pdf'
-        var document = {
-            type: 'file',     // 'file' or 'buffer'
-            template: html,
-            context: {
-                Dieseases: Data,
-                pat_info: req.body.patientData,
-                type: req.body.Dieseases.type.replace('_', ' ')
-            },
-            path: `${__dirname}/${filename}`  // it is not required if type is buffer
-        };
-        pdf.create(document, options)
-            .then(res22 => {
-                const file = `${__dirname}/${filename}`;
-                console.log(file)
-                res.download(file); // Set disposition and send it.  
-            })
-            .catch(error => {
-                res.json({ status: 200, hassuccessed: true, filename: filename });
-            });
-    
+        return options.inverse(this);
+    })
+
+    var options = {
+        format: "A3",
+        orientation: "portrait",
+        border: "10mm"
+    };
+    var Data = [];
+    {
+        Object.entries(req.body.Dieseases).map(([key, value]) => {
+            if (key !== 'attachfile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'datetime_on' && key !== 'publicdatetime' && key !== 'track_id') {
+                if (Array.isArray(value)) {
+                    Data.push({ 'k': key.replace('_', ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ') })
+                }
+                else if (typeof value === 'string') {
+                    Data.push({ 'k': key.replace('_', ' '), 'v': value })
+                }
+            }
+            if (key === 'created_by_temp') { Data.push({ 'k': 'Created by', 'v': value }) }
+        })
+    }
+    var filename = 'GeneratedReport.pdf'
+    var document = {
+        type: 'file',     // 'file' or 'buffer'
+        template: html,
+        context: {
+            Dieseases: Data,
+            pat_info: req.body.patientData,
+            type: req.body.Dieseases.type.replace('_', ' ')
+        },
+        path: `${__dirname}/${filename}`  // it is not required if type is buffer
+    };
+    pdf.create(document, options)
+        .then(res22 => {
+            const file = `${__dirname}/${filename}`;
+            console.log(file)
+            res.download(file); // Set disposition and send it.  
+        })
+        .catch(error => {
+            res.json({ status: 200, hassuccessed: true, filename: filename });
+        });
+
 })
 
 
