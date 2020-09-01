@@ -30,7 +30,6 @@ router.get('/:UserId', function (req, res, next) {
                                 let promise = new Promise(function (resolve, reject) {
                                 if(doc.family_doc[0])
                                 { 
-                                    console.log('doc.family_doc[0]', doc.family_doc[0])
                                     user.findOne({ _id: doc.family_doc[0] }).then((docor) => {
                                         console.log(docor);
                                        if(docor != null){doctor.push(docor);}
@@ -61,12 +60,11 @@ router.get('/:UserId', function (req, res, next) {
                             });
                             promise.then(() => {
                                 var personal_info = {_id: doc._id, profile_id: doc.profile_id, first_name: doc.first_name, last_name: doc.last_name, birthday: doc.birthday, email : doc.email, mobile : doc.mobile}
-                                var contact_partner ={name : doc.emergency_contact_name, number: doc.emergency_number,email: doc.emergency_email}
+                                var contact_partner ={name : doc.emergency_contact_name, number: doc.emergency_number,email: doc.emergency_email, relation : doc.emergency_relation}
                                 var statusbyp, remarksbyp, options;
-                                console.log('dddd')
+                               
                                 if(doc.organ_donor && doc.organ_donor.length>0)
                                 {
-                                    console.log('doc.organ_donor[0]',doc.organ_donor[0])
                                     if(doc.organ_donor[0].selectedOption)
                                     {
                                         if(doc.organ_donor[0].selectedOption == 'yes_to_all')
@@ -128,7 +126,6 @@ router.get('/:UserId', function (req, res, next) {
                         let promise = new Promise(function (resolve, reject) {
                             if(doc.family_doc[0])
                             {
-                                console.log('doc.family_doc[0]', doc.family_doc[0])
                                 user.findOne({ _id: doc.family_doc[0] }).then((docor) => {
                                     console.log(docor);
                                    if(docor != null){doctor.push(docor);}
@@ -158,12 +155,12 @@ router.get('/:UserId', function (req, res, next) {
                             setTimeout(() => resolve(), 500);
                         });
                         promise.then(() => {
-                            var contact_partner ={name : doc.emergency_contact_name, number: doc.emergency_number,email: doc.emergency_email}
+                            console.log('doc.emergency_relation1' , doc.emergency_relation)
+                            var contact_partner ={name : doc.emergency_contact_name, number: doc.emergency_number,email: doc.emergency_email, relation : doc.emergency_relation}
                             var statusbyp, remarksbyp, options;
-                            console.log('dddd')
+                          
                             if(doc.organ_donor && doc.organ_donor.length>0)
                             {
-                                console.log('doc.organ_donor[0]',doc.organ_donor[0])
                                 if(doc.organ_donor[0].selectedOption)
                                 {
                                     if(doc.organ_donor[0].selectedOption == 'yes_to_all')

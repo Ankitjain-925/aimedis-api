@@ -5,7 +5,8 @@ let express = require("express"),
     app = express(),
     Schema = require("../schema/lms_schema");
     Wishlist = require("../schema/wishlist_schema");
-    var Payment             = require("../schema/payment_schema");
+var Payment = require("../schema/payment_schema");
+var Rating = require("../schema/lms_rating");
 
 var lmsStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -19,10 +20,8 @@ var lmsStorage = multer.diskStorage({
 var upload = multer({ storage: lmsStorage }).single("uploadFile");
 
 router.post("/addLms", (req, res) => {
-    console.log("789455reqiuest", req.body);
     var lmsSchema = new Schema(req.body)
     const token = (req.headers.token)
-    console.log('token', token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         lmsSchema.save((err, result) => {
@@ -92,9 +91,7 @@ router.post("/addtowishlist", (req, res, next) => {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        var data = {user_id : req.body.user_id, attachment : req.body.attachment, teaser : req.body.teaser, userName: req.body.userName, userType: req.body.userType, email: req.body.email,courseId : req.body.courseId, courseTitle:req.body.courseTitle, courseDesc : req.body.courseDesc, price: req.body.price}
-        var wishlists = new Wishlist(data);
-       
+        var wishlists = new Wishlist(req.body);
         wishlists.save(
             (err) => {
               if (err) { res.status(200).json({ mess: 'Error at Saving Data!', success: false, data: err }); }
@@ -118,7 +115,6 @@ router.post("/getWishlist", (req, res, next) => {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        
         Wishlist.find({user_id : req.body.user_id }, function (err, result) {
             if (err) {
                 res.json({ status: 200, message: 'Something went wrong', hassuccessed: false, err: err });
@@ -134,7 +130,6 @@ router.post("/getWishlist", (req, res, next) => {
 
 router.post('/uploadFile', function (req, res, next) {
     const token = (req.headers.token)
-    console.log('token', token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         upload(req, res, function (err, data) {
@@ -277,6 +272,23 @@ router.get("/getOrderHistory", (req, res, next) => {
     }
 })
 
+router.post("/addRating", (req, res) => {
+    var Ratings = new Rating(req.body)
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Ratings.save((err, result) => {
+            if (result) {
+                res.json({ status: 200, hassuccessed: true, msg: 'Successfully data Uploaded !', result: result })
+            } else {
+                res.json({ status: 200, hassuccessed: false, msg: 'Problem in Inserting data', error: err })
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+})
 
 
 

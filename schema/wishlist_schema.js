@@ -52,11 +52,7 @@ var wishlist = new Schema({
         required: false,
         unique: false
     },
-    attachment: {
-        type: Object,
-        required: false,
-        unique: false
-    },
+    courseContent:[],
     teaser: {
         type: Object,
         required: false,
