@@ -2,6 +2,7 @@
 var express = require('express');
 let router = express.Router();
 var Payment = require("../schema/payment_schema");
+var Cart = require("../schema/cart")
 var jwtconfig = require('../jwttoken');
 const configureStripe = require('stripe');
 const STRIPE_SECRET_KEY = 'sk_live_T9Hsupvqoz7exnMc3N1Kw8md'
@@ -64,6 +65,9 @@ router.post('/saveData', (req, res) => {
             if (err) {
               res.status(400).json({ message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
+              Cart.update({user_id : req.body.user_id }, { $set: { orderlist: [] }}, function(err, affected){
+                  console.log('affected: ', affected);
+              });
               res.status(200).json({ message: 'Get all succussfully', hassuccessed: true, data: result });
             }
           });

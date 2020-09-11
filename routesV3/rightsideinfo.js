@@ -12,7 +12,7 @@ var appointment = require('../schema/appointments')
 router.get('/patient', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    var last_dia,info,last_dv,last_con,weight_bmi;
+    var last_dia,info,last_dv,last_con,weight_bmi,sick_certificates,prescriptions,laboratory_result,blood_pressure;
     if (legit) {
         user.find(
             {
@@ -47,9 +47,31 @@ router.get('/patient', function (req, res, next) {
                                     value.type ==='weight_bmi');
                                     console.log('myFilterData4',myFilterData3)
                                     weight_bmi = myFilterData4[0];
-                                }
+
+                                var myFilterData5 = doc[0].track_record.filter((value, key) =>
+                                    value.type ==='prescription');
+                                    console.log('myFilterData5',myFilterData5)
+                                    prescriptions = myFilterData5[0];
+                               
+                                var myFilterData6 = doc[0].track_record.filter((value, key) =>
+                                    value.type ==='sick_certificate');
+                                    console.log('myFilterData6',myFilterData6)
+                                    sick_certificates = myFilterData6[0];
+                                
+                                var myFilterData7 = doc[0].track_record.filter((value, key) =>
+                                    value.type ==='blood_pressure');
+                                    console.log('myFilterData7',myFilterData7)
+                                    blood_pressure = myFilterData7[0];
+
+                                var myFilterData8 = doc[0].track_record.filter((value, key) =>
+                                    value.type ==='laboratory_result' && value.lab_parameter ==='Creatinine');
+                                    console.log('myFilterData8',myFilterData8)
+                                    laboratory_result = myFilterData8[0];
+                            
+                            }
                         info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
-                        res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: last_dv, last_con:last_con, weight_bmi: weight_bmi}})
+                        res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: last_dv, last_con:last_con, weight_bmi: weight_bmi, 
+                            prescriptions: prescriptions, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
                 }
                 else{
                     res.json({status: 200, hassuccessed: true, data : {info: {}, last_dia: [], last_dv: [], last_con:[], weight_bmi: []}})

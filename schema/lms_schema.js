@@ -37,7 +37,11 @@ var lmsSchema= new Schema({
         required: false,
         unique: false
     },
-    courseContent:[],
+    courseContent:{ 
+        type: Object,
+        required: false,
+        unique:false
+    },
     teaser:{
         type: Object,
         required: false,

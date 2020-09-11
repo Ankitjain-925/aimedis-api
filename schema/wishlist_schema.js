@@ -7,6 +7,11 @@ var wishlist = new Schema({
         required: true,
         default: ''
       },
+    user_profile_id: {
+        type: String,
+        required: true,
+        default: ''
+      },
     userName:{
         type: String,
         required: false,
@@ -52,7 +57,7 @@ var wishlist = new Schema({
         required: false,
         unique: false
     },
-    courseContent:[],
+    attachment:[],
     teaser: {
         type: Object,
         required: false,
