@@ -1120,7 +1120,7 @@ router.get('/GetPrescription', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Prescription.find({ doctor_id: legit.id }, function (err, Userinfo) {
+        Prescription.find({ doctor_id: legit.id, status: { $ne: "remove" }}, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1389,7 +1389,7 @@ router.get('/GetSickCertificate', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Sick_certificate.find({ doctor_id: legit.id }, function (err, Userinfo) {
+        Sick_certificate.find({ doctor_id: legit.id, view_status: { $ne: "remove" }}, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
