@@ -1120,7 +1120,7 @@ router.get('/GetPrescription', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Prescription.find({ doctor_id: legit.id, $or: [{ status: 'free' }, { status: 'pending' }] }, function (err, Userinfo) {
+        Prescription.find({ doctor_id: legit.id }, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -1389,7 +1389,7 @@ router.get('/GetSickCertificate', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Sick_certificate.find({ doctor_id: legit.id, $or: [{ status: 'free' }, { status: 'pending' }] }, function (err, Userinfo) {
+        Sick_certificate.find({ doctor_id: legit.id }, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
@@ -2934,10 +2934,10 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.findOne({ profile_id: req.params.UserId })
+        User.findOne( {$or:[ {alies_id : req.params.UserId}, { profile_id : req.params.UserId }]})
             .select('profile_id first_name last_name _id email pin emergency_email mobile')
             .exec(function (err, doc) {
-                if (err && !doc) {
+                if (err && !dofc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                 } else {
                     if (doc == null || doc == 'undefined') {
