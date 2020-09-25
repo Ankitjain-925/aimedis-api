@@ -736,6 +736,26 @@ router.get('/updateSetting', function (req, res, next) {
     }
 })
 
+//For get setting perticular user
+router.get('/updateSetting/:user_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        // Find the document
+        Settings.findOne({ user_id: req.params.user_id }, function (error, result) {
+            if (error) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: error })
+            }
+            else {
+                res.json({ status: 200, hassuccessed: true, message: 'get Settings', data :  result})
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
 // For check alies profile id 
 
 router.get('/checkAlies', function (req, res, next) {
@@ -1544,6 +1564,67 @@ router.put('/UpdatePrescription/:sick_certificate_id', function (req, res, next)
     }
 })
 
+//Added by Ankita for Upcoming Appointment
+router.get('/UpcomingAppintmentDoc', function (req, res, next) {
+    console.log('Here comes')
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Appointment.aggregate(
+            [
+                { $addFields: {
+                    Appointdate: {
+                      $dateFromString: { dateString: "$date", format: "%m-%d-%Y" }
+                    } 
+                  }},
+                  { $match: {
+                    doctor_id : legit.id,  
+                    Appointdate: {
+                      $gte: new Date(),
+                    }
+                  }},
+            ],
+            function(err,results) {
+                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
+                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            }
+        )
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+//Added by Ankita for Upcoming Appointment
+router.get('/UpcomingAppintmentPat', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Appointment.aggregate(
+            [
+                { $addFields: {
+                    Appointdate: {
+                      $dateFromString: { dateString: "$date", format: "%m-%d-%Y" }
+                    } 
+                  }},
+                  { $match: {
+                    patient: legit.id,
+                    Appointdate: {
+                      $gte: new Date(),
+                    }
+                  }},
+            ],
+            function(err,results) {
+                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
+                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            }
+        ) 
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 //Add bY Ankita to update the Second Opinion
 router.put('/UpdateSecond/:sick_certificate_id', function (req, res, next) {
     const token = (req.headers.token)
@@ -2180,6 +2261,33 @@ router.delete('/favDocs/:User_id/:patient_id', function (req, res, next) {
 
                 }
             })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+
+router.delete('/favPatients/:User_id/:doctor_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.update({ profile_id: req.params.User_id }, { parent_id: "0", $pull: { fav_doctor: { doctor: req.params.doctor_id } } },
+        { multi: true },
+        function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                User.update({ _id: legit.id }, { $pull: { myPatient: { profile_id: req.params.User_id } } },
+                { multi: true },
+                function (err, userdata2) {
+                    if (err) {
+                        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                    } else {
+                        res.json({ status: 200, hassuccessed: true, message: 'Deleted Successfully' });
+                    }
+                })
+            }
+        })
     } else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
@@ -2929,6 +3037,7 @@ router.put('/setpassword', function (req, res, next) {
         res.status(401).json({ status: 401, success: false, message: 'Authentication required.' })
     }
 })
+
 //Added by Ankita
 router.post('/GetUserInfo/:UserId', function (req, res, next) {
     const token = (req.headers.token)

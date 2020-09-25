@@ -287,9 +287,7 @@ router.get("/getAllLms", (req, res, next) => {
 // Model.update(query, { name: 'jason bourne' }, options, callback);
 router.post("/editLms/:_id", (req, res) => {
     const token = (req.headers.token)
-    console.log('token', token, req.params._id)
     let legit = jwtconfig.verify(token)
-    console.log("Edit 124563", req.body)
     if (legit) {
         Schema.updateOne({_id: req.params._id}, req.body).then(data => {
             res.json({ status: 200, hassuccessed: true, msg: 'Course Data updated Successfully.', Data: data })

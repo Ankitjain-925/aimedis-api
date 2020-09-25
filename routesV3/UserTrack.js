@@ -445,7 +445,7 @@ router.get('/getUser/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        user.findOne({ profile_id: req.params.UserId },
+        user.findOne({ $or :  [{profile_id: req.params.UserId },{alies_id :req.params.UserId  }]},
             function (err, doc) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
