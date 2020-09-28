@@ -50,52 +50,56 @@ router.get('/patient', function (req, res, next) {
                    console.log('sdasd',doc);
                         doc[0].track_record.sort(mySorter);
                         if (doc[0].track_record.length > 0) {
-                                var myFilterData1 = doc[0].track_record.filter((value, key) =>
-                                    value.type === 'diagnosis');
-                                    console.log('myFilterData1',myFilterData1)
-                                    last_dia = myFilterData1[0];
+                            var myFilterData1 = doc[0].track_record.filter((value, key) =>
+                            value.type === 'diagnosis');
+                            last_dia = myFilterData1[0];
+                    
+                            var myFilterData2 = doc[0].track_record.filter((value, key) =>
+                                value.type === 'doctor_visit');
+                                last_dv = myFilterData2;
+                                if(myFilterData2.length>2)
+                                {
+                                    last_dv = myFilterData2.filter((value, key) =>
+                                    key < 2 );
+                                }
+                                
+                            var myFilterData3 = doc[0].track_record.filter((value, key) =>
+                                value.type === 'condition_pain');
+                                last_con = myFilterData3[0];
                             
-                                var myFilterData2 = doc[0].track_record.filter((value, key) =>
-                                    value.type === 'doctor_visit');
-                                    console.log('myFilterData2',myFilterData2)
-                                    last_dv = myFilterData2[0];
-                                
-                          
-                                var myFilterData3 = doc[0].track_record.filter((value, key) =>
-                                    value.type === 'condition_pain');
-                                    console.log('myFilterData3',myFilterData3)
-                                    last_con = myFilterData3[0];
-                                
-                                var myFilterData4 = doc[0].track_record.filter((value, key) =>
-                                    value.type ==='weight_bmi');
-                                    console.log('myFilterData4',myFilterData3)
-                                    weight_bmi = myFilterData4[0];
+                            var myFilterData4 = doc[0].track_record.filter((value, key) =>
+                                value.type ==='weight_bmi');
+                                weight_bmi = myFilterData4;
 
-                                var myFilterData5 = doc[0].track_record.filter((value, key) =>
-                                    value.type ==='prescription');
-                                    console.log('myFilterData5',myFilterData5)
-                                    prescriptions = myFilterData5[0];
-                               
-                                var myFilterData6 = doc[0].track_record.filter((value, key) =>
-                                    value.type ==='sick_certificate');
-                                    console.log('myFilterData6',myFilterData6)
-                                    sick_certificates = myFilterData6[0];
+                            var myFilterData5 = doc[0].track_record.filter((value, key) =>
+                                value.type ==='prescription');
+                                prescriptions = myFilterData5;
+                                if(myFilterData5.length>2)
+                                {
+                                    prescriptions = myFilterData2.filter((value, key) =>
+                                    key < 2 );
+                                }
+                        
+                            var myFilterData6 = doc[0].track_record.filter((value, key) =>
+                                value.type ==='sick_certificate');
+                                sick_certificates = myFilterData6;
+                                if(myFilterData5.length>2)
+                                {
+                                    sick_certificates = myFilterData2.filter((value, key) =>
+                                    key < 2 );
+                                }
+                            var myFilterData7 = doc[0].track_record.filter((value, key) =>
+                                value.type ==='blood_pressure');
+                                blood_pressure = myFilterData7;
+
+                            var myFilterData9 = doc[0].track_record.filter((value, key) =>
+                                value.type ==='blood_sugar');
+                                blood_sugar = myFilterData9;
+
+                            var myFilterData8 = doc[0].track_record.filter((value, key) =>
+                            value.type ==='laboratory_result' && value.lab_parameter.value ==='Creatinine');
+                                laboratory_result = myFilterData8;
                                 
-                                var myFilterData7 = doc[0].track_record.filter((value, key) =>
-                                    value.type ==='blood_pressure');
-                                    console.log('myFilterData7',myFilterData7)
-                                    blood_pressure = myFilterData7[0];
-
-                                var myFilterData9 = doc[0].track_record.filter((value, key) =>
-                                    value.type ==='blood_sugar');
-                                    console.log('myFilterData9',myFilterData9)
-                                    blood_sugar = myFilterData9[0];
-
-                                var myFilterData8 = doc[0].track_record.filter((value, key) =>
-                                value.type ==='laboratory_result' && value.lab_parameter.value ==='Creatinine');
-                                    console.log('myFilterData8',myFilterData8)
-                                    laboratory_result = myFilterData8[0];
-                            
                             }
                         info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
                         res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: last_dv, last_con:last_con, weight_bmi: weight_bmi, 
@@ -154,50 +158,54 @@ router.get('/patient/:patient_id', function (req, res, next) {
                         doc[0].track_record.sort(mySorter);
                         if (doc[0].track_record.length > 0) {
                             var myFilterData1 = doc[0].track_record.filter((value, key) =>
-                                value.type === 'diagnosis');
-                                console.log('myFilterData1',myFilterData1)
-                                last_dia = myFilterData1[0];
+                            value.type === 'diagnosis');
+                            last_dia = myFilterData1[0];
+                    
+                        var myFilterData2 = doc[0].track_record.filter((value, key) =>
+                            value.type === 'doctor_visit');
+                            last_dv = myFilterData2;
+                            if(myFilterData2.length>2)
+                            {
+                                last_dv = myFilterData2.filter((value, key) =>
+                                key < 2 );
+                            }
+                            
+                        var myFilterData3 = doc[0].track_record.filter((value, key) =>
+                            value.type === 'condition_pain');
+                            last_con = myFilterData3[0];
                         
-                            var myFilterData2 = doc[0].track_record.filter((value, key) =>
-                                value.type === 'doctor_visit');
-                                console.log('myFilterData2',myFilterData2)
-                                last_dv = myFilterData2[0];
-                            
-                      
-                            var myFilterData3 = doc[0].track_record.filter((value, key) =>
-                                value.type === 'condition_pain');
-                                console.log('myFilterData3',myFilterData3)
-                                last_con = myFilterData3[0];
-                            
-                            var myFilterData4 = doc[0].track_record.filter((value, key) =>
-                                value.type ==='weight_bmi');
-                                console.log('myFilterData4',myFilterData3)
-                                weight_bmi = myFilterData4[0];
+                        var myFilterData4 = doc[0].track_record.filter((value, key) =>
+                            value.type ==='weight_bmi');
+                            weight_bmi = myFilterData4;
 
-                            var myFilterData5 = doc[0].track_record.filter((value, key) =>
-                                value.type ==='prescription');
-                                console.log('myFilterData5',myFilterData5)
-                                prescriptions = myFilterData5[0];
-                           
-                            var myFilterData6 = doc[0].track_record.filter((value, key) =>
-                                value.type ==='sick_certificate');
-                                console.log('myFilterData6',myFilterData6)
-                                sick_certificates = myFilterData6[0];
-                            
-                            var myFilterData7 = doc[0].track_record.filter((value, key) =>
-                                value.type ==='blood_pressure');
-                                console.log('myFilterData7',myFilterData7)
-                                blood_pressure = myFilterData7[0];
+                        var myFilterData5 = doc[0].track_record.filter((value, key) =>
+                            value.type ==='prescription');
+                            prescriptions = myFilterData5;
+                            if(myFilterData5.length>2)
+                            {
+                                prescriptions = myFilterData2.filter((value, key) =>
+                                key < 2 );
+                            }
+                       
+                        var myFilterData6 = doc[0].track_record.filter((value, key) =>
+                            value.type ==='sick_certificate');
+                            sick_certificates = myFilterData6;
+                            if(myFilterData5.length>2)
+                            {
+                                sick_certificates = myFilterData2.filter((value, key) =>
+                                key < 2 );
+                            }
+                        var myFilterData7 = doc[0].track_record.filter((value, key) =>
+                            value.type ==='blood_pressure');
+                            blood_pressure = myFilterData7;
 
-                            var myFilterData9 = doc[0].track_record.filter((value, key) =>
-                                value.type ==='blood_sugar');
-                                console.log('myFilterData9',myFilterData9)
-                                blood_sugar = myFilterData9[0];
-                                
-                            var myFilterData8 = doc[0].track_record.filter((value, key) =>
-                                value.type ==='laboratory_result' && value.lab_parameter.value ==='Creatinine');
-                                console.log('myFilterData8',myFilterData8)
-                                laboratory_result = myFilterData8[0];
+                        var myFilterData9 = doc[0].track_record.filter((value, key) =>
+                            value.type ==='blood_sugar');
+                            blood_sugar = myFilterData9;
+
+                        var myFilterData8 = doc[0].track_record.filter((value, key) =>
+                        value.type ==='laboratory_result' && value.lab_parameter.value ==='Creatinine');
+                            laboratory_result = myFilterData8;
                         
                         }
                     info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}

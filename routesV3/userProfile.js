@@ -1514,7 +1514,6 @@ router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('req.body,12', req.body)
         Second_opinion.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
@@ -1527,6 +1526,29 @@ router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
+
+//Added  by Ankita
+// router.put('/UpdateSecond/:prescription_id', function (req, res, next) {
+
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         Second_opinion.updateOne({ _id: req.params.prescription_id }, { $push: { attachfile: req.body.docs } }, { safe: true, upsert: true }, (err, doc1) => {
+//             if (err && !doc1) {
+//                 res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
+//             } else {
+//                 if (doc1.nModified == '0') {
+//                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+//                 }
+//                 else {
+//                     res.json({ status: 200, hassuccessed: true, message: 'Updated', data: doc1 })
+//                 }
+//             }
+//         });
+//     } else {
+//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+//     }
+// })
 //Add bY Ankita to update the Sick certificate
 router.put('/UpdateSickcertificate/:sick_certificate_id', function (req, res, next) {
     const token = (req.headers.token)
@@ -1611,6 +1633,38 @@ router.get('/UpcomingAppintmentPat', function (req, res, next) {
                     patient: legit.id,
                     Appointdate: {
                       $gte: new Date(),
+                    }
+                  }},
+            ],
+            function(err,results) {
+                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
+                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            }
+        ) 
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+
+//Added by Ankita for Upcoming Appointment
+router.get('/PastAppintmentPat', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Appointment.aggregate(
+            [
+                { $addFields: {
+                    Appointdate: {
+                      $dateFromString: { dateString: "$date", format: "%m-%d-%Y" }
+                    } 
+                  }},
+                  { $match: {
+                    patient: legit.id,
+                    Appointdate: {
+                     $or: [{$lte: new Date()},
+                      {$eq: new Date()}]
                     }
                   }},
             ],
@@ -2333,6 +2387,8 @@ router.put('/UpdatePrescription/:prescription_id', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
+
+
 
 router.put('/UpdateSickCertificate/:Sick_id', function (req, res, next) {
     console.log(req.body, 'nnnnnnnnnnnnnnnnnnn')
