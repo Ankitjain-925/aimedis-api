@@ -1153,6 +1153,41 @@ router.get('/GetPrescription', function (req, res, next) {
     }
 })
 
+router.get('/GetPrescription', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Prescription.find({ doctor_id: legit.id, status: { $ne: "remove" }}, function (err, Userinfo) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: Userinfo });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+//Added by Ankita to get the Second opinion of the doctor
+router.get('/GetSecondOpinion', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Second_opinion.find({ doctor_id: legit.id, status: { $ne: "remove" }}, function (err, Userinfo) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: Userinfo });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
 router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
