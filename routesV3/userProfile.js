@@ -1170,6 +1170,7 @@ router.get('/GetPrescription', function (req, res, next) {
     }
 })
 
+
 //Added by Ankita to get the Second opinion of the doctor
 router.get('/GetSecondOpinion', function (req, res, next) {
     const token = (req.headers.token)
@@ -1697,11 +1698,11 @@ router.get('/PastAppintmentPat', function (req, res, next) {
                   }},
                   { $match: {
                     patient: legit.id,
-                    Appointdate: {
-                     $or: [{$lte: new Date()},
-                      {$eq: new Date()}]
-                    }
-                  }},
+                    $or : [
+                        { Appointdate: { $lte: new Date() }},
+                        { Appointdate: { $eq: new Date() }},
+                    ]}
+                  },
             ],
             function(err,results) {
                 if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
