@@ -357,7 +357,7 @@ router.get('/getPharmacy/search/:name', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-    user.find({ type: 'pharmacy', first_name : { $regex: '.*' + req.params.name + '.*', $options: 'i' }},'profile_id _id first_name last_name',
+    user.find({ type: 'pharmacy', $or: [{first_name : { $regex: '.*' + req.params.name + '.*', $options: 'i' }}, {alies_id : { $regex: '.*' + req.params.name + '.*', $options: 'i' }},{profile_id : { $regex: '.*' + req.params.name + '.*', $options: 'i' }}]},'profile_id _id first_name last_name',
         function (err, doc) {
             if (err && !doc) {
                 res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })

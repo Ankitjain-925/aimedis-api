@@ -47,9 +47,10 @@ router.get('/patient', function (req, res, next) {
                       
                     });
                     promise.then((upcoming_appointment) => {
-                   console.log('sdasd',doc);
+              
                         doc[0].track_record.sort(mySorter);
                         if (doc[0].track_record.length > 0) {
+                           
                             var myFilterData1 = doc[0].track_record.filter((value, key) =>
                             value.type === 'diagnosis');
                             last_dia = myFilterData1[0];
@@ -101,9 +102,11 @@ router.get('/patient', function (req, res, next) {
                                 laboratory_result = myFilterData8;
                                 
                             }
-                        info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
-                        res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: last_dv, last_con:last_con, weight_bmi: weight_bmi, 
-                            upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+            
+                            info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
+                                res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: last_dv, last_con:last_con, weight_bmi: weight_bmi, 
+                                upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                        
                     })
                 }
                 else{
