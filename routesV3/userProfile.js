@@ -1639,7 +1639,8 @@ router.get('/UpcomingAppintmentDoc', function (req, res, next) {
                     doctor_id : legit.id,  
                     Appointdate: {
                       $gte: new Date(),
-                    }
+                    },
+                    status : 'free'
                   }},
             ],
             function(err,results) {
@@ -3656,6 +3657,39 @@ router.post('/downloadPdf', function (req, res, next) {
         });
 
 })
+
+//API to get the
+//Added by Ankita for Upcoming Appointment
+router.put('/SuggestTimeSlot', function (req, res, next) {      
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        let email = req.body.email,
+        apppinment_id= req.body._id,
+        oldSchedule= req.body.oldSchedule,
+        doctorProfile = req.body.docProfile,
+        timeslot = req.body.timeslot
+        console.log("req.body", req.body)
+        return Appointment.update({_id:apppinment_id},{status:'cancel'}).exec()
+            .then((chnageData)=>{
+                let mailOptions = {
+                    from:'contact@aimedis.com',
+                    to : email,
+                    subject: 'Appoinment Cancel',
+                    html: `<div>The appoinment with Dr. ${doctorProfile.first_name+ ' '+ doctorProfile.last_name} on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div> `
+                };
+                let sendmail = transporter.sendMail(mailOptions)
+                res.json({ status: 200, hassuccessed: true, msg: 'Request Send succesfully' })
+            })
+            .catch((err)=>{
+                res.json({ status: 200, hassuccessed: false, msg: 'Request Send Unsuccesfull' })
+            })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 
 
 module.exports = router;
