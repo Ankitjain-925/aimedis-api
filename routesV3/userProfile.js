@@ -2648,13 +2648,12 @@ router.get('/getLocation/:radius', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, error: error })
             } else {
                 var finalArray = [];
-                let monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
+                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
-                        console.log('try', Userinfo[i].private_appointments[j].custom_text)
                         if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
                         }
@@ -2679,9 +2678,12 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })
+                       
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })    
                     }
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
+                       
                         if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
@@ -2705,6 +2707,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
                     for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
                         if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
@@ -2729,6 +2732,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
+                    
                     finalArray.push({
                         data: Userinfo[i],
                         appointments: user,
@@ -2755,13 +2759,13 @@ router.get('/getLocation/:radius', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, error: error })
             } else {
                 var finalArray = [];
-                let monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text
+                
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
+                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
-                        console.log('try11', Userinfo[i].private_appointments[j].custom_text)
                         if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
                         }
@@ -2788,7 +2792,9 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })
                     }
+                    monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[];
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
+                         
                         if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
@@ -2812,7 +2818,9 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         }
                         online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
                     }
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[];
                     for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+                        
                         if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
@@ -2915,7 +2923,7 @@ router.post('/sendMessages', function (req, res, next) {
 });
 
 router.post('/sendMessages1', function (req, res, next) {
-    console.log(req.body);
+  
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {

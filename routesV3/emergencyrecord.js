@@ -422,41 +422,30 @@ function getArAlltrack(data) {
                     var created_by = doc3.first_name;
                 }
                 new_data.created_by_temp = created_by;
+                new_data.created_by_image = doc3.image;
                 return new_data;
              
             }).then(function(new_data){
-                if(data.review_by)
+                if(data.patient_id)
                 {
-                     user.findOne({_id: data.review_by}).exec()
+                     user.findOne({profile_id: data.patient_id}).exec()
                     .then(function(doc5){
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                        if(doc5)
+                        {
+                            var new_data = data;
+                            if (doc5.last_name) {
+                                var patient_name = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var patient_name = doc5.first_name;
+                            }
+                            new_data.patient_name = patient_name;
+                            new_data.patient_alies_id= doc5.alies_id;
+                            new_data.patient_default_id = doc5._id
+                            new_data.patient_image = doc5.image;
                         }
-                        else {
-                            var reviewed_by = doc5.first_name;
-                        }
-                        new_data.review_by_temp = reviewed_by;
-                        return new_data;
-                    
-                    })
-                }
-                if(data.emergency_by)
-                {
-                    user.findOne({_id: data.emergency_by}).exec()
-                    .then(function(doc5){
-                        console.log('ttttt112',doc5);
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
                         return new_data;
                     })
-                    
                 } 
                 if(data.archive)
                 {
@@ -475,51 +464,50 @@ function getAlltrack(data) {
             user.findOne({_id: data.created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name;
+                if(doc3){
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name;
+                    }
+                    else {
+                        var created_by = doc3.first_name;
+                    }
+                    new_data.created_by_temp = created_by; 
+                    new_data.created_by_image = doc3.image;
                 }
-                else {
-                    var created_by = doc3.first_name;
-                }
-                new_data.created_by_temp = created_by;
                 return new_data;
-             
             }).then(function(new_data){
-                if(data.review_by)
+                if(data.patient_id)
                 {
-                     user.findOne({_id: data.review_by}).exec()
+                     user.findOne({profile_id: data.patient_id}).exec()
                     .then(function(doc5){
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                        console.log('Here1',doc5)
+                        if(doc5)
+                        {
+
+                            console.log('Here11', )
+                            var new_data = data;
+                            if (doc5.last_name) {
+                                var patient_name = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var patient_name = doc5.first_name;
+                            }
+                            new_data.patient_name = patient_name;
+                            new_data.patient_alies_id= doc5.alies_id;
+                            new_data.patient_default_id = doc5._id
+                            new_data.patient_image = doc5.image;
+                            console.log('Here12', new_data)
+                            return new_data;
                         }
-                        else {
-                            var reviewed_by = doc5.first_name;
+                        else{
+                            console.log('Her33')
+                            return new_data;  
                         }
-                        new_data.review_by_temp = reviewed_by;
-                        return new_data;
-                    
                     })
                 }
-                if(data.emergency_by)
-                {
-                    user.findOne({_id: data.emergency_by}).exec()
-                    .then(function(doc5){
-                        console.log('ttttt112',doc5);
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
-                        return new_data;
-                    })
-                    
-                } 
                 if(!data.archive)
                 {
+                    console.log('erer',)
                     trackrecord1.push(new_data);
                 }
                 

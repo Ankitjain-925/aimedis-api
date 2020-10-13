@@ -337,7 +337,7 @@ router.get('/AppointOfDate/:date', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('Params', req.params.date )
+
         Appointment.find({ doctor_id: legit.id, date: req.params.date }, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
@@ -350,6 +350,59 @@ router.get('/AppointOfDate/:date', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+
+
+//Added by Ankita
+router.get('/AppointOfDate1/:date', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+
+        Appointment.find({ patient: legit.id, date: req.params.date }, function (err, Userinfo) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                console.log('Userinfos')
+                res.json({ status: 200, hassuccessed: true, data: Userinfo });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+router.get('/AppointmentByDate1', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Appointment.aggregate(
+            [
+                { 
+                    $match: {
+                        patient : legit.id,
+                        status: 'accept'
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$date",
+                        count: { $sum: 1 },
+                       
+                    }
+                }
+            ],
+            function(err,results) {
+                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
+                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            }
+        )
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 router.get('/AppointmentByDate', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
