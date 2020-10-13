@@ -1198,7 +1198,7 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
                 var dt = dateTime.create();
-
+                if(userdata && typeof userdata =='object') userdata= userdata.toObject()
                 if (req.body.status === "decline") {
                     var data = {
                         message_header: 'Decline Prescription request',
@@ -1223,7 +1223,7 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                     if (err && !updatedata) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
-                        console.log('updatedata.attachfile', updatedata.attachfile);
+                        
                         if (updatedata.status == 'accept' && updatedata.attachfile.length > 0) {
                             var ids = { track_id: uuidv1() };
                             var type = { type: req.body.type };
@@ -1466,8 +1466,9 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
+                if(userdata && typeof userdata =='object') userdata= userdata.toObject()
                 var dt = dateTime.create();
-                console.log('userdata.attachfile.length', userdata.attachfile.length);
+                
                 if (req.body.status === "accept" && userdata.attachfile.length == 0) {
                     req.body.status = "pending";
                 }
@@ -1542,27 +1543,116 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
     } else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
-})
+}) 
 
 
 //Add bY Ankita to update the Second opinion
-router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next) {
+router.put('/GetSecondOpinion/:sick_certificate_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Second_opinion.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
+        Second_opinion.findById({ _id: req.params.sick_certificate_id },("patient_id attachfile"), function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Sick certificate is uodated', data: userdata })
+                var dt = dateTime.create();
+                if(userdata && typeof userdata === 'object')userdata = userdata.toObject()
+                if (req.body.status === "decline") {
+                    var data = {
+                        message_header: 'Decline Second Opinion request',
+                        message_text: 'Dear Patient, your request is declined for Second Opinion by - ' + legit.name + '. Thanks Aimedis Team',
+                        sent_date: new Date(),
+                        sender_id: legit.id,
+                        reciever_id: [userdata.patient_id]
+                    }
+                    var messages = new message(data);
+                    messages.save(function (err, messages_data) {
+                        if (err && !messages_data) {
+                            console.log(err);
+                        } else {
+                            console.log(messages_data);
+                        }
+                    })
+                }
+                console.log("userdata", userdata)
+                
+                console.log("userdata", userdata.attachfile)
+                if (req.body.status === "accept" && (!userdata.attachfile || userdata.attachfile.length == 0)) {
+                    req.body.status = "pending";
+                }
+                
+                Second_opinion.findOneAndUpdate({ _id: userdata._id }, { $set: { status: req.body.status, accept_datetime: dt.format('Y-m-d H:M:S') } }, { new: true }, function (err, updatedata) {
+                    if (err && !updatedata) {
+                        res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
+                    } else {
+                        console.log('updatedata.attachfile', updatedata.attachfile);
+                        if (updatedata.status == 'accept' && updatedata.attachfile.length > 0) {
+                            var ids = { track_id: uuidv1() };
+                            var type = { type: req.body.type };
+                            var datetime_on = { datetime_on: updatedata.accept_datetime };
+                            var created_by = { created_by: updatedata.doctor_id };
+                            var created_by_temp = { created_by_temp: req.body.doctor_name };
+                            var created_on = { created_on: dt.format('Y-m-d') };
+                            var created_at = { created_at: dt.format('H:M') }
+                            var attachfile = { attachfile: updatedata.attachfile }
+                            var public = { public: 'always' }
+
+                            var full_record = { ...ids, ...type, ...created_by, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                            User.updateOne({ _id: updatedata.patient_id },
+                                { $push: { track_record: full_record } },
+                                { safe: true, upsert: true },
+                                function (err, doc) {
+                                    if (err && !doc) {
+                                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                                    } else {
+                                        if (doc.nModified == '0') {
+                                            res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                                        }
+                                        else {
+                                            var dhtml = 'Your Prescription Request Accepted.<br/>' +
+                                                'And prescription added in to your timeline.<br/>' +
+                                                '<b>Your Aimedis team </b>'
+                                            var mailOptions = {
+                                                from: "contact@aimedis.com",
+                                                to: updatedata.patient_email,
+                                                subject: 'Prescription Accepted',
+                                                html: dhtml
+                                            };
+                                            var sendmail = transporter.sendMail(mailOptions)
+                                            res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                                        }
+                                    }
+                                });
+                        }
+                        else {
+                            res.json({ status: 200, hassuccessed: false, msg: 'File is not attached' })
+                        }
+                        // res.json({ status: 200 , hassuccessed: true , message: "user updated" , data: userdata })
+                    }
+                })
             }
         })
-          
     } else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
 
+router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        console.log('req.body,11', req.body)
+        Second_opinion.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, msg: 'Prescription is uodated', data: userdata })
+            }
+        })    
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
 //Added  by Ankita
 // router.put('/UpdateSecond/:prescription_id', function (req, res, next) {
 
@@ -1639,7 +1729,8 @@ router.get('/UpcomingAppintmentDoc', function (req, res, next) {
                     doctor_id : legit.id,  
                     Appointdate: {
                       $gte: new Date(),
-                    }
+                    },
+                    status : 'free'
                   }},
             ],
             function(err,results) {
@@ -3664,6 +3755,39 @@ router.post('/downloadPdf', function (req, res, next) {
         });
 
 })
+
+//API to get the
+//Added by Ankita for Upcoming Appointment
+router.put('/SuggestTimeSlot', function (req, res, next) {      
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        let email = req.body.email,
+        apppinment_id= req.body._id,
+        oldSchedule= req.body.oldSchedule,
+        doctorProfile = req.body.docProfile,
+        timeslot = req.body.timeslot
+        console.log("req.body", req.body)
+        return Appointment.update({_id:apppinment_id},{status:'cancel'}).exec()
+            .then((chnageData)=>{
+                let mailOptions = {
+                    from:'contact@aimedis.com',
+                    to : email,
+                    subject: 'Appoinment Cancel',
+                    html: `<div>The appoinment with Dr. ${doctorProfile.first_name+ ' '+ doctorProfile.last_name} on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div> `
+                };
+                let sendmail = transporter.sendMail(mailOptions)
+                res.json({ status: 200, hassuccessed: true, msg: 'Request Send succesfully' })
+            })
+            .catch((err)=>{
+                res.json({ status: 200, hassuccessed: false, msg: 'Request Send Unsuccesfull' })
+            })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 
 
 module.exports = router;
