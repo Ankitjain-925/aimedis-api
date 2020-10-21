@@ -813,7 +813,7 @@ router.get('/GetHintinstitute', function (req, res, next) {
     const token = (req.headers.token);
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Institute.find({},
+        Institute.find({ institute_name: { $exists:true }},
             function (err, allinstitute) {
                 if (err) {
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });

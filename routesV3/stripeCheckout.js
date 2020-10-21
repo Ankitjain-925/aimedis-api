@@ -49,7 +49,7 @@ router.post('/', (req, res) => {
         if (err && !doc) {
             res.json({ status : 200, hassuccessed : false, message : 'something went wrong' ,error : err})
             } else {
-            res.json({ status : 200, hassuccessed : true, message : 'booked sucessfully',data : doc})
+            res.json({ status : 200, hassuccessed : true, message : 'booked successfully',data : doc})
         }
       });
     //stripe.charges.create(req.body, postStripeCharge(res,legit.id));

@@ -22,6 +22,7 @@ const { join } = require('path');
 var shortid = require('shortid');
 var aws = require('aws-sdk');
 const axios = require("axios");
+
 var fs = require("fs")
 var converter = require('json-2-csv');
 var pdf = require('dynamic-html-pdf');
@@ -59,7 +60,6 @@ var storage = multer.diskStorage({
         cb(null, 'public/uploads')
     },
     filename: function (req, file, cb) {
-        console.log('filesss', file),
             cb(null, Date.now() + '-' + file.originalname)
     }
 })
@@ -69,8 +69,7 @@ var Certificatestorage = multer.diskStorage({
         cb(null, 'public/uploads/certificates')
     },
     filename: function (req, file, cb) {
-        console.log('filesss', file),
-            cb(null, Date.now() + '-' + file.originalname)
+        cb(null, Date.now() + '-' + file.originalname)
     }
 })
 
@@ -147,7 +146,7 @@ router.post('/sendRegisterationMail', function (req, res, next) {
         from: "contact@aimedis.com",
         to: req.body.email,
         subject: 'Aimedis Registration',
-        html: '<div>You have registered sucessfully'
+        html: '<div>You have registered successfully'
             + '<a href="' + link + '?token=' + token + '">click here</a> to login</div>'
             + '<div>If you have any questions, please do not hesitate to contact us via icuservices@aimedis.com.</div>'
             + '<div style="color:#ddd, font-size: 9px;">Aimedis Customer Support <br/> - Aimedis B.V. <br/> Sint Michaëlstraat 45935 BL Steyl<br/> Netherlands - <br/>Aimedis B.V. Netherlands'
@@ -426,7 +425,6 @@ router.post('/AddUser', function (req, res, next) {
                         .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false }))
                         .then(regRes => {
                             if (regRes && regRes.success) {
-                                console.log('I am here', regRes)
                                 var authyId = { authyId: regRes.user.id };
                                 req.body.mobile = req.body.country_code.toUpperCase() + '-' + req.body.mobile;
                                 datas = { ...authyId, ...profile_id, ...req.body, ...isblock, ...createdate, ...createdby, ...usertoken, ...verified }
@@ -478,7 +476,7 @@ router.put('/Bookservice', (req, res) => {
             if (err && !doc) {
                 res.json({ status: 200, hassuccessed: false, message: 'something went wrong', error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, message: 'booked sucessfully', data: doc })
+                res.json({ status: 200, hassuccessed: true, message: 'booked successfully', data: doc })
             }
         });
 });
@@ -520,7 +518,7 @@ router.delete('/Bookservice/:description', function (req, res, next) {
 //             if (err && !doc) {
 //                 res.json({ status: 200, hassuccessed: false, message: 'something went wrong', error: err })
 //             } else {
-//                 res.json({ status: 200, hassuccessed: true, message: 'booked sucessfully', data: doc })
+//                 res.json({ status: 200, hassuccessed: true, message: 'booked successfully', data: doc })
 //             }
 //         });
 // });
@@ -2395,6 +2393,7 @@ router.put('/AddFavTDoc/:id', function (req, res, next) {
                     if (err2) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
+                        console.log('userdata2', userdata2)
                         if (userdata2.length != 0) {
                             res.json({ status: 200, hassuccessed: false, message: "Doctor already exists", error: err })
                         } else {
@@ -2835,6 +2834,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
             }
         })
     } else {
+        console.log('heeee')
         User.find({
             area: {
                 $near: {
@@ -2844,13 +2844,13 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         coordinates: [Number(req.query.longitude), Number(req.query.Latitude)]
                     }
                 }
-            }, type: 'doctor', speciality: req.query.speciality
+            }, type: 'doctor', 'speciality.label':  req.query.speciality
         }).find((error, Userinfo) => {
             if (error) {
                 res.json({ status: 200, hassuccessed: false, error: error })
             } else {
                 var finalArray = [];
-                
+             
                 for (let i = 0; i < Userinfo.length; i++) {
                     var user = [];
                     var online_users = [];
@@ -2942,6 +2942,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         practice_days: Practices
                     })
                 }
+             
                 res.json({ status: 200, hassuccessed: true, data: finalArray });
             }
         })
@@ -3456,7 +3457,7 @@ router.get('/AskPatientProfile/:id', function (req, res, next) {
         User.findOne({
             $or: [{ email: req.params.id }, {
                 profile_id: req.params.id,
-            }]
+            },{alies_id: req.params.id} ]
         }).exec()
             .then((user_data1) => {
                 if (user_data1) {
@@ -3479,7 +3480,8 @@ router.post('/AskPatient/:id', function (req, res, next) {
         User.findOne({ profile_id: req.params.id }).exec()
             .then((user_data1) => {
                 if (user_data1) {
-                    var Link1 = 'https://sys.aimedis.io/patient/mydoctors'
+                    var Link1 = 'https://aidoc.io/patient'
+                    
                     if (req.body.lan === 'de') {
                         var dhtml = 'Sie haben eine Anfrage zum Hinzufügen eines Lieblingsarztes vom DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ').<br/>' +
                             'Für <b> Akzeptieren / Löschen </b> gehen Sie zu <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
@@ -3722,12 +3724,29 @@ router.post('/downloadPdf', function (req, res, next) {
     var Data = [];
     {
         Object.entries(req.body.Dieseases).map(([key, value]) => {
-            if (key !== 'attachfile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'datetime_on' && key !== 'publicdatetime' && key !== 'track_id') {
+            if (key !== 'attachfile' && key !== 'created_by_image' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'created_on' && key !== 'publicdatetime' && key !== 'track_id') {
                 if (Array.isArray(value)) {
-                    Data.push({ 'k': key.replace('_', ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ') })
+                    Data.push({ 'k': key.replace(/_/g, ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ') })
                 }
                 else if (typeof value === 'string') {
-                    Data.push({ 'k': key.replace('_', ' '), 'v': value })
+                    if(key === 'notes' || key === 'remarks' || key === 'symptoms' || key === 'free_text' || key === 'explanation'){
+                        Data.push({ 'k': key.replace(/_/g, ' '), 'v': value })
+                    }
+                    else if(key === 'date_measured' || key === 'emergency_on' || key === 'review_on' || key === 'diagnosed_on' || key === 'when_to' ||
+                    key === 'when_until' || key === 'date_doctor_visit' || key === 'dod_onset' || key === 'dob' || key === 'dod' || key === 'first_visit_date' 
+                    || key === 'last_visit_date' || key === 'date_measured' || key === 'prescribed_on' || key === 'until'  || key === 'from_when'  || key === 'until_when' 
+                    || key === 'data_of_vaccination' || key === 'datetime_on'){
+                        Data.push({ 'k': key.replace(/_/g, ' '), 'v': getDate(value, 'YYYY/MM/DD') })
+                    }
+                    else if(key === 'reminder_time_taken'||key === 'time_taken' ){
+                        Data.push({ 'k': key.replace(/_/g, ' '), 'v': getReminder(item.time_taken,'24') })
+                    }
+                    else if(key === 'time_measured' ){
+                        Data.push({ 'k': key.replace(/_/g, ' '), 'v': getTime(item.time_taken,'24') })
+                    }
+                    else{
+                        Data.push({ 'k': key.replace(/_/g, ' '), 'v': value })
+                    }
                 }
             }
             if (key === 'created_by_temp') { Data.push({ 'k': 'Created by', 'v': value }) }
@@ -3755,6 +3774,65 @@ router.post('/downloadPdf', function (req, res, next) {
         });
 
 })
+
+function getReminder(reminder, timeFormat){
+    if(reminder && reminder.length>0){
+        var data=[];
+        reminder.map((itm)=>{
+            var date = new Date(itm.value);
+            if(timeFormat ==='12')
+            {   
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var ampm = hours >= 12 ? 'pm' : 'am';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                minutes = minutes < 10 ? '0'+minutes : minutes;
+                var strTime = hours + ':' + minutes + ' ' + ampm;
+                data.push(strTime);
+            }
+            else {
+                var h = (date.getHours() < 10 ? '0' : '') + date.getHours();
+                var m = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+                data.push(h + ':' + m);
+            }   
+        })
+        return data.join(', ');
+    }
+}
+
+function getTime (date, timeFormat){
+    if(timeFormat ==='12')
+    {   
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+    else {
+        var h = (date.getHours() < 10 ? '0' : '') + date.getHours();
+        var m = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+        return h + ':' + m;
+    }   
+}
+
+function getDate (date, dateFormat){
+    var d = new Date(date);
+    var monthNames = ["01", "02", "03", "04", "05", "06",
+        "07", "08", "09", "10", "11", "12"],
+        month = monthNames[d.getMonth()],
+        day = d.getDate(),
+        year = d.getFullYear()
+    if (day.length < 2) day = '0' + day;
+    if(dateFormat === 'YYYY/DD/MM') { return year + ' / ' + day + ' / ' + month; }
+    else if(dateFormat === 'DD/MM/YYYY') {  return day + ' / ' + month + ' / ' + year; }
+    else { return month + ' / ' + day + ' / ' + year;}
+}
+
 
 //API to get the
 //Added by Ankita for Upcoming Appointment

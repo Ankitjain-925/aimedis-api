@@ -299,7 +299,7 @@ router.put('/AddstoredPre/:UserId', function (req, res, next) {
         var full_record = { ...ids, ...req.body.data }
         if(req.query.addtopatient && req.query.addtopatient==='true')
         {
-            user.updateOne({ profile_id: req.body.data.patient_id },
+            user.updateOne({$or: [{ profile_id: req.body.data.patient_id }, { alies_id: req.body.data.patient_id }] },
                 { $push: { track_record: full_record } },
                 { safe: true, upsert: true },
                 function (err, doc) {
