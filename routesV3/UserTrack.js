@@ -19,7 +19,7 @@ var transporter = nodemailer.createTransport({
     secure: false,
     auth:{
         user: "wp1052892-aimedis00102",
-        pass: "DyNaMiTe=2008"
+        pass: "JuPiTeR7=7?"
     }
 });
 
@@ -440,8 +440,10 @@ router.post('/appointment', function (req, res) {
         if (err && !user_data) {
             res.json({ status: 200, message: 'Something went wrong.', error: err });
         } else {
+            console.log('req.body.date', getDate(req.body.date, 'YYYY/MM/DD'))
+            var date = getDate(req.body.date, 'YYYY/MM/DD')
             if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben am   DATE'+ req.body.date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' ONLINE/OFFLINE vereinbart. .<br/>'+ 
+                var dhtml = 'Sie haben am   DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' ONLINE/OFFLINE vereinbart. .<br/>'+ 
                 'Sollten Sie den Termin nicht wahrnehmen können, sagen Sie den Termin bitte spätestens 24 Stunden vor Terminbeginn ab. <br/>'+
                 'Kontaktieren Sie bei Fragen Ihren behandelnden Arzt unter PRACTICE PHONE NUMBER. <br/>'+
                 'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten. '+
@@ -450,7 +452,7 @@ router.post('/appointment', function (req, res) {
             
             }
             else {
-                var dhtml = 'You have got an ONLINE / OFFLINE appointment with'+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+req.body.date +' at TIME'+ req.body.start_time+'.<br/>'+ 
+                var dhtml = 'You have got an ONLINE / OFFLINE appointment with'+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+date +' at TIME'+ req.body.start_time+'.<br/>'+ 
                 'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins. <br/>'+
                 'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>'+
                 'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
@@ -460,7 +462,7 @@ router.post('/appointment', function (req, res) {
             }
             if (req.body.lan === 'de') {
             
-                var dhtml2 = ' Sie haben für den  DATE'+ req.body.date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.patient_info.patient_id+'ONLINE/OFFLINE vereinbart. .<br/>'+ 
+                var dhtml2 = ' Sie haben für den  DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.patient_info.patient_id+'ONLINE/OFFLINE vereinbart. .<br/>'+ 
                 'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>'+
                 'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an'+req.body.patient_info.email+'. <br/>'+
                 'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> '+
@@ -468,7 +470,7 @@ router.post('/appointment', function (req, res) {
                 '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml2 ='You have got an ONLINE / OFFLINE appointment with'+ req.body.patient_info.patient_id+' on DATE '+req.body.date +' at TIME'+ req.body.start_time+'.<br/>'+ 
+                var dhtml2 ='You have got an ONLINE / OFFLINE appointment with'+ req.body.patient_info.patient_id+' on DATE '+ date  +' at TIME'+ req.body.start_time+'.<br/>'+ 
                 'Please accept the appointment inside the system.<br/>'+ 
                 'If you have any questions, contact the patient via '+req.body.patient_info.email+'.<br/>'+ 
                 'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
@@ -493,6 +495,20 @@ router.post('/appointment', function (req, res) {
         }
     })
 })
+
+function getDate (date, dateFormat){
+    var d = new Date(date);
+    var monthNames = ["01", "02", "03", "04", "05", "06",
+        "07", "08", "09", "10", "11", "12"],
+        month = monthNames[d.getMonth()],
+        day = d.getDate(),
+        year = d.getFullYear()
+    if (day.length < 2) day = '0' + day;
+    if(dateFormat === 'YYYY/DD/MM') { return year + ' / ' + day + ' / ' + month; }
+    else if(dateFormat === 'DD/MM/YYYY') {  return day + ' / ' + month + ' / ' + year; }
+    else { return month + ' / ' + day + ' / ' + year;}
+}
+
 //for emergency access by doctor
 router.get('/getUser/:UserId', function (req, res, next) {
     const token = (req.headers.token)

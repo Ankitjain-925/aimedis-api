@@ -57,7 +57,7 @@ var transporter = nodemailer.createTransport({
     secure: false,
     auth: {
         user: "wp1052892-aimedis00102",
-        pass: "DyNaMiTe=2008"
+        pass: "JuPiTeR7=7?"
     }
 });
 

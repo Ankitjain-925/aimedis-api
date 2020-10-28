@@ -268,10 +268,9 @@ router.get('/ArchivegetTrack/:UserId', function (req, res, next) {
                             doc[0].track_record.sort(mySorter);
                             if (doc[0].track_record.length > 0) {
                                 forEachPromise(doc[0].track_record, getArAlltrack)
-                                    .then((result) => {
-                                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord2 })
-                                    })
-    
+                                .then((result) => {
+                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord2 })
+                                })
                             }
                             else {
                                 res.json({ status: 200, hassuccessed: false, msg: 'No data' })
@@ -401,6 +400,7 @@ router.get('/pharmacyPrescription/:UserId', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+
 function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
         return promise.then(function () {

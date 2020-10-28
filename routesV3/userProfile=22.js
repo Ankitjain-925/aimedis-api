@@ -257,13 +257,8 @@ router.post('/UserLogin', function (req, res, next) {
                                             type: user_data.type
                                         }
                                         var token = jwtconfig.sign(payload);
-                                        if(user_data.type !=='superadmin' && user_data.type !=='hospitaladmin'){
-                                            res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
-                                        }
-                                        else{
-                                            res.json({ status: 450, message: "User does not exist", hassuccessed: false })
-                                        }
-                                       
+
+                                        res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                     }
                                     else {
                                         if (user_data.authyId) {
@@ -283,115 +278,8 @@ router.post('/UserLogin', function (req, res, next) {
                                             }
                                             var token = jwtconfig.sign(payload);
 
-                                            if(user_data.type !=='superadmin' && user_data.type !=='hospitaladmin'){
-                                                res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
-                                            }
-                                            else{
-                                                res.json({ status: 450, message: "User does not exist", hassuccessed: false })
-                                            }
-                                        }
-
-                                        else {
-                                            res.json({ status: 450, message: "Can not get Mobile number for the notification", hassuccessed: false })
-                                        }
-                                    }
-
-                                } else {
-                                    res.json({ status: 450, message: "Your Account is not verified, please check your email account.", hassuccessed: false })
-                                }
-                            } else {
-                                if(user_data.type !=='superadmin' && user_data.type !=='hospitaladmin'){
-                                    res.json({ status: 450, message: "Wrong password", hassuccessed: false })
-                                }
-                                else{
-                                    res.json({ status: 450, message: "User does not exist", hassuccessed: false })
-                                }
-                                
-                            }
-                        })
-                    }
-                }
-                else {
-                    console.log('Seven');
-                    res.json({ status: 450, message: "User does not exist", hassuccessed: false })
-                }
-            })
-    }
-})
-
-router.post('/UserLoginAdmin', function (req, res, next) {
-    if (req.body.email == '' || req.body.password == '') {
-        res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
-    } else {
-        User.findOne({ email: { $regex: req.body.email, $options: "i" } }).exec()
-            .then((user_data) => {
-                if (user_data) {
-                    if (user_data.isblock === true) {
-                        res.json({ status: 450, hassuccessed: false, message: "User is blocked" })
-                    } else {
-                        let promise = new Promise(function (resolve, reject) {
-                            if (req.body.logintoken != '' && req.body.logintoken != undefined) {
-                                if (req.body.logintoken == user_data.usertoken) {
-                                    User.findOneAndUpdate({ _id: user_data._id }, { $set: { verified: 'true' } }, { new: true }, (err, doc1) => {
-                                        if (err && !doc1) {
-                                            res.json({ status: 450, hassuccessed: false, message: 'Verification Failed', error: err })
-                                        } else {
-                                            console.log(doc1)
-                                            user_data = doc1
-                                        }
-                                    });
-                                } else {
-                                    res.json({ status: 450, hassuccessed: false, message: 'Verification Failed' })
-                                }
-                            }
-                            setTimeout(() => resolve(), 500);
-                        });
-                        promise.then(() => {
-                            console.log(user_data)
-                            var decode = base64.encode(req.body.password);
-                            if (user_data.password === decode) {
-                                if (user_data.verified === 'true') {
-                                    if (!user_data.is2fa || user_data.is2fa === false) {
-                                        console.log('data', user_data.type)
-                                        let payload = {
-                                            email: user_data.email,
-                                            name: user_data.first_name + " " + user_data.last_name,
-                                            id: user_data._id,
-                                            type: user_data.type
-                                        }
-                                        var token = jwtconfig.sign(payload);
-                                        if(user_data.type ==='superadmin' || user_data.type ==='hospitaladmin'){
                                             res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                         }
-                                        else{
-                                            res.json({ status: 450, message: "User does not exist", hassuccessed: false })
-                                        }
-                                    }
-                                    else {
-                                        if (user_data.authyId) {
-                                            authy.requestSms({ authyId: user_data.authyId }, { force: true }, function (err, smsRes) {
-                                                if (err) {
-                                                    console.log('ERROR requestSms', err);
-                                                    res.json({ status: 450, hassuccessed: false, message: 'request not send', error: err })
-
-                                                }
-                                            });
-
-                                            let payload = {
-                                                email: user_data.email,
-                                                name: user_data.first_name + " " + user_data.last_name,
-                                                id: user_data._id,
-                                                type: user_data.type
-                                            }
-                                            var token = jwtconfig.sign(payload);
-
-                                            if(user_data.type ==='superadmin' || user_data.type ==='hospitaladmin'){
-                                                res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
-                                            }
-                                            else{
-                                                res.json({ status: 450, message: "User does not exist", hassuccessed: false })
-                                            }
-                                        }
 
                                         else {
                                             res.json({ status: 450, message: "Can not get Mobile number for the notification", hassuccessed: false })
@@ -402,13 +290,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                     res.json({ status: 450, message: "Your Account is not verified, please check your email account.", hassuccessed: false })
                                 }
                             } else {
-                                if(user_data.type ==='superadmin' || user_data.type ==='hospitaladmin'){
-                                    res.json({ status: 450, message: "Wrong password", hassuccessed: false })
-                                }
-                                else{
-                                    res.json({ status: 450, message: "User does not exist", hassuccessed: false })
-                                }
-                              
+                                res.json({ status: 450, message: "Wrong password", hassuccessed: false })
                             }
                         })
                     }
@@ -420,7 +302,6 @@ router.post('/UserLoginAdmin', function (req, res, next) {
             })
     }
 })
-
 
 router.post('/verifyLogin', function (req, res, next) {
     authy.verifyToken({ authyId: req.body.authyId, token: req.body.mob_token }, function (err, tokenRes) {
@@ -1835,13 +1716,21 @@ router.get('/UpcomingAppintmentDoc', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Appointment.find( {doctor_id : legit.id,  
-            $or : [
-                {date: { $gte: new Date(), }},
-                {date: { $eq: new Date(), }}
-                ],
-            status : 'free'
-            },
+        Appointment.aggregate(
+            [
+                { $addFields: {
+                    Appointdate: {
+                      $dateFromString: { dateString: "$date" , timezone: 'Europe/London', }
+                    } 
+                  }},
+                  { $match: {
+                    doctor_id : legit.id,  
+                    Appointdate: {
+                      $gte: new Date(),
+                    },
+                    status : 'free'
+                  }},
+            ],
             function(err,results) {
                 if (err) { res.json({err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
                 else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
@@ -1858,12 +1747,20 @@ router.get('/UpcomingAppintmentPat', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Appointment.find( {patient : legit.id,  
-            $or : [
-            {date: { $gte: new Date(), }},
-            {date: { $eq: new Date(), }}
+        Appointment.aggregate(
+            [
+                { $addFields: {
+                    Appointdate: {
+                      $dateFromString: { dateString: "$date",  timezone: 'Europe/London',  }
+                    } 
+                  }},
+                  { $match: {
+                    patient: legit.id,
+                    Appointdate: {
+                      $gte: new Date(),
+                    }
+                  }},
             ],
-        },
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
                 else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
@@ -1881,10 +1778,21 @@ router.get('/PastAppintmentPat', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Appointment.find( {patient : legit.id,  
-            $or : [
-                { date: { $lte: new Date() }},
-            ]},
+        Appointment.aggregate(
+            [
+                { $addFields: {
+                    Appointdate: {
+                      $dateFromString: { dateString: "$date",  timezone: 'Europe/London' ,  }
+                    } 
+                  }},
+                  { $match: {
+                    patient: legit.id,
+                    $or : [
+                        { Appointdate: { $lte: new Date() }},
+                        { Appointdate: { $eq: new Date() }},
+                    ]}
+                  },
+            ],
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
                 else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
@@ -3575,15 +3483,15 @@ router.post('/AskPatient/:id', function (req, res, next) {
                     var Link1 = 'https://aidoc.io/patient'
                     
                     if (req.body.lan === 'de') {
-                        var dhtml = 'Sie haben die Anfrage erhalten, einen neuen DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ')' +
-                            ' zu Ihrer Liste vertrauenswürdiger privater Ärzte hinzuzufügen. Um diese Anfrage anzunehmen / abzulehnen / zu verschieben, folgen Sie bitte dem <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                        var dhtml = 'Sie haben eine Anfrage zum Hinzufügen eines Lieblingsarztes vom DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ').<br/>' +
+                            'Für <b> Akzeptieren / Löschen </b> gehen Sie zu <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
                             '<b>Ihr Aimedis Team</b><br/>' +
                             '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
                             '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
                     }
                     else {
-                        var dhtml = 'You got a request to add a new DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ')'+
-                            ' to your trusted private doctor list. To accept / decline / postpone this request please follow the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                        var dhtml = 'You have got a request to add favorite doctor from the DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ').<br/>' +
+                            'For <b>Accept / Delete</b> the request go to the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
                             '<b>Your Aimedis team</b><br/>' +
                             '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
                             '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
@@ -3592,7 +3500,7 @@ router.post('/AskPatient/:id', function (req, res, next) {
                     var mailOptions = {
                         from: "contact@aimedis.com",
                         to: user_data1.email,
-                        subject: 'Private doctor request',
+                        subject: 'Ask for become favorite doctor',
                         html: dhtml
                     };
                     var sendmail = transporter.sendMail(mailOptions)
@@ -3939,17 +3847,16 @@ router.put('/SuggestTimeSlot', function (req, res, next) {
         oldSchedule= req.body.oldSchedule,
         doctorProfile = req.body.docProfile,
         timeslot = req.body.timeslot
+        console.log("req.body", req.body)
         return Appointment.update({_id:apppinment_id},{status:'cancel'}).exec()
             .then((chnageData)=>{
                 let mailOptions = {
                     from:'contact@aimedis.com',
                     to : email,
-                    subject: 'Appoinment Cancel And New Time Suggestion',
+                    subject: 'Appoinment Cancel',
                     html: `<div>The appoinment with Dr. ${doctorProfile.first_name+ ' '+ doctorProfile.last_name} on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div> `
                 };
-               
                 let sendmail = transporter.sendMail(mailOptions)
-
                 res.json({ status: 200, hassuccessed: true, msg: 'Request Send succesfully' })
             })
             .catch((err)=>{
