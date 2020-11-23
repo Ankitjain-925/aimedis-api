@@ -18,7 +18,7 @@ var appointmentsSchema = new Schema({
         unique:false
     },
     date:{
-        type:String,
+        type:Date,
         required:false,
         unique:false
     },

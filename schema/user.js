@@ -12,6 +12,11 @@ var UserSchema = new Schema({
       required: false,
       unique: true
     },
+    alies_id:{
+      type: String,
+      required: false,
+      unique: false
+    },
     parent_id: {
        type: String,
        required: false,

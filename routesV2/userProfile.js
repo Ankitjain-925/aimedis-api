@@ -3739,6 +3739,7 @@ router.get('/DoctorAppointments', function (req, res, next) {
     }
 })
 
+
 router.get('/getLocation/:radius', function (req, res, next) {
     if (!req.query.speciality) {
         User.find({

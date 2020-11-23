@@ -28,6 +28,7 @@ var converter = require('json-2-csv');
 var pdf = require('dynamic-html-pdf');
 const { FieldValueContext } = require('twilio/lib/rest/preview/understand/assistant/fieldType/fieldValue');
 var html = fs.readFileSync(join(`${__dirname}/Userdata.html`), 'utf8');
+var html1 = fs.readFileSync(join(`${__dirname}/UserFullData.html`), 'utf8');
 //for authy
 // https://github.com/seegno/authy-client
 var API_KEY = 'rZ1SMhOZguUluAw1c1iFrMSdVNgxoFYK'
@@ -423,15 +424,13 @@ router.post('/UserLoginAdmin', function (req, res, next) {
 
 
 router.post('/verifyLogin', function (req, res, next) {
-    authy.verifyToken({ authyId: req.body.authyId, token: req.body.mob_token }, function (err, tokenRes) {
-        if (err) {
-            res.json({ status: 200, message: 'Something went wrong.', error: err, hassuccessed: false });
-        }
-        res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, tokenRes: tokenRes })
+    authy.verifyToken({ authyId: req.body.authyId, token: req.body.mob_token })
+        .catch(err =>  res.json({ status: 200, message: 'Something went wrong.', error: err, hassuccessed: false }))
+        .then(regRes => {
+            res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, tokenRes: regRes })
+        })
+        
         // res.status(200).json(tokenRes);
-
-    });
-
 })
 
 /*-----------------------F-O-R---A-D-D-I-N-G---U-S-E-R-Ss-------------------------*/
@@ -570,13 +569,13 @@ router.post('/AddUser', function (req, res, next) {
                                 })
                             }
                             else {
-                                res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false });
+                                res.json({ status: 200, message: 'Phone is not verified', hassuccessed: false });
                             }
                         })
 
                 }
                 else {
-                    res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false });
+                    res.json({ status: 200, message: 'Phone is not verified', hassuccessed: false });
                 }
 
             }
@@ -719,7 +718,10 @@ router.get('/Users/:User_id', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
                 if (Userinfo) {
-                    Userinfo.password = base64.decode(Userinfo.password);
+                    if(Userinfo.password){
+                        Userinfo.password = base64.decode(Userinfo.password);
+                    }
+                    
                     res.json({ status: 200, hassuccessed: true, data: Userinfo });
                 } else {
                     res.json({ status: 200, hassuccessed: false, message: 'User not found' });
@@ -1348,11 +1350,12 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                             var created_by = { created_by: updatedata.doctor_id };
                             var created_by_temp = { created_by_temp: req.body.doctor_name };
                             var created_on = { created_on: dt.format('Y-m-d') };
+                            var event_date = { event_date: dt.format('Y-m-d') };
                             var created_at = { created_at: dt.format('H:M') }
                             var attachfile = { attachfile: updatedata.attachfile }
                             var public = { public: 'always' }
 
-                            var full_record = { ...ids, ...type, ...created_by, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                            var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                             User.updateOne({ _id: updatedata.patient_id },
                                 { $push: { track_record: full_record } },
                                 { safe: true, upsert: true },
@@ -1615,6 +1618,7 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                             var ids = { track_id: uuidv1() };
                             var type = { type: req.body.type };
                             var datetime_on = { datetime_on: updatedata.accept_datetime };
+                            var event_date = { event_date: dt.format('Y-m-d') };
                             var created_by = { created_by: updatedata.doctor_id };
                             var created_by_temp = { created_by_temp: req.body.doctor_name };
                             var created_on = { created_on: dt.format('Y-m-d') };
@@ -1622,7 +1626,7 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                             var attachfile = { attachfile: updatedata.attachfile }
                             var public = { public: 'always' }
 
-                            var full_record = { ...ids, ...type, ...created_by, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                            var full_record = { ...ids, ...type, ...created_by, ...event_date, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                             User.updateOne({ _id: updatedata.patient_id },
                                 { $push: { track_record: full_record } },
                                 { safe: true, upsert: true },
@@ -1664,94 +1668,95 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
 
 
 //Add bY Ankita to update the Second opinion
-router.put('/GetSecondOpinion/:sick_certificate_id', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        Second_opinion.findById({ _id: req.params.sick_certificate_id },("patient_id attachfile"), function (err, userdata) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
-            } else {
-                var dt = dateTime.create();
-                if(userdata && typeof userdata === 'object')userdata = userdata.toObject()
-                if (req.body.status === "decline") {
-                    var data = {
-                        message_header: 'Decline Second Opinion request',
-                        message_text: 'Dear Patient, your request is declined for Second Opinion by - ' + legit.name + '. Thanks Aimedis Team',
-                        sent_date: new Date(),
-                        sender_id: legit.id,
-                        reciever_id: [userdata.patient_id]
+router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
+        const token = (req.headers.token)
+        let legit = jwtconfig.verify(token)
+        if (legit) {
+            Second_opinion.findOne({ _id: req.params.Prescription_id }, function (err, userdata) {
+                if (err) {
+                    res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
+                } else {
+                    var dt = dateTime.create();
+                    if(userdata && typeof userdata =='object') userdata= userdata.toObject()
+                    if (req.body.status === "decline") {
+                        var data = {
+                            message_header: 'Decline Second Opinion request',
+                            message_text: 'Dear Patient, your request is declined for Prescription by - ' + legit.name + '. Thanks Aimedis Team',
+                            sent_date: new Date(),
+                            sender_id: legit.id,
+                            reciever_id: [userdata.patient_id]
+                        }
+                        var messages = new message(data);
+                        messages.save(function (err, messages_data) {
+                            if (err && !messages_data) {
+                                console.log(err);
+                            } else {
+                                console.log(messages_data);
+                            }
+                        })
                     }
-                    var messages = new message(data);
-                    messages.save(function (err, messages_data) {
-                        if (err && !messages_data) {
-                            console.log(err);
+                    if (req.body.status === "accept" && userdata.attachfile.length == 0) {
+                        req.body.status = "pending";
+                    }
+                    Second_opinion.findOneAndUpdate({ _id: userdata._id }, { $set: { status: req.body.status, accept_datetime: dt.format('Y-m-d H:M:S') } }, { new: true }, function (err, updatedata) {
+                        if (err && !updatedata) {
+                            res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                         } else {
-                            console.log(messages_data);
+                            console.log('updatedata',updatedata.status, updatedata.attachfile)
+                            if (updatedata.status == 'accept' && updatedata.attachfile.length > 0) {
+                               console.log('comes here')
+                                var ids = { track_id: uuidv1() };
+                                var type = { type: req.body.type };
+                                var datetime_on = { datetime_on: dt.format('Y-m-d') };
+                                var created_by = { created_by: updatedata.doctor_id };
+                                var created_by_temp = { created_by_temp: req.body.doctor_name };
+                                var created_on = { created_on: dt.format('Y-m-d') };
+                                var event_date = { event_date: dt.format('Y-m-d') };
+                                var created_at = { created_at: dt.format('H:M') }
+                                var attachfile = { attachfile: updatedata.attachfile }
+                                var public = { public: 'always' }
+    
+                                var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                                User.updateOne({ _id: updatedata.patient_id },
+                                    { $push: { track_record: full_record } },
+                                    { safe: true, upsert: true },
+                                    function (err, doc) {
+                                        if (err && !doc) {
+                                            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                                        } else {
+                                            if (doc.nModified == '0') {
+                                                res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                                            }
+                                            else {
+                                                var dhtml = 'Your Second opinion Request Accepted.<br/>' +
+                                                    'And  Second opinion added in to your timeline.<br/>' +
+                                                    '<b>Your Aimedis team </b>'
+                                                var mailOptions = {
+                                                    from: "contact@aimedis.com",
+                                                    to: updatedata.patient_email,
+                                                    subject: ' Second opinion Accepted',
+                                                    html: dhtml
+                                                };
+                                                var sendmail = transporter.sendMail(mailOptions)
+                                                console.log('comes here3333')
+                                                res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                                            }
+                                        }
+                                    });
+                            }
+                            else {
+                                res.json({ status: 200, hassuccessed: false, msg: 'File is not attached' })
+                            }
+                            // res.json({ status: 200 , hassuccessed: true , message: "user updated" , data: userdata })
                         }
                     })
                 }
-                console.log("userdata", userdata)
-                
-                console.log("userdata", userdata.attachfile)
-                if (req.body.status === "accept" && (!userdata.attachfile || userdata.attachfile.length == 0)) {
-                    req.body.status = "pending";
-                }
-                
-                Second_opinion.findOneAndUpdate({ _id: userdata._id }, { $set: { status: req.body.status, accept_datetime: dt.format('Y-m-d H:M:S') } }, { new: true }, function (err, updatedata) {
-                    if (err && !updatedata) {
-                        res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
-                    } else {
-                        console.log('updatedata.attachfile', updatedata.attachfile);
-                        if (updatedata.status == 'accept' && updatedata.attachfile.length > 0) {
-                            var ids = { track_id: uuidv1() };
-                            var type = { type: req.body.type };
-                            var datetime_on = { datetime_on: updatedata.accept_datetime };
-                            var created_by = { created_by: updatedata.doctor_id };
-                            var created_by_temp = { created_by_temp: req.body.doctor_name };
-                            var created_on = { created_on: dt.format('Y-m-d') };
-                            var created_at = { created_at: dt.format('H:M') }
-                            var attachfile = { attachfile: updatedata.attachfile }
-                            var public = { public: 'always' }
-
-                            var full_record = { ...ids, ...type, ...created_by, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
-                            User.updateOne({ _id: updatedata.patient_id },
-                                { $push: { track_record: full_record } },
-                                { safe: true, upsert: true },
-                                function (err, doc) {
-                                    if (err && !doc) {
-                                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-                                    } else {
-                                        if (doc.nModified == '0') {
-                                            res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
-                                        }
-                                        else {
-                                            var dhtml = 'Your Prescription Request Accepted.<br/>' +
-                                                'And prescription added in to your timeline.<br/>' +
-                                                '<b>Your Aimedis team </b>'
-                                            var mailOptions = {
-                                                from: "contact@aimedis.com",
-                                                to: updatedata.patient_email,
-                                                subject: 'Prescription Accepted',
-                                                html: dhtml
-                                            };
-                                            var sendmail = transporter.sendMail(mailOptions)
-                                            res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
-                                        }
-                                    }
-                                });
-                        }
-                        else {
-                            res.json({ status: 200, hassuccessed: false, msg: 'File is not attached' })
-                        }
-                        // res.json({ status: 200 , hassuccessed: true , message: "user updated" , data: userdata })
-                    }
-                })
-            }
-        })
-    } else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-    }
+            })
+        } else {
+            res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+        }
+   
+    
 })
 
 router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next) {
@@ -1763,7 +1768,7 @@ router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Prescription is uodated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, msg: 'Second Opinion is updated', data: userdata })
             }
         })    
     } else {
@@ -1802,7 +1807,7 @@ router.put('/UpdateSickcertificate/:sick_certificate_id', function (req, res, ne
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Sick certificate is uodated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, msg: 'Sick certificate is updated', data: userdata })
             }
         })
           
@@ -1821,7 +1826,7 @@ router.put('/UpdatePrescription/:sick_certificate_id', function (req, res, next)
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Prescription is uodated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, msg: 'Prescription is updated', data: userdata })
             }
         })    
     } else {
@@ -1875,6 +1880,28 @@ router.get('/UpcomingAppintmentPat', function (req, res, next) {
     }
 });
 
+//Added by Ankita for Upcoming Appointment
+router.get('/UpcomingAppintmentPat/:Userid', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Appointment.find( {patient : req.params.Userid,  
+            $or : [
+            {date: { $gte: new Date(), }},
+            {date: { $eq: new Date(), }}
+            ],
+        },
+            function(err,results) {
+                if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
+                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            }
+        ) 
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 
 //Added by Ankita for Upcoming Appointment
 router.get('/PastAppintmentPat', function (req, res, next) {
@@ -1882,6 +1909,26 @@ router.get('/PastAppintmentPat', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         Appointment.find( {patient : legit.id,  
+            $or : [
+                { date: { $lte: new Date() }},
+            ]},
+            function(err,results) {
+                if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
+                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            }
+        ) 
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
+//Added by Ankita for Upcoming Appointment
+router.get('/PastAppintmentDoc', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Appointment.find( {doctor_id : legit.id,  
             $or : [
                 { date: { $lte: new Date() }},
             ]},
@@ -1906,7 +1953,7 @@ router.put('/UpdateSecond/:sick_certificate_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Second Opinion is uodated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, msg: 'Second Opinion is updated', data: userdata })
             }
         })    
     } else {
@@ -2427,6 +2474,55 @@ router.put('/AddFavDoc', function (req, res, next) {
     }
 })
 
+router.put('/AddFavDoc1/:user_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.findOne({ profile_id: req.params.user_id }, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
+            } else {
+                console.log('req.body.doctor', req.body.doctor)
+                User.findOne({ profile_id: req.body.doctor }, function (err1, userdata1) {
+                    if (err1) {
+                        res.json({ status: 200, hassuccessed: false, message: "Invalid doctor Id", error: err1 })
+                    } else {
+                        console.log('dsfsdf', userdata1)
+                        if (userdata1) {
+                            User.find({ _id: userdata._id, fav_doctor: { $elemMatch: { doctor: req.body.doctor } } }, function (err2, userdata2) {
+                                if (err2) {
+                                    res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
+                                } else {
+                                    console.log('fsdf', userdata2)
+                                    if (userdata2.length != 0) {
+                                        res.json({ status: 200, hassuccessed: false, message: "Doctor already exists", error: err })
+                                    } else {
+                                        console.log('i AM HERE', userdata1._id)
+                                        User.findByIdAndUpdate({ _id: userdata._id },{parent_id:  userdata1._id, $push: { fav_doctor: req.body} }, function (err2, updatedata) {
+                                            if (err2 && !updatedata) {
+                                                res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
+                                            } else {
+                                                res.json({ status: 200, hassuccessed: true, message: "user updated", data: userdata })
+                                            }
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                        else {
+                            res.json({ status: 200, hassuccessed: false, message: "Invalid doctor Id", error: err1 })
+                        }
+
+                    }
+                })
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
 router.put('/AddRecDoc', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -2694,7 +2790,7 @@ router.put('/GetAppointment/:GetAppointment_id', function (req, res, next) {
 
 /*-----------------------G-E-T---L-O-C-A-T-I-O-N-------------------------*/
 
-function getTimeStops(start, end, timeslots) {
+function getTimeStops(start, end, timeslots, breakstart, breakend) {
     var startTime = moment(start, 'HH:mm');
     var endTime = moment(end, 'HH:mm');
     var timeslot = parseInt(timeslots, 10)
@@ -2703,6 +2799,7 @@ function getTimeStops(start, end, timeslots) {
         endTime.add(1, 'day');
     }
     var timeStops = [];
+    
     while (startTime <= endTime) {
         timeStops.push(new moment(startTime).format('HH:mm'));
         startTime.add(timeslot, 'minutes');
@@ -2812,6 +2909,137 @@ router.get('/DoctorAppointments', function (req, res, next) {
         });
     }
 })
+router.get('/timeSuggest', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+    User.findOne({
+        _id: legit.id
+    }, function (error, Userinfo) {
+        if (error) {
+            res.json({
+                status: 200,
+                hassuccessed: false,
+                error: error
+            })
+        } else {
+            console.log('Userinfo', Userinfo)
+            var user = [];
+            var online_users = [];
+            var Practices = [];
+            var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
+            for (let j = 0; j < Userinfo.private_appointments.length; j++) {
+                if (Userinfo.private_appointments[j].custom_text) {
+                    custom_text = Userinfo.private_appointments[j].custom_text;
+                }
+                if (Userinfo.private_appointments[j].breakslot_start) {
+                    breakslot_start = Userinfo.private_appointments[j].breakslot_start;
+                }
+                if (Userinfo.private_appointments[j].breakslot_end) {
+                    breakslot_end = Userinfo.private_appointments[j].breakslot_end;
+                }
+                if (Userinfo.private_appointments[j].monday_start, Userinfo.private_appointments[j].monday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                    monday = getTimeStops(Userinfo.private_appointments[j].monday_start, Userinfo.private_appointments[j].monday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                }
+                if (Userinfo.private_appointments[j].tuesday_start, Userinfo.private_appointments[j].tuesday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                    tuesday = getTimeStops(Userinfo.private_appointments[j].tuesday_start, Userinfo.private_appointments[j].tuesday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                }
+                if (Userinfo.private_appointments[j].wednesday_start, Userinfo.private_appointments[j].wednesday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                    wednesday = getTimeStops(Userinfo.private_appointments[j].wednesday_start, Userinfo.private_appointments[j].wednesday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                }
+                if (Userinfo.private_appointments[j].thursday_start, Userinfo.private_appointments[j].thursday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                    thursday = getTimeStops(Userinfo.private_appointments[j].thursday_start, Userinfo.private_appointments[j].thursday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                }
+                if (Userinfo.private_appointments[j].friday_start, Userinfo.private_appointments[j].friday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                    friday = getTimeStops(Userinfo.private_appointments[j].friday_start, Userinfo.private_appointments[j].friday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                }
+                if (Userinfo.private_appointments[j].saturday_start, Userinfo.private_appointments[j].saturday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                    saturday = getTimeStops(Userinfo.private_appointments[j].saturday_start, Userinfo.private_appointments[j].saturday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                }
+                if (Userinfo.private_appointments[j].sunday_start, Userinfo.private_appointments[j].sunday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                    sunday = getTimeStops(Userinfo.private_appointments[j].sunday_start, Userinfo.private_appointments[j].sunday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                }
+               
+                user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start })    
+            }
+             monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="",breakslot_start="",breakslot_end="";
+            for (let k = 0; k < Userinfo.online_appointment.length; k++) {
+                if (Userinfo.online_appointment[k].breakslot_start) {
+                    breakslot_start = Userinfo.online_appointment[k].breakslot_start;
+                }
+                if (Userinfo.online_appointment[k].breakslot_end) {
+                    breakslot_end = Userinfo.online_appointment[k].breakslot_end;
+                }
+                if (Userinfo.online_appointment[k].monday_start, Userinfo.online_appointment[k].monday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                    monday = getTimeStops(Userinfo.online_appointment[k].monday_start, Userinfo.online_appointment[k].monday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                }
+                if (Userinfo.online_appointment[k].tuesday_start, Userinfo.online_appointment[k].tuesday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                    tuesday = getTimeStops(Userinfo.online_appointment[k].tuesday_start, Userinfo.online_appointment[k].tuesday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                }
+                if (Userinfo.online_appointment[k].wednesday_start, Userinfo.online_appointment[k].wednesday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                    wednesday = getTimeStops(Userinfo.online_appointment[k].wednesday_start, Userinfo.online_appointment[k].wednesday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                }
+                if (Userinfo.online_appointment[k].thursday_start, Userinfo.online_appointment[k].thursday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                    thursday = getTimeStops(Userinfo.online_appointment[k].thursday_start, Userinfo.online_appointment[k].thursday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                }
+                if (Userinfo.online_appointment[k].friday_start, Userinfo.online_appointment[k].friday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                    friday = getTimeStops(Userinfo.online_appointment[k].friday_start, Userinfo.online_appointment[k].friday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                }
+                if (Userinfo.online_appointment[k].saturday_start, Userinfo.online_appointment[k].saturday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                    saturday = getTimeStops(Userinfo.online_appointment[k].saturday_start, Userinfo.online_appointment[k].saturday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                }
+                if (Userinfo.online_appointment[k].sunday_start, Userinfo.online_appointment[k].sunday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                    sunday = getTimeStops(Userinfo.online_appointment[k].sunday_start, Userinfo.online_appointment[k].sunday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                }
+                online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
+            }
+             monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
+            for (let l = 0; l < Userinfo.days_for_practices.length; l++) {
+                if (Userinfo.days_for_practices[l].breakslot_start) {
+                    breakslot_start = Userinfo.days_for_practices[l].breakslot_start;
+                }
+                if (Userinfo.days_for_practices[l].breakslot_end) {
+                    breakslot_end = Userinfo.days_for_practices[l].breakslot_end;
+                }
+                if (Userinfo.days_for_practices[l].monday_start, Userinfo.days_for_practices[l].monday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                    monday = getTimeStops(Userinfo.days_for_practices[l].monday_start, Userinfo.days_for_practices[l].monday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                }
+                if (Userinfo.days_for_practices[l].tuesday_start, Userinfo.days_for_practices[l].tuesday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                    tuesday = getTimeStops(Userinfo.days_for_practices[l].tuesday_start, Userinfo.days_for_practices[l].tuesday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                }
+                if (Userinfo.days_for_practices[l].wednesday_start, Userinfo.days_for_practices[l].wednesday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                    wednesday = getTimeStops(Userinfo.days_for_practices[l].wednesday_start, Userinfo.days_for_practices[l].wednesday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                }
+                if (Userinfo.days_for_practices[l].thursday_start, Userinfo.days_for_practices[l].thursday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                    thursday = getTimeStops(Userinfo.days_for_practices[l].thursday_start, Userinfo.days_for_practices[l].thursday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                }
+                if (Userinfo.days_for_practices[l].friday_start, Userinfo.days_for_practices[l].friday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                    friday = getTimeStops(Userinfo.days_for_practices[l].friday_start, Userinfo.days_for_practices[l].friday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                }
+                if (Userinfo.days_for_practices[l].saturday_start, Userinfo.days_for_practices[l].saturday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                    saturday = getTimeStops(Userinfo.days_for_practices[l].saturday_start, Userinfo.days_for_practices[l].saturday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                }
+                if (Userinfo.days_for_practices[l].sunday_start, Userinfo.days_for_practices[l].sunday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                    sunday = getTimeStops(Userinfo.days_for_practices[l].sunday_start, Userinfo.days_for_practices[l].sunday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                }
+                Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
+            }
+            
+            var finalArray = {
+                data: Userinfo,
+                appointments: user,
+                online_appointment: online_users,
+                practice_days: Practices
+            }
+            res.json({ status: 200, hassuccessed: true, data: finalArray });
+        }
+    })
+}
+else {
+    res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+}
+
+});
 
 router.get('/getLocation/:radius', function (req, res, next) {
     if (!req.query.speciality) {
@@ -2834,10 +3062,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
-                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
+                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
+                        }
+                        if (Userinfo[i].private_appointments[j].breakslot_start) {
+                            breakslot_start = Userinfo[i].private_appointments[j].breakslot_start;
+                        }
+                        if (Userinfo[i].private_appointments[j].breakslot_end) {
+                            breakslot_end = Userinfo[i].private_appointments[j].breakslot_end;
                         }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
@@ -2861,11 +3095,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
                        
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })    
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start })    
                     }
-                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="",breakslot_start="",breakslot_end="";
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
-                       
+                        if (Userinfo[i].online_appointment[k].breakslot_start) {
+                            breakslot_start = Userinfo[i].online_appointment[k].breakslot_start;
+                        }
+                        if (Userinfo[i].online_appointment[k].breakslot_end) {
+                            breakslot_end = Userinfo[i].online_appointment[k].breakslot_end;
+                        }
                         if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
@@ -2887,10 +3126,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
-                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
+                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
                     }
-                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
                     for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+                        if (Userinfo[i].days_for_practices[l].breakslot_start) {
+                            breakslot_start = Userinfo[i].days_for_practices[l].breakslot_start;
+                        }
+                        if (Userinfo[i].days_for_practices[l].breakslot_end) {
+                            breakslot_end = Userinfo[i].days_for_practices[l].breakslot_end;
+                        }
                         if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
@@ -2912,7 +3157,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
-                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
+                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
                     }
                     
                     finalArray.push({
@@ -2947,10 +3192,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
-                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text=""
+                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
+                        }
+                        if (Userinfo[i].private_appointments[j].breakslot_start) {
+                            breakslot_start = Userinfo[i].private_appointments[j].breakslot_start;
+                        }
+                        if (Userinfo[i].private_appointments[j].breakslot_end) {
+                            breakslot_end = Userinfo[i].private_appointments[j].breakslot_end;
                         }
                         if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
@@ -2973,11 +3224,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text })
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text , breakslot_end, breakslot_start})
                     }
-                    monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[];
+                    monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[],breakslot_start="",breakslot_end="";
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
-                         
+                        if (Userinfo[i].online_appointment[k].breakslot_start) {
+                            breakslot_start = Userinfo[i].online_appointment[k].breakslot_start;
+                        }
+                        if (Userinfo[i].online_appointment[k].breakslot_end) {
+                            breakslot_end = Userinfo[i].online_appointment[k].breakslot_end;
+                        }
                         if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
@@ -2999,11 +3255,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
-                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
+                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start })
                     }
-                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[];
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], breakslot_start="",breakslot_end="";
                     for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
-                        
+                        if (Userinfo[i].days_for_practices[l].breakslot_start) {
+                            breakslot_start = Userinfo[i].days_for_practices[l].breakslot_start;
+                        }
+                        if (Userinfo[i].days_for_practices[l].breakslot_end) {
+                            breakslot_end = Userinfo[i].days_for_practices[l].breakslot_end;
+                        }
                         if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
@@ -3025,7 +3286,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
-                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday })
+                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start })
                     }
                     finalArray.push({
                         data: Userinfo[i],
@@ -3546,7 +3807,7 @@ router.get('/AskPatientProfile/:id', function (req, res, next) {
     const token = (req.headers.token);
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.findOne({
+        User.findOne({type : 'patient',
             $or: [{ email: req.params.id }, {
                 profile_id: req.params.id,
             },{alies_id: req.params.id} ]
@@ -3569,7 +3830,7 @@ router.post('/AskPatient/:id', function (req, res, next) {
     const token = (req.headers.token);
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.findOne({ profile_id: req.params.id }).exec()
+        User.findOne({ type: 'patient', $or :  [{profile_id: req.params.id },{alies_id :req.params.id  }]}).exec()
             .then((user_data1) => {
                 if (user_data1) {
                     var Link1 = 'https://aidoc.io/patient'
@@ -3816,7 +4077,7 @@ router.post('/downloadPdf', function (req, res, next) {
     var Data = [];
     {
         Object.entries(req.body.Dieseases).map(([key, value]) => {
-            if (key !== 'attachfile' && key !== 'created_by_image' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'created_on' && key !== 'publicdatetime' && key !== 'track_id') {
+            if (key !== 'attachfile' && key !== 'created_by_image' && key !== 'created_by_profile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'created_on' && key !== 'publicdatetime' && key !== 'track_id') {
                 if (Array.isArray(value)) {
                     Data.push({ 'k': key.replace(/_/g, ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ') })
                 }
@@ -3853,6 +4114,53 @@ router.post('/downloadPdf', function (req, res, next) {
             Dieseases: Data,
             pat_info: req.body.patientData,
             type: req.body.Dieseases.type.replace('_', ' ')
+        },
+        path: `${__dirname}/${filename}`  // it is not required if type is buffer
+    };
+    pdf.create(document, options)
+        .then(res22 => {
+            const file = `${__dirname}/${filename}`;
+            console.log(file)
+            res.download(file); // Set disposition and send it.  
+        })
+        .catch(error => {
+            res.json({ status: 200, hassuccessed: true, filename: filename });
+        });
+
+})
+
+router.post('/downloadfullPdf', function (req, res, next) {
+    // Custom handlebar helper
+    pdf.registerHelper('ifCond', function (v1, v2, options) {
+        if (v1 === v2) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    })
+
+    var options = {
+        format: "A3",
+        orientation: "portrait",
+        border: "10mm"
+    };
+    var Data = [];
+    {
+        console.log('req.body.Dieseases', req.body.Dieseasess)
+        Object.entries(req.body.Dieseases).map(([key, value]) => {
+                if (Array.isArray(value)) {
+                    Data.push({ 'k': key.replace(/_/g, ' '), 'v':  Array.prototype.map.call(value, s => s).toString().split(/[,]+/).join('<br/> ') })
+                }
+        })
+    }
+    console.log('Data', Data)
+    var filename = 'GeneratedReport.pdf'
+    var document = {
+        type: 'file',     // 'file' or 'buffer'
+        template: html1,
+        context: {
+            Dieseases: Data,
+            pat_info: req.body.patientData,
+    
         },
         path: `${__dirname}/${filename}`  // it is not required if type is buffer
     };

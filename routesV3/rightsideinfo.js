@@ -77,16 +77,16 @@ router.get('/patient', function (req, res, next) {
                                 prescriptions = myFilterData5;
                                 if(myFilterData5.length>2)
                                 {
-                                    prescriptions = myFilterData2.filter((value, key) =>
+                                    prescriptions = myFilterData5.filter((value, key) =>
                                     key < 2 );
                                 }
                         
                             var myFilterData6 = doc[0].track_record.filter((value, key) =>
                                 value.type ==='sick_certificate');
                                 sick_certificates = myFilterData6;
-                                if(myFilterData5.length>2)
+                                if(myFilterData6.length>2)
                                 {
-                                    sick_certificates = myFilterData2.filter((value, key) =>
+                                    sick_certificates = myFilterData6.filter((value, key) =>
                                     key < 2 );
                                 }
                             var myFilterData7 = doc[0].track_record.filter((value, key) =>

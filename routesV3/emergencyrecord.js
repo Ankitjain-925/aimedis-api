@@ -391,6 +391,7 @@ router.get('/pharmacyPrescription/:UserId', function (req, res, next) {
                 {
                     storedPrescriptions = [];
                 }
+                storedPrescriptions.sort(mySorter)
                 data = {first_name: doc.first_name, last_name: doc.last_name, _id: doc._id, profile_id: doc.profile_id, email: doc.email, track_record: storedPrescriptions }
                 res.json({ status: 200, hassuccessed: true, msg: 'Data is found', data : data })
             }

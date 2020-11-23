@@ -65,7 +65,7 @@ router.post('/saveData', (req, res) => {
             if (err) {
               res.status(400).json({ message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
-              Cart.update({user_id : req.body.user_id }, { $set: { orderlist: [] }}, function(err, affected){
+              Cart.update({user_id : req.body.user_id }, { $set: { cartList: [] }}, function(err, affected){
                   console.log('affected: ', affected);
               });
               res.status(200).json({ message: 'Get all succussfully', hassuccessed: true, data: result });
