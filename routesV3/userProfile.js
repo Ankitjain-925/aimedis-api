@@ -139,6 +139,24 @@ router.post('/SupportMail', function (req, res) {
     }
 })
 
+// For landing pages
+router.post('/IssuegetMail', function (req, res) {
+    let mailOptions = {
+        to: req.body.email,
+        from: "contact@aimedis.com",
+        subject: 'Got some issue on the Aimedis App',
+        html: req.body.message 
+    };
+    let sendmail = transporter.sendMail(mailOptions)
+    if (sendmail) {
+        res.json({ status: 200, message: 'Mail sent Successfully', hassuccessed: true });
+    }
+    else {
+        res.json({ status: 200, msg: 'Mail is not sent', hassuccessed: false })
+    }
+})
+
+
 
 router.post('/sendRegisterationMail', function (req, res, next) {
     const token = (req.headers.token)
@@ -1354,7 +1372,7 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                             var created_at = { created_at: dt.format('H:M') }
                             var attachfile = { attachfile: updatedata.attachfile }
                             var public = { public: 'always' }
-
+                            if(req.body.send_to_timeline){
                             var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                             User.updateOne({ _id: updatedata.patient_id },
                                 { $push: { track_record: full_record } },
@@ -1381,6 +1399,10 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                                         }
                                     }
                                 });
+                            }
+                            else{
+                                res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                            }
                         }
                         else {
                             res.json({ status: 200, hassuccessed: false, msg: 'File is not attached' })
@@ -1625,33 +1647,38 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                             var created_at = { created_at: dt.format('H:M') }
                             var attachfile = { attachfile: updatedata.attachfile }
                             var public = { public: 'always' }
-
-                            var full_record = { ...ids, ...type, ...created_by, ...event_date, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
-                            User.updateOne({ _id: updatedata.patient_id },
-                                { $push: { track_record: full_record } },
-                                { safe: true, upsert: true },
-                                function (err, doc) {
-                                    if (err && !doc) {
-                                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-                                    } else {
-                                        if (doc.nModified == '0') {
-                                            res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                            if(req.body.send_to_timeline){
+                                var full_record = { ...ids, ...type, ...created_by, ...event_date, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                                User.updateOne({ _id: updatedata.patient_id },
+                                    { $push: { track_record: full_record } },
+                                    { safe: true, upsert: true },
+                                    function (err, doc) {
+                                        if (err && !doc) {
+                                            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                                        } else {
+                                            if (doc.nModified == '0') {
+                                                res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                                            }
+                                            else {
+                                                var dhtml = 'Your Sick certificate Request Accepted.<br/>' +
+                                                    'And sick certificate added in to your timeline.<br/>' +
+                                                    '<b>Your Aimedis team </b>'
+                                                var mailOptions = {
+                                                    from: "contact@aimedis.com",
+                                                    to: updatedata.patient_email,
+                                                    subject: 'Sick certificate Accepted',
+                                                    html: dhtml
+                                                };
+                                                var sendmail = transporter.sendMail(mailOptions)
+                                                res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                                            }
                                         }
-                                        else {
-                                            var dhtml = 'Your Sick certificate Request Accepted.<br/>' +
-                                                'And sick certificate added in to your timeline.<br/>' +
-                                                '<b>Your Aimedis team </b>'
-                                            var mailOptions = {
-                                                from: "contact@aimedis.com",
-                                                to: updatedata.patient_email,
-                                                subject: 'Sick certificate Accepted',
-                                                html: dhtml
-                                            };
-                                            var sendmail = transporter.sendMail(mailOptions)
-                                            res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
-                                        }
-                                    }
-                                });
+                                    });
+                            }
+                            else{
+                                res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                            }    
+                            
                         }
                         else {
                             res.json({ status: 200, hassuccessed: false, msg: 'File is not attached' })
@@ -1715,7 +1742,7 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                                 var created_at = { created_at: dt.format('H:M') }
                                 var attachfile = { attachfile: updatedata.attachfile }
                                 var public = { public: 'always' }
-    
+                                if(req.body.send_to_timeline){
                                 var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                                 User.updateOne({ _id: updatedata.patient_id },
                                     { $push: { track_record: full_record } },
@@ -1743,6 +1770,10 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                                             }
                                         }
                                     });
+                                }
+                                else{
+                                    res.json({ status: 200, hassuccessed: true, msg: 'track is updated' }) 
+                                }
                             }
                             else {
                                 res.json({ status: 200, hassuccessed: false, msg: 'File is not attached' })
@@ -3181,7 +3212,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         coordinates: [Number(req.query.longitude), Number(req.query.Latitude)]
                     }
                 }
-            }, type: 'doctor', 'speciality.label':  req.query.speciality
+            }, type: 'doctor', 'speciality.value':  req.query.speciality
         }).find((error, Userinfo) => {
             if (error) {
                 res.json({ status: 200, hassuccessed: false, error: error })
@@ -3717,7 +3748,9 @@ router.post('/forgotPassword', function (req, res, next) {
         if (token !== '') {
             var link = 'https://sys.aimedis.io/change-password';
             if (req.body.passFrom === 'landing') {
-                link = 'https://aidoc.io/change-password'
+                link = '/change-password';
+                // link = 'https://aidoc.io/change-password'
+                link = 'https://sys.aimedis.io/change-password';
             }
             // var link = 'http://localhost:3000/change-password';
             console.log('sdfsdf', req.body.lan)
@@ -3833,8 +3866,8 @@ router.post('/AskPatient/:id', function (req, res, next) {
         User.findOne({ type: 'patient', $or :  [{profile_id: req.params.id },{alies_id :req.params.id  }]}).exec()
             .then((user_data1) => {
                 if (user_data1) {
-                    var Link1 = 'https://aidoc.io/patient'
-                    
+                    // var Link1 = 'https://aidoc.io/patient'
+                    var Link1 = 'https://sys.aimedis.io/patient'
                     if (req.body.lan === 'de') {
                         var dhtml = 'Sie haben die Anfrage erhalten, einen neuen DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ')' +
                             ' zu Ihrer Liste vertrauenswürdiger privater Ärzte hinzuzufügen. Um diese Anfrage anzunehmen / abzulehnen / zu verschieben, folgen Sie bitte dem <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
@@ -4088,7 +4121,7 @@ router.post('/downloadPdf', function (req, res, next) {
                     else if(key === 'date_measured' || key === 'emergency_on' || key === 'review_on' || key === 'diagnosed_on' || key === 'when_to' ||
                     key === 'when_until' || key === 'date_doctor_visit' || key === 'dod_onset' || key === 'dob' || key === 'dod' || key === 'first_visit_date' 
                     || key === 'last_visit_date' || key === 'date_measured' || key === 'prescribed_on' || key === 'until'  || key === 'from_when'  || key === 'until_when' 
-                    || key === 'data_of_vaccination' || key === 'datetime_on'){
+                    || key === 'data_of_vaccination'){
                         Data.push({ 'k': key.replace(/_/g, ' '), 'v': getDate(value, 'YYYY/MM/DD') })
                     }
                     else if(key === 'reminder_time_taken'||key === 'time_taken' ){
@@ -4096,6 +4129,11 @@ router.post('/downloadPdf', function (req, res, next) {
                     }
                     else if(key === 'time_measured' ){
                         Data.push({ 'k': key.replace(/_/g, ' '), 'v': getTime(value,'24') })
+                    }
+                    else if(key === 'datetime_on')
+                    {
+                        console.log('datetime_on', key)
+                        Data.push({ 'k': 'Date of event', 'v': getDate(value, 'YYYY/MM/DD') })
                     }
                     else{
                         Data.push({ 'k': key.replace(/_/g, ' '), 'v': value })

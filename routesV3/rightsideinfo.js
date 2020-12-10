@@ -9,7 +9,9 @@ var sick_certificate = require('../schema/sick_certificate');
 var appointment = require('../schema/appointments')
 
 //Get patient info
+var trackrecord1 = [];
 router.get('/patient', function (req, res, next) {
+    trackrecord1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     var upcoming_appointment,blood_sugar,last_dia,info,last_dv,last_con,weight_bmi,sick_certificates,prescriptions,laboratory_result,blood_pressure;
@@ -63,7 +65,7 @@ router.get('/patient', function (req, res, next) {
                                     last_dv = myFilterData2.filter((value, key) =>
                                     key < 2 );
                                 }
-                                
+                               
                             var myFilterData3 = doc[0].track_record.filter((value, key) =>
                                 value.type === 'condition_pain');
                                 last_con = myFilterData3[0];
@@ -102,11 +104,20 @@ router.get('/patient', function (req, res, next) {
                                 laboratory_result = myFilterData8;
                                 
                             }
-            
-                            info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
-                                res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: last_dv, last_con:last_con, weight_bmi: weight_bmi, 
+                            if(last_dv && last_dv.length>0)
+                            {
+                                forEachPromise(last_dv, getAlltrack)
+                                .then((result) => {
+                                    info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
+                                    res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
+                                    upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                                })
+                            }
+                            else{
+                                info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
+                                res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
                                 upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
-                        
+                            }  
                     })
                 }
                 else{
@@ -121,6 +132,7 @@ router.get('/patient', function (req, res, next) {
 });
 
 router.get('/patient/:patient_id', function (req, res, next) {
+    trackrecord1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     var upcoming_appointment,blood_sugar,last_dia,info,last_dv,last_con,weight_bmi,sick_certificates,prescriptions,laboratory_result,blood_pressure;
@@ -172,6 +184,10 @@ router.get('/patient/:patient_id', function (req, res, next) {
                                 last_dv = myFilterData2.filter((value, key) =>
                                 key < 2 );
                             }
+                            forEachPromise(last_dv, getAlltrack)
+                            .then((result) => {
+                                var last_dv1 =  trackrecord1;
+                            })
                             
                         var myFilterData3 = doc[0].track_record.filter((value, key) =>
                             value.type === 'condition_pain');
@@ -212,7 +228,7 @@ router.get('/patient/:patient_id', function (req, res, next) {
                         
                         }
                     info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
-                    res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: last_dv, last_con:last_con, weight_bmi: weight_bmi, 
+                    res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
                         upcoming_appointment: upcoming_appointment, prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
                 })
             }
@@ -226,6 +242,40 @@ router.get('/patient/:patient_id', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+
+function forEachPromise(items, fn) {
+    return items.reduce(function (promise, item) {
+        return promise.then(function () {
+            return fn(item);
+        });
+    }, Promise.resolve());
+}
+
+function getAlltrack(data) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+            user.findOne({$or: [{profile_id: data.doctor_id}, {alies_id: data.doctor_id}]}).exec()
+            .then(function(doc3){
+                if(doc3){
+                    var new_data = data;
+                    if(doc3.image)
+                    {
+                        new_data.image = doc3.image;
+                    }
+                    return new_data;
+                }
+                else{
+                    var new_data = data;
+                    return new_data;
+                }
+                
+            }).then(function(new_data){
+                trackrecord1.push(new_data);
+                resolve(trackrecord1);
+            })
+        });
+    });
+}
 
 //Get doctor info
 router.get('/doctor', function (req, res, next) {
