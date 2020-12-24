@@ -19,13 +19,14 @@ var data = re.regions && re.regions.length>0 && re.regions.filter((value, key) =
 value.bucket === bucket);
 var params = {
   Bucket:bucket, // your bucket name,
-  Key: req.query.find // path to the object you're looking for
+  Key: req.query.find, // path to the object you're looking for
 }
 
 aws.config.update({
   region: data[0].region,
   accessKeyId: 'AKIASQXDNWERH3C6MMP5',
-  secretAccessKey: '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'
+  secretAccessKey: 'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC',
+  signatureVersion: "v4",
 })
 var s3 = new aws.S3({apiVersion: '2006-03-01'});
 

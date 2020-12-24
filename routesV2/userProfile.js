@@ -4641,7 +4641,8 @@ router.post('/forgotPassword', function (req, res, next) {
         if (token !== '') {
             var link = 'https://sys.aimedis.io/change-password';
             if (req.body.passFrom === 'landing') {
-                link = 'https://aidoc.io/change-password'
+                // link = 'https://aidoc.io/change-password'
+                link = 'https://sys.aimedis.io/change-password';
             }
             // var link = 'http://localhost:3000/change-password';
             console.log('sdfsdf', req.body.lan)

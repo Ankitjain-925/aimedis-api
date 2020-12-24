@@ -100,7 +100,7 @@ router.get('/patient', function (req, res, next) {
                                 blood_sugar = myFilterData9;
 
                             var myFilterData8 = doc[0].track_record.filter((value, key) =>
-                            value.type ==='laboratory_result' && value.lab_parameter.value ==='Creatinine');
+                            value.type ==='laboratory_result');
                                 laboratory_result = myFilterData8;
                                 
                             }
@@ -223,7 +223,7 @@ router.get('/patient/:patient_id', function (req, res, next) {
                             blood_sugar = myFilterData9;
 
                         var myFilterData8 = doc[0].track_record.filter((value, key) =>
-                        value.type ==='laboratory_result' && value.lab_parameter.value ==='Creatinine');
+                        value.type ==='laboratory_result');
                             laboratory_result = myFilterData8;
                         
                         }

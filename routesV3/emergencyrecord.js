@@ -68,43 +68,108 @@ router.get('/:UserId', function (req, res, next) {
                                     if(doc.organ_donor[0].selectedOption)
                                     {
                                         if(doc.organ_donor[0].selectedOption == 'yes_to_all')
-                                        {
-                                            statusbyp = 'Transplantation of one or more organ / tissues of mine after doctors have pronounced me dead'
-                                            options =''
-                                        }
-                                        else if(doc.organ_donor[0].selectedOption == 'exclude_some')
-                                        {
-                                            statusbyp = 'Transplantation of organ / tissues of mine after doctors have pronounced me dead accept for following organ / tissues'
-                                            options = doc.organ_donor[0].OptionData 
-                                        }
-                                        else if(doc.organ_donor[0].selectedOption == 'include_some')
-                                        {
-                                            statusbyp = 'Transplantation of organ / tissues of mine after doctors have pronounced me dead only for following organ / tissues'
-                                            options = doc.organ_donor[0].OptionData 
-                                        }
-                                        else if(doc.organ_donor[0].selectedOption == 'not_allowed')
-                                        {
-                                            statusbyp = 'NOT allow a transplantation of any of my organs or tissues'
-                                        }
-                                        else if(doc.organ_donor[0].selectedOption == 'decided_by_following')
-                                        {
-                                            statusbyp = 'Transplantation of one or more organ / tissues of mine after doctors have pronounced me dead YES or NO shall be decided by the following person'
-                                            options = doc.organ_donor[0].OptionData 
-                                        }
-                                        else
-                                        {
-                                            statusbyp = 'Nothing'
-                                            options = ''
-                                        }
+                                    {
+                                        statusbyp = {label_en : 'Transplantation of one or more organ / tissues of mine after doctors have pronounced me dead',
+                                        label_pt : 'Transplante de um ou mais órgãos / tecidos meus depois que os médicos me declararam morto',
+                                        label_nl : 'Transplantatie van een of meer organen / weefsels van mij nadat doktoren mij dood hebben verklaard',
+                                        label_rs : 'Трансплантация одного или нескольких моих органов / тканей после того, как врачи констатировали мою смерть',
+                                        label_de : 'Transplantation eines oder mehrerer Organe / Gewebe von mir, nachdem Ärzte mich für tot erklärt haben',
+                                        label_sw : 'Kupandikiza kiungo / tishu moja yangu au zaidi baada ya madaktari kutangaza kuwa nimekufa',
+                                        label_sp : 'Trasplante de uno o más órganos / tejidos míos después de que los médicos me declararon muerto',
+                                        label_ch :  '在医生宣布我死亡后，我的一个或多个器官/组织的移植',
+                                        label_fr: "Transplantation d'un ou de plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort",
+                                        label_ar: 'زرع عضو / نسيجي واحد أو أكثر بعد إعلان الأطباء وفاتي'
+                                    }
+                                        options =''
+                                    }
+                                    else if(doc.organ_donor[0].selectedOption == 'exclude_some')
+                                    {
+                                        statusbyp = {label_en : 'Transplantation of organ / tissues of mine after doctors have pronounced me dead except for following organ / tissues',
+                                        label_pt : 'Transplante de órgãos / tecidos meus depois que os médicos me declararam morto aceito para os seguintes órgãos / tecidos',
+                                        label_nl : 'Transplantatie van orgaan / weefsels van mij nadat doktoren mij dood hebben verklaard, accepteren voor het volgen van orgaan / weefsels',
+                                        label_rs : 'Трансплантация моего органа / тканей после того, как врачи объявили меня мертвым, согласны на следующие органы / ткани',
+                                        label_de : 'Die Transplantation von Organen / Geweben von mir, nachdem Ärzte mich für tot erklärt haben, akzeptiert für folgende Organe / Gewebe',
+                                        label_sw : 'Upandikizaji wa chombo / tishu za mgodi baada ya madaktari kutamka kuwa nimekufa kukubali kwa kufuata chombo / tishu',
+                                        label_sp : 'Trasplante de órganos / tejidos míos después de que los médicos me hayan declarado muerto aceptar para los siguientes órganos / tejidos',
+                                        label_ch :  '在医生宣布我死亡接受以下器官/组织后，我的器官/组织的移植',
+                                        label_fr: "Transplantation d'un ou de plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort",
+                                        label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي باستثناء الأعضاء / الأنسجة التالية'
+                                    }
+                                        options = doc.organ_donor[0].OptionData 
+                                    }
+                                    else if(doc.organ_donor[0].selectedOption == 'include_some')
+                                    {
+                                        statusbyp = {label_en :'Transplantation of organ / tissues of mine after doctors have pronounced me dead only for following organ / tissues',
+                                        label_pt : 'Transplante de órgãos / tecidos meus depois que os médicos me declararam morto apenas pelos seguintes órgãos / tecidos',
+                                        label_nl : 'Transplantatie van orgaan / weefsels van mij nadat doktoren mij dood hebben verklaard, alleen voor het volgen van orgaan / weefsels',
+                                        label_rs : 'Трансплантация моего органа / тканей после того, как врачи объявили меня мертвым, только для следующих органов / тканей',
+                                        label_de : 'Transplantation von Organen / Geweben von mir, nachdem Ärzte mich nur für folgende Organe / Gewebe für tot erklärt haben',
+                                        label_sw : 'Kupandikiza kiungo / tishu za mgodi baada ya madaktari kutangaza kuwa nimekufa tu kwa kufuata chombo / tishu',
+                                        label_sp : 'Trasplante de órganos / tejidos míos después de que los médicos me hayan declarado muerto solo por los siguientes órganos / tejidos',
+                                        label_ch :  '在医生宣布我仅因以下器官/组织死亡后，我的器官/组织的移植',
+                                        label_fr: "Transplantation de mes organes / tissus après que les médecins m'ont déclaré mort uniquement pour les organes / tissus suivants",
+                                        label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي فقط بسبب متابعة الأعضاء / الأنسجة'}
+                                        options = doc.organ_donor[0].OptionData 
+                                    }
+                                    else if(doc.organ_donor[0].selectedOption == 'not_allowed')
+                                    {
+                                        statusbyp = {label_en :'NOT allow a transplantation of any of my organs or tissues',
+                                        label_pt : 'NÃO permitir o transplante de nenhum dos meus órgãos ou tecidos',
+                                        label_nl : 'GEEN transplantatie van mijn organen of weefsels toestaan',
+                                        label_rs : 'НЕ разрешать трансплантацию любого из моих органов или тканей',
+                                        label_de : 'Erlaube KEINE Transplantation meiner Organe oder Gewebe',
+                                        label_sw : 'USiruhusu upandikizaji wa viungo vyangu vyovyote au tishu',
+                                        label_sp : 'NO permitir un trasplante de ninguno de mis órganos o tejidosd me dead',
+                                        label_ch :  '不允许移植我的任何器官或组织',
+                                        label_fr: "NE PAS autoriser une transplantation de l'un de mes organes ou tissus",
+                                        label_ar: 'عدم السماح بزرع أي من أعضائي أو أنسجتي'}
+                                    }
+                                    else if(doc.organ_donor[0].selectedOption == 'decided_by_following')
+                                    {
+                                        statusbyp = {label_en : 'Transplantation of one or more organ / tissues of mine after doctors have pronounced me dead YES or NO shall be decided by the following person',
+                                        label_pt : 'O transplante de um ou mais órgãos / tecidos meus após os médicos me declararem morto SIM ou NÃO será decidido pela seguinte pessoa',
+                                        label_nl : 'Transplantatie van een of meer organen / weefsels van mij nadat doktoren mij dood hebben verklaard JA of NEE wordt beslist door de volgende persoon',
+                                        label_rs : 'Решение о трансплантации одного или нескольких моих органов / тканей после того, как врачи объявили меня умершим ДА или НЕТ, принимает следующий человек',
+                                        label_de : 'Die Transplantation eines oder mehrerer Organe / Gewebe von mir, nachdem Ärzte mich für tot erklärt haben JA oder NEIN, wird von der folgenden Person entschieden',
+                                        label_sw : 'Kupandikiza kiungo / tishu moja yangu au zaidi baada ya madaktari kutangaza kuwa nimekufa NDIYO au HAPANA kutaamuliwa na mtu ifuatayo',
+                                        label_sp : 'El trasplante de uno o más órganos / tejidos míos después de que los médicos me hayan declarado muerto SÍ o NO lo decidirá la siguiente persona',
+                                        label_ch :  '在医生宣布我已死亡后，我的一个或多个器官/组织的移植应由以下人员决定',
+                                        label_fr: "La transplantation d'un ou plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort OUI ou NON sera décidée par la personne suivante",
+                                        label_ar: 'يجب أن يقرر الشخص التالي زراعة عضو / أنسجة لي واحدة أو أكثر بعد إعلان الأطباء وفاتي نعم أو لا'}
+                                        options = doc.organ_donor[0].OptionData 
+                                    }
+                                    else
+                                    {
+                                        statusbyp = {label_en : 'Nothing',
+                                        label_pt : 'Nada',
+                                        label_nl : 'Niets',
+                                        label_rs : 'Ничего',
+                                        label_de : 'Nichts',
+                                        label_sw : 'Hakuna kitu',
+                                        label_sp : 'Nada',
+                                        label_ch :  '没有',
+                                        label_fr: "Rien",
+                                        label_ar: 'لا شيئ'}
+                                        options = ''
+                                    }
                                     }
                                    if(doc.organ_donor[0].free_remarks) 
                                    {remarksbyp = doc.organ_donor[0].free_remarks;}
                                    else { remarksbyp = ''} 
                                 }
-                                else {
-                                    statusbyp = 'Nothing'
-                                    remarksbyp = ''
-                                    options =''
+                                else
+                                {
+                                    statusbyp = {label_en : 'Nothing',
+                                    label_pt : 'Nada',
+                                    label_nl : 'Niets',
+                                    label_rs : 'Ничего',
+                                    label_de : 'Nichts',
+                                    label_sw : 'Hakuna kitu',
+                                    label_sp : 'Nada',
+                                    label_ch :  '没有',
+                                    label_fr: "Rien",
+                                    label_ar: 'لا شيئ'}
+                                    options = ''
                                 }
                                 var donar = {remarks :remarksbyp, status : statusbyp , options: options}
                                 console.log(donar, 'donorrr')
@@ -173,19 +238,24 @@ router.get('/:UserId', function (req, res, next) {
                                         label_sw : 'Kupandikiza kiungo / tishu moja yangu au zaidi baada ya madaktari kutangaza kuwa nimekufa',
                                         label_sp : 'Trasplante de uno o más órganos / tejidos míos después de que los médicos me declararon muerto',
                                         label_ch :  '在医生宣布我死亡后，我的一个或多个器官/组织的移植',
+                                        label_fr: "Transplantation d'un ou de plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort",
+                                        label_ar: 'زرع عضو / نسيجي واحد أو أكثر بعد إعلان الأطباء وفاتي'
                                     }
                                         options =''
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'exclude_some')
                                     {
-                                        statusbyp = {label_en : 'Transplantation of organ / tissues of mine after doctors have pronounced me dead accept for following organ / tissues',
+                                        statusbyp = {label_en : 'Transplantation of organ / tissues of mine after doctors have pronounced me dead except for following organ / tissues',
                                         label_pt : 'Transplante de órgãos / tecidos meus depois que os médicos me declararam morto aceito para os seguintes órgãos / tecidos',
                                         label_nl : 'Transplantatie van orgaan / weefsels van mij nadat doktoren mij dood hebben verklaard, accepteren voor het volgen van orgaan / weefsels',
                                         label_rs : 'Трансплантация моего органа / тканей после того, как врачи объявили меня мертвым, согласны на следующие органы / ткани',
                                         label_de : 'Die Transplantation von Organen / Geweben von mir, nachdem Ärzte mich für tot erklärt haben, akzeptiert für folgende Organe / Gewebe',
                                         label_sw : 'Upandikizaji wa chombo / tishu za mgodi baada ya madaktari kutamka kuwa nimekufa kukubali kwa kufuata chombo / tishu',
                                         label_sp : 'Trasplante de órganos / tejidos míos después de que los médicos me hayan declarado muerto aceptar para los siguientes órganos / tejidos',
-                                        label_ch :  '在医生宣布我死亡接受以下器官/组织后，我的器官/组织的移植',}
+                                        label_ch :  '在医生宣布我死亡接受以下器官/组织后，我的器官/组织的移植',
+                                        label_fr: "Transplantation d'un ou de plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort",
+                                        label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي باستثناء الأعضاء / الأنسجة التالية'
+                                    }
                                         options = doc.organ_donor[0].OptionData 
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'include_some')
@@ -197,7 +267,9 @@ router.get('/:UserId', function (req, res, next) {
                                         label_de : 'Transplantation von Organen / Geweben von mir, nachdem Ärzte mich nur für folgende Organe / Gewebe für tot erklärt haben',
                                         label_sw : 'Kupandikiza kiungo / tishu za mgodi baada ya madaktari kutangaza kuwa nimekufa tu kwa kufuata chombo / tishu',
                                         label_sp : 'Trasplante de órganos / tejidos míos después de que los médicos me hayan declarado muerto solo por los siguientes órganos / tejidos',
-                                        label_ch :  '在医生宣布我仅因以下器官/组织死亡后，我的器官/组织的移植',}
+                                        label_ch :  '在医生宣布我仅因以下器官/组织死亡后，我的器官/组织的移植',
+                                        label_fr: "Transplantation de mes organes / tissus après que les médecins m'ont déclaré mort uniquement pour les organes / tissus suivants",
+                                        label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي فقط بسبب متابعة الأعضاء / الأنسجة'}
                                         options = doc.organ_donor[0].OptionData 
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'not_allowed')
@@ -209,7 +281,9 @@ router.get('/:UserId', function (req, res, next) {
                                         label_de : 'Erlaube KEINE Transplantation meiner Organe oder Gewebe',
                                         label_sw : 'USiruhusu upandikizaji wa viungo vyangu vyovyote au tishu',
                                         label_sp : 'NO permitir un trasplante de ninguno de mis órganos o tejidosd me dead',
-                                        label_ch :  '不允许移植我的任何器官或组织',}
+                                        label_ch :  '不允许移植我的任何器官或组织',
+                                        label_fr: "NE PAS autoriser une transplantation de l'un de mes organes ou tissus",
+                                        label_ar: 'عدم السماح بزرع أي من أعضائي أو أنسجتي'}
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'decided_by_following')
                                     {
@@ -220,7 +294,9 @@ router.get('/:UserId', function (req, res, next) {
                                         label_de : 'Die Transplantation eines oder mehrerer Organe / Gewebe von mir, nachdem Ärzte mich für tot erklärt haben JA oder NEIN, wird von der folgenden Person entschieden',
                                         label_sw : 'Kupandikiza kiungo / tishu moja yangu au zaidi baada ya madaktari kutangaza kuwa nimekufa NDIYO au HAPANA kutaamuliwa na mtu ifuatayo',
                                         label_sp : 'El trasplante de uno o más órganos / tejidos míos después de que los médicos me hayan declarado muerto SÍ o NO lo decidirá la siguiente persona',
-                                        label_ch :  '在医生宣布我已死亡后，我的一个或多个器官/组织的移植应由以下人员决定',}
+                                        label_ch :  '在医生宣布我已死亡后，我的一个或多个器官/组织的移植应由以下人员决定',
+                                        label_fr: "La transplantation d'un ou plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort OUI ou NON sera décidée par la personne suivante",
+                                        label_ar: 'يجب أن يقرر الشخص التالي زراعة عضو / أنسجة لي واحدة أو أكثر بعد إعلان الأطباء وفاتي نعم أو لا'}
                                         options = doc.organ_donor[0].OptionData 
                                     }
                                     else
@@ -232,7 +308,9 @@ router.get('/:UserId', function (req, res, next) {
                                         label_de : 'Nichts',
                                         label_sw : 'Hakuna kitu',
                                         label_sp : 'Nada',
-                                        label_ch :  '没有',}
+                                        label_ch :  '没有',
+                                        label_fr: "Rien",
+                                        label_ar: 'لا شيئ'}
                                         options = ''
                                     }
                                 }
@@ -242,13 +320,15 @@ router.get('/:UserId', function (req, res, next) {
                             }
                             else {
                                 statusbyp = {label_en : 'Nothing',
-                                        label_pt : 'Nada',
-                                        label_nl : 'Niets',
-                                        label_rs : 'Ничего',
-                                        label_de : 'Nichts',
-                                        label_sw : 'Hakuna kitu',
-                                        label_sp : 'Nada',
-                                        label_ch :  '没有',}
+                                label_pt : 'Nada',
+                                label_nl : 'Niets',
+                                label_rs : 'Ничего',
+                                label_de : 'Nichts',
+                                label_sw : 'Hakuna kitu',
+                                label_sp : 'Nada',
+                                label_ch :  '没有',
+                                label_fr: "Rien",
+                                label_ar: 'لا شيئ'}
                                 remarksbyp = ''
                                 options =''
                             }

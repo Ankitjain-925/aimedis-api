@@ -289,6 +289,7 @@ if (reciver.length == 2) {
   let accountSid = "ACa53065dfe46a3e8a48e5d529fd4a63c2";
   let authToken = "f8c828f98bad85a8f9af298fd5764401";
   const client = new twilio(accountSid, authToken);
+  console.log('mobile12', mobile)
   return client.messages.create({
     body: message,
     to: mobile,

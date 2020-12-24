@@ -3619,93 +3619,79 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.findOne( {$or:[ {alies_id : req.params.UserId}, { profile_id : req.params.UserId }]})
-            .select('profile_id first_name last_name _id email pin emergency_email mobile emergency_number')
-            .exec(function (err, doc) {
-                if (err && !dofc) {
-                    res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
-                } else {
-                    if (doc == null || doc == 'undefined') {
-                        res.json({ status: 200, hassuccessed: false, msg: 'User is not exist' })
-
+        User.findOne({
+        $or: [{ profile_id: req.params.UserId,},{alies_id: req.params.UserId} ]
+    }).exec(function (err, doc) {
+            console.log('doc', doc)
+            if (!doc) {
+                res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+            } else {
+                if (doc == null || doc == 'undefined') {
+                    res.json({ status: 200, hassuccessed: false, msg: 'User is not exist' })
+            
+                }
+                else {
+                    var m = new Date();
+                    var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
+                    console.log('data', req.body)
+                    if (req.body.lan === 'de') {
+            
+            
+                        var dhtml =
+                            'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profil.<br/>' +
+                            'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
+                            'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
+                            'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
+                            'Herzliche Grüße und alles Gute<br/>' +
+                            '<b>Ihr Aimedis Team </b>'
+            
                     }
                     else {
-                        var m = new Date();
-                        var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
-                        console.log('data', req.body)
-                        if (req.body.lan === 'de') {
-
-
-                            var dhtml =
-                                'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profil.<br/>' +
-                                'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
-                                'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
-                                'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
-                                'Herzliche Grüße und alles Gute<br/>' +
-                                '<b>Ihr Aimedis Team </b>'
-
-                        }
-                        else {
-                            var dhtml = 'There was an emergency access to the data in your Aimedis profile.<br/>' +
-                                'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
-                                'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
-                            'Best regards<br/>' +
-                                '<b>Your Aimedis team </b>'
-                        }
-                        if (req.body.lan === 'de') {
-                            var dhtml2 = 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profils von </b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' ).</b><br/>' +
-                                'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
-                                'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
-                                'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
-                                'Herzliche Grüße und alles Gute<br/>' +
-                                '<b>Ihr Aimedis Team </b>'
-                        }
-                        else {
-                            var dhtml2 = 'There was an emergency access to the data in your Aimedis profile of <b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' )</b><br/>' +
-                                'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
-                                'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
-                            'Best regards<br/>' +
-                                '<b>Your Aimedis team </b>'
-                        }
-                        var mailOptions = {
-                            from: "contact@aimedis.com",
-                            to: doc.email,
-                            subject: 'Emergency Access',
-                            html: dhtml
-                        };
-                        sendSms(doc.mobile, 'There was an emergency an access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
+                        var dhtml = 'There was emergency access to the data in your Aimedis profile.<br/>' +
+                            'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
+                            'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
+                        'Best regards<br/>' +
+                            '<b>Your Aimedis team </b>'
+                    }
+                    if (req.body.lan === 'de') {
+                        var dhtml2 = 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profils von </b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' ).</b><br/>' +
+                            'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
+                            'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
+                            'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
+                            'Herzliche Grüße und alles Gute<br/>' +
+                            '<b>Ihr Aimedis Team </b>'
+                    }
+                    else {
+                        var dhtml2 = 'There was emergency access to the data in your Aimedis profile of <b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' )</b><br/>' +
+                            'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
+                            'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
+                        'Best regards<br/>' +
+                            '<b>Your Aimedis team </b>'
+                    }
+                    var mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: doc.email,
+                        subject: 'Emergency Access',
+                        html: dhtml
+                    };
+                    console.log('doc.mobile', doc)
+                    sendSms(doc.mobile, 'There was emergency access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
+                        console.log('Message is sent')
+                    }).catch(e => {
+                        console.log('Message is not sent', e)
+                    })
+                    if(doc.emergency_number && doc.emergency_number !== ''){
+                        console.log('doc.emergency_number', doc.emergency_number)
+                        sendSms(doc.emergency_number, 'There was emergency access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
                             console.log('Message is sent')
                         }).catch(e => {
                             console.log('Message is not sent', e)
                         })
-                        if(doc.emergency_number && doc.emergency_number !== ''){
-                            sendSms(doc.emergency_number, 'There was an emergency access to the data in'+ doc.first_name+' '+doc.last_name +' Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
-                                console.log('Message is sent')
-                            }).catch(e => {
-                                console.log('Message is not sent', e)
-                            })
-                        }
-                        if (req.body.comefrom === 'pharmacy') {
-                            console.log('I here', req.body.pin)
-                            if (req.body.pin && req.body.pin == doc.pin && req.body.pin !== "") {
-                                console.log('I here2', req.body.pin)
-                                var sendmail = transporter.sendMail(mailOptions)
-                                if (doc.emergency_email && doc.emergency_email !== '') {
-                                    var mailOptions2 = {
-                                        from: "contact@aimedis.com",
-                                        to: doc.emergency_email,
-                                        subject: 'Emergency Access',
-                                        html: dhtml2
-                                    };
-                                    var sendmail2 = transporter.sendMail(mailOptions2)
-                                }
-                                res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
-                            }
-                            else {
-                                res.json({ status: 200, hassuccessed: false, msg: 'Pin is not correct' })
-                            }
-                        }
-                        else {
+                    }
+                    if (req.body.comefrom === 'pharmacy') {
+                        console.log('I here', req.body.pin)
+                        if (req.body.pin && req.body.pin == doc.pin && req.body.pin !== "") {
+                            console.log('I here2', req.body.pin)
                             var sendmail = transporter.sendMail(mailOptions)
                             if (doc.emergency_email && doc.emergency_email !== '') {
                                 var mailOptions2 = {
@@ -3718,8 +3704,25 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
                             }
                             res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
                         }
+                        else {
+                            res.json({ status: 200, hassuccessed: false, msg: 'Pin is not correct' })
+                        }
+                    }
+                    else {
+                        var sendmail = transporter.sendMail(mailOptions)
+                        if (doc.emergency_email && doc.emergency_email !== '') {
+                            var mailOptions2 = {
+                                from: "contact@aimedis.com",
+                                to: doc.emergency_email,
+                                subject: 'Emergency Access',
+                                html: dhtml2
+                            };
+                            var sendmail2 = transporter.sendMail(mailOptions2)
+                        }
+                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
                     }
                 }
+            }
             });
     }
     else {
@@ -4116,7 +4119,7 @@ router.post('/downloadPdf', function (req, res, next) {
     var Data = [];
     {
         Object.entries(req.body.Dieseases).map(([key, value]) => {
-            if (key !=='event_date' && key !== 'SARS' &&  key !== 'Positive_SARS' && key !== 'attachfile' && key !== 'created_by_image' && key !== 'created_by_profile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'created_on' && key !== 'publicdatetime' && key !== 'track_id') {
+            if (key !== 'attachfile' && key !== 'created_by_image' && key !== 'created_by_profile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'created_on' && key !== 'publicdatetime' && key !== 'track_id') {
                 if (Array.isArray(value)) {
                     Data.push({ 'k': key.replace(/_/g, ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ') })
                 }

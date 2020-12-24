@@ -25,7 +25,8 @@ var params = {
 aws.config.update({
   region: data[0].region,
   accessKeyId: 'AKIASQXDNWERH3C6MMP5',
-  secretAccessKey: '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'
+  secretAccessKey: 'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC',
+  signatureVersion: "v4",
 })
 var s3 = new aws.S3({apiVersion: '2006-03-01'});
 
@@ -71,8 +72,8 @@ router.post('/sign_s3', (req, res) => {
     var fileName = req.body.folders+Date.now()+'-'+ req.body.fileName;
   }
  
-  const fileType = req.body.fileType;
-  console.log('req.body', req.body)
+  const fileType = req.body.fileType === 'pdf'? 'application/pdf' :req.body.fileType;
+
 // Set up the payload of what we are sending to the S3 api
 const s3Params = {
     Bucket: S3_BUCKET,
