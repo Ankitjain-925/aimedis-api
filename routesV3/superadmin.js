@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var router = express.Router();
 const multer = require("multer");
@@ -20,8 +21,8 @@ var aws = require('aws-sdk');
 var fs = require('fs');
 var base64 = require('base-64');
 var shortid = require('shortid');
-var API_KEY = 'rZ1SMhOZguUluAw1c1iFrMSdVNgxoFYK'
-var SECRET = "SUPERSECRETSECRET"
+var API_KEY = process.env.ADMIN_API_KEY
+var SECRET = process.env.ADMIN_API_SECRET
 var phoneReg = require('../lib/phone_verification')(API_KEY);
 const Client = require('authy-client').Client;
 const authy = new Client({key: API_KEY});
@@ -36,12 +37,12 @@ const authy = new Client({key: API_KEY});
 //     });
 
 var transporter = nodemailer.createTransport({
-    host : "vwp3097.webpack.hosteurope.de",
+    host : process.env.MAIL_HOST,
     port : 25,
     secure: false,
     auth:{
-        user: "wp1052892-aimedis00102",
-        pass: "JuPiTeR7=7?"
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
     }
 });
 var storage = multer.diskStorage(
@@ -50,7 +51,6 @@ var storage = multer.diskStorage(
             cb(null, 'public/uploads')
         },
         filename: function (req, file, cb) {
-            console.log('filesss', file),
                 cb(null, Date.now() + '-' + file.originalname)
         }
     })
@@ -67,7 +67,7 @@ router.post('/Addadminuser', function (req, res, next) {
     if (legit) {
         User.findOne( {$or: [{ email: req.body.email }, {email: req.body.email.toLowerCase()}, {email: req.body.email.toUpperCase()}]}).exec().then((data1) => {
             if (data1) {
-                console.log('seruhjk');
+              
                 res.json({ status: 200, msg: 'Email is Already exist', success: false });
             }
             else {
@@ -163,10 +163,10 @@ router.post('/Addadminuser', function (req, res, next) {
         if (req.body.institute_id) {
             institute_id = { institute_id: req.body.institute_id }
         }
-        console.log('inst_id', institute_id);
+
         req.body.password = enpassword;
 
-        console.log('country_code', req.body)
+       
         if (req.body.country_code && req.body.mobile) {
             authy.registerUser({
                 countryCode: req.body.country_code,
@@ -181,11 +181,11 @@ router.post('/Addadminuser', function (req, res, next) {
             var users = new User(datas);
             users.save((err, user_data) => {
             if (err && !user_data) {
-                console.log('ddsds');
+        
                 res.json({ status: 200, message: 'Something went wrong.', error: err });
             } else {
                 if (user_data) {
-                    console.log(user_data, 'kkkkk')
+                 
                     user_id = user_data._id;
                     let token = user_data.usertoken;
                     if(user_data.type =='hospitaladmin')
@@ -206,16 +206,16 @@ router.post('/Addadminuser', function (req, res, next) {
                     let sendmail = transporter.sendMail(mailOptions)
                     
                     if (!req.body.institute_id && req.body.institute_name!="") {
-                        console.log('inside_ifff')
+                    
                         var fullInstitute = { institute_name: req.body.institute_name, created_by: user_id }
                         var Institutes = new Institute(fullInstitute);
                         Institutes.save((err, inst) => {
                             if (err && !inst) {
-                                console.log('ds');
+                              
                                 res.json({ status: 200, message: 'Something went wrong on Institute creation', error: err });
                             } else {
                                 if (inst) {
-                                    console.log('fdsfd');
+                                   
                                     User.updateOne({ _id: user_id },
                                         { institute_id: inst._id },
                                         function (err, doc) {
@@ -228,7 +228,7 @@ router.post('/Addadminuser', function (req, res, next) {
                                         })
                                 }
                                 else {
-                                    console.log('fdedadasfd');
+                               
                                     res.json({ status: 200, hassuccessed: false, message: 'Problem with assign the Institute', error: err });
                                 }
                             }
@@ -239,7 +239,7 @@ router.post('/Addadminuser', function (req, res, next) {
                     }
                 }
                 else {
-                    console.log('tttttttttt');
+                 
                     res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
                 }
             }
@@ -328,8 +328,8 @@ router.get('/messageUsers', function (req, res, next) {
 function emptyBucket(bucketName, foldername){
     aws.config.update({
         region: 'ap-south-1', // Put your aws region here
-        accessKeyId: 'AKIASQXDNWERH3C6MMP5',
-        secretAccessKey: 'SUZCeBjOvBrltj/s5Whs1i1yuNyWxHLU31mdXkyC'
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        secretAccessKey: process.env.S3_SECRET_KEY,
       })
 
       var s3 = new aws.S3({apiVersion: '2006-03-01'});
@@ -372,10 +372,10 @@ router.delete('/deleteUser/:UserId', function (req, res, next) {
             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
         } else {
             if(req.query.bucket)
-            {  console.log('data122', req.query.bucket)
+            { 
                 var buck =  req.query.bucket }
             else
-            { console.log('data121', req.query.bucket)
+            { 
                 var buck =  'aimedisfirstbucket' }
             emptyBucket(buck, data12.profile_id)
             res.json({ status: 200, hassuccessed: true, msg: 'User is Deleted' });
@@ -484,7 +484,7 @@ router.post('/fileAttachment', function (req, res, next) {
 });
 
 router.post('/Messages1', function (req, res, next) {
-    console.log(req.body);
+    
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -497,10 +497,10 @@ router.post('/Messages1', function (req, res, next) {
         var messages = new message(data);
         messages.save(function (err, messages_data) {
             if (err && !messages_data) {
-                console.log(err);
+               
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
             } else {
-                console.log(messages_data);
+                
                 res.json({ status: 200, hassuccessed: true, msg: 'messages is added Successfully' });
             }
         })
@@ -518,12 +518,12 @@ router.get('/Messages', function (req, res, next) {
         message.find({ reciever_id: legit.id }
             , function (err, recieve_message) {
                 if (err && !recieve_message) {
-                    console.log(err);
+                  
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong1.' });
                 } else {
                     message.find({ sender_id: legit.id }, function (err, send_message) {
                         if (err && !recieve_message) {
-                            console.log(err);
+                         
                             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong2.' });
                         } else {
                             var messages = { recieve: recieve_message, sents: send_message }
@@ -540,7 +540,7 @@ router.get('/Messages', function (req, res, next) {
 
 
 router.post('/Messages', function (req, res, next) {
-    console.log('withattach', req.body);
+  
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -561,10 +561,10 @@ router.post('/Messages', function (req, res, next) {
         var messages = new message(data);
         messages.save(function (err, messages_data) {
             if (err && !messages_data) {
-                console.log(err);
+               
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', err: err });
             } else {
-                console.log(messages_data);
+             
                 res.json({ status: 200, hassuccessed: true, msg: 'messages is added Successfully' });
             }
         })
@@ -580,7 +580,7 @@ router.post('/Document', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-      console.log('req.query', req.query)
+     
       var data = { DocumentId: uuidv1(), version: 1, status: true, filename : req.query.filename, url : req.query.url+'&bucket='+req.query.bucket };
 
     User.findByIdAndUpdate(legit.id,
@@ -611,7 +611,7 @@ router.get('/Document', function (req, res, next) {
 
             } else {
                 if (doc !== 'undefined' && doc.length > 0 && doc[0] !== null) {
-                    console.log('doc[0]', doc[0])
+                 
                     res.json({ status: 200, hassuccessed: true, msg: 'Document is found', data: doc[0].documents });
                 }
                 else {
@@ -643,16 +643,16 @@ router.put('/ChangeStatus/:DocumentId', function (req, res, next) {
             },
             function (err, doc) {
                 if (err && !doc) {
-                    console.log("rttttt")
+             
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                 } else {
-                    console.log('doc', doc);
+                 
                     if (doc.nModified == '0') {
-                        console.log("rttttwwwwt")
+                      
                         res.json({ status: 200, hassuccessed: false, msg: 'Document is not found' })
                     }
                     else {
-                        console.log("rtttwwwwtwwwwt")
+                       
                         res.json({ status: 200, hassuccessed: true, msg: 'Document is updated' })
                     }
                 }
@@ -664,7 +664,7 @@ router.put('/ChangeStatus/:DocumentId', function (req, res, next) {
 });
 
 router.put('/ReplaceDocument/:DocumentId', function (req, res, next) {
-    console.log('dddddd', req.file);
+  
     var dataspull = Array();
     var dataspush = Array();
     const token = (req.headers.token)
@@ -672,10 +672,10 @@ router.put('/ReplaceDocument/:DocumentId', function (req, res, next) {
     if (legit) {
         upload_replace(req, res, function (err) {
             if (err instanceof multer.MulterError) {
-                console.log('dddddd');
+             
                 res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
             } else if (err) {
-                console.log('eeeeeee');
+                
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
             }
             else {
@@ -699,16 +699,17 @@ router.put('/ReplaceDocument/:DocumentId', function (req, res, next) {
                     },
                     function (err, doc) {
                         if (err && !doc) {
-                            console.log("rttttt")
+                           
                             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                         } else {
-                            console.log('doc', doc);
+                         
+                            
                             if (doc.nModified == '0') {
-                                console.log("rttttwwwwt")
+                               
                                 res.json({ status: 200, hassuccessed: false, msg: 'Document is not found' })
                             }
                             else {
-                                console.log("rtttwwwwtwwwwt")
+                              
                                 res.json({ status: 200, hassuccessed: true, msg: 'Document is updated' })
                             }
                         }
@@ -732,7 +733,7 @@ router.put('/ShareDocument/:DocumentId', function (req, res, next) {
         }, function (err, changeStatus) {
             if (err) { }
             else {
-                console.log('users', req.body.reciever_id);
+              
                 if (changeStatus.documents) {
                     changeStatus.documents.forEach(function (item3) {
                         if (item3.DocumentId == req.params.DocumentId) {
@@ -755,16 +756,16 @@ router.put('/ShareDocument/:DocumentId', function (req, res, next) {
                                 })
                             if (Array.isArray(req.body.reciever_id)) {
                                 req.body.reciever_id.forEach(function (usershare) {
-                                    console.log('usershare', usershare);
+                                   
                                     User.findOne({ _id: usershare, documents: { $elemMatch: { DocumentId: req.params.DocumentId } } },
                                         function (err, data2) {
                                             if (err) {
                                                 console.log(err);
                                             }
                                             else {
-                                                console.log('data222222', data2)
+                                           
                                                 if (data2 === null) {
-                                                    console.log('data2', usershare)
+                                                 
                                                     User.updateOne({ _id: usershare },
                                                         { $push: { documents: dataspush[0] } },
                                                         { safe: true, upsert: true },
@@ -842,7 +843,7 @@ router.delete('/Document/:DocumentId', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                 } else {
-                    console.log('doc', doc);
+                   
                     if (doc.nModified == '0') {
                         res.json({ status: 200, hassuccessed: false, msg: 'Track record is not found' })
                     }
@@ -859,17 +860,17 @@ router.delete('/Document/:DocumentId', function (req, res, next) {
 });
 
 router.post('/topic', function (req, res, next) {
-    console.log(req.body);
+
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         var topics = new Topic(req.body);
         topics.save(function (err, messages_data) {
             if (err && !messages_data) {
-                console.log(err);
+           
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
             } else {
-                console.log(messages_data);
+            
                 res.json({ status: 200, hassuccessed: true, msg: 'topic is added Successfully' });
             }
         })
@@ -879,17 +880,17 @@ router.post('/topic', function (req, res, next) {
     }
 });
 router.get('/topic', function (req, res, next) {
-    console.log(req.body);
+   
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
        
         Topic.find({}, function (err, messages_data) {
             if (err && !messages_data) {
-                console.log(err);
+              
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
             } else {
-                console.log(messages_data);
+              
                 res.json({ status: 200, hassuccessed: true, msg: 'topic is find Successfully', data : messages_data });
             }
         })

@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 let router = express.Router();
 const multer = require("multer");
@@ -31,8 +32,8 @@ var html = fs.readFileSync(join(`${__dirname}/Userdata.html`), 'utf8');
 var html1 = fs.readFileSync(join(`${__dirname}/UserFullData.html`), 'utf8');
 //for authy
 // https://github.com/seegno/authy-client
-var API_KEY = 'rZ1SMhOZguUluAw1c1iFrMSdVNgxoFYK'
-var SECRET = "SUPERSECRETSECRET"
+var API_KEY = process.env.ADMIN_API_KEY
+var SECRET = process.env.ADMIN_API_SECRET
 var phoneReg = require('../lib/phone_verification')(API_KEY);
 const Client = require('authy-client').Client;
 const authy = new Client({ key: API_KEY });
@@ -47,12 +48,12 @@ var GetResult1 = [], GetResult2 = [], GetResult3 = [];;
 //     }
 // });
 var transporter = nodemailer.createTransport({
-    host: "vwp3097.webpack.hosteurope.de",
-    port: 25,
+    host : process.env.MAIL_HOST,
+    port : 25,
     secure: false,
-    auth: {
-        user: "wp1052892-aimedis00102",
-        pass: "JuPiTeR7=7?"
+    auth:{
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
     }
 });
 
@@ -80,7 +81,6 @@ var upload2 = multer({ storage: Certificatestorage }).single("uploadCertificate"
 
 router.post('/uploadImage', function (req, res, next) {
     const token = (req.headers.token)
-    console.log('token', token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         upload(req, res, function (err) {
@@ -102,7 +102,6 @@ router.post('/uploadImage', function (req, res, next) {
 
 router.post('/uploadCertificate', function (req, res, next) {
     const token = (req.headers.token)
-    console.log('token', token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         upload2(req, res, function (err) {
@@ -176,65 +175,6 @@ router.post('/sendRegisterationMail', function (req, res, next) {
 
 //For login the user
 
-// router.post('/UserLogin',function (req, res, next) {
-//     if(req.body.email=='' || req.body.password==''){
-//     res.json({status: 450,message: "Email and password fields should not be empty",hassuccessed: false})
-//     }else{
-//     User.findOne({
-//     email: req.body.email,
-//     }).exec()
-//     .then((user_data) => {
-//     if (user_data) {
-//     if (user_data.isblock === true) {
-//     res.json({status: 450,hassuccessed: false, message: "User is blocked"})
-//     }else {
-//     let promise = new Promise(function (resolve, reject) {
-//     if( req.body.logintoken != '' && req.body.logintoken != undefined ){
-//     if(req.body.logintoken == user_data.usertoken){
-//     User.findOneAndUpdate({ _id : user_data._id}, { $set :{verified : 'true' }}, {new: true}, (err, doc1) => {
-//     if (err && !doc1) {
-//     res.json({ status: 450, hassuccessed: false, message: 'Verification Failed' ,error : err})
-//     }else{
-//     console.log(doc1)
-//     user_data = doc1
-//     }
-//     });
-//     }else{
-//     res.json({ status: 450, hassuccessed: false, message: 'Verification Failed'})
-//     }
-//     }
-//     setTimeout(() => resolve(), 500);
-//     });
-//     promise.then(() => {
-//     console.log(user_data)
-//     var decode = base64.encode(req.body.password);
-//     if (user_data.password === decode) {
-//     if(user_data.verified === 'true'){
-//     let payload = {
-//     email : req.body.email,
-//     name : user_data.first_name + " " + user_data.last_name,
-//     id : user_data._id,
-//     type : user_data.type
-//     }
-//     var token = jwtconfig.sign(payload);
-//     res.json({status: 200,message: "Succefully fetched",hassuccessed: true, user: user_data,token: token})
-//     }else{
-//     res.json({status: 450,message: "Your Account is not verified, please check your email account.",hassuccessed: false })
-//     }
-//     }else {
-//     res.json({status: 450,message: "Wrong password",hassuccessed: false })
-//     }
-//     })
-//     }
-//     }
-//     else {
-//     console.log('Seven');
-//     res.json({status: 450,message: "User does'nt exist",hassuccessed: false})
-//     }
-//     })
-//     }
-//     })
-
 router.post('/UserLogin', function (req, res, next) {
     if (req.body.email == '' || req.body.password == '') {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
@@ -252,7 +192,7 @@ router.post('/UserLogin', function (req, res, next) {
                                         if (err && !doc1) {
                                             res.json({ status: 450, hassuccessed: false, message: 'Verification Failed', error: err })
                                         } else {
-                                            console.log(doc1)
+                                            
                                             user_data = doc1
                                         }
                                     });
@@ -263,12 +203,12 @@ router.post('/UserLogin', function (req, res, next) {
                             setTimeout(() => resolve(), 500);
                         });
                         promise.then(() => {
-                            console.log(user_data)
+                    
                             var decode = base64.encode(req.body.password);
                             if (user_data.password === decode) {
                                 if (user_data.verified === 'true') {
                                     if (!user_data.is2fa || user_data.is2fa === false) {
-                                        console.log('data', user_data.type)
+                                     
                                         let payload = {
                                             email: user_data.email,
                                             name: user_data.first_name + " " + user_data.last_name,
@@ -288,7 +228,7 @@ router.post('/UserLogin', function (req, res, next) {
                                         if (user_data.authyId) {
                                             authy.requestSms({ authyId: user_data.authyId }, { force: true }, function (err, smsRes) {
                                                 if (err) {
-                                                    console.log('ERROR requestSms', err);
+                                                
                                                     res.json({ status: 450, hassuccessed: false, message: 'request not send', error: err })
 
                                                 }
@@ -331,7 +271,7 @@ router.post('/UserLogin', function (req, res, next) {
                     }
                 }
                 else {
-                    console.log('Seven');
+                   
                     res.json({ status: 450, message: "User does not exist", hassuccessed: false })
                 }
             })
@@ -355,7 +295,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                         if (err && !doc1) {
                                             res.json({ status: 450, hassuccessed: false, message: 'Verification Failed', error: err })
                                         } else {
-                                            console.log(doc1)
+                                           
                                             user_data = doc1
                                         }
                                     });
@@ -366,12 +306,12 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                             setTimeout(() => resolve(), 500);
                         });
                         promise.then(() => {
-                            console.log(user_data)
+                            
                             var decode = base64.encode(req.body.password);
                             if (user_data.password === decode) {
                                 if (user_data.verified === 'true') {
                                     if (!user_data.is2fa || user_data.is2fa === false) {
-                                        console.log('data', user_data.type)
+                                       
                                         let payload = {
                                             email: user_data.email,
                                             name: user_data.first_name + " " + user_data.last_name,
@@ -390,7 +330,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                         if (user_data.authyId) {
                                             authy.requestSms({ authyId: user_data.authyId }, { force: true }, function (err, smsRes) {
                                                 if (err) {
-                                                    console.log('ERROR requestSms', err);
+                                             
                                                     res.json({ status: 450, hassuccessed: false, message: 'request not send', error: err })
 
                                                 }
@@ -433,7 +373,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                     }
                 }
                 else {
-                    console.log('Seven');
+                  
                     res.json({ status: 450, message: "User does not exist", hassuccessed: false })
                 }
             })
@@ -459,12 +399,12 @@ router.post('/AddUser', function (req, res, next) {
     } else {
 
         User.findOne({ $or: [{ email: req.body.email }, { email: req.body.email.toLowerCase() }, { email: req.body.email.toUpperCase() }] }).exec().then((data1) => {
-            console.log('here', data1)
+      
             if (data1) {
                 res.json({ status: 200, message: 'Email is Already exist', hassuccessed: false });
             } else {
                 var ids = shortid.generate();
-                console.log('dddd', req.body.lan)
+               
                 if (req.body.lan === 'de') {
                     var dhtml = '<b>Herzlich Willkommen bei Aimedis – Ihrer Gesundheitsplattform.</b><br/>' +
                         'Mit Aimedis stehen Sie immer an der Seite Ihrer Patienten. Bieten Sie online Termine und Videosprechstunden an, stellen Sie Rezepte und Arbeitsunfähigkeitsbescheinigungen aus oder bieten Sie Zweitmeinungen über die Plattform an, alles bis auf Weiteres kostenfrei.<br/>' +
@@ -551,7 +491,7 @@ router.post('/AddUser', function (req, res, next) {
                 req.body.password = enpassword;
 
                 var user_id;
-                console.log('dfdsf', req.body.country_code)
+            
                 if (req.body.country_code && req.body.mobile) {
                     authy.registerUser({
                         countryCode: req.body.country_code,
@@ -628,7 +568,7 @@ router.delete('/Bookservice/:description', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                 } else {
-                    console.log('doc', doc);
+                    
                     if (doc.nModified == '0') {
                         res.json({ status: 200, hassuccessed: false, msg: 'Services not deactivate' })
                     }
@@ -708,11 +648,11 @@ router.delete('/Users/:User_id', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
                 if (req.query.bucket) {
-                    console.log('data122', req.query.bucket)
+                   
                     var buck = req.query.bucket
                 }
                 else {
-                    console.log('data121', req.query.bucket)
+                 
                     var buck = 'aimedisfirstbucket'
                 }
                 emptyBucket(buck, data.profile_id)
@@ -789,7 +729,7 @@ router.put('/Users/update', function (req, res, next) {
                             }
                         }
                     }
-                    console.log('my tern ', country_code, mob1)
+                    
                     authy.registerUser({
                         countryCode: country_code,
                         email: changeStatus.email,
@@ -899,9 +839,9 @@ router.get('/checkAlies', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('req.params.alies_id', req.query.alies_id)
+       
         User.find({ $or: [{ alies_id: req.query.alies_id }, { profile_id: req.query.alies_id }] }, function (err, changeStatus) {
-            console.log('changeStatus', changeStatus)
+        
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err })
             }
@@ -1226,17 +1166,7 @@ router.post('/Prescription', function (req, res, next) {
         }
     })
 })
-// router.post('/Prescription', function (req, res, next) {
-//     console.log('I am here tooo')
-//     var prescription = new Prescription(req, body)
-//     prescription.save(function (err, data) {
-//         if (err && !data) {
-//             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
-//         } else {
-//             res.json({ status: 200, hasssuccessed: true, message: "no success" })
-//         }
-//     })
-// })
+
 
 router.get('/Prescription/:Prescription_id', function (req, res, next) {
     const token = (req.headers.token)
@@ -1512,11 +1442,7 @@ router.get('/RequestedAppointment', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
-                // console.log('data22', data)
-                // forEachPromise(data, getMyResult3)
-                // .then((result) => {
-                //     res.json({ status: 200, hassuccessed: true, msg: 'Appointments are found', data: getResult3 })
-                // })
+              
                 res.json({ status: 200, hassuccessed: true, data: data });
             }
         });
@@ -1635,7 +1561,7 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                     if (err && !updatedata) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
-                        console.log('updatedata.attachfile', updatedata.attachfile);
+                       
                         if (updatedata.status == 'accept' && updatedata.attachfile.length > 0) {
                             var ids = { track_id: uuidv1() };
                             var type = { type: req.body.type };
@@ -1729,9 +1655,9 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                         if (err && !updatedata) {
                             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                         } else {
-                            console.log('updatedata',updatedata.status, updatedata.attachfile)
+                          
                             if (updatedata.status == 'accept' && updatedata.attachfile.length > 0) {
-                               console.log('comes here')
+                             
                                 var ids = { track_id: uuidv1() };
                                 var type = { type: req.body.type };
                                 var datetime_on = { datetime_on: dt.format('Y-m-d') };
@@ -1765,7 +1691,7 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                                                     html: dhtml
                                                 };
                                                 var sendmail = transporter.sendMail(mailOptions)
-                                                console.log('comes here3333')
+                                           
                                                 res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                                             }
                                         }
@@ -1794,7 +1720,7 @@ router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('req.body,11', req.body)
+    
         Second_opinion.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
@@ -1833,7 +1759,7 @@ router.put('/UpdateSickcertificate/:sick_certificate_id', function (req, res, ne
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('req.body,11', req.body)
+        
         Sick_certificate.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
@@ -1852,7 +1778,7 @@ router.put('/UpdatePrescription/:sick_certificate_id', function (req, res, next)
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('req.body,11', req.body)
+
         Prescription.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
@@ -1867,7 +1793,7 @@ router.put('/UpdatePrescription/:sick_certificate_id', function (req, res, next)
 
 //Added by Ankita for Upcoming Appointment
 router.get('/UpcomingAppintmentDoc', function (req, res, next) {
-    console.log('Here comes')
+
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -1979,7 +1905,7 @@ router.put('/UpdateSecond/:sick_certificate_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('req.body,11', req.body)
+        
         Second_opinion.updateOne({ _id: req.params.sick_certificate_id }, req.body, function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
@@ -1997,7 +1923,7 @@ router.post('/AddtoPatientList/:id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log('myPaitent', req.body)
+   
         User.findOneAndUpdate({ profile_id: req.params.id }, { $push: { myPatient: req.body } }, function (err2, updatedata) {
             if (err2 && !updatedata) {
                 res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
@@ -2073,7 +1999,7 @@ router.delete('/Mypatients/:patient_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        console.log(req.params.patient_id);
+      
         User.findByIdAndRemove(req.params.patient_id, function (err, data) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
@@ -2198,18 +2124,18 @@ router.post('/second_opinion', function (req, res, next) {
 router.post('/Second_opinion/UploadDocument', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    console.log(legit.id, 'navdeep')
+ 
     if (legit) {
         upload1(req, res, function (err) {
-            console.log('1');
+       
             if (err instanceof multer.MulterError) {
-                console.log('2');
+              
                 res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
             } else if (err) {
-                console.log('3');
+          
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
             } else {
-                console.log('4');
+            
                 var file_entry = [];
                 res.req.files.forEach((item, index) => {
                     file_entry.push({ filename: item.filename, filetype: item.mimetype, url: item.destination + '/' + item.filename })
@@ -2434,7 +2360,7 @@ router.get('/DoctorProfile/:doctor_id', function (req, res, next) {
 
 /*----------S-T-R-I-P-E---P-A-Y-M-E-N-T----------*/
 router.put('/paid_services', function (req, res, next) {
-    console.log(req, 'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
+    
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -2513,22 +2439,22 @@ router.put('/AddFavDoc1/:user_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
             } else {
-                console.log('req.body.doctor', req.body.doctor)
+               
                 User.findOne({ profile_id: req.body.doctor }, function (err1, userdata1) {
                     if (err1) {
                         res.json({ status: 200, hassuccessed: false, message: "Invalid doctor Id", error: err1 })
                     } else {
-                        console.log('dsfsdf', userdata1)
+                    
                         if (userdata1) {
                             User.find({ _id: userdata._id, fav_doctor: { $elemMatch: { doctor: req.body.doctor } } }, function (err2, userdata2) {
                                 if (err2) {
                                     res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                                 } else {
-                                    console.log('fsdf', userdata2)
+                               
                                     if (userdata2.length != 0) {
                                         res.json({ status: 200, hassuccessed: false, message: "Doctor already exists", error: err })
                                     } else {
-                                        console.log('i AM HERE', userdata1._id)
+                                       
                                         User.findByIdAndUpdate({ _id: userdata._id },{parent_id:  userdata1._id, $push: { fav_doctor: req.body} }, function (err2, updatedata) {
                                             if (err2 && !updatedata) {
                                                 res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
@@ -2612,7 +2538,7 @@ router.put('/AddFavTDoc/:id', function (req, res, next) {
                     if (err2) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
-                        console.log('userdata2', userdata2)
+                    
                         if (userdata2.length != 0) {
                             res.json({ status: 200, hassuccessed: false, message: "Doctor already exists", error: err })
                         } else {
@@ -2647,7 +2573,7 @@ router.delete('/favDocs/:User_id/:patient_id', function (req, res, next) {
                 if (err) {
                     res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
                 } else {
-                    console.log('user_data', userdata)
+                
                     User.update({ profile_id: req.params.User_id }, { $pull: { myPatient: { profile_id: req.params.patient_id } } },
                         { multi: true },
                         function (err, userdata2) {
@@ -2736,7 +2662,7 @@ router.put('/UpdatePrescription/:prescription_id', function (req, res, next) {
 
 
 router.put('/UpdateSickCertificate/:Sick_id', function (req, res, next) {
-    console.log(req.body, 'nnnnnnnnnnnnnnnnnnn')
+  
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -2789,7 +2715,7 @@ router.put('/GetAppointment/:GetAppointment_id', function (req, res, next) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
                         if (req.body.status === 'accept') {
-                            console.log('come inside')
+                           
                             if (req.body.lan === 'de') {
                                 var dhtml = 'Ihre Terminanfrage wurde von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
                                     '<b>Ihr Aimedis Team </b>'
@@ -2954,7 +2880,7 @@ router.get('/timeSuggest', function (req, res, next) {
                 error: error
             })
         } else {
-            console.log('Userinfo', Userinfo)
+        
             var user = [];
             var online_users = [];
             var Practices = [];
@@ -3202,7 +3128,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
             }
         })
     } else {
-        console.log('heeee')
+       
         User.find({
             area: {
                 $near: {
@@ -3459,12 +3385,12 @@ router.get('/getMessages', function (req, res, next) {
         message.find({ reciever_id: legit.id }
             , function (err, recieve_message) {
                 if (err && !recieve_message) {
-                    console.log(err);
+                
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong1.' });
                 } else {
                     message.find({ sender_id: legit.id }, function (err, send_message) {
                         if (err && !recieve_message) {
-                            console.log(err);
+                           
                             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong2.' });
                         } else {
                             var messages = { recieve: recieve_message, sents: send_message }
@@ -3531,73 +3457,9 @@ router.get('/Pharmacyallusers', function (req, res, next) {
 })
 
 
-// function Get_id(type)
-// {
-//     console.log('Get_id')
-//     var random = Math.floor(Math.random()*1000000000) + 1;
-//     var result = false;
-//     if(type='patient')
-//     {
-//         console.log(type);
-//        var profile_id = 'P'+random;
-//     }
-//     else if(type='nurse')
-//     {
-//         console.log(type);
-//         var profile_id = 'N'+random;
-//     }
-//     else if(type='pharmacy')
-//     {
-//         console.log(type);
-//         var profile_id = 'M'+random;
-//     }
-//     else if(type='doctor')
-//     {
-//         console.log(type);
-//         var profile_id = 'D'+random;
-//     }
-//     else if(type='paramedic')
-//     {
-//         console.log(type);
-//         var profile_id = 'R'+random;
-//     }
-//     else if(type='insurance')
-//     {
-//         console.log(type);
-//         var profile_id = 'I'+random;
-//     }
-//     else if(type='hospitaladmin')
-//     {
-//         console.log(type);
-//         var profile_id = 'H'+random;
-//     }
-//     let promise = new Promise(function (resolve, reject) {
-//     User.findOne({
-//         profile_id: profile_id,
-//     }).exec()
-//         .then((user_data) => {
-//             console.log('check in db')
-//             if(user_data){
-//             console.log('userdata',user_data)
-//                 result= false;
-//                 setTimeout(() => resolve(result), 200);
-//             }
-//             else
-//             {
-//                 console.log('get_id');
-//                result = profile_id;
-//                setTimeout(() => resolve(result), 200);
-//             }
-//         })
-//     });
-//     promise.then((result) => { 
-//         return result;
-//     })         
-
-// }
 router.put('/setpassword', function (req, res, next) {
     const token = (req.headers.token);
-    console.log('password', req.query.password);
+   
     let legit = jwtconfig.verify(token)
     if (legit) {
         var enpassword = base64.encode(req.query.password);
@@ -3632,7 +3494,7 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
                     else {
                         var m = new Date();
                         var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
-                        console.log('data', req.body)
+                       
                         if (req.body.lan === 'de') {
 
 
@@ -3674,21 +3536,21 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
                             html: dhtml
                         };
                         sendSms(doc.mobile, 'There was an emergency an access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
-                            console.log('Message is sent')
+                           
                         }).catch(e => {
                             console.log('Message is not sent', e)
                         })
                         if(doc.emergency_number && doc.emergency_number !== ''){
                             sendSms(doc.emergency_number, 'There was an emergency access to the data in'+ doc.first_name+' '+doc.last_name +' Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
-                                console.log('Message is sent')
+                             
                             }).catch(e => {
                                 console.log('Message is not sent', e)
                             })
                         }
                         if (req.body.comefrom === 'pharmacy') {
-                            console.log('I here', req.body.pin)
+                            
                             if (req.body.pin && req.body.pin == doc.pin && req.body.pin !== "") {
-                                console.log('I here2', req.body.pin)
+                               
                                 var sendmail = transporter.sendMail(mailOptions)
                                 if (doc.emergency_email && doc.emergency_email !== '') {
                                     var mailOptions2 = {
@@ -3759,7 +3621,7 @@ router.post('/forgotPassword', function (req, res, next) {
                 link = 'https://sys.aimedis.io/change-password';
             }
             // var link = 'http://localhost:3000/change-password';
-            console.log('sdfsdf', req.body.lan)
+           
             if (req.body.lan === 'de') {
                 var dhtml = 'Sie haben Ihr Passwort vergessen und ein neues angefordert.<br/>' +
                     'Bitte klicken Sie auf diesen Link, um ein neues Passwort zu wählen:<br/>' +
@@ -4002,7 +3864,7 @@ router.post('/requireCSV', function (req, res, next) {
                     staff.push(req.body.Content.specilization)
                     staff.push(req.body.Content.profession)
                     var data = { tags: staff, type: "PERSON", properties: [{ type: "SYSTEM", name: "first_name", "value": req.body.Content.first_name }, { type: "SYSTEM", name: "last_name", value: req.body.Content.last_name }, { type: "SYSTEM", name: "email", subtype: "", value: req.body.Content.email }, { name: "phone", value: req.body.Content.phone, subtype: "" }] };
-                    console.log('dataa', data)
+                
                     var config = {
                         method: 'post',
                         url: 'https://aimedis.agilecrm.com/dev/api/contacts',
@@ -4015,7 +3877,7 @@ router.post('/requireCSV', function (req, res, next) {
                     axios(config)
                         .then(function (response) {
                             converter.json2csv(todos, (err, csv) => {
-                                console.log('cominside')
+                              
                                 var mailOptions = {
                                     from: "contact@aimedis.com",
                                     to: "contact@aimedis.com",
@@ -4138,7 +4000,7 @@ router.post('/downloadPdf', function (req, res, next) {
                     }
                     else if(key === 'datetime_on')
                     {
-                        console.log('datetime_on', key)
+                       
                         Data.push({ 'k': 'Date of event', 'v': getDate(value, 'YYYY/MM/DD') })
                     }
                     else{
@@ -4149,7 +4011,7 @@ router.post('/downloadPdf', function (req, res, next) {
             if (key === 'created_by_temp') { Data.push({ 'k': 'Created by', 'v': value }) }
         })
     }
-    console.log('Data', Data)
+    
     var filename = 'GeneratedReport.pdf'
     var document = {
         type: 'file',     // 'file' or 'buffer'
@@ -4164,7 +4026,7 @@ router.post('/downloadPdf', function (req, res, next) {
     pdf.create(document, options)
         .then(res22 => {
             const file = `${__dirname}/${filename}`;
-            console.log(file)
+        
             res.download(file); // Set disposition and send it.  
         })
         .catch(error => {
@@ -4189,14 +4051,14 @@ router.post('/downloadfullPdf', function (req, res, next) {
     };
     var Data = [];
     {
-        console.log('req.body.Dieseases', req.body.Dieseasess)
+       
         Object.entries(req.body.Dieseases).map(([key, value]) => {
                 if (Array.isArray(value)) {
                     Data.push({ 'k': key.replace(/_/g, ' '), 'v':  Array.prototype.map.call(value, s => s).toString().split(/[,]+/).join('<br/> ') })
                 }
         })
     }
-    console.log('Data', Data)
+    
     var filename = 'GeneratedReport.pdf'
     var document = {
         type: 'file',     // 'file' or 'buffer'
@@ -4211,7 +4073,7 @@ router.post('/downloadfullPdf', function (req, res, next) {
     pdf.create(document, options)
         .then(res22 => {
             const file = `${__dirname}/${filename}`;
-            console.log(file)
+         
             res.download(file); // Set disposition and send it.  
         })
         .catch(error => {

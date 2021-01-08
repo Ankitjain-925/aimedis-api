@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 let router = express.Router();
 var nodemailer = require('nodemailer');
@@ -5,12 +6,12 @@ var User = require('../schema/user.js');
 
 
 var transporter = nodemailer.createTransport({
-    host : "vwp3097.webpack.hosteurope.de",
+    host : process.env.MAIL_HOST,
     port : 25,
     secure: false,
     auth:{
-        user: "wp1052892-aimedis00102",
-        pass: "JuPiTeR7=7?"
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
     }
 });
 

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const twilio = require("twilio");
 const countries = [
   { name: "Israel", dial_code: "+972", code: "IL" },
@@ -286,10 +287,10 @@ if (reciver.length == 2) {
   mobile = `${code}${to}`;
 }
   }
-  let accountSid = "ACa53065dfe46a3e8a48e5d529fd4a63c2";
-  let authToken = "f8c828f98bad85a8f9af298fd5764401";
+  let accountSid = process.env.ACC_SID;
+  let authToken =  process.env.SID_TOKEN;
   const client = new twilio(accountSid, authToken);
-  console.log('mobile12', mobile)
+  
   return client.messages.create({
     body: message,
     to: mobile,

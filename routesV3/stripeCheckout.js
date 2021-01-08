@@ -1,10 +1,10 @@
-
+require('dotenv').config();
 var express             = require('express');
 let router              = express.Router();
 var User                = require('../schema/user.js');
 var jwtconfig           = require('../jwttoken');
 const configureStripe   = require('stripe');
-const STRIPE_SECRET_KEY = 'sk_test_hUobT4GcGe95zN3uOC9MvqlF00vdthTPvO'
+const STRIPE_SECRET_KEY= process.env.STRIPE_SECRET_KEY
 const stripe            = configureStripe(STRIPE_SECRET_KEY);
 var moment              = require('moment');
 //For payment when enable then reset it.s

@@ -16,6 +16,7 @@
     "cors": "^2.8.5",
     "csv-parser": "^2.3.0",
     "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
     "dynamic-html-pdf": "^1.0.1",
     "express": "^4.17.1",
     "handlebars": "^4.0.6",

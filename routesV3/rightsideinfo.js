@@ -176,7 +176,7 @@ router.get('/patient/:patient_id', function (req, res, next) {
                             value.type === 'diagnosis');
                             last_dia = myFilterData1[0];
                     
-                        var myFilterData2 = doc[0].track_record.filter((value, key) =>
+                            var myFilterData2 = doc[0].track_record.filter((value, key) =>
                             value.type === 'doctor_visit');
                             last_dv = myFilterData2;
                             if(myFilterData2.length>2)
@@ -184,10 +184,6 @@ router.get('/patient/:patient_id', function (req, res, next) {
                                 last_dv = myFilterData2.filter((value, key) =>
                                 key < 2 );
                             }
-                            forEachPromise(last_dv, getAlltrack)
-                            .then((result) => {
-                                var last_dv1 =  trackrecord1;
-                            })
                             
                         var myFilterData3 = doc[0].track_record.filter((value, key) =>
                             value.type === 'condition_pain');
@@ -202,7 +198,7 @@ router.get('/patient/:patient_id', function (req, res, next) {
                             prescriptions = myFilterData5;
                             if(myFilterData5.length>2)
                             {
-                                prescriptions = myFilterData2.filter((value, key) =>
+                                prescriptions = myFilterData5.filter((value, key) =>
                                 key < 2 );
                             }
                        
@@ -211,7 +207,7 @@ router.get('/patient/:patient_id', function (req, res, next) {
                             sick_certificates = myFilterData6;
                             if(myFilterData5.length>2)
                             {
-                                sick_certificates = myFilterData2.filter((value, key) =>
+                                sick_certificates = myFilterData6.filter((value, key) =>
                                 key < 2 );
                             }
                         var myFilterData7 = doc[0].track_record.filter((value, key) =>
@@ -227,9 +223,20 @@ router.get('/patient/:patient_id', function (req, res, next) {
                             laboratory_result = myFilterData8;
                         
                         }
-                    info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
-                    res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
-                        upcoming_appointment: upcoming_appointment, prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                        if(last_dv && last_dv.length>0)
+                        {
+                            forEachPromise(last_dv, getAlltrack)
+                            .then((result) => {
+                                info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
+                                res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
+                                upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                            })
+                        }
+                        else{
+                            info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
+                            res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
+                            upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                        }  
                 })
             }
                 else{
@@ -296,36 +303,30 @@ router.get('/doctor', function (req, res, next) {
                         prescription.count({doctor_id: legit.id},function (err, count) {
                             if(err){}
                             else{
-                                console.log(count, 'countsss1')
                                 prescriptions = count;
                             }
                         })
                         sick_certificate.count({doctor_id: legit.id},function (err, count) {
                             if(err){}
                             else{
-                                console.log(count, 'countsss2')
                                 sickcertificate = count;
                             }
                         })
                         appointment.count({doctor_id: legit.id},function (err, count) {
                             if(err){}
                             else{
-                                console.log(count, 'countsss3')
                                 appointments = count;
                             }
                         })
                         user.count({parent_id: legit.id},function (err, count) {
                             if(err){}
                             else{
-                                console.log(count, 'countsss4')
                                 patients = count;
                             }
                         })
-                        console.log('tttt',sickcertificate,appointments,patients )
                         setTimeout(() => resolve(), 1000);
 
                     });
-                    console.log('tttt11',sickcertificate,appointments,patients )
                     promise.then(()=>{
                         res.json({status: 200, hassuccessed: true, data :{ info: info, prescriptions: prescriptions, sickcertificate:sickcertificate, appointments:appointments,patients:patients}});
                     })

@@ -31,7 +31,7 @@ router.get('/:UserId', function (req, res, next) {
                                 if(doc.family_doc[0])
                                 { 
                                     user.findOne({ _id: doc.family_doc[0] }).then((docor) => {
-                                        console.log(docor);
+                                  
                                        if(docor != null){doctor.push(docor);}
                                       }).catch((err) => {
                                         res.json({ status: 200, hassuccessed: false, msg: 'Family Doctor not find' })
@@ -172,7 +172,7 @@ router.get('/:UserId', function (req, res, next) {
                                     options = ''
                                 }
                                 var donar = {remarks :remarksbyp, status : statusbyp , options: options}
-                                console.log(donar, 'donorrr')
+                                
                                 res.json({ status: 200, hassuccessed: true, msg: 'Data is found', diagnosisdata: diagnosis, medicationdata : medication,allergydata : allergy,doctor: doctor, personal_info: personal_info, donardata: donar,contact_partner :contact_partner})
                             })   
                             // }
@@ -192,7 +192,7 @@ router.get('/:UserId', function (req, res, next) {
                             if(doc.family_doc[0])
                             {
                                 user.findOne({ _id: doc.family_doc[0] }).then((docor) => {
-                                    console.log(docor);
+                                
                                    if(docor != null){doctor.push(docor);}
                                   }).catch((err) => {
                                     res.json({ status: 200, hassuccessed: false, msg: 'Family Doctor not find' })
@@ -211,7 +211,6 @@ router.get('/:UserId', function (req, res, next) {
                                         }
                                         if(element.type=='medication')
                                         {
-                                            console.log('medication')
                                             medication.push(element);
                                         }   
                                     // }
@@ -220,7 +219,6 @@ router.get('/:UserId', function (req, res, next) {
                             setTimeout(() => resolve(), 500);
                         });
                         promise.then(() => {
-                            console.log('doc.emergency_relation1' , doc.emergency_relation)
                             var contact_partner ={name : doc.emergency_contact_name, number: doc.emergency_number,email: doc.emergency_email, relation : doc.emergency_relation}
                             var statusbyp, remarksbyp, options;
                           
@@ -482,7 +480,6 @@ router.get('/getLocationPharmacy/:radius', function (req, res, next) {
 })
 
 router.get('/getPharmacy/search/:name', function (req, res, next) {
-    console.log('dfsdfd', req.params)
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -611,11 +608,11 @@ function getAlltrack(data) {
                 {
                      user.findOne({profile_id: data.patient_id}).exec()
                     .then(function(doc5){
-                        console.log('Here1',doc5)
+                        
                         if(doc5)
                         {
 
-                            console.log('Here11', )
+                        
                             var new_data = data;
                             if (doc5.last_name) {
                                 var patient_name = doc5.first_name + ' ' + doc5.last_name;
@@ -627,18 +624,18 @@ function getAlltrack(data) {
                             new_data.patient_alies_id= doc5.alies_id;
                             new_data.patient_default_id = doc5._id
                             new_data.patient_image = doc5.image;
-                            console.log('Here12', new_data)
+                         
                             return new_data;
                         }
                         else{
-                            console.log('Her33')
+                        
                             return new_data;  
                         }
                     })
                 }
                 if(!data.archive)
                 {
-                    console.log('erer',)
+                    
                     trackrecord1.push(new_data);
                 }
                 

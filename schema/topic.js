@@ -10,5 +10,6 @@ var Topic = new Schema({
    },
 },{ strict: false });
 
+
 var Topic = mongoose.model('Topic', Topic);
 module.exports = Topic;

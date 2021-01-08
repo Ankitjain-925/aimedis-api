@@ -118,8 +118,9 @@ app.use("/api/v3/cron", cronPrecess3)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
-appAdmin.use((req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+appAdmin.use((err, req, res, next) => {
+  console.log('er1r', err)
+  // return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
 });
 appAdmin.use(function(req, res, next) {
   var err = new Error('Not Found');

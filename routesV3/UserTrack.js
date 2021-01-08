@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var router = express.Router();
 const multer = require("multer");
@@ -14,15 +15,14 @@ const handlebars = require('handlebars');
 var nodemailer = require('nodemailer');
 
 var transporter = nodemailer.createTransport({
-    host : "vwp3097.webpack.hosteurope.de",
+    host : process.env.MAIL_HOST,
     port : 25,
     secure: false,
     auth:{
-        user: "wp1052892-aimedis00102",
-        pass: "JuPiTeR7=7?"
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
     }
 });
-
 
 var trackrecord1 = [];
 var track2 = [];
@@ -35,7 +35,7 @@ var storage = multer.diskStorage(
             cb(null, 'public/uploads/Trackrecord')
         },
         filename: function (req, file, cb) {
-            console.log('filesss', file),
+           
                 cb(null, Date.now() + '-' + file.originalname)
         }
 
@@ -47,7 +47,7 @@ var storage1 = multer.diskStorage(
         cb(null, 'public/uploads/KYC')
     },
     filename: function (req, file, cb) {
-        console.log('filesss', file),
+ 
             cb(null, Date.now() + '-' + file.originalname)
     }
 })
@@ -57,15 +57,7 @@ var upload1 = multer({ storage: storage }).array("UploadTrackImageMulti", 5);
 var upload2 = multer({ storage: storage1 }).single("Uploadkyc");
 
 //Temprary for add the User
-// router.post('/AddUser', function (req, res, next) {
-//     console.log('second file');
-//     var data = req.body;
-//     var users = new user(data);
-//     users.save(function (err, AddUser) {
-//         if (err) return next(err);
-//         res.json({ status: 200, hassuccessed: true, msg: 'User is created' });
-//     });
-// });
+
 router.get('/getKyc/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -75,7 +67,7 @@ router.get('/getKyc/:UserId', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                 } else {
-                    console.log('dsdfsdf', doc)
+                  
                     if(doc)
                     {
                         var data= true;
@@ -96,7 +88,7 @@ router.get('/getKyc/:UserId', function (req, res, next) {
 router.put('/updateKyc/:KYCId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    console.log('data', req.body)
+   
     if (legit) {
         kyc.updateOne({ _id : req.params.KYCId}, { $set : req.body}, {new: true}, (err, doc1) => {
             if (err && !doc1) {
@@ -230,7 +222,7 @@ router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
 //Add the track record
 
 router.put('/AddTrack/:UserId', function (req, res, next) {
-    console.log('req.body', req.body);
+  
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -269,7 +261,7 @@ router.delete('/AddTrack/:UserId/:TrackId', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                 } else {
-                    console.log('doc', doc);
+                   
                     if (doc.nModified == '0') {
                         res.json({ status: 200, hassuccessed: false, msg: 'Track record is not found' })
                     }
@@ -289,7 +281,7 @@ router.delete('/AddTrack/:UserId/:TrackId', function (req, res, next) {
 router.post('/AddTrack/TrackUploadImage', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    console.log('req.params.TrackId', req.params.TrackId)
+    
     if (legit) {
         upload(req, res, function (err) {
             if (err instanceof multer.MulterError) {
@@ -311,7 +303,6 @@ router.post('/AddTrack/TrackUploadImage', function (req, res, next) {
 router.post('/AddTrack/TrackUploadImageMulti', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    console.log('req.params.TrackId', req.params.TrackId)
     if (legit) {
         upload1(req, res, function (err) {
             if (err instanceof multer.MulterError) {
@@ -362,7 +353,7 @@ router.get('/AppointOfDate1/:date', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
-                console.log('Userinfos')
+                
                 res.json({ status: 200, hassuccessed: true, data: Userinfo });
             }
         });
@@ -532,7 +523,7 @@ router.get('/getUser/:UserId', function (req, res, next) {
                         if(req.query.comefrom && req.query.comefrom === 'healthdata')
                         {
                             if (req.query.pin && req.query.pin!=='undefined') {
-                                console.log('here comes')
+                                
                                 if (req.query.pin == doc.pin) {
                                     res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id : doc._id  })
                                 }
@@ -739,7 +730,7 @@ function getAlltrack(data) {
                 {
                     user.findOne({_id: data.emergency_by}).exec()
                     .then(function(doc5){
-                        console.log('ttttt112',doc5);
+                      
                         var new_data = data;
                         if (doc5.last_name) {
                             var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
@@ -809,7 +800,7 @@ function getAlltrack2(data) {
                 {
                     user.findOne({_id: data.emergency_by}).exec()
                     .then(function(doc5){
-                        console.log('ttttt112',doc5);
+                      
                         var new_data = data;
                         if (doc5.last_name) {
                             var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
@@ -836,7 +827,7 @@ function getAlltrack2(data) {
 function getAlltrack1(data, right_management) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            console.log('right_management', right_management)
+        
             user.findOne({_id: data.created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
@@ -930,7 +921,7 @@ function getAlltrack1(data, right_management) {
                 else {
                     var d1 = new Date();
                     var d2 = new Date(new_data.public);
-                    console.log('item.public', new_data.public);
+
                     // if (d1.getTime() <= d2.getTime()) {
                     //     trackrecord1.push(new_data);
                     // }
@@ -981,7 +972,7 @@ router.post('/mailenglish',function (req,res,next){
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-      console.log(legit);
+
         var html = 'Dear Mr./Mrs.'+legit.name+'<br/>'+
         'you sent a second opinion request with <b>the following information:<br/><br/>'+
         'Selected specialist:</b>   '+ req.body.specialist+'<br/>'+
@@ -1013,7 +1004,7 @@ router.post('/mailenglish',function (req,res,next){
         '<hr/><br/>'+
         'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.'+ 
         '</I><hr/>';
-        console.log('data', req.body);
+    
         if(req.body.filename)
         {
             var mailOptions = {
@@ -1059,7 +1050,7 @@ router.post('/mailenglish',function (req,res,next){
 })
 
 router.post('/mailgerman',function (req,res,next){
-    console.log(__dirname);
+    
     // const token = (req.headers.token)
     // let legit = jwtconfig.verify(token)
     // if (legit) {
@@ -1121,7 +1112,7 @@ function sendmailteam(data, legit){
     'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.'+ 
     '</I><hr/>';
 
-    console.log('data2', data)
+
     if(data.filename)
     {
         var mailOptions = {

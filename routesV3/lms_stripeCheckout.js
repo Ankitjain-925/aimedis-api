@@ -1,11 +1,12 @@
 
+require('dotenv').config();
 var express = require('express');
 let router = express.Router();
 var Payment = require("../schema/payment_schema");
 var Cart = require("../schema/cart")
 var jwtconfig = require('../jwttoken');
 const configureStripe = require('stripe');
-const STRIPE_SECRET_KEY = 'sk_live_T9Hsupvqoz7exnMc3N1Kw8md'
+const STRIPE_SECRET_KEY= process.env.LMS_STRIPE_SECRET_KEY
 const stripe = configureStripe(STRIPE_SECRET_KEY);
 var moment = require('moment');
 
@@ -29,7 +30,6 @@ const postStripeCharge = (res, id) => (stripeErr, stripeRes) => {
       description: stripeRes.description,
     })
     if (id) {
-      console.log("StripepaymentData", paymentData);
       res.status(200).json({ message: 'Payment Success', paymentData: paymentData })
     }
   }
@@ -66,7 +66,6 @@ router.post('/saveData', (req, res) => {
               res.status(400).json({ message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
               Cart.update({user_id : req.body.user_id }, { $set: { cartList: [] }}, function(err, affected){
-                  console.log('affected: ', affected);
               });
               res.status(200).json({ message: 'Get all succussfully', hassuccessed: true, data: result });
             }

@@ -13,7 +13,6 @@ var lmsStorage = multer.diskStorage({
         cb(null, 'public/uploads/lmsFile')
     },
     filename: function (req, file, cb) {
-        console.log('filesss', file),
             cb(null, Date.now() + '-' + file.originalname)
     }
 })
@@ -69,7 +68,6 @@ function forEachPromise(items, fn) {
 }
 
 function getAllrating(data){
-    console.log('dats',data._id)
     return new Promise((resolve, reject) => {
         process.nextTick(() => { 
             Rating.aggregate([
@@ -77,7 +75,7 @@ function getAllrating(data){
                 {$group: {_id: "$courseID", average: {$avg: '$rating'}, count: { $sum: 1 }}}   
             ]).exec()
             .then(function(doc3){
-                console.log('doc3',doc3)
+                
                 var new_data = data;
                 if (doc3 && doc3.length>0) {
                     new_data.courseContent = doc3[0]
@@ -172,7 +170,7 @@ router.delete('/removeCart/:UserId/:CourseId', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                 } else {
-                    console.log('doc', doc);
+                    
                     if (doc.nModified == '0') {
                         res.json({ status: 200, hassuccessed: false, msg: 'Track record is not found' })
                     }
@@ -267,7 +265,6 @@ router.post('/uploadFile', function (req, res, next) {
 
 router.get("/getAllLms", (req, res, next) => {
     const token = (req.headers.token)
-    console.log('token', token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         Schema.find({}, function (err, result) {
@@ -305,10 +302,8 @@ router.get("/getWishlist", (req, res) => {
     if (legit) {
         Wishlist.find({}, (err, data) => {
             if (data) {
-                console.log("Dataa", data)
                 res.json({ status: 200, hassuccessed: true, msg: 'Course Wishlist Fetched Successfully.!',  data })
             } else {
-                console.log("Error", err);
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong..' })
             }
         })
@@ -320,7 +315,6 @@ router.get("/getWishlist", (req, res) => {
 router.delete('/removeLms/:Id', function (req, res) {
     let legit = jwtconfig.verify(req.headers.token)
     if (legit) {
-        console.log('console params', req.params)
     Schema.findOneAndRemove({_id : req.params.Id} , function (err, data12) {
         if (err) {
             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
