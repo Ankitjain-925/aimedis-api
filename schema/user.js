@@ -1,6 +1,23 @@
+require('dotenv').config();
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
+const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 
+
+const PaitentList = new mongoose.Schema({
+   profile_id:{
+       type: String,
+       required: false,
+       unique: false
+   }
+},{ strict: false });
+
+PaitentList.plugin(mongooseFieldEncryption, {
+   fields: ["profile_id" ],
+   secret: process.env.SOME_32BYTE_BASE64_STRING,
+   saltGenerator: function (secret) {
+       return "1234567890123456"; // should ideally use the secret to return a string of length 16
+} });
 
 var UserSchema = new Schema({
     type:{
@@ -239,17 +256,22 @@ var UserSchema = new Schema({
    required: false,
    unique: false
    },
-   myPatient: {
-   type: Array,
-   required: false,
-   unique: false
-   }
+   myPatient: [PaitentList]
 },
 { strict: false },
 { timestamps : true }
 );
 
+
+
 UserSchema.index({ area : '2dsphere' });
+
+UserSchema.plugin(mongooseFieldEncryption, { fields: [ "weoffer_text","latest_info","emergency_number","emergency_email",
+"emergency_contact_name", "fax", "website", "phone","city","address","sex", "birthday", "mobile","profile_id", "alies_id", 
+"latest_info", "createdate"], secret: process.env.SOME_32BYTE_BASE64_STRING,
+saltGenerator: function (secret) {
+    return "1234567890123456"; // should ideally use the secret to return a string of length 16
+  } });
 var User = mongoose.model('User', UserSchema);
 module.exports = User;
  

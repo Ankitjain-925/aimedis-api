@@ -1,0 +1,40 @@
+<html>
+    <head>
+        Aimedis Timeline Report
+    </head>
+    <body style="letter-spacing: 2px;">
+        <div style="text-align: center;">
+            <img style="height: 40px; width: auto; margin: 30px;" src='https://aimedis.io/assets/images/LogoSymbolTransparentAimedis.png' />
+        </div>
+        <div style="text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: 900; text-transform: uppercase;">Aimedis Timeline Record</div>
+        <h2><b>{{pat_info.name}}</b></h2>
+        <div>{{pat_info.email}}</div>
+        <div>{{pat_info.Mobile}}</div>
+        <div style= "margin-top: 30px; margin-bottom: 30px;  font-size: 20px;">
+            Emergency Contact -
+        </div>
+        <div>{{pat_info.emergency_contact_name}}</div>
+        <div>{{pat_info.emergency_email}}</div>
+        <div>{{pat_info.emergency_relation}}</div>
+
+        <div style="margin-top: 30px; line-height: 2;">
+            {{#each Dieseases}}
+                <div><b style="text-transform: capitalize; padding-top: 10px; padding-bottom: 10px; line-height: 3">{{k}}:</b><br/></div>
+                <div style="line-height: 2">{{{v}}}</div>
+            </div>
+            {{/each}}
+        </div>
+
+
+        <div>
+              <div style="text-align: right;margin-top:40px; font-size: 20px; line-height: 2;"><b>Your Aimedis team</b><br/>
+                https://sys.aimedis.io<br/>
+                <b>The Aimedis blog:</b>https://blog.aimedis.com<br/>
+              </div>
+        </div>
+    </body>
+</html>
+
+
+
+
