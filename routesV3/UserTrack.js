@@ -7,18 +7,19 @@ var kyc = require('../schema/kyc');
 var Appointment = require('../schema/appointments')
 var jwtconfig = require('../jwttoken');
 const uuidv1 = require('uuid/v1');
-const {join} = require('path');
+const { join } = require('path');
 const moment = require('moment');
-const {promisify} = require('util');
+const { promisify } = require('util');
 const read = promisify(require('fs').readFile);
 const handlebars = require('handlebars');
 var nodemailer = require('nodemailer');
+const sendSms = require("./sendSms")
 
 var transporter = nodemailer.createTransport({
-    host : process.env.MAIL_HOST,
-    port : 25,
+    host: process.env.MAIL_HOST,
+    port: 25,
     secure: false,
-    auth:{
+    auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS
     }
@@ -28,29 +29,29 @@ var trackrecord1 = [];
 var track2 = [];
 
 //var paths= "http:/localhost:5000/uploads/Trackrecord"
- var paths= "https://aimedis1.com/public/uploads/Trackrecord"
+var paths = "https://aimedis1.com/public/uploads/Trackrecord"
 var storage = multer.diskStorage(
     {
         destination: function (req, file, cb) {
             cb(null, 'public/uploads/Trackrecord')
         },
         filename: function (req, file, cb) {
-           
-                cb(null, Date.now() + '-' + file.originalname)
+
+            cb(null, Date.now() + '-' + file.originalname)
         }
 
     })
 
 var storage1 = multer.diskStorage(
-{
-    destination: function (req, file, cb) {
-        cb(null, 'public/uploads/KYC')
-    },
-    filename: function (req, file, cb) {
- 
+    {
+        destination: function (req, file, cb) {
+            cb(null, 'public/uploads/KYC')
+        },
+        filename: function (req, file, cb) {
+
             cb(null, Date.now() + '-' + file.originalname)
-    }
-})
+        }
+    })
 
 var upload = multer({ storage: storage }).single("UploadTrackImage");
 var upload1 = multer({ storage: storage }).array("UploadTrackImageMulti", 5);
@@ -67,13 +68,11 @@ router.get('/getKyc/:UserId', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                 } else {
-                  
-                    if(doc)
-                    {
-                        var data= true;
+
+                    if (doc) {
+                        var data = true;
                     }
-                    else 
-                    {
+                    else {
                         var data = false;
                     }
                     res.json({ status: 200, hassuccessed: true, msg: 'Data is fetched', data: data, fulldata: doc })
@@ -88,13 +87,13 @@ router.get('/getKyc/:UserId', function (req, res, next) {
 router.put('/updateKyc/:KYCId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-   
+
     if (legit) {
-        kyc.updateOne({ _id : req.params.KYCId}, { $set : req.body}, {new: true}, (err, doc1) => {
+        kyc.updateOne({ _id: req.params.KYCId }, { $set: req.body }, { new: true }, (err, doc1) => {
             if (err && !doc1) {
-                res.json({ status: 450, hassuccessed: false, message: 'Something went wrong' ,error : err})
-            }else{
-                res.json({ status: 450, hassuccessed: true, message: 'KYC is updated'}) 
+                res.json({ status: 450, hassuccessed: false, message: 'Something went wrong', error: err })
+            } else {
+                res.json({ status: 450, hassuccessed: true, message: 'KYC is updated' })
             }
         });
     }
@@ -167,12 +166,10 @@ router.get('/Get_patient_gender/:UserId', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                 } else {
-                    if(doc && doc.sex)
-                    {
-                        var gender= doc.sex;
+                    if (doc && doc.sex) {
+                        var gender = doc.sex;
                     }
-                    else 
-                    {
+                    else {
                         var gender = false;
                     }
                     res.json({ status: 200, hassuccessed: true, msg: 'Data iis fetched', data: gender })
@@ -185,34 +182,62 @@ router.get('/Get_patient_gender/:UserId', function (req, res, next) {
 });
 
 //Edit track records
-router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
+router.put('/AddTrack/:UserId/:TrackId', async function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         // var track_id = {track_id : req.params.TrackId}
         var data = req.body.data
-        user.findOneAndUpdate(
-            {
-                '_id': req.params.UserId,
-                'track_record.track_id': req.params.TrackId
-            },
-            {
-                $set: {
-                    'track_record.$': data
-                }
-            },
-            function (err, doc) {
-                if (err && !doc) {
-                    res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-                } else {
-                    if (doc.nModified == '0') {
-                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
-                    }
-                    else {
-                        res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
-                    }
-                }
-            });
+        user.find({ _id: data.created_by }, { email: 1, mobile: 1 }).then(docUser => {
+            if (docUser) {
+                let dhtml = 'Hi <b>' + data.created_by_temp + "</b>,<br/><br/>" +
+                    "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name + '.<br/>' +
+                    'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
+                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
+                    '<b>Your Aimedis team </b>'
+                // if (data.lan === 'de') {
+                //     dhtml = 'Prescription Handled Sie haben für den  DATE' + date + 'um TIME ' + req.body.start_time + ' einen Termin bei ' + req.body.patient_info.patient_id + 'ONLINE/OFFLINE vereinbart. .<br/>' +
+                //         'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>' +
+                //         'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an' + req.body.patient_info.email + '. <br/>' +
+                //         'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> ' +
+
+                //         '<b>Ihr Aimedis Team </b>'
+                // }
+
+                var mailOptions = {
+                    from: "contact@aimedis.com",
+                    to: docUser.email,
+                    subject: 'Precription Handeled Report',
+                    html: dhtml
+                };
+                user.findOneAndUpdate(
+                    {
+                        '_id': req.params.UserId,
+                        'track_record.track_id': req.params.TrackId
+                    },
+                    {
+                        $set: {
+                            'track_record.$': data
+                        }
+                    },
+                    function (err, doc) {
+                        if (err && !doc) {
+                            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                        } else {
+                            if (doc.nModified == '0') {
+                                res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                            }
+                            else {
+                                let sendmail = transporter.sendMail(mailOptions)
+                                let sentSMS = sendSms(docUser.mobile, "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name+" at "+ data.created_on +" Regards, Aimedis team.")
+                                sendmail && sentSMS && res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                            }
+                        }
+                    });
+            }
+        })
+
+
     }
     else {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
@@ -222,7 +247,7 @@ router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
 //Add the track record
 
 router.put('/AddTrack/:UserId', function (req, res, next) {
-  
+
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -261,7 +286,7 @@ router.delete('/AddTrack/:UserId/:TrackId', function (req, res, next) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                 } else {
-                   
+
                     if (doc.nModified == '0') {
                         res.json({ status: 200, hassuccessed: false, msg: 'Track record is not found' })
                     }
@@ -281,7 +306,7 @@ router.delete('/AddTrack/:UserId/:TrackId', function (req, res, next) {
 router.post('/AddTrack/TrackUploadImage', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    
+
     if (legit) {
         upload(req, res, function (err) {
             if (err instanceof multer.MulterError) {
@@ -353,7 +378,7 @@ router.get('/AppointOfDate1/:date', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
             } else {
-                
+
                 res.json({ status: 200, hassuccessed: true, data: Userinfo });
             }
         });
@@ -369,9 +394,9 @@ router.get('/AppointmentByDate1', function (req, res, next) {
     if (legit) {
         Appointment.aggregate(
             [
-                { 
+                {
                     $match: {
-                        patient : legit.id,
+                        patient: legit.id,
                         status: 'accept'
                     }
                 },
@@ -379,13 +404,13 @@ router.get('/AppointmentByDate1', function (req, res, next) {
                     $group: {
                         _id: "$date",
                         count: { $sum: 1 },
-                       
+
                     }
                 }
             ],
-            function(err,results) {
-                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
-                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            function (err, results) {
+                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' }) }
+                else { res.json({ status: 200, hassuccessed: true, data: results }) };
             }
         )
     }
@@ -400,9 +425,9 @@ router.get('/AppointmentByDate', function (req, res, next) {
     if (legit) {
         Appointment.aggregate(
             [
-                { 
+                {
                     $match: {
-                        doctor_id : legit.id,
+                        doctor_id: legit.id,
                         status: 'accept'
                     }
                 },
@@ -410,13 +435,13 @@ router.get('/AppointmentByDate', function (req, res, next) {
                     $group: {
                         _id: "$date",
                         count: { $sum: 1 },
-                       
+
                     }
                 }
             ],
-            function(err,results) {
-                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' })}
-                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+            function (err, results) {
+                if (err) { res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' }) }
+                else { res.json({ status: 200, hassuccessed: true, data: results }) };
             }
         )
     }
@@ -433,43 +458,43 @@ router.post('/appointment', function (req, res) {
         } else {
             var date = getDate(moment(req.body.date).format('YYYY/MM/DD'), 'YYYY/MM/DD')
             if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben am   DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' ONLINE/OFFLINE vereinbart. .<br/>'+ 
-                'Sollten Sie den Termin nicht wahrnehmen können, sagen Sie den Termin bitte spätestens 24 Stunden vor Terminbeginn ab. <br/>'+
-                'Kontaktieren Sie bei Fragen Ihren behandelnden Arzt unter PRACTICE PHONE NUMBER. <br/>'+
-                'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten. '+
-            
-                '<b>Ihr Aimedis Team </b>'
-            
+                var dhtml = 'Sie haben am   DATE' + date + 'um TIME ' + req.body.start_time + ' einen Termin bei ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ONLINE/OFFLINE vereinbart. .<br/>' +
+                    'Sollten Sie den Termin nicht wahrnehmen können, sagen Sie den Termin bitte spätestens 24 Stunden vor Terminbeginn ab. <br/>' +
+                    'Kontaktieren Sie bei Fragen Ihren behandelnden Arzt unter PRACTICE PHONE NUMBER. <br/>' +
+                    'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten. ' +
+
+                    '<b>Ihr Aimedis Team </b>'
+
             }
             else {
-                var dhtml = 'You have got an ONLINE / OFFLINE appointment with '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+date +' at TIME '+ req.body.start_time+'.<br/>'+ 
-                'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins. <br/>'+
-                'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>'+
-                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
-                
-                '<b>Your Aimedis team </b>'
-            
+                var dhtml = 'You have got an ONLINE / OFFLINE appointment with ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' on DATE ' + date + ' at TIME ' + req.body.start_time + '.<br/>' +
+                    'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins. <br/>' +
+                    'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>' +
+                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>' +
+
+                    '<b>Your Aimedis team </b>'
+
             }
             if (req.body.lan === 'de') {
-            
-                var dhtml2 = ' Sie haben für den  DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.patient_info.patient_id+'ONLINE/OFFLINE vereinbart. .<br/>'+ 
-                'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>'+
-                'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an'+req.body.patient_info.email+'. <br/>'+
-                'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> '+
-            
-                '<b>Ihr Aimedis Team </b>'
+
+                var dhtml2 = ' Sie haben für den  DATE' + date + 'um TIME ' + req.body.start_time + ' einen Termin bei ' + req.body.patient_info.patient_id + 'ONLINE/OFFLINE vereinbart. .<br/>' +
+                    'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>' +
+                    'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an' + req.body.patient_info.email + '. <br/>' +
+                    'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> ' +
+
+                    '<b>Ihr Aimedis Team </b>'
             }
             else {
-                var dhtml2 ='You have got an ONLINE / OFFLINE appointment with '+ req.body.patient_info.patient_id+' on DATE '+ date  +' at TIME '+ req.body.start_time+'.<br/>'+ 
-                'Please accept the appointment inside the system.<br/>'+ 
-                'If you have any questions, contact the patient via '+req.body.patient_info.email+'.<br/>'+ 
-                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
-                
-                '<b>Your Aimedis team </b>'
+                var dhtml2 = 'You have got an ONLINE / OFFLINE appointment with ' + req.body.patient_info.patient_id + ' on DATE ' + date + ' at TIME ' + req.body.start_time + '.<br/>' +
+                    'Please accept the appointment inside the system.<br/>' +
+                    'If you have any questions, contact the patient via ' + req.body.patient_info.email + '.<br/>' +
+                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>' +
+
+                    '<b>Your Aimedis team </b>'
             }
             var mailOptions = {
                 from: "contact@aimedis.com",
-                to:req.body.patient_info.email ,
+                to: req.body.patient_info.email,
                 subject: 'Appointment Request',
                 html: dhtml
             };
@@ -486,7 +511,7 @@ router.post('/appointment', function (req, res) {
     })
 })
 
-function getDate (date, dateFormat){
+function getDate(date, dateFormat) {
     var d = new Date(date);
     var monthNames = ["01", "02", "03", "04", "05", "06",
         "07", "08", "09", "10", "11", "12"],
@@ -494,9 +519,9 @@ function getDate (date, dateFormat){
         day = d.getDate(),
         year = d.getFullYear()
     if (day.length < 2) day = '0' + day;
-    if(dateFormat === 'YYYY/DD/MM') { return year + ' / ' + day + ' / ' + month; }
-    else if(dateFormat === 'DD/MM/YYYY') {  return day + ' / ' + month + ' / ' + year; }
-    else { return month + ' / ' + day + ' / ' + year;}
+    if (dateFormat === 'YYYY/DD/MM') { return year + ' / ' + day + ' / ' + month; }
+    else if (dateFormat === 'DD/MM/YYYY') { return day + ' / ' + month + ' / ' + year; }
+    else { return month + ' / ' + day + ' / ' + year; }
 }
 
 //for emergency access by doctor
@@ -504,28 +529,25 @@ router.get('/getUser/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        user.findOne({ type: 'patient', $or :  [{profile_id: req.params.UserId },{alies_id :req.params.UserId  }]},
+        user.findOne({ type: 'patient', $or: [{ profile_id: req.params.UserId }, { alies_id: req.params.UserId }] },
             function (err, doc) {
                 if (err && !doc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                 } else {
-                    if(doc == null || doc =='undefined' )
-                    {
+                    if (doc == null || doc == 'undefined') {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not exist' })
-                      
+
                     }
-                    else
-                    {
+                    else {
                         // if (doc.family_doc.includes(legit.id)) {
                         //     res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id : doc._id  })
                         // }
                         // else {
-                        if(req.query.comefrom && req.query.comefrom === 'healthdata')
-                        {
-                            if (req.query.pin && req.query.pin!=='undefined') {
-                                
+                        if (req.query.comefrom && req.query.comefrom === 'healthdata') {
+                            if (req.query.pin && req.query.pin !== 'undefined') {
+
                                 if (req.query.pin == doc.pin) {
-                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id : doc._id  })
+                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
                                 }
                                 else {
                                     res.json({ status: 200, hassuccessed: false, msg: 'Pin is not Correct' })
@@ -534,12 +556,11 @@ router.get('/getUser/:UserId', function (req, res, next) {
                             else {
                                 res.json({ status: 200, hassuccessed: false, msg: 'Please Enter the Pin' })
                             }
-                         }
-                         else
-                         {
-                            res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id : doc._id  })
-                         }
-                        
+                        }
+                        else {
+                            res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
+                        }
+
                     }
                 }
             });
@@ -560,25 +581,24 @@ router.get('/AddTrack/:UserId', function (req, res, next) {
                     if (err && !doc) {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                     } else {
-                        if(doc && doc.length>0)
-                        {
+                        if (doc && doc.length > 0) {
                             doc[0].track_record.sort(mySorter);
                             if (doc[0].track_record.length > 0) {
-    
+
                                 forEachPromise(doc[0].track_record, getAlltrack)
                                     .then((result) => {
                                         res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord1 })
                                     })
-    
+
                             }
                             else {
                                 res.json({ status: 200, hassuccessed: false, msg: 'No data' })
-                            }  
+                            }
                         }
                         else {
                             res.json({ status: 200, hassuccessed: false, msg: 'No data' })
-                        }  
-                   
+                        }
+
                     }
                 })
         }
@@ -588,25 +608,24 @@ router.get('/AddTrack/:UserId', function (req, res, next) {
                     if (err && !doc) {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                     } else {
-                        if(doc && doc.length>0)
-                        {
+                        if (doc && doc.length > 0) {
                             // if (doc && doc[0] && doc[0].Rigt_management &&  doc[0].Rigt_management.length>0) {
                             //     if(doc.Rigt_management[0] && doc.Rigt_management[0].emergency_access === 'yes')
                             //     {
-                                   
-                                    var finaloutput = [];
-                                    doc[0].track_record.sort(mySorter);
-                                    if (doc[0].track_record.length > 0) {
-                                        if (doc[0].track_record.length > 0) {
-                                            forEachPromises(doc[0].track_record, doc[0].Rigt_management[0], getAlltrack1)
-                                                .then((result) => {
-                                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord1 })
-                                                })
-                                        }
-                                    }
-                                    else {
-                                        res.json({ status: 200, hassuccessed: false, msg: 'No data' })
-                                    }
+
+                            var finaloutput = [];
+                            doc[0].track_record.sort(mySorter);
+                            if (doc[0].track_record.length > 0) {
+                                if (doc[0].track_record.length > 0) {
+                                    forEachPromises(doc[0].track_record, doc[0].Rigt_management[0], getAlltrack1)
+                                        .then((result) => {
+                                            res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord1 })
+                                        })
+                                }
+                            }
+                            else {
+                                res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                            }
                             //     }
                             //     else
                             //     {
@@ -617,7 +636,7 @@ router.get('/AddTrack/:UserId', function (req, res, next) {
                             // {
                             //     res.json({ status: 200, hassuccessed: false, msg: 'No authority access to get inforamtion' })
                             // }     
-                    }
+                        }
                         else {
                             res.json({ status: 200, hassuccessed: false, msg: 'No data' })
                         }
@@ -634,34 +653,33 @@ router.get('/ArchivedTrack/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-    user.find({ _id: req.params.UserId },
-        function (err, doc) {
-            if (err && !doc) {
-                res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
-            } else {
-                if(doc && doc.length>0)
-                {
-                    doc[0].track_record.sort(mySorter);
-                    if (doc[0].track_record.length > 0) {
+        user.find({ _id: req.params.UserId },
+            function (err, doc) {
+                if (err && !doc) {
+                    res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+                } else {
+                    if (doc && doc.length > 0) {
+                        doc[0].track_record.sort(mySorter);
+                        if (doc[0].track_record.length > 0) {
 
-                        forEachPromise(doc[0].track_record, getAlltrack2)
-                            .then((result) => {
-                                res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: track2 })
-                            })
+                            forEachPromise(doc[0].track_record, getAlltrack2)
+                                .then((result) => {
+                                    res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: track2 })
+                                })
 
+                        }
+                        else {
+                            res.json({ status: 200, hassuccessed: false, msg: 'No data' })
+                        }
                     }
                     else {
                         res.json({ status: 200, hassuccessed: false, msg: 'No data' })
-                    }  
+                    }
+
                 }
-                else {
-                    res.json({ status: 200, hassuccessed: false, msg: 'No data' })
-                }  
-            
-            }
-        })
-        
-        
+            })
+
+
     }
     else {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
@@ -676,7 +694,7 @@ function forEachPromise(items, fn) {
     }, Promise.resolve());
 }
 
-function forEachPromises(items, right_management,fn) {
+function forEachPromises(items, right_management, fn) {
     return items.reduce(function (promise, item) {
         return promise.then(function () {
             return fn(item, right_management);
@@ -687,69 +705,66 @@ function forEachPromises(items, right_management,fn) {
 function getAlltrack(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            user.findOne({_id: data.created_by}).exec()
-            .then(function(doc3){
-                var new_data = data;
-               
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'; 
-                }
-                else {
-                    var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-               
-                new_data.created_by_temp = created_by;
-               
-                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                new_data.created_by_image = doc3.image;
-                if(doc3.alies_id){
-                    new_data.created_by_profile = doc3.alies_id;
-                }
-                else{
-                    new_data.created_by_profile = doc3.profile_id;
-                }
-                return new_data;
-            }).then(function(new_data){
-                if(data.review_by)
-                {
-                     user.findOne({_id: data.review_by}).exec()
-                    .then(function(doc5){
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var reviewed_by = doc5.first_name;
-                        }
-                        new_data.review_by_temp = reviewed_by;
-                        return new_data;
-                    
-                    })
-                }
-                if(data.emergency_by)
-                {
-                    user.findOne({_id: data.emergency_by}).exec()
-                    .then(function(doc5){
-                      
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
-                        return new_data;
-                    })
-                    
-                } 
-                if(!data.archive)
-                {
-                    trackrecord1.push(new_data);
-                }
-                
-                resolve(trackrecord1);
-            })
+            user.findOne({ _id: data.created_by }).exec()
+                .then(function (doc3) {
+                    var new_data = data;
+
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )';
+                    }
+                    else {
+                        var created_by = doc3.first_name + ' ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )';
+                    }
+
+                    new_data.created_by_temp = created_by;
+
+                    new_data.created_by_temp2 = created_by.substring(0, 7) + '... ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )';
+                    new_data.created_by_image = doc3.image;
+                    if (doc3.alies_id) {
+                        new_data.created_by_profile = doc3.alies_id;
+                    }
+                    else {
+                        new_data.created_by_profile = doc3.profile_id;
+                    }
+                    return new_data;
+                }).then(function (new_data) {
+                    if (data.review_by) {
+                        user.findOne({ _id: data.review_by }).exec()
+                            .then(function (doc5) {
+                                var new_data = data;
+                                if (doc5.last_name) {
+                                    var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                                }
+                                else {
+                                    var reviewed_by = doc5.first_name;
+                                }
+                                new_data.review_by_temp = reviewed_by;
+                                return new_data;
+
+                            })
+                    }
+                    if (data.emergency_by) {
+                        user.findOne({ _id: data.emergency_by }).exec()
+                            .then(function (doc5) {
+
+                                var new_data = data;
+                                if (doc5.last_name) {
+                                    var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                                }
+                                else {
+                                    var emergency1_by = doc5.first_name;
+                                }
+                                new_data.emergency_by_temp = emergency1_by;
+                                return new_data;
+                            })
+
+                    }
+                    if (!data.archive) {
+                        trackrecord1.push(new_data);
+                    }
+
+                    resolve(trackrecord1);
+                })
         });
     });
 }
@@ -757,69 +772,66 @@ function getAlltrack(data) {
 function getAlltrack2(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            user.findOne({_id: data.created_by}).exec()
-            .then(function(doc3){
-                var new_data = data;
+            user.findOne({ _id: data.created_by }).exec()
+                .then(function (doc3) {
+                    var new_data = data;
 
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-                else {
-                    var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-              
-                new_data.created_by_temp = created_by;
-                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
-                new_data.created_by_image = doc3.image;
-                if(doc3.alies_id){
-                    new_data.created_by_profile = doc3.alies_id;
-                }
-                else{
-                    new_data.created_by_profile = doc3.profile_id;
-                }
-                return new_data;
-             
-            }).then(function(new_data){
-                if(data.review_by)
-                {
-                     user.findOne({_id: data.review_by}).exec()
-                    .then(function(doc5){
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var reviewed_by = doc5.first_name;
-                        }
-                        new_data.review_by_temp = reviewed_by;
-                        return new_data;
-                    
-                    })
-                }
-                if(data.emergency_by)
-                {
-                    user.findOne({_id: data.emergency_by}).exec()
-                    .then(function(doc5){
-                      
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
-                        return new_data;
-                    })
-                    
-                } 
-                if(data.archive)
-                {
-                    track2.push(new_data);
-                }
-                
-                resolve(track2);
-            })
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )';
+                    }
+                    else {
+                        var created_by = doc3.first_name + ' ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )';
+                    }
+
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by_temp2 = created_by.substring(0, 7) + '... ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )'
+                    new_data.created_by_image = doc3.image;
+                    if (doc3.alies_id) {
+                        new_data.created_by_profile = doc3.alies_id;
+                    }
+                    else {
+                        new_data.created_by_profile = doc3.profile_id;
+                    }
+                    return new_data;
+
+                }).then(function (new_data) {
+                    if (data.review_by) {
+                        user.findOne({ _id: data.review_by }).exec()
+                            .then(function (doc5) {
+                                var new_data = data;
+                                if (doc5.last_name) {
+                                    var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                                }
+                                else {
+                                    var reviewed_by = doc5.first_name;
+                                }
+                                new_data.review_by_temp = reviewed_by;
+                                return new_data;
+
+                            })
+                    }
+                    if (data.emergency_by) {
+                        user.findOne({ _id: data.emergency_by }).exec()
+                            .then(function (doc5) {
+
+                                var new_data = data;
+                                if (doc5.last_name) {
+                                    var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                                }
+                                else {
+                                    var emergency1_by = doc5.first_name;
+                                }
+                                new_data.emergency_by_temp = emergency1_by;
+                                return new_data;
+                            })
+
+                    }
+                    if (data.archive) {
+                        track2.push(new_data);
+                    }
+
+                    resolve(track2);
+                })
         });
     });
 }
@@ -827,125 +839,112 @@ function getAlltrack2(data) {
 function getAlltrack1(data, right_management) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-        
-            user.findOne({_id: data.created_by}).exec()
-            .then(function(doc3){
-                var new_data = data;
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-                else {
-                    var created_by = doc3.first_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-               
-                new_data.created_by_temp = created_by;
-                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
-                new_data.created_by_image = doc3.image;
-                if(doc3.alies_id){
-                    new_data.created_by_profile = doc3.alies_id;
-                }
-                else{
-                    new_data.created_by_profile = doc3.profile_id;
-                }
-                return new_data;
-             
-            }).then(function(new_data){
-                if(data.review_by)
-                {
-                     user.findOne({_id: data.review_by}).exec()
-                    .then(function(doc5){
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var reviewed_by = doc5.first_name;
-                        }
-                        new_data.review_by_temp = reviewed_by;
-                        return new_data;
-                    
-                    })
-                }
-                if(data.emergency_by)
-                {
-                    user.findOne({_id: data.emergency_by}).exec()
-                    .then(function(doc5){
-                        var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
-                        }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
-                        return new_data;
-                    })
-                    
-                } 
-                if (!new_data.public || new_data.public == '') {
-                    if(!data.archive)
-                    { 
-                        if(right_management && right_management.opt && right_management.opt==='in')
-                        {
-                            if(right_management.opt_set && right_management.opt_set==='until')
-                            {
-                                var d1 = new Date();
-                                var d2 = new Date(right_management.opt_until);
-                                if (d1.getTime() >= d2.getTime()) {
-                                    trackrecord1.push(new_data);    
-                                }
-                            } 
-                        }
-                        else if(right_management && right_management.opt && right_management.opt==='out')
-                        {
-                            if(right_management.opt_set && right_management.opt_set==='until')
-                            {
-                                var d1 = new Date();
-                                var d2 = new Date(right_management.opt_until);
-                                if (d1.getTime() <= d2.getTime()) {
-                                    trackrecord1.push(new_data);    
-                                }
-                            } 
-                            else
-                            {
-                                trackrecord1.push(new_data); 
-                            }
-                        }
-                        else
-                        {}
-                    }
-                 }
-                else if (new_data.visible== 'show' && new_data.public == 'always') {
-                     trackrecord1.push(new_data);
-                }
-                else {
-                    var d1 = new Date();
-                    var d2 = new Date(new_data.public);
 
-                    // if (d1.getTime() <= d2.getTime()) {
-                    //     trackrecord1.push(new_data);
-                    // }
-                    if(new_data.visible == 'show')
-                    {
-                        if (d1.getTime() <= d2.getTime()) {
-                            if(!data.archive)
-                            {
-                                trackrecord1.push(new_data);
+            user.findOne({ _id: data.created_by }).exec()
+                .then(function (doc3) {
+                    var new_data = data;
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )';
+                    }
+                    else {
+                        var created_by = doc3.first_name + ' ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )';
+                    }
+
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by_temp2 = created_by.substring(0, 7) + '... ( ' + doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) + ' )'
+                    new_data.created_by_image = doc3.image;
+                    if (doc3.alies_id) {
+                        new_data.created_by_profile = doc3.alies_id;
+                    }
+                    else {
+                        new_data.created_by_profile = doc3.profile_id;
+                    }
+                    return new_data;
+
+                }).then(function (new_data) {
+                    if (data.review_by) {
+                        user.findOne({ _id: data.review_by }).exec()
+                            .then(function (doc5) {
+                                var new_data = data;
+                                if (doc5.last_name) {
+                                    var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                                }
+                                else {
+                                    var reviewed_by = doc5.first_name;
+                                }
+                                new_data.review_by_temp = reviewed_by;
+                                return new_data;
+
+                            })
+                    }
+                    if (data.emergency_by) {
+                        user.findOne({ _id: data.emergency_by }).exec()
+                            .then(function (doc5) {
+                                var new_data = data;
+                                if (doc5.last_name) {
+                                    var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                                }
+                                else {
+                                    var emergency1_by = doc5.first_name;
+                                }
+                                new_data.emergency_by_temp = emergency1_by;
+                                return new_data;
+                            })
+
+                    }
+                    if (!new_data.public || new_data.public == '') {
+                        if (!data.archive) {
+                            if (right_management && right_management.opt && right_management.opt === 'in') {
+                                if (right_management.opt_set && right_management.opt_set === 'until') {
+                                    var d1 = new Date();
+                                    var d2 = new Date(right_management.opt_until);
+                                    if (d1.getTime() >= d2.getTime()) {
+                                        trackrecord1.push(new_data);
+                                    }
+                                }
+                            }
+                            else if (right_management && right_management.opt && right_management.opt === 'out') {
+                                if (right_management.opt_set && right_management.opt_set === 'until') {
+                                    var d1 = new Date();
+                                    var d2 = new Date(right_management.opt_until);
+                                    if (d1.getTime() <= d2.getTime()) {
+                                        trackrecord1.push(new_data);
+                                    }
+                                }
+                                else {
+                                    trackrecord1.push(new_data);
+                                }
+                            }
+                            else { }
+                        }
+                    }
+                    else if (new_data.visible == 'show' && new_data.public == 'always') {
+                        trackrecord1.push(new_data);
+                    }
+                    else {
+                        var d1 = new Date();
+                        var d2 = new Date(new_data.public);
+
+                        // if (d1.getTime() <= d2.getTime()) {
+                        //     trackrecord1.push(new_data);
+                        // }
+                        if (new_data.visible == 'show') {
+                            if (d1.getTime() <= d2.getTime()) {
+                                if (!data.archive) {
+                                    trackrecord1.push(new_data);
+                                }
+                            }
+                        }
+                        else {
+                            if (d1.getTime() >= d2.getTime()) {
+                                if (!data.archive) {
+                                    trackrecord1.push(new_data);
+                                }
                             }
                         }
                     }
-                    else
-                    {
-                        if (d1.getTime() >= d2.getTime()) {
-                            if(!data.archive)
-                            {
-                                trackrecord1.push(new_data);
-                            }
-                        }
-                    }
-                }
-                resolve(trackrecord1);
-            })
+                    resolve(trackrecord1);
+                })
         });
     });
 }
@@ -960,7 +959,7 @@ router.post('/DowloadTrack/:Patientid', function (req, res, next) {
             }
             else {
             }
-        })      
+        })
     }
     else {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
@@ -968,78 +967,74 @@ router.post('/DowloadTrack/:Patientid', function (req, res, next) {
 })
 
 //for second opinion mailss
-router.post('/mailenglish',function (req,res,next){
+router.post('/mailenglish', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
 
-        var html = 'Dear Mr./Mrs.'+legit.name+'<br/>'+
-        'you sent a second opinion request with <b>the following information:<br/><br/>'+
-        'Selected specialist:</b>   '+ req.body.specialist+'<br/>'+
-        '<b>Way of transfer:</b>   '+req.body.online_offline+'<br/>'+
-        '<b>Selected specialty:</b>   '+req.body.speciality+'<br/>'+
-        '<b>How are you?:</b>   '+req.body.how_are_you+'<br/>'+
-        '<b>Knows diseases:    '+req.body.know_diseases+'</b><br/>'+
-        '<b>Medication:   '+req.body.medication+'</b><br/>'+
-        '<b>Allergies:   '+req.body.allergies+'</b><br/>'+
-        '<b>Profession:   '+req.body.professions+'</b><br/>'+
-        '<b>Uploaded files:   attached to this mail</b><br/>'+
-        '<b>Detailed questions:   '+req.body.details+'</b><br/><br/>'+
-        'We will get back to you as soon as possible. Prof. Barker might be willing to arrange a videocall with you. He will contact you via your Aimedis mail system and email if this is the case.'+
-        'Before the second opinion is processed, we will send you an estimate of costs, that has to be paid via bank wire, via credit card or via cryptocurrencies such as Bitcoin (BTC), Ethereum (ETH) or the Aimedis token (AIM) (AIM will give you a 10% discount compared to all other payment methods.'+
-        'Please contact us to learn more about buying and spending AIM tokens. Optionally you can send us an assumption of costs by your health insurance company.<br/><br/>'+
-        'Thanks for your trust.<br/>'+
-        'Kind regards<br/>'+
-        'Your Aimedis Second Opinion Team<br/><br/>'+
-        
-        '<b>Aimedis B.V.</b><br/>'+
-        'Sint Michaëlstraat 4<br/>'+
-        '5935 BL Steyl<br/>'+ 
-        'Netherlands<br/>'+
-        'secondopinion@aimedis.com<br/>'+
-        '+31 (0) 20 262 29 02<br/><br/><br/><br/>'+
-        '<hr/><br/><I>Aimedis B.V. Netherlands<br/>'+
-        'Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO<br/>'+
-        'VAT No.: NL858194478B01<br/>'+
-        '<hr/><br/>'+
-        'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.'+ 
-        '</I><hr/>';
-    
-        if(req.body.filename)
-        {
+        var html = 'Dear Mr./Mrs.' + legit.name + '<br/>' +
+            'you sent a second opinion request with <b>the following information:<br/><br/>' +
+            'Selected specialist:</b>   ' + req.body.specialist + '<br/>' +
+            '<b>Way of transfer:</b>   ' + req.body.online_offline + '<br/>' +
+            '<b>Selected specialty:</b>   ' + req.body.speciality + '<br/>' +
+            '<b>How are you?:</b>   ' + req.body.how_are_you + '<br/>' +
+            '<b>Knows diseases:    ' + req.body.know_diseases + '</b><br/>' +
+            '<b>Medication:   ' + req.body.medication + '</b><br/>' +
+            '<b>Allergies:   ' + req.body.allergies + '</b><br/>' +
+            '<b>Profession:   ' + req.body.professions + '</b><br/>' +
+            '<b>Uploaded files:   attached to this mail</b><br/>' +
+            '<b>Detailed questions:   ' + req.body.details + '</b><br/><br/>' +
+            'We will get back to you as soon as possible. Prof. Barker might be willing to arrange a videocall with you. He will contact you via your Aimedis mail system and email if this is the case.' +
+            'Before the second opinion is processed, we will send you an estimate of costs, that has to be paid via bank wire, via credit card or via cryptocurrencies such as Bitcoin (BTC), Ethereum (ETH) or the Aimedis token (AIM) (AIM will give you a 10% discount compared to all other payment methods.' +
+            'Please contact us to learn more about buying and spending AIM tokens. Optionally you can send us an assumption of costs by your health insurance company.<br/><br/>' +
+            'Thanks for your trust.<br/>' +
+            'Kind regards<br/>' +
+            'Your Aimedis Second Opinion Team<br/><br/>' +
+
+            '<b>Aimedis B.V.</b><br/>' +
+            'Sint Michaëlstraat 4<br/>' +
+            '5935 BL Steyl<br/>' +
+            'Netherlands<br/>' +
+            'secondopinion@aimedis.com<br/>' +
+            '+31 (0) 20 262 29 02<br/><br/><br/><br/>' +
+            '<hr/><br/><I>Aimedis B.V. Netherlands<br/>' +
+            'Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO<br/>' +
+            'VAT No.: NL858194478B01<br/>' +
+            '<hr/><br/>' +
+            'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.' +
+            '</I><hr/>';
+
+        if (req.body.filename) {
             var mailOptions = {
-                from    : 'ankita.webnexus@gmail.com',
-                to      : 'aakash.webnexus@gmail.com',
-                subject : 'Aimedis Second Opinion',
-                html    : html,
+                from: 'ankita.webnexus@gmail.com',
+                to: 'aakash.webnexus@gmail.com',
+                subject: 'Aimedis Second Opinion',
+                html: html,
                 attachments: [
                     {
-                    filename: req.body.filename,
-                    path:  './public/uploads/'+ req.body.filename,
-                    cid: 'uniq-'+ req.body.filename,
+                        filename: req.body.filename,
+                        path: './public/uploads/' + req.body.filename,
+                        cid: 'uniq-' + req.body.filename,
                     }
                 ]
-                      
+
             };
         }
-        else
-        {
+        else {
             var mailOptions = {
-                from    : 'ankita.webnexus@gmail.com',
-                to      : 'aakash.webnexus@gmail.com',
-                subject : 'Aimedis Second Opinion',
-                html    : html    
+                from: 'ankita.webnexus@gmail.com',
+                to: 'aakash.webnexus@gmail.com',
+                subject: 'Aimedis Second Opinion',
+                html: html
             }
         }
-       
+
         // var sendmail = transporter.sendMail(mailOptions);
         // var sendmail1 = sendmailteam(req.body, legit);
-        if(sendmail && sendmail1)
-        {
+        if (sendmail && sendmail1) {
             res.json({ status: 200, hassuccessed: true, msg: 'mail is sent' })
         }
-        else
-        {
+        else {
             res.json({ status: 200, hassuccessed: true, msg: 'something went wrong' })
         }
     }
@@ -1049,104 +1044,100 @@ router.post('/mailenglish',function (req,res,next){
 
 })
 
-router.post('/mailgerman',function (req,res,next){
-    
+router.post('/mailgerman', function (req, res, next) {
+
     // const token = (req.headers.token)
     // let legit = jwtconfig.verify(token)
     // if (legit) {
-        // var mailOptions = {
-        //     from    : 'ankita.webnexus@gmail.com',
-        //     to      : 'ankita.webnexus@gmail.com, aakash.webnexus@gmail.com',
-        //     subject : 'Aimedis zweite Meinung',
-        //     html    : '<div>Demo for second opinion mail</div>',
-        //     attachments: [
-        //         {
+    // var mailOptions = {
+    //     from    : 'ankita.webnexus@gmail.com',
+    //     to      : 'ankita.webnexus@gmail.com, aakash.webnexus@gmail.com',
+    //     subject : 'Aimedis zweite Meinung',
+    //     html    : '<div>Demo for second opinion mail</div>',
+    //     attachments: [
+    //         {
 
-        //           filename: req.body.filename,
-        //           path:  __dirname + '/'+ req.body.filename,
-        //           cid: 'uniq-mailtrap.png' 
-        //         }
-        //       ]
-        // };
-        // var sendmail = transporter.sendMail(mailOptions)
-        // if(sendmail)
-        // {
-        //     res.json({ status: 200, hassuccessed: true, msg: 'mail is sent' })
-        // }
-        // else
-        // {
-        //     res.json({ status: 200, hassuccessed: true, msg: 'something went wrong' })
-        // }
+    //           filename: req.body.filename,
+    //           path:  __dirname + '/'+ req.body.filename,
+    //           cid: 'uniq-mailtrap.png' 
+    //         }
+    //       ]
+    // };
+    // var sendmail = transporter.sendMail(mailOptions)
+    // if(sendmail)
+    // {
+    //     res.json({ status: 200, hassuccessed: true, msg: 'mail is sent' })
+    // }
+    // else
+    // {
+    //     res.json({ status: 200, hassuccessed: true, msg: 'something went wrong' })
+    // }
     // }
     // else {
     //     res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     // }
 })
 
-function sendmailteam(data, legit){
+function sendmailteam(data, legit) {
 
-    var html = 'Dear Aimedis Second Opinion team,<br/>'+
-    'Mr./Mrs. '+legit.name+' Patient ID '+legit.id+', sent a second opinion request with <b>the following information:<br/><br/>'+
-    'Selected specialist:</b>   '+ data.specialist+'<br/>'+
-    '<b>Way of transfer:</b>   '+data.online_offline+'<br/>'+
-    '<b>Selected specialty:</b>   '+data.speciality+'<br/>'+
-    '<b>How are you?:</b>   '+data.how_are_you+'<br/>'+
-    '<b>Knows diseases:    '+data.know_diseases+'</b><br/>'+
-    '<b>Medication:   '+data.medication+'</b><br/>'+
-    '<b>Allergies:   '+data.allergies+'</b><br/>'+
-    '<b>Profession:   '+data.professions+'</b><br/>'+
-    '<b>Uploaded files:   attached to this mail</b><br/>'+
-    '<b>Detailed questions:   '+data.details+'</b><br/><br/>'+
-    'Help now! <br/><br/>'+
-    
-    '<b>Aimedis B.V.</b><br/>'+
-    'Sint Michaëlstraat 4<br/>'+
-    '5935 BL Steyl<br/>'+ 
-    'Netherlands<br/>'+
-    'secondopinion@aimedis.com<br/>'+
-    '+31 (0) 20 262 29 02<br/><br/><br/><br/>'+
-    '<hr/><br/><I>Aimedis B.V. Netherlands<br/>'+
-    'Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO<br/>'+
-    'VAT No.: NL858194478B01<br/>'+
-    '<hr/><br/>'+
-    'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.'+ 
-    '</I><hr/>';
+    var html = 'Dear Aimedis Second Opinion team,<br/>' +
+        'Mr./Mrs. ' + legit.name + ' Patient ID ' + legit.id + ', sent a second opinion request with <b>the following information:<br/><br/>' +
+        'Selected specialist:</b>   ' + data.specialist + '<br/>' +
+        '<b>Way of transfer:</b>   ' + data.online_offline + '<br/>' +
+        '<b>Selected specialty:</b>   ' + data.speciality + '<br/>' +
+        '<b>How are you?:</b>   ' + data.how_are_you + '<br/>' +
+        '<b>Knows diseases:    ' + data.know_diseases + '</b><br/>' +
+        '<b>Medication:   ' + data.medication + '</b><br/>' +
+        '<b>Allergies:   ' + data.allergies + '</b><br/>' +
+        '<b>Profession:   ' + data.professions + '</b><br/>' +
+        '<b>Uploaded files:   attached to this mail</b><br/>' +
+        '<b>Detailed questions:   ' + data.details + '</b><br/><br/>' +
+        'Help now! <br/><br/>' +
+
+        '<b>Aimedis B.V.</b><br/>' +
+        'Sint Michaëlstraat 4<br/>' +
+        '5935 BL Steyl<br/>' +
+        'Netherlands<br/>' +
+        'secondopinion@aimedis.com<br/>' +
+        '+31 (0) 20 262 29 02<br/><br/><br/><br/>' +
+        '<hr/><br/><I>Aimedis B.V. Netherlands<br/>' +
+        'Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO<br/>' +
+        'VAT No.: NL858194478B01<br/>' +
+        '<hr/><br/>' +
+        'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.' +
+        '</I><hr/>';
 
 
-    if(data.filename)
-    {
+    if (data.filename) {
         var mailOptions = {
-            from    : 'ankita.webnexus@gmail.com',
-            to      : 'aakash.webnexus@gmail.com',
-            subject : 'Aimedis Second Opinion',
-            html    : html,
+            from: 'ankita.webnexus@gmail.com',
+            to: 'aakash.webnexus@gmail.com',
+            subject: 'Aimedis Second Opinion',
+            html: html,
             attachments: [
                 {
-                filename: data.filename,
-                path:  './public/uploads/'+ data.filename,
-                cid: 'uniq-'+ data.filename,
+                    filename: data.filename,
+                    path: './public/uploads/' + data.filename,
+                    cid: 'uniq-' + data.filename,
                 }
             ]
-                  
+
         };
     }
-    else
-    {
+    else {
         var mailOptions = {
-            from    : 'ankita.webnexus@gmail.com',
-            to      : 'aakash.webnexus@gmail.com',
-            subject : 'Aimedis Second Opinion',
-            html    : html       
+            from: 'ankita.webnexus@gmail.com',
+            to: 'aakash.webnexus@gmail.com',
+            subject: 'Aimedis Second Opinion',
+            html: html
         }
     }
-   
+
     // var sendmail = transporter.sendMail(mailOptions);
-    if(sendmail)
-    {
+    if (sendmail) {
         return true;
     }
-    else
-    {
+    else {
         return false;
     }
 }
