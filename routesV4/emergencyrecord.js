@@ -4,9 +4,9 @@ const multer = require("multer");
 var user = require('../schema/user.js');
 var prescription = require('../schema/prescription')
 var jwtconfig = require('../jwttoken');
-var base64 = require('base-64');
 const uuidv1 = require('uuid/v1');
 var dateTime = require('node-datetime');
+const {encrypt, decrypt} = require("./Cryptofile.js")
 var trackrecord1 = [];
 var trackrecord2 = [];
 //get the emergency record of the patient
@@ -95,7 +95,12 @@ router.get('/:UserId', function (req, res, next) {
                                         label_fr: "Transplantation d'un ou de plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort",
                                         label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي باستثناء الأعضاء / الأنسجة التالية'
                                     }
-                                        options = doc.organ_donor[0].OptionData 
+                                        if(doc.organ_donor[0]._enc_OptionData===true){
+                                            options =  decrypt(doc.organ_donor[0].OptionData); 
+                                        }
+                                        else{
+                                            options = doc.organ_donor[0].OptionData;
+                                        }   
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'include_some')
                                     {
@@ -109,7 +114,13 @@ router.get('/:UserId', function (req, res, next) {
                                         label_ch :  '在医生宣布我仅因以下器官/组织死亡后，我的器官/组织的移植',
                                         label_fr: "Transplantation de mes organes / tissus après que les médecins m'ont déclaré mort uniquement pour les organes / tissus suivants",
                                         label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي فقط بسبب متابعة الأعضاء / الأنسجة'}
-                                        options = doc.organ_donor[0].OptionData 
+                                        if(doc.organ_donor[0]._enc_OptionData===true){
+                                            options =  decrypt(doc.organ_donor[0].OptionData); 
+                                        }
+                                        else{
+                                            options = doc.organ_donor[0].OptionData;
+                                        } 
+                                       
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'not_allowed')
                                     {
@@ -136,7 +147,12 @@ router.get('/:UserId', function (req, res, next) {
                                         label_ch :  '在医生宣布我已死亡后，我的一个或多个器官/组织的移植应由以下人员决定',
                                         label_fr: "La transplantation d'un ou plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort OUI ou NON sera décidée par la personne suivante",
                                         label_ar: 'يجب أن يقرر الشخص التالي زراعة عضو / أنسجة لي واحدة أو أكثر بعد إعلان الأطباء وفاتي نعم أو لا'}
-                                        options = doc.organ_donor[0].OptionData 
+                                        if(doc.organ_donor[0]._enc_OptionData===true){
+                                            options = JSON.parse(decrypt(doc.organ_donor[0].OptionData));
+                                        }
+                                        else{
+                                            options = doc.organ_donor[0].OptionData;
+                                        }
                                     }
                                     else
                                     {
@@ -254,7 +270,12 @@ router.get('/:UserId', function (req, res, next) {
                                         label_fr: "Transplantation d'un ou de plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort",
                                         label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي باستثناء الأعضاء / الأنسجة التالية'
                                     }
-                                        options = doc.organ_donor[0].OptionData 
+                                        if(doc.organ_donor[0]._enc_OptionData===true){
+                                            options =  decrypt(doc.organ_donor[0].OptionData); 
+                                        }
+                                        else{
+                                            options = doc.organ_donor[0].OptionData;
+                                        } 
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'include_some')
                                     {
@@ -268,7 +289,13 @@ router.get('/:UserId', function (req, res, next) {
                                         label_ch :  '在医生宣布我仅因以下器官/组织死亡后，我的器官/组织的移植',
                                         label_fr: "Transplantation de mes organes / tissus après que les médecins m'ont déclaré mort uniquement pour les organes / tissus suivants",
                                         label_ar: 'زرع عضو / أنسجتي بعد أن أعلن الأطباء وفاتي فقط بسبب متابعة الأعضاء / الأنسجة'}
-                                        options = doc.organ_donor[0].OptionData 
+                                        if(doc.organ_donor[0]._enc_OptionData===true){
+                                            options =  decrypt(doc.organ_donor[0].OptionData); 
+                                        }
+                                        else{
+                                            options = doc.organ_donor[0].OptionData;
+                                        }
+                                        
                                     }
                                     else if(doc.organ_donor[0].selectedOption == 'not_allowed')
                                     {
@@ -295,7 +322,12 @@ router.get('/:UserId', function (req, res, next) {
                                         label_ch :  '在医生宣布我已死亡后，我的一个或多个器官/组织的移植应由以下人员决定',
                                         label_fr: "La transplantation d'un ou plusieurs de mes organes / tissus après que les médecins m'ont déclaré mort OUI ou NON sera décidée par la personne suivante",
                                         label_ar: 'يجب أن يقرر الشخص التالي زراعة عضو / أنسجة لي واحدة أو أكثر بعد إعلان الأطباء وفاتي نعم أو لا'}
-                                        options = doc.organ_donor[0].OptionData 
+                                        if(doc.organ_donor[0]._enc_OptionData===true){
+                                            options = JSON.parse(decrypt(doc.organ_donor[0].OptionData));
+                                        }
+                                        else{
+                                            options = doc.organ_donor[0].OptionData;
+                                        }
                                     }
                                     else
                                     {
@@ -540,7 +572,8 @@ function forEachPromise(items, fn) {
 function getArAlltrack(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            user.findOne({_id: data.created_by}).exec()
+            var created_by = data._enc_created_by===true ?  decrypt(data.created_by) : data.created_by;
+            user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
                 if (doc3.last_name) {
@@ -589,7 +622,8 @@ function getArAlltrack(data) {
 function getAlltrack(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            user.findOne({_id: data.created_by}).exec()
+            var created_by = data._enc_created_by===true ? decrypt(data.created_by) : data.created_by;
+            user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
                 if(doc3){

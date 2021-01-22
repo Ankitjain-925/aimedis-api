@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 
-
 const PaitentList = new mongoose.Schema({
    profile_id:{
        type: String,
@@ -14,6 +13,92 @@ const PaitentList = new mongoose.Schema({
 
 PaitentList.plugin(mongooseFieldEncryption, {
    fields: ["profile_id" ],
+   secret: process.env.SOME_32BYTE_BASE64_STRING,
+   saltGenerator: function (secret) {
+       return "1234567890123456"; // should ideally use the secret to return a string of length 16
+} });
+
+const insuranceList=  new mongoose.Schema({
+   insurance:{
+       type: String,
+       required: false,
+       unique: false
+   },
+   insurance_number:{
+      type: String,
+      required: false,
+      unique: false
+  },
+  insurance_type:{
+      type: String,
+      required: false,
+      unique: false
+   },
+   insurance_country:{
+      type: String,
+      required: false,
+      unique: false
+   }
+},{ strict: false });
+
+insuranceList.plugin(mongooseFieldEncryption, {
+   fields: ["insurance_country", "insurance_country","insurance_number","insurance" ],
+   secret: process.env.SOME_32BYTE_BASE64_STRING,
+   saltGenerator: function (secret) {
+       return "1234567890123456"; // should ideally use the secret to return a string of length 16
+} });
+
+
+const FavDocList = new mongoose.Schema({
+   doctor:{
+       type: String,
+       required: false,
+       unique: false
+   },
+   profile_id:{
+      type: String,
+      required: false,
+      unique: false
+  },
+  type:{
+   type: String,
+   required: false,
+   unique: false
+}
+},{ strict: false });
+
+FavDocList.plugin(mongooseFieldEncryption, {
+   fields: ["profile_id", "doctor" ],
+   secret: process.env.SOME_32BYTE_BASE64_STRING,
+   saltGenerator: function (secret) {
+       return "1234567890123456"; // should ideally use the secret to return a string of length 16
+} });
+
+Rigt_managementList = new mongoose.Schema({
+   emergency_access:{
+       type: String,
+       required: false,
+       unique: false
+   },
+   opt:{
+      type: String,
+      required: false,
+      unique: false
+  },
+  opt_set:{
+   type: String,
+   required: false,
+   unique: false
+},
+opt_until:{
+   type: String,
+   required: false,
+   unique: false
+}
+},{ strict: false });
+
+Rigt_managementList.plugin(mongooseFieldEncryption, {
+   fields: ["opt_set", "opt" , "emergency_access"],
    secret: process.env.SOME_32BYTE_BASE64_STRING,
    saltGenerator: function (secret) {
        return "1234567890123456"; // should ideally use the secret to return a string of length 16
@@ -126,8 +211,8 @@ var UserSchema = new Schema({
        required: false,
        unique: false
     },
-    insurance  : {type : Array},
-    fav_doctor : {type : Array},
+    insurance  : [insuranceList],
+    fav_doctor : [FavDocList],
     family_doc : {type : Array},
     aimedis_doc: {type : Array},
     marital_status:{
@@ -150,21 +235,18 @@ var UserSchema = new Schema({
        required: false,
        unique: false
     },
-    track_record:{
-       type: Array,
-       required: false,
-       unique: false
-    },
+    track_record: {  
+      type: Array,
+      required: false,
+      unique: false
+   },
     membership:{
         type: Array,
         required: false,
         unique: false
     },
-    Rigt_management:{
-        type: Array,
-        required: false,
-        unique: false
-    },
+    Rigt_management: [Rigt_managementList]
+    ,
     pin:{
         type: Number,
         required: false,
@@ -266,7 +348,7 @@ var UserSchema = new Schema({
 
 UserSchema.index({ area : '2dsphere' });
 
-UserSchema.plugin(mongooseFieldEncryption, { fields: [ "weoffer_text","latest_info","emergency_number","emergency_email",
+UserSchema.plugin(mongooseFieldEncryption, { fields: ["first_name","last_name", "weoffer_text","latest_info","emergency_number","emergency_email",
 "emergency_contact_name", "fax", "website", "phone","city","address","sex", "birthday", "mobile","profile_id", "alies_id", 
 "latest_info", "createdate"], secret: process.env.SOME_32BYTE_BASE64_STRING,
 saltGenerator: function (secret) {

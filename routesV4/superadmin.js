@@ -6,6 +6,7 @@ var User = require('../schema/user');
 var message = require('../schema/message');
 var Topic = require('../schema/topic');
 var Institute = require('../schema/institute');
+const {encrypt, decrypt} = require("./Cryptofile.js")
 var Wishlist = require('../schema/wishlist_schema')
 var jwtconfig = require('../jwttoken');
 const uuidv1 = require('uuid/v1');
@@ -155,7 +156,7 @@ router.post('/Addadminuser', function (req, res, next) {
         var isblock = { isblock: false }
         var dt = dateTime.create();
         var createdate = { createdate: dt.format('Y-m-d H:M:S') }
-        var enpassword = base64.encode(req.body.password);
+        var enpassword = base64.encode((encrypt(req.body.password)));
         var usertoken = { usertoken: uuidv1() }
         var verified = { verified: 'true' }
         // var parent_id = { parent_id: legit.id }
@@ -342,9 +343,6 @@ function emptyBucket(bucketName, foldername){
 
     s3.listObjects(params, function(err, data) {
       if (err) return err;
-
-
-      console.log("RESPONSE FROM S3" , data)
 
       if (data.Contents.length == 0) {
         console.log("Bucket is empty!");

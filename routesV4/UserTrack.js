@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 const multer = require("multer");
 var user = require('../schema/user');
+const {encrypt, decrypt} = require("./Cryptofile.js")
 var kyc = require('../schema/kyc');
 var Appointment = require('../schema/appointments')
 var jwtconfig = require('../jwttoken');
@@ -230,6 +231,8 @@ router.put('/AddTrack/:UserId', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         var ids = { track_id: uuidv1() };
+        req.body.data.created_by = encrypt(req.body.data.created_by);
+        req.body.data._enc_created_by = true;
         var full_record = { ...ids, ...req.body.data }
         user.updateOne({ _id: req.params.UserId },
             { $push: { track_record: full_record } },
@@ -708,7 +711,8 @@ function forEachPromises(items, right_management,fn) {
 function getAlltrack(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            user.findOne({_id: data.created_by}).exec()
+            var created_by = data._enc_created_by===true ?  decrypt(data.created_by) : data.created_by;
+            user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
                
@@ -778,7 +782,8 @@ function getAlltrack(data) {
 function getAlltrack2(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            user.findOne({_id: data.created_by}).exec()
+            var created_by = data._enc_created_by===true ?  decrypt(data.created_by) : data.created_by;
+            user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
 
@@ -848,8 +853,8 @@ function getAlltrack2(data) {
 function getAlltrack1(data, right_management) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-        
-            user.findOne({_id: data.created_by}).exec()
+            var created_by = data._enc_created_by===true ?  decrypt(data.created_by) : data.created_by;
+            user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
                 if (doc3.last_name) {
