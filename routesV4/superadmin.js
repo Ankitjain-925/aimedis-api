@@ -66,7 +66,18 @@ router.post('/Addadminuser', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     var institute_id = { institute_id: 0 }
     if (legit) {
-        User.findOne( {$or: [{ email: req.body.email }, {email: req.body.email.toLowerCase()}, {email: req.body.email.toUpperCase()}]}).exec().then((data1) => {
+
+       const email = req.body.email;
+        const messageToSearchWith = new User({email});
+        messageToSearchWith.encryptFieldsSync();
+
+        const messageToSearchWith1 = new User({email : req.body.email.toLowerCase()});
+        messageToSearchWith1.encryptFieldsSync();
+
+        const messageToSearchWith2 = new User({email :  req.body.email.toUpperCase()});
+        messageToSearchWith2.encryptFieldsSync();
+
+        User.findOne({ $or: [{ email: messageToSearchWith1.email }, { email: messageToSearchWith.email }, { email: messageToSearchWith2.email }, { email: req.body.email }, { email: req.body.email.toLowerCase() }, { email: req.body.email.toUpperCase() }] }).exec().then((data1) => {
             if (data1) {
               
                 res.json({ status: 200, msg: 'Email is Already exist', success: false });
@@ -156,9 +167,10 @@ router.post('/Addadminuser', function (req, res, next) {
         var isblock = { isblock: false }
         var dt = dateTime.create();
         var createdate = { createdate: dt.format('Y-m-d H:M:S') }
-        var enpassword = base64.encode((encrypt(req.body.password)));
+        var enpassword = base64.encode(JSON.stringify(encrypt(req.body.password)));
         var usertoken = { usertoken: uuidv1() }
         var verified = { verified: 'true' }
+        var createdby = { pin: '1234' }
         // var parent_id = { parent_id: legit.id }
         var profile_id = { profile_id: profile_id, alies_id : profile_id }
         if (req.body.institute_id) {
@@ -176,9 +188,10 @@ router.post('/Addadminuser', function (req, res, next) {
             })
             .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
             .then(regRes=>{
+                console.log('createdby', createdby)
                 var authyId = {authyId: regRes.user.id};
                 req.body.mobile = req.body.country_code.toUpperCase()+'-'+req.body.mobile;
-            datas = { ...authyId, ...profile_id, ...req.body, ...institute_id, ...isblock, ...createdate, ...usertoken, ...verified }
+            datas = { ...authyId, ...profile_id, ...req.body, ...institute_id, ...isblock, ...createdate,...createdby, ...usertoken, ...verified }
             var users = new User(datas);
             users.save((err, user_data) => {
             if (err && !user_data) {
@@ -216,7 +229,6 @@ router.post('/Addadminuser', function (req, res, next) {
                                 res.json({ status: 200, message: 'Something went wrong on Institute creation', error: err });
                             } else {
                                 if (inst) {
-                                   
                                     User.updateOne({ _id: user_id },
                                         { institute_id: inst._id },
                                         function (err, doc) {
@@ -224,23 +236,39 @@ router.post('/Addadminuser', function (req, res, next) {
                                                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err });
                                             }
                                             else {
-                                                res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
-                                            }
+                                                User.findOne({ _id: user_id },
+                                                    function (err, doc) {
+                                                        if (err && !doc) {
+                                                            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err });
+                                                        }
+                                                        else {
+                                                            console.log('doc', doc)
+                                                        res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: doc });
+                                                    }
+                                                })
+                                            }   
                                         })
                                 }
                                 else {
-                               
                                     res.json({ status: 200, hassuccessed: false, message: 'Problem with assign the Institute', error: err });
                                 }
                             }
                         })
                     }
                     else {
-                        res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
+                        User.findOne({ _id: user_id },
+                            function (err, doc) {
+                                if (err && !doc) {
+                                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err });
+                                }
+                                else {
+                                    console.log('doc33', doc)
+                                res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: doc });
+                            }
+                        })
                     }
                 }
                 else {
-                 
                     res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
                 }
             }

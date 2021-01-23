@@ -180,7 +180,10 @@ router.post('/UserLogin', function (req, res, next) {
     if (req.body.email == '' || req.body.password == '') {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
     } else {
-        User.findOne({ email: { $regex: req.body.email, $options: "i" } }).exec()
+        const email = req.body.email;
+        const messageToSearchWith = new User({email});
+        messageToSearchWith.encryptFieldsSync();
+        User.findOne({ $or :[{email: { $regex: req.body.email, $options: "i" }}, {email: { $regex: messageToSearchWith.email, $options: "i" }}]}).exec()
             .then((user_data) => {
                 if (user_data) {
                     if (user_data.isblock === true) {
@@ -205,15 +208,9 @@ router.post('/UserLogin', function (req, res, next) {
                         });
                         promise.then(() => {
                     
-                            var decode = base64.encode(req.body.password);
-                           
-                        if(user_data.password.indexOf('iv')!==-1 && user_data.password.indexOf('"{')!==-1 && user_data.password.indexOf('encryptedData') !== -1){
-                            var decryptThis = JSON.parse(user_data.password)
-                        }
-                        else{
-                            var decryptThis = user_data.password
-                        }
-                    if (user_data.password === decode || decrypt(decryptThis) === req.body.password) {
+                            var decodes = base64.decode(user_data.password);
+                            if(decodes === req.body.password || decrypt(parseReturn(decodes)) === req.body.password){   
+    
                                 if (user_data.verified === 'true') {
                                     if (!user_data.is2fa || user_data.is2fa === false) {
                                      
@@ -290,7 +287,10 @@ router.post('/UserLoginAdmin', function (req, res, next) {
     if (req.body.email == '' || req.body.password == '') {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
     } else {
-        User.findOne({ email: { $regex: req.body.email, $options: "i" } }).exec()
+        const email = req.body.email;
+        const messageToSearchWith = new User({email});
+        messageToSearchWith.encryptFieldsSync();
+        User.findOne({ $or :[{email: { $regex: req.body.email, $options: "i" }}, {email: { $regex: messageToSearchWith.email, $options: "i" }}]}).exec()
             .then((user_data) => {
                 if (user_data) {
                     if (user_data.isblock === true) {
@@ -315,15 +315,8 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                         });
                         promise.then(() => {
                             
-                            var decode = base64.encode(req.body.password);
-                           
-                            if(user_data.password.indexOf('iv')!==-1 && user_data.password.indexOf('"{')!==-1 && user_data.password.indexOf('encryptedData') !== -1){
-                                var decryptThis = JSON.parse(user_data.password)
-                            }
-                            else{
-                                var decryptThis = user_data.password
-                            }
-                        if (user_data.password === decode || decrypt(decryptThis) === req.body.password) {
+                            var decodes = base64.decode(user_data.password);
+                            if(decodes === req.body.password || decrypt(parseReturn(decodes)) === req.body.password){   
                                 if (user_data.verified === 'true') {
                                     if (!user_data.is2fa || user_data.is2fa === false) {
                                        
@@ -412,8 +405,17 @@ router.post('/AddUser', function (req, res, next) {
     if (req.body.email == '' || req.body.email == undefined || req.body.password == '' || req.body.password == undefined) {
         res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
     } else {
+        const email = req.body.email;
+        const messageToSearchWith = new User({email});
+        messageToSearchWith.encryptFieldsSync();
 
-        User.findOne({ $or: [{ email: req.body.email }, { email: req.body.email.toLowerCase() }, { email: req.body.email.toUpperCase() }] }).exec().then((data1) => {
+        const messageToSearchWith1 = new User({email : req.body.email.toLowerCase()});
+        messageToSearchWith1.encryptFieldsSync();
+
+        const messageToSearchWith2 = new User({email :  req.body.email.toUpperCase()});
+        messageToSearchWith2.encryptFieldsSync();
+
+        User.findOne({ $or: [{ email: messageToSearchWith1.email }, { email: messageToSearchWith.email }, { email: messageToSearchWith2.email }, { email: req.body.email }, { email: req.body.email.toLowerCase() }, { email: req.body.email.toUpperCase() }] }).exec().then((data1) => {
       
             if (data1) {
                 res.json({ status: 200, message: 'Email is Already exist', hassuccessed: false });
@@ -499,14 +501,14 @@ router.post('/AddUser', function (req, res, next) {
                 var dt = dateTime.create();
                 var createdate = { createdate: dt.format('Y-m-d H:M:S') }
                 var createdby = { pin: '1234' }
-                var enpassword = base64.encode(encrypt(req.body.password));
+                var enpassword =  base64.encode(JSON.stringify(encrypt(req.body.password)));
                 var usertoken = { usertoken: uuidv1() }
                 var verified = { verified: 'true' }
                 var profile_id = { profile_id: profile_id, alies_id: profile_id }
                 req.body.password = enpassword;
 
                 var user_id;
-            
+          
                 if (req.body.country_code && req.body.mobile) {
                     authy.registerUser({
                         countryCode: req.body.country_code,
@@ -515,6 +517,7 @@ router.post('/AddUser', function (req, res, next) {
                     })
                         .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false }))
                         .then(regRes => {
+                            console.log('createdby', createdby)
                             if (regRes && regRes.success) {
                                 var authyId = { authyId: regRes.user.id };
                                 req.body.mobile = req.body.country_code.toUpperCase() + '-' + req.body.mobile;
@@ -537,7 +540,16 @@ router.post('/AddUser', function (req, res, next) {
                                             html: dhtml
                                         };
                                         let sendmail = transporter.sendMail(mailOptions)
-                                        res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
+                                        User.findOne({ _id: user_id },
+                                            function (err, doc) {
+                                                if (err && !doc) {
+                                                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err });
+                                                }
+                                                else {
+                                                    console.log('doc', doc)
+                                                res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: doc });
+                                            }
+                                        })
                                     }
                                 })
                             }
@@ -667,29 +679,31 @@ router.get('/Users/:User_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-            } else {
-                if (Userinfo) {
-                    // if(Userinfo.password){
-                    //     Userinfo.password = base64.decode(Userinfo.password);
-                    // }
-                    if(Userinfo.organ_donor && Userinfo.organ_donor.length>0 && Userinfo.organ_donor[0].OptionData && Userinfo.organ_donor[0]._enc_OptionData===true){
-                        if(decrypt(Userinfo.organ_donor[0].OptionData).indexOf("{") !== -1){
-                            Userinfo.organ_donor[0].OptionData = JSON.parse(decrypt(Userinfo.organ_donor[0].OptionData));
-                        }
-                        else{
-                            Userinfo.organ_donor[0].OptionData = decrypt(Userinfo.organ_donor[0].OptionData);  
-                        }
-                        
+    User.findOne({ _id: req.params.User_id })
+    .select("-password")
+    .exec(function(err, Userinfo) {
+        if (err) {
+            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+        } else {
+            if (Userinfo){
+                if(Userinfo.organ_donor && Userinfo.organ_donor.length>0 && Userinfo.organ_donor[0].OptionData && Userinfo.organ_donor[0]._enc_OptionData===true){
+                    if(decrypt(Userinfo.organ_donor[0].OptionData).indexOf("{") !== -1){
+                        Userinfo.organ_donor[0].OptionData = JSON.parse(decrypt(Userinfo.organ_donor[0].OptionData));
                     }
-                    res.json({ status: 200, hassuccessed: true, data: Userinfo });
-                } else {
-                    res.json({ status: 200, hassuccessed: false, message: 'User not found' });
+                    else{
+                        Userinfo.organ_donor[0].OptionData = decrypt(Userinfo.organ_donor[0].OptionData);  
+                    }
+                    
                 }
+                res.json({ status: 200, hassuccessed: true, data: Userinfo });
+            } else {
+                res.json({ status: 200, hassuccessed: false, message: 'User not found' });
             }
-        });
+        }
+    });
+        // User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
+           
+        // });
     }
     else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
@@ -716,7 +730,7 @@ router.put('/Users/changePass', function (req, res, next) {
             }
             else{
                 if (req.body.password) {
-                    var enpassword = base64.encode(encrypt(req.body.password));
+                    var enpassword = base64.encode(JSON.stringify(encrypt(req.body.password)));
                     req.body.password = enpassword;
                 }
                          
@@ -756,11 +770,8 @@ router.post('/Users/checkPass', function (req, res, next) {
             }
             else{
                 if(changeStatus){
-                   
                     var decodes = base64.decode(changeStatus.password);
-                
-                    console.log('decode',decodes, req.body.password, decrypt(parseReturn(decodes)), parseReturn(decodes))
-                    if(decodes === req.body.password || decrypt(parseReturn(decodes))){
+                    if(decodes === req.body.password || decrypt(parseReturn(decodes)) === req.body.password){
                         res.json({ status: 200, hassuccessed: true, message: 'Password matched', data: true})
                     }
                     else{
@@ -1160,7 +1171,7 @@ router.put('/organDonor', function (req, res, next) {
 
 router.post('/Registration', function (req, res, next) {
     var users = new User(req.body);
-    var enpassword = base64.encode(encrypt(req.body.password));
+    var enpassword = base64.encode(JSON.stringify(encrypt(req.body.password)));
     req.body.password = enpassword;
     users.save(function (err, data) {
         if (err && !data) {
@@ -1842,13 +1853,13 @@ router.get('/UpcomingAppintmentDoc', function (req, res, next) {
         const doctor_id = legit.id;
         const messageToSearchWith = new Appointment({doctor_id});
         messageToSearchWith.encryptFieldsSync();
-        Appointment.find( {$or: [{doctor_id :  messageToSearchWith.doctor_id },{doctor_id : legit.id}], 
-            $or : [
+        Appointment.find(  {$and: [{$or: [{doctor_id :  messageToSearchWith.doctor_id },{doctor_id : legit.id}]}, 
+            {$or : [
                 {date: { $gte: new Date(), }},
                 {date: { $eq: new Date(), }}
                 ],
             status : 'free'
-            },
+            }]},
             function(err,results) {
                 if (err) { res.json({err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
                 else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
@@ -1868,11 +1879,11 @@ router.get('/UpcomingAppintmentPat', function (req, res, next) {
         const patient = legit.id;
         const messageToSearchWith = new Appointment({patient});
         messageToSearchWith.encryptFieldsSync();
-        Appointment.find( {$or: [{patient :  messageToSearchWith.patient },{patient : legit.id}], 
-            $or : [
+        Appointment.find( {$and: [{$or: [{patient :  messageToSearchWith.patient },{patient : legit.id}]}, 
+           { $or : [
             {date: { $gte: new Date(), }},
             {date: { $eq: new Date(), }}
-            ],
+            ]}]
         },
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
@@ -1893,11 +1904,11 @@ router.get('/UpcomingAppintmentPat/:Userid', function (req, res, next) {
         const patient = req.params.Userid;
         const messageToSearchWith = new Appointment({patient});
         messageToSearchWith.encryptFieldsSync();
-        Appointment.find( {$or: [{patient :  messageToSearchWith.patient },{patient : req.params.Userid}], 
-            $or : [
+        Appointment.find( {$and: [{$or: [{patient :  messageToSearchWith.patient },{patient : req.params.Userid}]}, 
+            {$or : [
             {date: { $gte: new Date(), }},
             {date: { $eq: new Date(), }}
-            ],
+            ]}]
         },
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
@@ -1919,10 +1930,10 @@ router.get('/PastAppintmentPat', function (req, res, next) {
         const patient = legit.id;
         const messageToSearchWith = new Appointment({patient});
         messageToSearchWith.encryptFieldsSync();
-        Appointment.find( {$or: [{patient :  messageToSearchWith.patient },{patient : legit.id}], 
-            $or : [
+        Appointment.find({$and: [ {$or: [{patient :  messageToSearchWith.patient },{patient : legit.id}]}, 
+            {$or : [
                 { date: { $lte: new Date() }},
-            ]},
+            ]}]},
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
                 else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
@@ -1942,10 +1953,11 @@ router.get('/PastAppintmentDoc', function (req, res, next) {
         const doctor_id = legit.id;
         const messageToSearchWith = new Appointment({doctor_id});
         messageToSearchWith.encryptFieldsSync();
-        Appointment.find( {$or: [{doctor_id :  messageToSearchWith.doctor_id },{doctor_id : legit.id}],  
-            $or : [
+        Appointment.find( {$and: [{$or: [{doctor_id :  messageToSearchWith.doctor_id },{doctor_id : legit.id}]},  
+            {$or : [
                 { date: { $lte: new Date() }},
-            ]},
+            ]}
+        ]},
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
                 else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
@@ -1980,8 +1992,10 @@ router.post('/AddtoPatientList/:id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-   
-        User.findOneAndUpdate({ profile_id: req.params.id }, { $push: { myPatient: req.body } }, function (err2, updatedata) {
+        const profile_id = req.params.id;
+        const messageToSearchWith = new User({profile_id});
+        messageToSearchWith.encryptFieldsSync();
+        User.findOneAndUpdate({ $or:[{profile_id: req.params.id },{profile_id: messageToSearchWith.profile_id}]}, { $push: { myPatient: req.body } }, function (err2, updatedata) {
             if (err2 && !updatedata) {
                 res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err2 })
             } else {
@@ -2037,16 +2051,19 @@ function forEachPromise(items, fn) {
 function getMyPat(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            User.findOne({ profile_id: data.profile_id }).exec()
-                .then(function (doc3) {
-                    if (doc3) {
-                        Mypat.push(doc3)
-                        resolve(Mypat);
-                    }
-                    else {
-                        resolve(Mypat);
-                    }
-                })
+            const profile_id = data.profile_id;
+            const messageToSearchWith = new User({profile_id});
+            messageToSearchWith.encryptFieldsSync();
+            User.findOne({$or:[{ profile_id: data.profile_id },{profile_id : messageToSearchWith.profile_id}]}).exec()
+            .then(function (doc3) {
+                if (doc3) {
+                    Mypat.push(doc3)
+                    resolve(Mypat);
+                }
+                else {
+                    resolve(Mypat);
+                }
+            })
         });
     });
 }
@@ -2113,7 +2130,7 @@ router.post('/Mypatients/create_patient', function (req, res, next) {
                 res.json({ status: 200, message: 'Email is Already exist', hassuccessed: false });
             } else {
                 var parent_id = { parent_id: legit.id }
-                var enpassword = base64.encode(encrypt(req.body.password));
+                var enpassword = base64.encode(JSON.stringify(encrypt(req.body.password)));
                 req.body.password = enpassword;
                 datas = { ...req.body, ...parent_id }
                 var users = new User(datas);
@@ -2123,7 +2140,15 @@ router.post('/Mypatients/create_patient', function (req, res, next) {
                         res.json({ status: 200, message: 'Something went wrong.', error: err });
                     } else {
                         user_id = user_data._id;
-                        res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: user_data });
+                        User.findOne({ _id: user_id },
+                            function (err, doc) {
+                                if (err && !doc) {
+                                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err });
+                                }
+                                else {
+                                res.json({ status: 200, message: 'User is added Successfully', hassuccessed: true, data: doc });
+                            }
+                        })
                     }
                 })
             }
@@ -2531,7 +2556,10 @@ router.put('/AddRecDoc', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
             } else {
-                User.findOne({ profile_id: req.body.doctor }, function (err1, userdata1) {
+                const profile_id = req.body.doctor;
+                const messageToSearchWith = new User({profile_id});
+                messageToSearchWith.encryptFieldsSync();
+                User.findOne({$or: [{ profile_id: req.body.doctor },{profile_id : messageToSearchWith.profile_id}]}, function (err1, userdata1) {
                     if (err1) {
                         res.json({ status: 200, hassuccessed: false, message: "Invalid doctor Id", error: err1 })
                     } else {
@@ -3516,7 +3544,7 @@ router.put('/setpassword', function (req, res, next) {
    
     let legit = jwtconfig.verify(token)
     if (legit) {
-        var enpassword = base64.encode(encrypt(req.query.password));
+        var enpassword = base64.encode(JSON.stringify(encrypt(req.query.password)));
         User.findOneAndUpdate({ _id: legit.id }, { password: enpassword }, { new: true }, function (err, Isbolck) {
             if (err) {
                 res.json({ status: 450, msg: 'User is not exists' });
@@ -3652,8 +3680,10 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
 router.post('/forgotPassword', function (req, res, next) {
     var token;
     let promise = new Promise(function (resolve, reject) {
-        User.findOne({
-            email: req.query.email,
+        const email = req.query.email;
+        const messageToSearchWith = new User({email});
+        messageToSearchWith.encryptFieldsSync();
+        User.findOne({ $or:[{email: req.query.email},{email: messageToSearchWith.email}]
         }).exec()
             .then((user_data1) => {
                 if (user_data1) {
@@ -3680,7 +3710,7 @@ router.post('/forgotPassword', function (req, res, next) {
                 // link = 'https://aidoc.io/change-password'
                 link = 'https://sys.aimedis.io/change-password';
             }
-            // var link = 'http://localhost:3000/change-password';
+            var link = 'http://localhost:3000/change-password';
            
             if (req.body.lan === 'de') {
                 var dhtml = 'Sie haben Ihr Passwort vergessen und ein neues angefordert.<br/>' +
@@ -3768,10 +3798,13 @@ router.get('/AskPatientProfile/:id', function (req, res, next) {
         const alies_id = req.params.id;
         const messageToSearchWith = new User({profile_id});
         const messageToSearchWith1 = new User({alies_id});
+        const email = req.params.id;
+        const messageToSearchWith2 = new User({email});
+        messageToSearchWith2.encryptFieldsSync();
         messageToSearchWith.encryptFieldsSync();
         messageToSearchWith1.encryptFieldsSync();
         User.findOne({type : 'patient',
-            $or: [{ email: req.params.id }, 
+            $or: [{ email: req.params.id },{email: messageToSearchWith2.email}, 
                 {alies_id : messageToSearchWith1.alies_id},{ profile_id :  messageToSearchWith.profile_id},
                 {profile_id: req.params.id},{alies_id: req.params.id} ]
         }).exec()
@@ -3850,7 +3883,6 @@ router.get('/AllusersMessages', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         User.find()
-            .select('profile_id first_name last_name _id email')
             .exec(function (err, Userinfo) {
                 if (err) {
                     res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });

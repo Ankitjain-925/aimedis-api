@@ -1,5 +1,27 @@
-var mongoose= require("mongoose");
-var Schema= mongoose.Schema;
+require('dotenv').config();
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
+const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
+
+const FileList = new mongoose.Schema({
+    filename:{
+        type: String,
+        required: false,
+        unique: false
+    },
+    title:{
+        type: String,
+        required: false,
+        unique: false
+    }
+},{ strict: false });
+
+FileList.plugin(mongooseFieldEncryption, {
+    fields: ["title"],
+    secret: process.env.SOME_32BYTE_BASE64_STRING,
+    saltGenerator: function (secret) {
+        return "1234567890123456"; // should ideally use the secret to return a string of length 16
+} });
 
 var lmsSchema= new Schema({
     courseTitle:{
@@ -42,11 +64,8 @@ var lmsSchema= new Schema({
         required: false,
         unique:false
     },
-    teaser:{
-        type: Object,
-        required: false,
-        unique:false
-    },
+    teaser: [FileList],
+    attachment: [FileList],
     createdBy:{
         type:String,
         required: false,
@@ -64,4 +83,8 @@ var lmsSchema= new Schema({
     }
 },{ strict: false }) 
 
+lmsSchema.plugin(mongooseFieldEncryption, { fields: [ "createdAt", "createdBy", "courseContent", "language", "courseTitle", "courseDesc"  ], secret: process.env.SOME_32BYTE_BASE64_STRING,
+saltGenerator: function (secret) {
+    return "1234567890123456"; // should ideally use the secret to return a string of length 16
+  } });
 module.exports = mongoose.model('Lms', lmsSchema); 

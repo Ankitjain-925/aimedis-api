@@ -348,8 +348,8 @@ var UserSchema = new Schema({
 
 UserSchema.index({ area : '2dsphere' });
 
-UserSchema.plugin(mongooseFieldEncryption, { fields: ["first_name","last_name", "weoffer_text","latest_info","emergency_number","emergency_email",
-"emergency_contact_name", "fax", "website", "phone","city","address","sex", "birthday", "mobile","profile_id", "alies_id", 
+UserSchema.plugin(mongooseFieldEncryption, { fields: ["institute_name","email","first_name","last_name", "weoffer_text","latest_info","emergency_number","emergency_email",
+"emergency_contact_name", "fax", "website", "phone","city","address","sex", "birthday", "mobile","profile_id", "alies_id",
 "latest_info", "createdate"], secret: process.env.SOME_32BYTE_BASE64_STRING,
 saltGenerator: function (secret) {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
