@@ -458,7 +458,14 @@ router.put('/AddstoredPre/:UserId', function (req, res, next) {
         var full_record = { ...ids, ...req.body.data }
         if(req.query.addtopatient && req.query.addtopatient==='true')
         {
-            user.updateOne({$or: [{ profile_id: req.body.data.patient_id }, { alies_id: req.body.data.patient_id }] },
+            const profile_id = req.body.data.patient_id;
+            const messageToSearchWith = new user({profile_id});
+            messageToSearchWith.encryptFieldsSync();
+            const alies_id = req.body.data.patient_id;
+            const messageToSearchWith1 = new user({alies_id});
+            messageToSearchWith1.encryptFieldsSync();
+
+            user.updateOne({$or: [{profile_id :  messageToSearchWith.profile_id }, {alies_id :  messageToSearchWith1.alies_id }, { profile_id: req.body.data.patient_id }, { alies_id: req.body.data.patient_id }] },
                 { $push: { track_record: full_record } },
                 { safe: true, upsert: true },
                 function (err, doc) {
@@ -469,8 +476,9 @@ router.put('/AddstoredPre/:UserId', function (req, res, next) {
                         }
                     });
         }
-      
-        user.updateOne({ profile_id: req.params.UserId },
+        const messageToSearchWith = new user({profile_id : req.params.UserId });
+        messageToSearchWith.encryptFieldsSync();
+        user.updateOne({$or: [{ profile_id: req.params.UserId }, {profile_id: messageToSearchWith.profile_id}]},
             { $push: { track_record: full_record } },
             { safe: true, upsert: true },
             function (err, doc) {
@@ -502,7 +510,7 @@ router.get('/getLocationPharmacy/:radius', function (req, res, next) {
                 }
             }
         }, type : 'pharmacy'
-    }, 'profile_id _id first_name last_name').find((error, Userinfo) => {
+    }).find((error, Userinfo) => {
         if (error) {
             res.json({ status: 200, hassuccessed: false, error: error })
         } else {
@@ -515,20 +523,33 @@ router.get('/getPharmacy/search/:name', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-    user.find({ type: 'pharmacy', $or: [{first_name : { $regex: '.*' + req.params.name + '.*', $options: 'i' }}, {alies_id : { $regex: '.*' + req.params.name + '.*', $options: 'i' }},{profile_id : { $regex: '.*' + req.params.name + '.*', $options: 'i' }}]},'profile_id _id first_name last_name',
+    user.find({ type: 'pharmacy'},
         function (err, doc) {
             if (err && !doc) {
                 res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: doc })
+                console.log('doc',  doc)
+                var doc1 = [];
+                doc1 = getPharma(doc, req.params.name);
+                res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: doc1 })
             }
         })
     }
-    else {
+   else  {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 })
  
+function getPharma(data, name) {
+    return data
+      .filter(function(obj) {
+        return obj.first_name.includes(name) || obj.profile_id.includes(name) || obj.alies_id.includes(name);
+      })
+      .map(function(obj) {
+        return {first_name : obj.first_name, last_name : obj.last_name, profile_id : obj.profile_id, alies_id : obj.alies_id, _id: obj._id};
+      });
+  }
+
 router.get('/pharmacyPrescription/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)

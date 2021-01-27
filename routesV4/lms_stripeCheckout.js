@@ -6,7 +6,8 @@ var Payment = require("../schema/payment_schema");
 var Cart = require("../schema/cart")
 var jwtconfig = require('../jwttoken');
 const configureStripe = require('stripe');
-const STRIPE_SECRET_KEY= process.env.LMS_STRIPE_SECRET_KEY
+const {encrypt, decrypt} = require("./Cryptofile.js")
+const STRIPE_SECRET_KEY= process.env.LMS_STRIPE_SECRET_KEY_TEST
 const stripe = configureStripe(STRIPE_SECRET_KEY);
 var moment = require('moment');
 
@@ -51,8 +52,10 @@ router.post('/saveData', (req, res) => {
       user_id: req.body.user_id,
       userName: req.body.userName,
       userType: req.body.userType,
-      paymentData: req.body.paymentData,
-      orderlist: req.body.orderlist
+      paymentData: encrypt(JSON.stringify(req.body.paymentData)),
+      _enc_paymentData: true,
+      orderlist: encrypt(JSON.stringify(req.body.orderlist)),
+      _enc_orderlist: true,
     }
 
 

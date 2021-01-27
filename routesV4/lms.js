@@ -1,4 +1,5 @@
 const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
+const {encrypt, decrypt} = require("./Cryptofile.js")
 let express = require("express"),
     router = express.Router(),
     multer = require("multer"),
@@ -127,7 +128,10 @@ router.post("/getCart", (req, res, next) => {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Cart.findOne({user_id : req.body.user_id }, function (err, result) {
+        const user_id = req.body.user_id;
+        const messageToSearchWith = new Cart({user_id});
+        messageToSearchWith.encryptFieldsSync();
+        Cart.findOne({$or: [{user_id : req.body.user_id },{user_id : messageToSearchWith.user_id}]}, function (err, result) {
             if (err) {
                 res.json({ status: 200, message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
@@ -145,7 +149,10 @@ router.post("/addtocart", (req, res, next) => {
     let legit = jwtconfig.verify(token)
     if (legit) {
         // Find the document
-        Cart.updateOne({ user_id: req.body.user_id }, req.body, { upsert: true, new: true, setDefaultsOnInsert: true }, function (error, result) {
+        const user_id = req.body.user_id;
+        const messageToSearchWith = new Cart({user_id});
+        messageToSearchWith.encryptFieldsSync();
+        Cart.updateOne({$or: [{ user_id: req.body.user_id },{ user_id: messageToSearchWith.user_id}]}, req.body, { upsert: true, new: true, setDefaultsOnInsert: true }, function (error, result) {
             if (error) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: error })
             }
@@ -164,7 +171,10 @@ router.delete('/removeCart/:UserId/:CourseId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Cart.updateOne({ user_id: req.params.UserId },
+        const user_id = req.params.UserId;
+        const messageToSearchWith = new Cart({user_id});
+        messageToSearchWith.encryptFieldsSync();
+        Cart.updateOne({ $or: [{ user_id: req.params.UserId },{ user_id: messageToSearchWith.user_id }]},
             { $pull: { cartList: { courseId: req.params.CourseId } } },
             { multi: true },
             function (err, doc) {
@@ -336,11 +346,20 @@ router.get("/getOrderHistory/:id", (req, res, next) => {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Payment.find({user_id : req.params.user_id }, function (err, result) {
+        const user_id = req.params.user_id;
+        const messageToSearchWith = new Payment({user_id});
+        messageToSearchWith.encryptFieldsSync();
+        Payment.find({$or:[{user_id : req.params.user_id },{user_id : messageToSearchWith.user_id}]}, function (err, result) {
             if (err) {
                 res.json({ status: 200, message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
-                res.json({ status: 200, message: 'Get all succussfully', hassuccessed: true, data: result });
+                var result1 = []
+                result.forEach(function(obj) {
+                    obj.paymentData= obj._enc_paymentData===true ? JSON.parse(decrypt(obj.paymentData)): obj.paymentData = obj.paymentData
+                    obj._enc_orderlist===true ? obj.orderlist=  JSON.parse(decrypt(obj.orderlist)): obj.orderlist = obj.orderlist
+                    result1.push(obj);
+                });
+                res.json({ status: 200, message: 'Get all succussfully', hassuccessed: true, data: result1 });
             }
         });
     }
@@ -353,11 +372,20 @@ router.post("/getOrderHistory", (req, res, next) => {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Payment.find({user_id : req.body.user_id }, function (err, result) {
+        const user_id = req.body.user_id;
+        const messageToSearchWith = new Payment({user_id});
+        messageToSearchWith.encryptFieldsSync();
+        Payment.find({$or: [{user_id : req.body.user_id },{user_id : messageToSearchWith.user_id}]}, function (err, result) {
             if (err) {
                 res.json({ status: 200, message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
-                 res.json({ status: 200, message: 'Get all succussfully', hassuccessed: true, data: result })    
+                var result1 = []
+                result.forEach(function(obj) {
+                    obj.paymentData= obj._enc_paymentData===true ? JSON.parse(decrypt(obj.paymentData)): obj.paymentData = obj.paymentData
+                    obj._enc_orderlist===true ? obj.orderlist=  JSON.parse(decrypt(obj.orderlist)): obj.orderlist = obj.orderlist
+                    result1.push(obj);
+                });
+                 res.json({ status: 200, message: 'Get all succussfully', hassuccessed: true, data: result1 })    
             }
         });
     }
@@ -374,7 +402,13 @@ router.get("/getOrderHistory", (req, res, next) => {
             if (err) {
                 res.json({ status: 400, message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
-                res.json({ status: 200, message: 'Get all succussfully', hassuccessed: true, data: result });
+                var result1 = []
+                result.forEach(function(obj) {
+                    obj.paymentData= obj._enc_paymentData===true ? JSON.parse(decrypt(obj.paymentData)): obj.paymentData = obj.paymentData
+                    obj._enc_orderlist===true ? obj.orderlist=  JSON.parse(decrypt(obj.orderlist)): obj.orderlist = obj.orderlist
+                    result1.push(obj);
+                });
+                res.json({ status: 200, message: 'Get all succussfully', hassuccessed: true, data: result1 });
             }
         });
     }
@@ -405,7 +439,10 @@ router.get("/myRating", (req, res) => {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Rating.find({user_id: legit.id}, (err, result) => {
+        const user_id = legit.id;
+        const messageToSearchWith = new Rating({user_id});
+        messageToSearchWith.encryptFieldsSync();
+        Rating.find({$or: [{user_id: legit.id},{user_id : messageToSearchWith.user_id}]}, (err, result) => {
             if (result) {
                 res.json({ status: 200, hassuccessed: true, msg: 'Successfully data Uploaded !', data: result })
             } else {

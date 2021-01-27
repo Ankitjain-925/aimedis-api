@@ -206,6 +206,11 @@ var UserSchema = new Schema({
        unique: false
     },
     we_offer:{   type : Object   },
+    marital_status:{
+      type : Object,
+      required: false,
+      unique: false 
+    },
     image: {
        type: String,
        required: false,
