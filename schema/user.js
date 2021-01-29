@@ -48,6 +48,11 @@ var UserSchema = new Schema({
        required: false,
        unique: false
     },
+    marital_status:{
+       type:{},
+       requierd:false,
+       unique:false
+    },
     birthday: {
        type: String,
        required: false,
