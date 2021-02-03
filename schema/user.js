@@ -221,7 +221,7 @@ var UserSchema = new Schema({
     family_doc : {type : Array},
     aimedis_doc: {type : Array},
     marital_status:{
-       type: String,
+       type: Object,
        required: false,
        unique: false
     },

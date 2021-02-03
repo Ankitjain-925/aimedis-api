@@ -194,7 +194,10 @@ router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
         // var track_id = {track_id : req.params.TrackId}
-        var data = req.body.data
+        
+        req.body.data.created_by = encrypt(req.body.data.created_by);
+        req.body.data._enc_created_by = true;
+     
         user.findOneAndUpdate(
             {
                 '_id': req.params.UserId,
@@ -202,7 +205,7 @@ router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
             },
             {
                 $set: {
-                    'track_record.$': data
+                    'track_record.$': req.body.data
                 }
             },
             function (err, doc) {
@@ -724,7 +727,7 @@ function getAlltrack(data) {
                 }
                
                 new_data.created_by_temp = created_by;
-               
+                new_data.created_by = doc3._id;
                 new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                 new_data.created_by_image = doc3.image;
                 if(doc3.alies_id){

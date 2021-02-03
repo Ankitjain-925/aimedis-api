@@ -528,9 +528,8 @@ router.get('/getPharmacy/search/:name', function (req, res, next) {
             if (err && !doc) {
                 res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
             } else {
-                console.log('doc',  doc)
                 var doc1 = [];
-                doc1 = getPharma(doc, req.params.name);
+                doc1 = getPharma(doc, req.params.name.toLowerCase());
                 res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: doc1 })
             }
         })
@@ -543,7 +542,15 @@ router.get('/getPharmacy/search/:name', function (req, res, next) {
 function getPharma(data, name) {
     return data
       .filter(function(obj) {
-        return obj.first_name.includes(name) || obj.profile_id.includes(name) || obj.alies_id.includes(name);
+          if(obj.first_name && obj.last_name){
+            return obj.first_name.toLowerCase().includes(name) || obj.last_name.toLowerCase().includes(name) || obj.profile_id.toLowerCase().includes(name) || obj.alies_id.toLowerCase().includes(name);  
+          }
+          else if(obj.first_name){
+            return obj.first_name.toLowerCase().includes(name) || obj.profile_id.toLowerCase().includes(name) || obj.alies_id.toLowerCase().includes(name);  
+          }
+          else {
+            return obj.profile_id.toLowerCase().includes(name) || obj.alies_id.toLowerCase().includes(name);  
+          }
       })
       .map(function(obj) {
         return {first_name : obj.first_name, last_name : obj.last_name, profile_id : obj.profile_id, alies_id : obj.alies_id, _id: obj._id};
@@ -593,24 +600,30 @@ function forEachPromise(items, fn) {
 function getArAlltrack(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            var created_by = data._enc_created_by===true ?  decrypt(data.created_by) : data.created_by;
+            var created_by = data._enc_created_by===true ? decrypt(data.created_by) : data.created_by;
             user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name;
+                if(doc3){
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name;
+                    }
+                    else {
+                        var created_by = doc3.first_name;
+                    }
+                    new_data.created_by_temp = created_by; 
+                    new_data.created_by_image = doc3.image;
                 }
-                else {
-                    var created_by = doc3.first_name;
-                }
-                new_data.created_by_temp = created_by;
-                new_data.created_by_image = doc3.image;
                 return new_data;
-             
             }).then(function(new_data){
                 if(data.patient_id)
-                {
-                     user.findOne({profile_id: data.patient_id}).exec()
+                {   
+                    const profile_id = data.patient_id;
+                    const messageToSearchWith1 = new user({alies_id :profile_id});
+                    messageToSearchWith1.encryptFieldsSync();
+                    const messageToSearchWith = new user({profile_id});
+                    messageToSearchWith.encryptFieldsSync();
+                    user.findOne({$or: [{alies_id: data.patient_id},{alies_id: messageToSearchWith1.alies_id},{profile_id: data.patient_id},{profile_id: messageToSearchWith.profile_id}]}).exec()
                     .then(function(doc5){
                         if(doc5)
                         {
@@ -625,16 +638,27 @@ function getArAlltrack(data) {
                             new_data.patient_alies_id= doc5.alies_id;
                             new_data.patient_default_id = doc5._id
                             new_data.patient_image = doc5.image;
+                            return new_data;
                         }
-                        return new_data;
+                        else{
+                            return new_data;  
+                        }
+                        console.log('Iam here', new_data)
+                    }).then(function(new_data){
+                        if(data.archive)
+                        { 
+                            trackrecord2.push(new_data);
+                        }
+                        resolve(trackrecord2);
                     })
-                } 
-                if(data.archive)
-                {
-                    trackrecord2.push(new_data);
                 }
-                
-                resolve(trackrecord2);
+                else{
+                    if(data.archive)
+                    { 
+                        trackrecord2.push(new_data);
+                    }
+                    resolve(trackrecord2);
+                } 
             })
         });
     });
@@ -660,14 +684,16 @@ function getAlltrack(data) {
                 return new_data;
             }).then(function(new_data){
                 if(data.patient_id)
-                {
-                     user.findOne({profile_id: data.patient_id}).exec()
+                {   
+                    const profile_id = data.patient_id;
+                    const messageToSearchWith1 = new user({alies_id :profile_id});
+                    messageToSearchWith1.encryptFieldsSync();
+                    const messageToSearchWith = new user({profile_id});
+                    messageToSearchWith.encryptFieldsSync();
+                    user.findOne({$or: [{alies_id: data.patient_id},{alies_id: messageToSearchWith1.alies_id},{profile_id: data.patient_id},{profile_id: messageToSearchWith.profile_id}]}).exec()
                     .then(function(doc5){
-                        
                         if(doc5)
                         {
-
-                        
                             var new_data = data;
                             if (doc5.last_name) {
                                 var patient_name = doc5.first_name + ' ' + doc5.last_name;
@@ -679,22 +705,26 @@ function getAlltrack(data) {
                             new_data.patient_alies_id= doc5.alies_id;
                             new_data.patient_default_id = doc5._id
                             new_data.patient_image = doc5.image;
-                         
                             return new_data;
                         }
                         else{
-                        
                             return new_data;  
                         }
+                    }).then(function(new_data){
+                        if(!data.archive)
+                        { 
+                            trackrecord1.push(new_data);
+                        }
+                        resolve(trackrecord1);
                     })
                 }
-                if(!data.archive)
-                {
-                    
-                    trackrecord1.push(new_data);
-                }
-                
-                resolve(trackrecord1);
+                else{
+                    if(!data.archive)
+                    { 
+                        trackrecord1.push(new_data);
+                    }
+                    resolve(trackrecord1);
+                } 
             })
         });
     });

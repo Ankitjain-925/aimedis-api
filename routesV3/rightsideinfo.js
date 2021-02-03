@@ -14,7 +14,7 @@ router.get('/patient', function (req, res, next) {
     trackrecord1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    var upcoming_appointment,blood_sugar,last_dia,info,last_dv,last_con,weight_bmi,sick_certificates,prescriptions,laboratory_result,blood_pressure;
+    var respiration, upcoming_appointment,blood_sugar,last_dia,info,last_dv,last_con,weight_bmi,sick_certificates,prescriptions,laboratory_result,blood_pressure;
     if (legit) {
         user.find(
             {
@@ -100,9 +100,12 @@ router.get('/patient', function (req, res, next) {
                                 blood_sugar = myFilterData9;
 
                             var myFilterData8 = doc[0].track_record.filter((value, key) =>
-                            value.type ==='laboratory_result');
+                                value.type ==='laboratory_result');
                                 laboratory_result = myFilterData8;
-                                
+                            
+                            var myFilterData23 = doc[0].track_record.filter((value, key) =>
+                                value.type === 'respiration');
+                                respiration = myFilterData23;
                             }
                             if(last_dv && last_dv.length>0)
                             {
@@ -110,13 +113,15 @@ router.get('/patient', function (req, res, next) {
                                 .then((result) => {
                                     info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
                                     res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
-                                    upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                                    upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result,
+                                    respiration: respiration}})
                                 })
                             }
                             else{
                                 info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
                                 res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
-                                upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                                upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result,
+                                respiration: respiration}})
                             }  
                     })
                 }
@@ -135,7 +140,7 @@ router.get('/patient/:patient_id', function (req, res, next) {
     trackrecord1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
-    var upcoming_appointment,blood_sugar,last_dia,info,last_dv,last_con,weight_bmi,sick_certificates,prescriptions,laboratory_result,blood_pressure;
+    var respiration,upcoming_appointment,blood_sugar,last_dia,info,last_dv,last_con,weight_bmi,sick_certificates,prescriptions,laboratory_result,blood_pressure;
     if (legit) {
         user.find(
             {
@@ -219,23 +224,31 @@ router.get('/patient/:patient_id', function (req, res, next) {
                             blood_sugar = myFilterData9;
 
                         var myFilterData8 = doc[0].track_record.filter((value, key) =>
-                        value.type ==='laboratory_result');
+                            value.type ==='laboratory_result');
                             laboratory_result = myFilterData8;
+                            
+                        var myFilterData23 = doc[0].track_record.filter((value, key) =>
+                            value.type === 'respiration');
+                            respiration = myFilterData23;
                         
                         }
+                       
+                    
                         if(last_dv && last_dv.length>0)
                         {
                             forEachPromise(last_dv, getAlltrack)
                             .then((result) => {
                                 info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
                                 res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
-                                upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                                upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result,
+                                respiration: respiration}})
                             })
                         }
                         else{
                             info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
                             res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
-                            upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result}})
+                            upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result,
+                            respiration: respiration}})
                         }  
                 })
             }

@@ -221,7 +221,9 @@ router.post('/UserLogin', function (req, res, next) {
                                             type: user_data.type
                                         }
                                         var token = jwtconfig.sign(payload);
-                                        if(user_data.type !=='superadmin' && user_data.type !=='hospitaladmin'){
+                                        console.log('user_data.type', user_data.type)
+                                        if(user_data.type !=='superadmin'){
+                                            console.log('I am here')
                                             res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                         }
                                         else{
@@ -233,9 +235,7 @@ router.post('/UserLogin', function (req, res, next) {
                                         if (user_data.authyId) {
                                             authy.requestSms({ authyId: user_data.authyId }, { force: true }, function (err, smsRes) {
                                                 if (err) {
-                                                
                                                     res.json({ status: 450, hassuccessed: false, message: 'request not send', error: err })
-
                                                 }
                                             });
 
@@ -247,7 +247,7 @@ router.post('/UserLogin', function (req, res, next) {
                                             }
                                             var token = jwtconfig.sign(payload);
 
-                                            if(user_data.type !=='superadmin' && user_data.type !=='hospitaladmin'){
+                                            if(user_data.type !=='superadmin'){
                                                 res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                             }
                                             else{
@@ -295,7 +295,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                 if (user_data) {
                     if (user_data.isblock === true) {
                         res.json({ status: 450, hassuccessed: false, message: "User is blocked" })
-                    } else {
+                    } else {``
                         let promise = new Promise(function (resolve, reject) {
                             if (req.body.logintoken != '' && req.body.logintoken != undefined) {
                                 if (req.body.logintoken == user_data.usertoken) {
@@ -327,7 +327,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                             type: user_data.type
                                         }
                                         var token = jwtconfig.sign(payload);
-                                        if(user_data.type ==='superadmin' || user_data.type ==='hospitaladmin'){
+                                        if(user_data.type ==='superadmin'){
                                             res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                         }
                                         else{
@@ -2503,7 +2503,10 @@ router.put('/AddFavDoc1/:user_id', function (req, res, next) {
         const profile_id = req.body.doctor;
         const messageToSearchWith = new User({profile_id});
         messageToSearchWith.encryptFieldsSync();
-        User.findOne({$or: [{ profile_id: req.params.user_id },{profile_id: messageToSearchWith.profile_id}]}, function (err, userdata) {
+        const messageToSearchWith2 = new User({profile_id : req.params.user_id});
+        messageToSearchWith2.encryptFieldsSync();
+         
+        User.findOne({$or: [{ profile_id: req.params.user_id },{profile_id: messageToSearchWith2.profile_id}]}, function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
             } else {

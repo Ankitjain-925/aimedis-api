@@ -68,9 +68,13 @@ router.post('/saveData', (req, res) => {
             if (err) {
               res.status(400).json({ message: 'Something went wrong', hassuccessed: false, err: err });
             } else {
-              Cart.update({user_id : req.body.user_id }, { $set: { cartList: [] }}, function(err, affected){
+              const user_id = req.body.user_id;
+              const messageToSearchWith = new Cart({user_id});
+              messageToSearchWith.encryptFieldsSync();
+              Cart.update({ $or: [{user_id : req.body.user_id },{user_id : messageToSearchWith.user_id}]}, { $set: { cartList: [] }}, function(err, affected){
+                res.status(200).json({ message: 'Get all succussfully', hassuccessed: true, data: result });
               });
-              res.status(200).json({ message: 'Get all succussfully', hassuccessed: true, data: result });
+
             }
           });
         }

@@ -216,7 +216,7 @@ router.post('/UserLogin', function (req, res, next) {
                                             type: user_data.type
                                         }
                                         var token = jwtconfig.sign(payload);
-                                        if(user_data.type !=='superadmin' && user_data.type !=='hospitaladmin'){
+                                        if(user_data.type !=='superadmin'){
                                             res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                         }
                                         else{
@@ -319,7 +319,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                             type: user_data.type
                                         }
                                         var token = jwtconfig.sign(payload);
-                                        if(user_data.type ==='superadmin' || user_data.type ==='hospitaladmin'){
+                                        if(user_data.type ==='superadmin'){
                                             res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                         }
                                         else{
