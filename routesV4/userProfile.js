@@ -295,7 +295,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                 if (user_data) {
                     if (user_data.isblock === true) {
                         res.json({ status: 450, hassuccessed: false, message: "User is blocked" })
-                    } else {``
+                    } else {
                         let promise = new Promise(function (resolve, reject) {
                             if (req.body.logintoken != '' && req.body.logintoken != undefined) {
                                 if (req.body.logintoken == user_data.usertoken) {
@@ -1833,7 +1833,6 @@ router.put('/UpdateSecondOpinion/:sick_certificate_id', function (req, res, next
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
-
 //Add bY Ankita to update the Sick certificate
 router.put('/UpdateSickcertificate/:sick_certificate_id', function (req, res, next) {
     const token = (req.headers.token)
@@ -2432,7 +2431,6 @@ router.get('/getFvDoc', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
-
 
 router.get('/DoctorProfile/:doctor_id', function (req, res, next) {
     User.findOne({ _id: req.params.doctor_id }, function (err, Userinfo) {
@@ -3740,7 +3738,7 @@ router.post('/forgotPassword', function (req, res, next) {
                 // link = 'https://aidoc.io/change-password'
                 link = 'https://sys.aimedis.io/change-password';
             }
-            var link = 'http://aidoc.io/change-password';
+            // var link = 'http://aidoc.io/change-password';
            
             if (req.body.lan === 'de') {
                 var dhtml = 'Sie haben Ihr Passwort vergessen und ein neues angefordert.<br/>' +
