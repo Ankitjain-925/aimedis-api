@@ -718,23 +718,24 @@ function getAlltrack(data) {
             user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
-               
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'; 
-                }
-                else {
-                    var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-               
-                new_data.created_by_temp = created_by;
-                new_data.created_by = doc3._id;
-                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                new_data.created_by_image = doc3.image;
-                if(doc3.alies_id){
-                    new_data.created_by_profile = doc3.alies_id;
-                }
-                else{
-                    new_data.created_by_profile = doc3.profile_id;
+                if(doc3){
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'; 
+                    }
+                    else {
+                        var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                    }
+                   
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by = doc3._id;
+                    new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                    new_data.created_by_image = doc3.image;
+                    if(doc3.alies_id){
+                        new_data.created_by_profile = doc3.alies_id;
+                    }
+                    else{
+                        new_data.created_by_profile = doc3.profile_id;
+                    }
                 }
                 return new_data;
             }).then(function(new_data){
@@ -743,13 +744,15 @@ function getAlltrack(data) {
                      user.findOne({_id: data.review_by}).exec()
                     .then(function(doc5){
                         var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                        if(doc5){
+                            if (doc5.last_name) {
+                                var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var reviewed_by = doc5.first_name;
+                            }
+                            new_data.review_by_temp = reviewed_by;
                         }
-                        else {
-                            var reviewed_by = doc5.first_name;
-                        }
-                        new_data.review_by_temp = reviewed_by;
                         return new_data;
                     
                     })
@@ -760,13 +763,15 @@ function getAlltrack(data) {
                     .then(function(doc5){
                       
                         var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                        if(doc5){
+                            if (doc5.last_name) {
+                                var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var emergency1_by = doc5.first_name;
+                            }
+                            new_data.emergency_by_temp = emergency1_by;
                         }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
                         return new_data;
                     })
                     
@@ -789,22 +794,23 @@ function getAlltrack2(data) {
             user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
-
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-                else {
-                    var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-              
-                new_data.created_by_temp = created_by;
-                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
-                new_data.created_by_image = doc3.image;
-                if(doc3.alies_id){
-                    new_data.created_by_profile = doc3.alies_id;
-                }
-                else{
-                    new_data.created_by_profile = doc3.profile_id;
+                if(doc3){
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                    }
+                    else {
+                        var created_by = doc3.first_name + ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                    }
+                  
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
+                    new_data.created_by_image = doc3.image;
+                    if(doc3.alies_id){
+                        new_data.created_by_profile = doc3.alies_id;
+                    }
+                    else{
+                        new_data.created_by_profile = doc3.profile_id;
+                    }
                 }
                 return new_data;
              
@@ -814,15 +820,16 @@ function getAlltrack2(data) {
                      user.findOne({_id: data.review_by}).exec()
                     .then(function(doc5){
                         var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                        if(doc5){
+                            if (doc5.last_name) {
+                                var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var reviewed_by = doc5.first_name;
+                            }
+                            new_data.review_by_temp = reviewed_by;
                         }
-                        else {
-                            var reviewed_by = doc5.first_name;
-                        }
-                        new_data.review_by_temp = reviewed_by;
                         return new_data;
-                    
                     })
                 }
                 if(data.emergency_by)
@@ -831,13 +838,15 @@ function getAlltrack2(data) {
                     .then(function(doc5){
                       
                         var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                        if(doc5){
+                            if (doc5.last_name) {
+                                var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var emergency1_by = doc5.first_name;
+                            }
+                            new_data.emergency_by_temp = emergency1_by;
                         }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
                         return new_data;
                     })
                     
@@ -860,21 +869,23 @@ function getAlltrack1(data, right_management) {
             user.findOne({_id: created_by}).exec()
             .then(function(doc3){
                 var new_data = data;
-                if (doc3.last_name) {
-                    var created_by = doc3.first_name + ' ' + doc3.last_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-                else {
-                    var created_by = doc3.first_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
-                }
-               
-                new_data.created_by_temp = created_by;
-                new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
-                new_data.created_by_image = doc3.image;
-                if(doc3.alies_id){
-                    new_data.created_by_profile = doc3.alies_id;
-                }
-                else{
-                    new_data.created_by_profile = doc3.profile_id;
+                if(doc3){
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                    }
+                    else {
+                        var created_by = doc3.first_name+ ' ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
+                    }
+                   
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
+                    new_data.created_by_image = doc3.image;
+                    if(doc3.alies_id){
+                        new_data.created_by_profile = doc3.alies_id;
+                    }
+                    else{
+                        new_data.created_by_profile = doc3.profile_id;
+                    }
                 }
                 return new_data;
              
@@ -884,13 +895,15 @@ function getAlltrack1(data, right_management) {
                      user.findOne({_id: data.review_by}).exec()
                     .then(function(doc5){
                         var new_data = data;
-                        if (doc5.last_name) {
-                            var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                        if(doc5){
+                            if (doc5.last_name) {
+                                var reviewed_by = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var reviewed_by = doc5.first_name;
+                            }
+                            new_data.review_by_temp = reviewed_by;
                         }
-                        else {
-                            var reviewed_by = doc5.first_name;
-                        }
-                        new_data.review_by_temp = reviewed_by;
                         return new_data;
                     
                     })
@@ -900,13 +913,15 @@ function getAlltrack1(data, right_management) {
                     user.findOne({_id: data.emergency_by}).exec()
                     .then(function(doc5){
                         var new_data = data;
-                        if (doc5.last_name) {
-                            var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                        if(doc5){
+                            if (doc5.last_name) {
+                                var emergency1_by = doc5.first_name + ' ' + doc5.last_name;
+                            }
+                            else {
+                                var emergency1_by = doc5.first_name;
+                            }
+                            new_data.emergency_by_temp = emergency1_by;
                         }
-                        else {
-                            var emergency1_by = doc5.first_name;
-                        }
-                        new_data.emergency_by_temp = emergency1_by;
                         return new_data;
                     })
                     

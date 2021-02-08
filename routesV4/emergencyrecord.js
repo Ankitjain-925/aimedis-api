@@ -566,21 +566,23 @@ router.get('/pharmacyPrescription/:UserId', function (req, res, next) {
             if (err && !doc) {
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
             } else {
-                if (doc.track_record.length > 0) {
-                    doc.track_record.forEach((element, index) => {
-                        if(element.type==='prescription')
-                        {
-                            storedPrescriptions.push(element)
-                        }
-                    }) 
+                if(doc){
+                    if (doc.track_record.length > 0) {
+                        doc.track_record.forEach((element, index) => {
+                            if(element.type==='prescription')
+                            {
+                                storedPrescriptions.push(element)
+                            }
+                        }) 
+                    }
+                    else 
+                    {
+                        storedPrescriptions = [];
+                    }
+                    storedPrescriptions.sort(mySorter)
+                    data = {first_name: doc.first_name, last_name: doc.last_name, _id: doc._id, profile_id: doc.profile_id, email: doc.email, track_record: storedPrescriptions }
+                    res.json({ status: 200, hassuccessed: true, msg: 'Data is found', data : data })
                 }
-                else 
-                {
-                    storedPrescriptions = [];
-                }
-                storedPrescriptions.sort(mySorter)
-                data = {first_name: doc.first_name, last_name: doc.last_name, _id: doc._id, profile_id: doc.profile_id, email: doc.email, track_record: storedPrescriptions }
-                res.json({ status: 200, hassuccessed: true, msg: 'Data is found', data : data })
             }
         })
     }

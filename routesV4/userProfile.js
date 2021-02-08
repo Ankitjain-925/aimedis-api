@@ -675,12 +675,39 @@ router.delete('/Users/:User_id', function (req, res, next) {
 
 /*-----------------------G-E-T---U-S-E-R-------------------------*/
 
-router.get('/Users/:User_id', function (req, res, next) {
+router.get('/existorblock/:User_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
     User.findOne({ _id: req.params.User_id })
     .select("-password")
+    .exec(function(err, Userinfo) {
+        if (err) {
+            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+        } else {
+            if (Userinfo){
+                if(Userinfo.isblock){
+                    res.json({ status: 200, hassuccessed: false});
+                }else{
+                    res.json({ status: 200, hassuccessed: true });
+                }    
+            } else {
+                res.json({ status: 200, hassuccessed: false, message: 'User not found' });
+            }
+        }
+    });  
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.get('/Users/:User_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+    User.findOne({ _id: req.params.User_id })
+    .select("-password -track_record")
     .exec(function(err, Userinfo) {
         if (err) {
             res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
@@ -3713,7 +3740,7 @@ router.post('/forgotPassword', function (req, res, next) {
                 // link = 'https://aidoc.io/change-password'
                 link = 'https://sys.aimedis.io/change-password';
             }
-            var link = 'http://localhost:3000/change-password';
+            var link = 'http://aidoc.io/change-password';
            
             if (req.body.lan === 'de') {
                 var dhtml = 'Sie haben Ihr Passwort vergessen und ein neues angefordert.<br/>' +

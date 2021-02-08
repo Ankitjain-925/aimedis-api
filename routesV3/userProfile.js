@@ -667,15 +667,44 @@ router.delete('/Users/:User_id', function (req, res, next) {
 
 /*-----------------------G-E-T---U-S-E-R-------------------------*/
 
+router.get('/existorblock/:User_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+    User.findOne({ _id: req.params.User_id })
+    .select("-password")
+    .exec(function(err, Userinfo) {
+        if (err) {
+            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+        } else {
+            if (Userinfo){
+                if(Userinfo.isblock){
+                    res.json({ status: 200, hassuccessed: false});
+                }else{
+                    res.json({ status: 200, hassuccessed: true });
+                }    
+            } else {
+                res.json({ status: 200, hassuccessed: false, message: 'User not found' });
+            }
+        }
+    });  
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
 router.get('/Users/:User_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-            } else {
-                if (Userinfo) {
+        User.findOne({ _id: req.params.User_id })
+        .select("-track_record")
+        .exec(function(err, Userinfo) {
+        if (err) {
+            res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+        } else {
+            if (Userinfo){
                     if(Userinfo.password){
                         Userinfo.password = base64.decode(Userinfo.password);
                     }
