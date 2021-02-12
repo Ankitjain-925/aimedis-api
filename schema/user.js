@@ -104,20 +104,6 @@ Rigt_managementList.plugin(mongooseFieldEncryption, {
        return "1234567890123456"; // should ideally use the secret to return a string of length 16
 } });
 
-const PaitentList = new mongoose.Schema({
-   profile_id:{
-       type: String,
-       required: false,
-       unique: false
-   }
-},{ strict: false });
-
-PaitentList.plugin(mongooseFieldEncryption, {
-   fields: ["profile_id" ],
-   secret: process.env.SOME_32BYTE_BASE64_STRING,
-   saltGenerator: function (secret) {
-       return "1234567890123456"; // should ideally use the secret to return a string of length 16
-} });
 
 var UserSchema = new Schema({
     type:{

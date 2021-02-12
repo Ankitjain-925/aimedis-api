@@ -226,6 +226,62 @@ router.put('/AddTrack/:UserId/:TrackId', function (req, res, next) {
     }
 });
 
+/*Added for the handle precriptions*/
+
+router.put('/HandlePrescriptions/:UserId/:TrackId', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        var created_by = req.body.data.created_by
+        req.body.data.created_by = encrypt(req.body.data.created_by);
+        req.body.data._enc_created_by = true;
+     
+        user.findOneAndUpdate(
+            {
+                '_id': req.params.UserId,
+                'track_record.track_id': req.params.TrackId
+            },
+            {
+                $set: {
+                    'track_record.$': req.body.data
+                }
+            },
+            function (err, doc) {
+                if (err && !doc) {
+                    res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                } else {
+                    if (doc.nModified == '0') {
+                        res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
+                    }
+                    else {
+                        console.log('created_by', created_by)
+                        user.findOne({ _id: created_by  }).then(docUser => {
+                            if (docUser) {
+                            let dhtml = 'Hi <b>' + data.created_by_temp + "</b>,<br/><br/>" +
+                                "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name + '.<br/>' +
+                                'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
+                                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
+                                '<b>Your Aimedis team </b>'
+                                var mailOptions = {
+                                    from: "contact@aimedis.com",
+                                    to: docUser.email,
+                                    subject: 'Precription Handeled Report',
+                                    html: dhtml
+                                };
+                            }
+                            let sendmail = transporter.sendMail(mailOptions)
+                            let sentSMS = sendSms(docUser.mobile, "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name+" at "+ data.created_on +" Regards, Aimedis team.")
+                        })
+                        res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                    }
+                }
+            });
+        
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
 //Add the track record
 
 router.put('/AddTrack/:UserId', function (req, res, next) {
@@ -248,7 +304,35 @@ router.put('/AddTrack/:UserId', function (req, res, next) {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                     }
                     else {
-                        res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                        console.log('pharmacy_id', req.body.data.pharmacy_id)
+                        if(req.body.data && req.body.data.pharmacy_id){
+                            const messageToSearchWith = new user({profile_id :req.body.data.pharmacy_id });
+                            messageToSearchWith.encryptFieldsSync();
+                            var patient_id2 = { patient_id: req.body.data.patient_profile_id };
+                            var full_record1 = { ...patient_id2, ...ids, ...req.body.data }
+                            user.updateOne({$or: [{ profile_id: req.body.data.pharmacy_id }, {profile_id: messageToSearchWith.profile_id}]},
+                                { $push: { track_record: full_record1 } },
+                                { safe: true, upsert: true },
+                                function (err, doc) {
+                                    if (err && !doc) {
+                                        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                                    } else {
+                                        if (doc.nModified == '0') {
+                                            console.log('I am heereee056')
+                                            res.json({ status: 200, hassuccessed: false, msg: 'Pharmacy is not found' })
+                                        }
+                                        else {
+                                            console.log('I am heereee to send on Pharmcay too.')
+                                            res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                                        }
+                                    }
+                                });
+                        }
+                        else{
+                            console.log('terrererer')
+                            res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                        }
+                        // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                     }
                 }
             });
@@ -803,7 +887,8 @@ function getAlltrack2(data) {
                     }
                   
                     new_data.created_by_temp = created_by;
-                    new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
+                    new_data.created_by = doc3._id;
+                    new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                     new_data.created_by_image = doc3.image;
                     if(doc3.alies_id){
                         new_data.created_by_profile = doc3.alies_id;
@@ -878,7 +963,8 @@ function getAlltrack1(data, right_management) {
                     }
                    
                     new_data.created_by_temp = created_by;
-                    new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )'
+                    new_data.created_by = doc3._id;
+                    new_data.created_by_temp2 = created_by.substring(0,7) +'... ( '+doc3.type.charAt(0).toUpperCase() + doc3.type.slice(1) +' )';
                     new_data.created_by_image = doc3.image;
                     if(doc3.alies_id){
                         new_data.created_by_profile = doc3.alies_id;

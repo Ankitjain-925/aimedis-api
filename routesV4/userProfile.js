@@ -1413,7 +1413,34 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                                                 html: dhtml
                                             };
                                             var sendmail = transporter.sendMail(mailOptions)
-                                            res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                                            if(req.body.sendPharmacy){
+                                                const messageToSearchWith = new User({profile_id :req.body.sendPharmacy });
+                                                messageToSearchWith.encryptFieldsSync();
+                                                var patient_id2 = { patient_id: updatedata.patient_profile_id };
+                                                var full_record1 = { ...patient_id2, ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                                                User.updateOne({$or: [{ profile_id: req.body.sendPharmacy }, {profile_id: messageToSearchWith.profile_id}]},
+                                                    { $push: { track_record: full_record1 } },
+                                                    { safe: true, upsert: true },
+                                                    function (err, doc) {
+                                                        if (err && !doc) {
+                                                            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                                                        } else {
+                                                            if (doc.nModified == '0') {
+                                                                console.log('I am heereee056')
+                                                                res.json({ status: 200, hassuccessed: false, msg: 'Pharmacy is not found' })
+                                                            }
+                                                            else {
+                                                                console.log('I am heereee to send on Pharmcay too.')
+                                                                res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                                                            }
+                                                        }
+                                                    });
+                                            }
+                                            else{
+                                                console.log('I am hereeee')
+                                                res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+                                            }
+                                            
                                         }
                                     }
                                 });

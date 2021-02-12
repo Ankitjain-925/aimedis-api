@@ -9,6 +9,7 @@ var dateTime = require('node-datetime');
 const {encrypt, decrypt} = require("./Cryptofile.js")
 var trackrecord1 = [];
 var trackrecord2 = [];
+var trackrecord9 = [];
 //get the emergency record of the patient
 router.get('/:UserId', function (req, res, next) {
     const token = (req.headers.token)
@@ -613,7 +614,8 @@ function getArAlltrack(data) {
                     else {
                         var created_by = doc3.first_name;
                     }
-                    new_data.created_by_temp = created_by; 
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by = doc3._id;
                     new_data.created_by_image = doc3.image;
                 }
                 return new_data;
@@ -680,7 +682,8 @@ function getAlltrack(data) {
                     else {
                         var created_by = doc3.first_name;
                     }
-                    new_data.created_by_temp = created_by; 
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by = doc3._id;
                     new_data.created_by_image = doc3.image;
                 }
                 return new_data;
@@ -737,4 +740,99 @@ function mySorter(a, b) {
     var y = b.datetime_on.toLowerCase();
     return ((x > y) ? -1 : ((x < y) ? 1 : 0));
 }
+
+function getAllTrackDoc(data, created_by) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+            if(data.patient_id)
+            {   
+                const profile_id = data.patient_id;
+                const messageToSearchWith1 = new user({alies_id :profile_id});
+                messageToSearchWith1.encryptFieldsSync();
+                const messageToSearchWith = new user({profile_id});
+                messageToSearchWith.encryptFieldsSync();
+                user.findOne({$or: [{alies_id: data.patient_id},{alies_id: messageToSearchWith1.alies_id},{profile_id: data.patient_id},{profile_id: messageToSearchWith.profile_id}]}).exec()
+                .then(function(doc5){
+                    if(doc5)
+                    {
+                        var new_data = data;
+                        if (doc5.last_name) {
+                            var patient_name = doc5.first_name + ' ' + doc5.last_name;
+                        }
+                        else {
+                            var patient_name = doc5.first_name;
+                        }
+                        new_data.patient_name = patient_name;
+                        new_data.patient_alies_id= doc5.alies_id;
+                        new_data.patient_default_id = doc5._id;
+                        new_data.patient_image = doc5.image;
+                        new_data.created_by = created_by;
+                        return new_data;
+                    }
+                    else{
+                        return new_data;  
+                    }
+                }).then(function(new_data){
+                    trackrecord9.push(new_data);
+                    resolve(trackrecord9);
+                })
+            }
+            else{
+                trackrecord9.push(new_data);
+                resolve(trackrecord9);
+            } 
+        });
+    });
+}
+
+function forEachPromises(items, created_by, fn) {
+    return items.reduce(function (promise, item) {
+        return promise.then(function () {
+            return fn(item, created_by);
+        });
+    }, Promise.resolve());
+}
+
+router.get('/getSentPrescription/:UserId', function (req, res, next) {
+    trackrecord1 = [];
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        user.find({ type: "pharmacy"},
+        function (err, data) {
+            if (err && !data) {
+                res.json({ status: 200, hassuccessed: false, msg: "Something went wrong", Error: err })
+            } else {
+                    let promise = new Promise(function (resolve, reject) {
+                        var track= [], fullData =[];
+                        data && data.length>0 && data.forEach((item) => {
+                            trackrecord9 = [];
+                            track = item.track_record.filter(val=>{
+                                let created_by = val._enc_created_by===true ? decrypt(val.created_by) : val.created_by;
+                                return created_by === req.params.UserId
+                            })
+                            forEachPromises(track,req.params.UserId, getAllTrackDoc)
+                            .then((result) => {
+                                let NewTrack =  trackrecord9;
+                                trackrecord9 = [];
+                                fullData.push({email: item.email, speciality: item.speciality, track_record : NewTrack, 
+                                    profile_id: item.profile_id, alies_id: item.alies_id, _id: item._id, first_name: item.first_name,
+                                    last_name: item.last_name, image: item.image})
+                                })
+                        })
+                        setTimeout(() => resolve(fullData), 1000);
+                    });
+                    promise.then((fullData)=>{
+                        res.json({ status: 200, hassuccessed: true, msg: 'Data is found', data: fullData })
+                    })
+                } 
+        });
+                   
+    }
+         
+    else {
+        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+});
+
 module.exports = router;
