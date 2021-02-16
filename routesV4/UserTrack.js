@@ -9,6 +9,7 @@ var Appointment = require('../schema/appointments')
 var jwtconfig = require('../jwttoken');
 const uuidv1 = require('uuid/v1');
 const {join} = require('path');
+const sendSms = require("./sendSms")
 const moment = require('moment');
 const {promisify} = require('util');
 const read = promisify(require('fs').readFile);
@@ -257,7 +258,8 @@ router.put('/HandlePrescriptions/:UserId/:TrackId', function (req, res, next) {
                         console.log('created_by', created_by)
                         user.findOne({ _id: created_by  }).then(docUser => {
                             if (docUser) {
-                            let dhtml = 'Hi <b>' + data.created_by_temp + "</b>,<br/><br/>" +
+                                var data = req.body.data;
+                            let dhtml = 'Hi <b>' + docUser.first_name +' '+ docUser.last_name + "</b>,<br/><br/>" +
                                 "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name + '.<br/>' +
                                 'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
                                 'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
@@ -268,9 +270,16 @@ router.put('/HandlePrescriptions/:UserId/:TrackId', function (req, res, next) {
                                     subject: 'Precription Handeled Report',
                                     html: dhtml
                                 };
+                                let sendmail = transporter.sendMail(mailOptions)
+                                if(sendmail){
+                                    console.log('Mail is sent')
+                                }
+                                let sentSMS = sendSms(docUser.mobile, "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name+" at "+ data.created_on +" Regards, Aimedis team.")
+                                if(sentSMS){
+                                    console.log('Message is sent .....')
+                                }
                             }
-                            let sendmail = transporter.sendMail(mailOptions)
-                            let sentSMS = sendSms(docUser.mobile, "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name+" at "+ data.created_on +" Regards, Aimedis team.")
+                            
                         })
                         res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                     }

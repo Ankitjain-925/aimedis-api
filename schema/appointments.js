@@ -142,6 +142,11 @@ var appointmentsSchema = new Schema({
         required:false,
         unique:false
     },
+    custom_text :{
+        type: String,
+        required: false,
+        unique: false
+     },
     patient_info :patient_infos,
     docProfile :docProfiles
 },{ strict: false });

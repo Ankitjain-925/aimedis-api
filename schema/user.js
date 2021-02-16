@@ -95,6 +95,7 @@ opt_until:{
    required: false,
    unique: false
 }
+
 },{ strict: false });
 
 Rigt_managementList.plugin(mongooseFieldEncryption, {
@@ -253,6 +254,11 @@ var UserSchema = new Schema({
     },
     Rigt_management: [Rigt_managementList]
     ,
+    logWrongPass:{
+      type: Number,
+      required: false,
+      unique: false
+   },
     pin:{
         type: Number,
         required: false,

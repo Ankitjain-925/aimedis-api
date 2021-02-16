@@ -40,6 +40,8 @@ const Client = require('authy-client').Client;
 const authy = new Client({ key: API_KEY });
 
 var Mypat = [];
+var GetUpcomingAppoint1 = [], GetPastAppoint1=[];
+
 var GetResult1 = [], GetResult2 = [], GetResult3 = [];;
 // var transporter = nodemailer.createTransport({
 //     service: 'gmail',
@@ -221,9 +223,9 @@ router.post('/UserLogin', function (req, res, next) {
                                             type: user_data.type
                                         }
                                         var token = jwtconfig.sign(payload);
-                                        console.log('user_data.type', user_data.type)
+                                       
                                         if(user_data.type !=='superadmin'){
-                                            console.log('I am here')
+                                            User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: 0 } }, { new: true }, (err, doc1) => {});
                                             res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                         }
                                         else{
@@ -248,6 +250,7 @@ router.post('/UserLogin', function (req, res, next) {
                                             var token = jwtconfig.sign(payload);
 
                                             if(user_data.type !=='superadmin'){
+                                                User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: 0 } }, { new: true }, (err, doc1) => {});
                                                 res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                             }
                                             else{
@@ -264,7 +267,33 @@ router.post('/UserLogin', function (req, res, next) {
                                     res.json({ status: 450, message: "Your Account is not verified, please check your email account.", hassuccessed: false })
                                 }
                             } else {
-                                if(user_data.type !=='superadmin' && user_data.type !=='hospitaladmin'){
+                                if(user_data.type !=='superadmin'){
+                                    var count = (user_data.logWrongPass && user_data.logWrongPass < 5) ? user_data.logWrongPass+1 : 1;
+                                    if(count==5){
+                                        let payload1 = {
+                                            email: user_data.email,
+                                            id: user_data._id,
+                                            type: user_data.type,
+                                        }
+                                        token1 = jwtconfig.sign(payload1);
+                                        let link = 'https://aidoc.io/change-password';
+                                        var mailOptions1 = {
+                                            from: "contact@aimedis.com",
+                                            to: user_data.email,
+                                            subject: 'Reset Your Password immediately!!',
+                                            html: '<div>Please reset Your Password immediately.</br>'
+                                                + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
+                                                '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>' +
+                                                'You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
+                                                '<b>Your Aimedis team </b>'
+                                        };
+                                        var sendmail = transporter.sendMail(mailOptions1)
+                                        User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: count, isblock : true } }, { new: true }, (err, doc1) => {});
+                                    }
+                                    else{
+                                        User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: count } }, { new: true }, (err, doc1) => {});
+                                    }
+                                    
                                     res.json({ status: 450, message: "Wrong password", hassuccessed: false })
                                 }
                                 else{
@@ -328,6 +357,7 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                         }
                                         var token = jwtconfig.sign(payload);
                                         if(user_data.type ==='superadmin'){
+                                            User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: 0 } }, { new: true }, (err, doc1) => {});
                                             res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                         }
                                         else{
@@ -352,7 +382,8 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                             }
                                             var token = jwtconfig.sign(payload);
 
-                                            if(user_data.type ==='superadmin' || user_data.type ==='hospitaladmin'){
+                                            if(user_data.type ==='superadmin'){
+                                                User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: 0 } }, { new: true }, (err, doc1) => {});
                                                 res.json({ status: 200, message: "Succefully fetched", hassuccessed: true, user: user_data, token: token })
                                             }
                                             else{
@@ -369,7 +400,27 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                     res.json({ status: 450, message: "Your Account is not verified, please check your email account.", hassuccessed: false })
                                 }
                             } else {
-                                if(user_data.type ==='superadmin' || user_data.type ==='hospitaladmin'){
+                                if(user_data.type ==='superadmin'){
+                                    var count = (user_data.logWrongPass && user_data.logWrongPass < 5) ? user_data.logWrongPass+1 : 1;
+                                    if(count==5){
+                                        let payload1 = {
+                                            email: user_data.email,
+                                            id: user_data._id,
+                                            type: user_data.type,
+                                        }
+                                        token1 = jwtconfig.sign(payload1);
+                                        let link = 'https://aidoc.io/admin/change-password';
+                                        var mailOptions1 = {
+                                            from: "contact@aimedis.com",
+                                            to: "aakash.webnexus@gmail.com",
+                                            subject: 'Admin - Reset Your Password immediately!!',
+                                            html: '<div>Admin Aimedis Please reset Your Password immediately.</br>'
+                                                + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
+                                                '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>'
+                                        };
+                                        var sendmail = transporter.sendMail(mailOptions1)
+                                    }
+                                    User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: count } }, { new: true }, (err, doc1) => {});
                                     res.json({ status: 450, message: "Wrong password", hassuccessed: false })
                                 }
                                 else{
@@ -517,7 +568,7 @@ router.post('/AddUser', function (req, res, next) {
                     })
                         .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false }))
                         .then(regRes => {
-                            console.log('createdby', createdby)
+                        
                             if (regRes && regRes.success) {
                                 var authyId = { authyId: regRes.user.id };
                                 req.body.mobile = req.body.country_code.toUpperCase() + '-' + req.body.mobile;
@@ -1926,6 +1977,7 @@ router.get('/UpcomingAppintmentDoc', function (req, res, next) {
 
 //Added by Ankita for Upcoming Appointment
 router.get('/UpcomingAppintmentPat', function (req, res, next) {
+    GetUpcomingAppoint1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -1940,7 +1992,12 @@ router.get('/UpcomingAppintmentPat', function (req, res, next) {
         },
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
-                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+                else{  
+                    forEachPromise(results, GetUpcomingAppoint)
+                    .then((result) => {
+                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: GetUpcomingAppoint1 })
+                    })  
+                }
             }
         ) 
     }
@@ -1951,6 +2008,7 @@ router.get('/UpcomingAppintmentPat', function (req, res, next) {
 
 //Added by Ankita for Upcoming Appointment
 router.get('/UpcomingAppintmentPat/:Userid', function (req, res, next) {
+    GetUpcomingAppoint1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -1965,7 +2023,12 @@ router.get('/UpcomingAppintmentPat/:Userid', function (req, res, next) {
         },
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
-                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+                else { 
+                    forEachPromise(results, GetUpcomingAppoint)
+                    .then((result) => {
+                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: GetUpcomingAppoint1 })
+                    })
+                };
             }
         ) 
     }
@@ -1977,6 +2040,7 @@ router.get('/UpcomingAppintmentPat/:Userid', function (req, res, next) {
 
 //Added by Ankita for Upcoming Appointment
 router.get('/PastAppintmentPat', function (req, res, next) {
+    GetPastAppoint1 = [];
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
@@ -1989,7 +2053,11 @@ router.get('/PastAppintmentPat', function (req, res, next) {
             ]}]},
             function(err,results) {
                 if (err) { res.json({ err: err, status: 200, hassuccessed: false, msg: 'Something went wrong' })}
-                else{ res.json({ status: 200, hassuccessed: true, data:  results}) };
+                else{ 
+                    forEachPromise(results, GetPastAppoint)
+                    .then((result) => {
+                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: GetPastAppoint1 })
+                    })};
             }
         ) 
     }
@@ -2121,6 +2189,65 @@ function getMyPat(data) {
     });
 }
 
+function GetUpcomingAppoint(item) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+        var new_data = item;
+        if(new_data.appointment_type==="appointments"){
+            console.log('I am here34',item.appointment_type )
+            User.findOne({type: 'doctor', _id: item.doctor_id }).exec()
+            .then(function(doc3){
+                if(doc3){
+                    if(doc3.private_appointments && doc3.private_appointments.length>0)
+                    {
+                        var custom_text = doc3.private_appointments[0].custom_text;
+                        new_data.custom_text = custom_text;
+                   
+                    } 
+                }
+                GetUpcomingAppoint1.push(new_data); 
+                resolve(GetUpcomingAppoint1);
+            })
+        }
+        else{
+            console.log('I am here36',item.appointment_type )
+            GetUpcomingAppoint1.push(item); 
+            resolve(GetUpcomingAppoint1);
+        }
+            
+        })
+    })
+}   
+
+function GetPastAppoint(item) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+        var new_data = item;
+        if(item.appointment_type==="appointments"){
+            User.findOne({type: 'doctor', _id: item.doctor_id }).exec()
+            .then(function(doc3){
+                if(doc3){
+                    if(doc3.private_appointments && doc3.private_appointments.length>0)
+                    {
+                        var custom_text = doc3.private_appointments[0].custom_text;
+                        new_data.custom_text = custom_text;
+                   
+                    } 
+                }
+                return new_data;
+            }).then(function(new_data){
+                GetPastAppoint1.push(new_data); 
+                resolve(GetPastAppoint1);
+            })
+        }
+        else{
+            GetPastAppoint1.push(new_data); 
+            resolve(GetPastAppoint1);
+        }
+            
+        })
+    })
+}   
 
 router.delete('/Mypatients/:patient_id', function (req, res, next) {
     const token = (req.headers.token)
