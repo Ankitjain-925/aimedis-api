@@ -17,7 +17,7 @@ router.get('/DoctorUsersSc', function (req, res, next) {
     const token = (req.headers.token)
     let   legit = jwtconfig.verify(token)
     if (legit) {
-        user.find({type : 'doctor', 'we_offer.Offer_online_sick_certificates': true}, function (err, Userinfo) {
+        user.find({type : 'doctor','paid_services.description': 'prescription', 'we_offer.Offer_online_sick_certificates': true}, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
             } else {
@@ -34,7 +34,7 @@ router.get('/DoctorUsersP', function (req, res, next) {
     const token = (req.headers.token)
     let   legit = jwtconfig.verify(token)
     if (legit) {
-        user.find({type : 'doctor', 'we_offer.Offer_online_prescription': true}, function (err, Userinfo) {
+        user.find({type : 'doctor', 'paid_services.description': 'prescription' ,'we_offer.Offer_online_prescription': true}, function (err, Userinfo) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
             } else {

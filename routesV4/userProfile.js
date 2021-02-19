@@ -43,13 +43,7 @@ var Mypat = [];
 var GetUpcomingAppoint1 = [], GetPastAppoint1=[];
 
 var GetResult1 = [], GetResult2 = [], GetResult3 = [];;
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//     user:  "contact@aimedis.com",,
-//     pass: 'ankita@30webnexus'
-//     }
-// });
+
 var transporter = nodemailer.createTransport({
     host : process.env.MAIL_HOST,
     port : 25,
@@ -1440,9 +1434,9 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                             var event_date = { event_date: dt.format('Y-m-d') };
                             var created_at = { created_at: dt.format('H:M') }
                             var attachfile = { attachfile: updatedata.attachfile }
-                            var public = { public: 'always' }
+                            
                             if(req.body.send_to_timeline){
-                            var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                            var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                             User.updateOne({ _id: updatedata.patient_id },
                                 { $push: { track_record: full_record } },
                                 { safe: true, upsert: true },
@@ -1468,7 +1462,7 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                                                 const messageToSearchWith = new User({profile_id :req.body.sendPharmacy });
                                                 messageToSearchWith.encryptFieldsSync();
                                                 var patient_id2 = { patient_id: updatedata.patient_profile_id };
-                                                var full_record1 = { ...patient_id2, ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                                                var full_record1 = { ...patient_id2, ...ids, ...type, ...created_by, ...created_on, ...event_date, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                                                 User.updateOne({$or: [{ profile_id: req.body.sendPharmacy }, {profile_id: messageToSearchWith.profile_id}]},
                                                     { $push: { track_record: full_record1 } },
                                                     { safe: true, upsert: true },
@@ -1751,9 +1745,8 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                             var created_on = { created_on: dt.format('Y-m-d') };
                             var created_at = { created_at: dt.format('H:M') }
                             var attachfile = { attachfile: updatedata.attachfile }
-                            var public = { public: 'always' }
                             if(req.body.send_to_timeline){
-                                var full_record = { ...ids, ...type, ...created_by, ...event_date, ...created_on, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                                var full_record = { ...ids, ...type, ...created_by, ...event_date, ...created_on, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                                 User.updateOne({ _id: updatedata.patient_id },
                                     { $push: { track_record: full_record } },
                                     { safe: true, upsert: true },
@@ -1846,9 +1839,8 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                                 var event_date = { event_date: dt.format('Y-m-d') };
                                 var created_at = { created_at: dt.format('H:M') }
                                 var attachfile = { attachfile: updatedata.attachfile }
-                                var public = { public: 'always' }
                                 if(req.body.send_to_timeline){
-                                var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...public, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
+                                var full_record = { ...ids, ...type, ...created_by, ...created_on, ...event_date, ...created_at, ...datetime_on, ...created_by_temp, ...attachfile }
                                 User.updateOne({ _id: updatedata.patient_id },
                                     { $push: { track_record: full_record } },
                                     { safe: true, upsert: true },
@@ -3135,7 +3127,7 @@ router.get('/timeSuggest', function (req, res, next) {
     let legit = jwtconfig.verify(token)
     if (legit) {
     User.findOne({
-        _id: legit.id
+        _id: legit.id,
     }, function (error, Userinfo) {
         if (error) {
             res.json({
@@ -3144,115 +3136,150 @@ router.get('/timeSuggest', function (req, res, next) {
                 error: error
             })
         } else {
-        
-            var user = [];
-            var online_users = [];
-            var Practices = [];
-            var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
-            for (let j = 0; j < Userinfo.private_appointments.length; j++) {
-                if (Userinfo.private_appointments[j].custom_text) {
-                    custom_text = Userinfo.private_appointments[j].custom_text;
-                }
-                if (Userinfo.private_appointments[j].breakslot_start) {
-                    breakslot_start = Userinfo.private_appointments[j].breakslot_start;
-                }
-                if (Userinfo.private_appointments[j].breakslot_end) {
-                    breakslot_end = Userinfo.private_appointments[j].breakslot_end;
-                }
-                if (Userinfo.private_appointments[j].monday_start, Userinfo.private_appointments[j].monday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
-                    monday = getTimeStops(Userinfo.private_appointments[j].monday_start, Userinfo.private_appointments[j].monday_end, Userinfo.private_appointments[j].duration_of_timeslots)
-                }
-                if (Userinfo.private_appointments[j].tuesday_start, Userinfo.private_appointments[j].tuesday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
-                    tuesday = getTimeStops(Userinfo.private_appointments[j].tuesday_start, Userinfo.private_appointments[j].tuesday_end, Userinfo.private_appointments[j].duration_of_timeslots)
-                }
-                if (Userinfo.private_appointments[j].wednesday_start, Userinfo.private_appointments[j].wednesday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
-                    wednesday = getTimeStops(Userinfo.private_appointments[j].wednesday_start, Userinfo.private_appointments[j].wednesday_end, Userinfo.private_appointments[j].duration_of_timeslots)
-                }
-                if (Userinfo.private_appointments[j].thursday_start, Userinfo.private_appointments[j].thursday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
-                    thursday = getTimeStops(Userinfo.private_appointments[j].thursday_start, Userinfo.private_appointments[j].thursday_end, Userinfo.private_appointments[j].duration_of_timeslots)
-                }
-                if (Userinfo.private_appointments[j].friday_start, Userinfo.private_appointments[j].friday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
-                    friday = getTimeStops(Userinfo.private_appointments[j].friday_start, Userinfo.private_appointments[j].friday_end, Userinfo.private_appointments[j].duration_of_timeslots)
-                }
-                if (Userinfo.private_appointments[j].saturday_start, Userinfo.private_appointments[j].saturday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
-                    saturday = getTimeStops(Userinfo.private_appointments[j].saturday_start, Userinfo.private_appointments[j].saturday_end, Userinfo.private_appointments[j].duration_of_timeslots)
-                }
-                if (Userinfo.private_appointments[j].sunday_start, Userinfo.private_appointments[j].sunday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
-                    sunday = getTimeStops(Userinfo.private_appointments[j].sunday_start, Userinfo.private_appointments[j].sunday_end, Userinfo.private_appointments[j].duration_of_timeslots)
-                }
-               
-                user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start })    
-            }
-             monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="",breakslot_start="",breakslot_end="";
-            for (let k = 0; k < Userinfo.online_appointment.length; k++) {
-                if (Userinfo.online_appointment[k].breakslot_start) {
-                    breakslot_start = Userinfo.online_appointment[k].breakslot_start;
-                }
-                if (Userinfo.online_appointment[k].breakslot_end) {
-                    breakslot_end = Userinfo.online_appointment[k].breakslot_end;
-                }
-                if (Userinfo.online_appointment[k].monday_start, Userinfo.online_appointment[k].monday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
-                    monday = getTimeStops(Userinfo.online_appointment[k].monday_start, Userinfo.online_appointment[k].monday_end, Userinfo.online_appointment[k].duration_of_timeslots)
-                }
-                if (Userinfo.online_appointment[k].tuesday_start, Userinfo.online_appointment[k].tuesday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
-                    tuesday = getTimeStops(Userinfo.online_appointment[k].tuesday_start, Userinfo.online_appointment[k].tuesday_end, Userinfo.online_appointment[k].duration_of_timeslots)
-                }
-                if (Userinfo.online_appointment[k].wednesday_start, Userinfo.online_appointment[k].wednesday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
-                    wednesday = getTimeStops(Userinfo.online_appointment[k].wednesday_start, Userinfo.online_appointment[k].wednesday_end, Userinfo.online_appointment[k].duration_of_timeslots)
-                }
-                if (Userinfo.online_appointment[k].thursday_start, Userinfo.online_appointment[k].thursday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
-                    thursday = getTimeStops(Userinfo.online_appointment[k].thursday_start, Userinfo.online_appointment[k].thursday_end, Userinfo.online_appointment[k].duration_of_timeslots)
-                }
-                if (Userinfo.online_appointment[k].friday_start, Userinfo.online_appointment[k].friday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
-                    friday = getTimeStops(Userinfo.online_appointment[k].friday_start, Userinfo.online_appointment[k].friday_end, Userinfo.online_appointment[k].duration_of_timeslots)
-                }
-                if (Userinfo.online_appointment[k].saturday_start, Userinfo.online_appointment[k].saturday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
-                    saturday = getTimeStops(Userinfo.online_appointment[k].saturday_start, Userinfo.online_appointment[k].saturday_end, Userinfo.online_appointment[k].duration_of_timeslots)
-                }
-                if (Userinfo.online_appointment[k].sunday_start, Userinfo.online_appointment[k].sunday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
-                    sunday = getTimeStops(Userinfo.online_appointment[k].sunday_start, Userinfo.online_appointment[k].sunday_end, Userinfo.online_appointment[k].duration_of_timeslots)
-                }
-                online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
-            }
-             monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
-            for (let l = 0; l < Userinfo.days_for_practices.length; l++) {
-                if (Userinfo.days_for_practices[l].breakslot_start) {
-                    breakslot_start = Userinfo.days_for_practices[l].breakslot_start;
-                }
-                if (Userinfo.days_for_practices[l].breakslot_end) {
-                    breakslot_end = Userinfo.days_for_practices[l].breakslot_end;
-                }
-                if (Userinfo.days_for_practices[l].monday_start, Userinfo.days_for_practices[l].monday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
-                    monday = getTimeStops(Userinfo.days_for_practices[l].monday_start, Userinfo.days_for_practices[l].monday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
-                }
-                if (Userinfo.days_for_practices[l].tuesday_start, Userinfo.days_for_practices[l].tuesday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
-                    tuesday = getTimeStops(Userinfo.days_for_practices[l].tuesday_start, Userinfo.days_for_practices[l].tuesday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
-                }
-                if (Userinfo.days_for_practices[l].wednesday_start, Userinfo.days_for_practices[l].wednesday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
-                    wednesday = getTimeStops(Userinfo.days_for_practices[l].wednesday_start, Userinfo.days_for_practices[l].wednesday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
-                }
-                if (Userinfo.days_for_practices[l].thursday_start, Userinfo.days_for_practices[l].thursday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
-                    thursday = getTimeStops(Userinfo.days_for_practices[l].thursday_start, Userinfo.days_for_practices[l].thursday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
-                }
-                if (Userinfo.days_for_practices[l].friday_start, Userinfo.days_for_practices[l].friday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
-                    friday = getTimeStops(Userinfo.days_for_practices[l].friday_start, Userinfo.days_for_practices[l].friday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
-                }
-                if (Userinfo.days_for_practices[l].saturday_start, Userinfo.days_for_practices[l].saturday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
-                    saturday = getTimeStops(Userinfo.days_for_practices[l].saturday_start, Userinfo.days_for_practices[l].saturday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
-                }
-                if (Userinfo.days_for_practices[l].sunday_start, Userinfo.days_for_practices[l].sunday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
-                    sunday = getTimeStops(Userinfo.days_for_practices[l].sunday_start, Userinfo.days_for_practices[l].sunday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
-                }
-                Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
-            }
+            var getAvailable = Userinfo && Userinfo.paid_services && Userinfo.paid_services.length>0 && Userinfo.paid_services.filter((data)=>data.description === 'appointment')
+
             
-            var finalArray = {
-                data: Userinfo,
-                appointments: user,
-                online_appointment: online_users,
-                practice_days: Practices
+                var user = [];
+                var online_users = [];
+                var Practices = [];
+                var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", holidays_end="", holidays_start= "", breakslot_start="",breakslot_end="";
+                for (let j = 0; j < Userinfo.private_appointments.length; j++) {
+                    if (Userinfo.private_appointments[j].custom_text) {
+                        custom_text = Userinfo.private_appointments[j].custom_text;
+                    }
+                    if (Userinfo.private_appointments[j].holidays_start) {
+                        holidays_start = Userinfo.private_appointments[j].holidays_start;
+                    }
+                    if (Userinfo.private_appointments[j].holidays_end) {
+                        holidays_end = Userinfo.private_appointments[j].holidays_end;
+                    }
+                    if (Userinfo.private_appointments[j].breakslot_start) {
+                        breakslot_start = Userinfo.private_appointments[j].breakslot_start;
+                    }
+                    if (Userinfo.private_appointments[j].breakslot_end) {
+                        breakslot_end = Userinfo.private_appointments[j].breakslot_end;
+                    }
+                    if (Userinfo.private_appointments[j].monday_start, Userinfo.private_appointments[j].monday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                        monday = getTimeStops(Userinfo.private_appointments[j].monday_start, Userinfo.private_appointments[j].monday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                    }
+                    if (Userinfo.private_appointments[j].tuesday_start, Userinfo.private_appointments[j].tuesday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                        tuesday = getTimeStops(Userinfo.private_appointments[j].tuesday_start, Userinfo.private_appointments[j].tuesday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                    }
+                    if (Userinfo.private_appointments[j].wednesday_start, Userinfo.private_appointments[j].wednesday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                        wednesday = getTimeStops(Userinfo.private_appointments[j].wednesday_start, Userinfo.private_appointments[j].wednesday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                    }
+                    if (Userinfo.private_appointments[j].thursday_start, Userinfo.private_appointments[j].thursday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                        thursday = getTimeStops(Userinfo.private_appointments[j].thursday_start, Userinfo.private_appointments[j].thursday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                    }
+                    if (Userinfo.private_appointments[j].friday_start, Userinfo.private_appointments[j].friday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                        friday = getTimeStops(Userinfo.private_appointments[j].friday_start, Userinfo.private_appointments[j].friday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                    }
+                    if (Userinfo.private_appointments[j].saturday_start, Userinfo.private_appointments[j].saturday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                        saturday = getTimeStops(Userinfo.private_appointments[j].saturday_start, Userinfo.private_appointments[j].saturday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                    }
+                    if (Userinfo.private_appointments[j].sunday_start, Userinfo.private_appointments[j].sunday_end, Userinfo.private_appointments[j].duration_of_timeslots) {
+                        sunday = getTimeStops(Userinfo.private_appointments[j].sunday_start, Userinfo.private_appointments[j].sunday_end, Userinfo.private_appointments[j].duration_of_timeslots)
+                    }
+                
+                    user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start, holidays_end, holidays_start })    
+                }
+                monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="",breakslot_start="",breakslot_end="", holidays_end="", holidays_start= "";
+                for (let k = 0; k < Userinfo.online_appointment.length; k++) {
+                    if (Userinfo.online_appointment[k].holidays_end) {
+                        holidays_end = Userinfo.online_appointment[k].holidays_end;
+                    }
+                    if (Userinfo.online_appointment[k].holidays_start) {
+                        holidays_start = Userinfo.online_appointment[k].holidays_start;
+                    }
+                    if (Userinfo.online_appointment[k].breakslot_start) {
+                        breakslot_start = Userinfo.online_appointment[k].breakslot_start;
+                    }
+                    if (Userinfo.online_appointment[k].breakslot_end) {
+                        breakslot_end = Userinfo.online_appointment[k].breakslot_end;
+                    }
+                    if (Userinfo.online_appointment[k].monday_start, Userinfo.online_appointment[k].monday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                        monday = getTimeStops(Userinfo.online_appointment[k].monday_start, Userinfo.online_appointment[k].monday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                    }
+                    if (Userinfo.online_appointment[k].tuesday_start, Userinfo.online_appointment[k].tuesday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                        tuesday = getTimeStops(Userinfo.online_appointment[k].tuesday_start, Userinfo.online_appointment[k].tuesday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                    }
+                    if (Userinfo.online_appointment[k].wednesday_start, Userinfo.online_appointment[k].wednesday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                        wednesday = getTimeStops(Userinfo.online_appointment[k].wednesday_start, Userinfo.online_appointment[k].wednesday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                    }
+                    if (Userinfo.online_appointment[k].thursday_start, Userinfo.online_appointment[k].thursday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                        thursday = getTimeStops(Userinfo.online_appointment[k].thursday_start, Userinfo.online_appointment[k].thursday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                    }
+                    if (Userinfo.online_appointment[k].friday_start, Userinfo.online_appointment[k].friday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                        friday = getTimeStops(Userinfo.online_appointment[k].friday_start, Userinfo.online_appointment[k].friday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                    }
+                    if (Userinfo.online_appointment[k].saturday_start, Userinfo.online_appointment[k].saturday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                        saturday = getTimeStops(Userinfo.online_appointment[k].saturday_start, Userinfo.online_appointment[k].saturday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                    }
+                    if (Userinfo.online_appointment[k].sunday_start, Userinfo.online_appointment[k].sunday_end, Userinfo.online_appointment[k].duration_of_timeslots) {
+                        sunday = getTimeStops(Userinfo.online_appointment[k].sunday_start, Userinfo.online_appointment[k].sunday_end, Userinfo.online_appointment[k].duration_of_timeslots)
+                    }
+                    online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end, holidays_start, holidays_end })
+                }
+                monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="", holidays_start="", holidays_end="";
+                for (let l = 0; l < Userinfo.days_for_practices.length; l++) {
+                    if (Userinfo.days_for_practices[l].holidays_start) {
+                        holidays_start = Userinfo.days_for_practices[l].holidays_start;
+                    }
+                    if (Userinfo.days_for_practices[l].holidays_end) {
+                        holidays_end = Userinfo.days_for_practices[l].holidays_end;
+                    }
+                    if (Userinfo.days_for_practices[l].breakslot_start) {
+                        breakslot_start = Userinfo.days_for_practices[l].breakslot_start;
+                    }
+                    if (Userinfo.days_for_practices[l].breakslot_end) {
+                        breakslot_end = Userinfo.days_for_practices[l].breakslot_end;
+                    }
+                    if (Userinfo.days_for_practices[l].monday_start, Userinfo.days_for_practices[l].monday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                        monday = getTimeStops(Userinfo.days_for_practices[l].monday_start, Userinfo.days_for_practices[l].monday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                    }
+                    if (Userinfo.days_for_practices[l].tuesday_start, Userinfo.days_for_practices[l].tuesday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                        tuesday = getTimeStops(Userinfo.days_for_practices[l].tuesday_start, Userinfo.days_for_practices[l].tuesday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                    }
+                    if (Userinfo.days_for_practices[l].wednesday_start, Userinfo.days_for_practices[l].wednesday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                        wednesday = getTimeStops(Userinfo.days_for_practices[l].wednesday_start, Userinfo.days_for_practices[l].wednesday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                    }
+                    if (Userinfo.days_for_practices[l].thursday_start, Userinfo.days_for_practices[l].thursday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                        thursday = getTimeStops(Userinfo.days_for_practices[l].thursday_start, Userinfo.days_for_practices[l].thursday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                    }
+                    if (Userinfo.days_for_practices[l].friday_start, Userinfo.days_for_practices[l].friday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                        friday = getTimeStops(Userinfo.days_for_practices[l].friday_start, Userinfo.days_for_practices[l].friday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                    }
+                    if (Userinfo.days_for_practices[l].saturday_start, Userinfo.days_for_practices[l].saturday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                        saturday = getTimeStops(Userinfo.days_for_practices[l].saturday_start, Userinfo.days_for_practices[l].saturday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                    }
+                    if (Userinfo.days_for_practices[l].sunday_start, Userinfo.days_for_practices[l].sunday_end, Userinfo.days_for_practices[l].duration_of_timeslots) {
+                        sunday = getTimeStops(Userinfo.days_for_practices[l].sunday_start, Userinfo.days_for_practices[l].sunday_end, Userinfo.days_for_practices[l].duration_of_timeslots)
+                    }
+                    Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end, holidays_start, holidays_end })
+                }
+            if(Userinfo && getAvailable  && getAvailable.length>0)
+            {
+                var finalArray = {
+                    data: Userinfo,
+                    appointments: user,
+                    online_appointment: online_users,
+                    practice_days: Practices
+                }
+                res.json({ status: 200, hassuccessed: true, data: finalArray });
             }
-            res.json({ status: 200, hassuccessed: true, data: finalArray });
+            else{
+                custom_text = ""
+                if (Userinfo.private_appointments && Userinfo.private_appointments.length>0 && Userinfo.private_appointments[0].custom_text) {
+                    custom_text = Userinfo.private_appointments[0].custom_text;
+                }
+                var finalArray = {
+                    data: Userinfo,
+                    appointments: [{custom_text: custom_text}],
+                    online_appointment: [],
+                    practice_days: []
+                }
+                res.json({ status: 200, hassuccessed: true, data: finalArray });
+            }
         }
     })
 }
@@ -3273,7 +3300,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         coordinates: [Number(req.query.longitude), Number(req.query.Latitude)]
                     }
                 }
-            }, type: 'doctor'
+            }, type: 'doctor', 'paid_services.description': "appointment"
         }).find((error, Userinfo) => {
             if (error) {
                 res.json({ status: 200, hassuccessed: false, error: error })
@@ -3283,10 +3310,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
-                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
+                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="", holidays_end="", holidays_start="";
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
+                        }
+                        if (Userinfo[i].private_appointments[j].holidays_start) {
+                            holidays_start = Userinfo[i].private_appointments[j].holidays_start;
+                        }
+                        if (Userinfo[i].private_appointments[j].holidays_end) {
+                            holidays_end = Userinfo[i].private_appointments[j].holidays_end;
                         }
                         if (Userinfo[i].private_appointments[j].breakslot_start) {
                             breakslot_start = Userinfo[i].private_appointments[j].breakslot_start;
@@ -3316,10 +3349,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
                        
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start })    
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start , holidays_start, holidays_end })    
                     }
-                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="",breakslot_start="",breakslot_end="";
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="",breakslot_start="",breakslot_end="", holidays_start="", holidays_end="";
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
+                        if (Userinfo[i].online_appointment[k].holidays_start) {
+                            holidays_start = Userinfo[i].online_appointment[k].holidays_start;
+                        }
+                        if (Userinfo[i].online_appointment[k].holidays_end) {
+                            holidays_end = Userinfo[i].online_appointment[k].holidays_end;
+                        }
                         if (Userinfo[i].online_appointment[k].breakslot_start) {
                             breakslot_start = Userinfo[i].online_appointment[k].breakslot_start;
                         }
@@ -3347,10 +3386,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
-                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
+                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end, holidays_start, holidays_end })
                     }
-                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="", holidays_start="", holidays_end="";
                     for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+                        if (Userinfo[i].days_for_practices[l].holidays_start) {
+                            holidays_start = Userinfo[i].days_for_practices[l].holidays_start;
+                        }
+                        if (Userinfo[i].days_for_practices[l].holidays_end) {
+                            holidays_end = Userinfo[i].days_for_practices[l].holidays_end;
+                        }
                         if (Userinfo[i].days_for_practices[l].breakslot_start) {
                             breakslot_start = Userinfo[i].days_for_practices[l].breakslot_start;
                         }
@@ -3378,7 +3423,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
-                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end })
+                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end, holidays_end, holidays_start })
                     }
                     
                     finalArray.push({
@@ -3413,10 +3458,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                     var user = [];
                     var online_users = [];
                     var Practices = [];
-                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="";
+                    var monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], custom_text="", breakslot_start="",breakslot_end="", holidays_end="", holidays_start="";
                     for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
                         if (Userinfo[i].private_appointments[j].custom_text) {
                             custom_text = Userinfo[i].private_appointments[j].custom_text;
+                        }
+                        if (Userinfo[i].private_appointments[j].holidays_start) {
+                            holidays_start = Userinfo[i].private_appointments[j].holidays_start;
+                        }
+                        if (Userinfo[i].private_appointments[j].holidays_end) {
+                            holidays_end = Userinfo[i].private_appointments[j].holidays_end;
                         }
                         if (Userinfo[i].private_appointments[j].breakslot_start) {
                             breakslot_start = Userinfo[i].private_appointments[j].breakslot_start;
@@ -3445,10 +3496,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
                         }
-                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text , breakslot_end, breakslot_start})
+                        user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text , breakslot_end, breakslot_start, holidays_end, holidays_start})
                     }
-                    monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[],breakslot_start="",breakslot_end="";
+                    monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[],breakslot_start="",breakslot_end="", holidays_end="", holidays_start="";
                     for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
+                        if (Userinfo[i].private_appointments[k].holidays_start) {
+                            holidays_start = Userinfo[i].online_appointment[k].holidays_start;
+                        }
+                        if (Userinfo[i].private_appointments[k].holidays_end) {
+                            holidays_end = Userinfo[i].online_appointment[k].holidays_end;
+                        }
                         if (Userinfo[i].online_appointment[k].breakslot_start) {
                             breakslot_start = Userinfo[i].online_appointment[k].breakslot_start;
                         }
@@ -3476,10 +3533,16 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
                         }
-                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start })
+                        online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start, holidays_end, holidays_start })
                     }
-                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], breakslot_start="",breakslot_end="";
+                     monday=[], tuesday=[], wednesday=[], thursday=[], friday=[], saturday=[], sunday=[], breakslot_start="",breakslot_end="", holidays_end="", holidays_start="";
                     for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+                        if (Userinfo[i].private_appointments[l].holidays_start) {
+                            holidays_start = Userinfo[i].online_appointment[l].holidays_start;
+                        }
+                        if (Userinfo[i].private_appointments[l].holidays_end) {
+                            holidays_end = Userinfo[i].online_appointment[l].holidays_end;
+                        }
                         if (Userinfo[i].days_for_practices[l].breakslot_start) {
                             breakslot_start = Userinfo[i].days_for_practices[l].breakslot_start;
                         }
@@ -3507,7 +3570,7 @@ router.get('/getLocation/:radius', function (req, res, next) {
                         if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
                             sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
                         }
-                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start })
+                        Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start, holidays_end, holidays_start })
                     }
                     finalArray.push({
                         data: Userinfo[i],

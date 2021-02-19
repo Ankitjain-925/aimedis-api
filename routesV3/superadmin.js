@@ -27,14 +27,6 @@ var phoneReg = require('../lib/phone_verification')(API_KEY);
 const Client = require('authy-client').Client;
 const authy = new Client({key: API_KEY});
 
-// var transporter = nodemailer.createTransport
-//     ({
-//         service: 'gmail',
-//         auth: {
-//             user:  "contact@aimedis.com",
-//             pass: 'ankita@30webnexus'
-//         }
-//     });
 
 var transporter = nodemailer.createTransport({
     host : process.env.MAIL_HOST,

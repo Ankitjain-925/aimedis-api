@@ -1029,8 +1029,11 @@ function getAlltrack1(data, right_management) {
                             if(right_management.opt_set && right_management.opt_set==='until')
                             {
                                 var d1 = new Date();
-                                var d2 = new Date(right_management.opt_until);
-                                if (d1.getTime() >= d2.getTime()) {
+                                let end_date = new Date(right_management.opt_until);
+                                end_date = end_date.setDate(end_date.getDate() + 1);
+                                var d2 = new Date(end_date).setHours(0, 0, 0, 0);
+                                if (d1 >= d2) {
+                                    console.log('rrr45r')
                                     trackrecord1.push(new_data);    
                                 }
                             } 
@@ -1040,8 +1043,10 @@ function getAlltrack1(data, right_management) {
                             if(right_management.opt_set && right_management.opt_set==='until')
                             {
                                 var d1 = new Date();
-                                var d2 = new Date(right_management.opt_until);
-                                if (d1.getTime() <= d2.getTime()) {
+                                let end_date = new Date(right_management.opt_until);
+                                end_date = end_date.setDate(end_date.getDate() + 1);
+                                var d2 = new Date(end_date).setHours(0, 0, 0, 0);
+                                if (d1 <= d2) {
                                     trackrecord1.push(new_data);    
                                 }
                             } 
@@ -1054,19 +1059,59 @@ function getAlltrack1(data, right_management) {
                         {}
                     }
                  }
+                else if (!new_data.visible && new_data.public == 'always') {
+                    if(!data.archive)
+                    { 
+                        if(right_management && right_management.opt && right_management.opt==='in')
+                        {
+                            if(right_management.opt_set && right_management.opt_set==='until')
+                            {
+                                var d1 = new Date();
+                                let end_date = new Date(right_management.opt_until);
+                                end_date = end_date.setDate(end_date.getDate() + 1);
+                                var d2 = new Date(end_date).setHours(0, 0, 0, 0);
+                                console.log('rrrr')
+                                if (d1 >= d2) {
+                                    console.log('rrr333r')
+                                    trackrecord1.push(new_data);    
+                                }
+                            } 
+                        }
+                        else if(right_management && right_management.opt && right_management.opt==='out')
+                        {
+                            if(right_management.opt_set && right_management.opt_set==='until')
+                            {
+                                var d1 = new Date();
+                                let end_date = new Date(right_management.opt_until);
+                                end_date = end_date.setDate(end_date.getDate() + 1);
+                                var d2 = new Date(end_date).setHours(0, 0, 0, 0);
+                                if (d1 <= d2) {
+                                    trackrecord1.push(new_data);    
+                                }
+                            } 
+                            else
+                            {
+                                trackrecord1.push(new_data); 
+                            }
+                        }
+                        else
+                        {}
+                    }
+               }
                 else if (new_data.visible== 'show' && new_data.public == 'always') {
                      trackrecord1.push(new_data);
                 }
                 else {
                     var d1 = new Date();
-                    var d2 = new Date(new_data.public);
-
+                    let end_date = new Date(new_data.public);
+                    end_date = end_date.setDate(new Date(end_date).getDate() + 1);
+                    var d2 = new Date(end_date).setHours(0, 0, 0, 0);
                     // if (d1.getTime() <= d2.getTime()) {
                     //     trackrecord1.push(new_data);
                     // }
                     if(new_data.visible == 'show')
                     {
-                        if (d1.getTime() <= d2.getTime()) {
+                        if (d1 <= d2) {
                             if(!data.archive)
                             {
                                 trackrecord1.push(new_data);
@@ -1075,7 +1120,7 @@ function getAlltrack1(data, right_management) {
                     }
                     else
                     {
-                        if (d1.getTime() >= d2.getTime()) {
+                        if (d1 >= d2) {
                             if(!data.archive)
                             {
                                 trackrecord1.push(new_data);

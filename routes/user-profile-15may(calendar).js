@@ -30,13 +30,6 @@ const Client = require('authy-client').Client;
 const authy = new Client({ key: API_KEY });
 
 
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//     user:  "contact@aimedis.com",,
-//     pass: 'ankita@30webnexus'
-//     }
-// });
 var transporter = nodemailer.createTransport({
     host: "vwp3097.webpack.hosteurope.de",
     port: 25,

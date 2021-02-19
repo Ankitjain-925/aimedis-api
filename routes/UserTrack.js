@@ -15,13 +15,6 @@ const handlebars = require('handlebars');
 var nodemailer = require('nodemailer');
 
 
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//     user: 'ankita.webnexus@gmail.com',
-//     pass: 'ankita@30webnexus'
-//     }
-// });
 var transporter = nodemailer.createTransport({
     host : "vwp3097.webpack.hosteurope.de",
     port : 25,

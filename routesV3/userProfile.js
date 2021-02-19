@@ -40,13 +40,7 @@ const authy = new Client({ key: API_KEY });
 
 var Mypat = [];
 var GetResult1 = [], GetResult2 = [], GetResult3 = [];;
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//     user:  "contact@aimedis.com",,
-//     pass: 'ankita@30webnexus'
-//     }
-// });
+
 var transporter = nodemailer.createTransport({
     host : process.env.MAIL_HOST,
     port : 25,
