@@ -5,6 +5,7 @@ var user = require('../schema/user');
 var prescription= require('../schema/prescription');
 var jwtconfig = require('../jwttoken');
 const uuidv1 = require('uuid/v1');
+const {encrypt, decrypt} = require("./Cryptofile.js")
 var sick_certificate = require('../schema/sick_certificate');
 var appointment = require('../schema/appointments')
 
@@ -51,6 +52,9 @@ router.get('/patient', function (req, res, next) {
                     promise.then((upcoming_appointment) => {
               
                         doc[0].track_record.sort(mySorter);
+                        doc[0].track_record.forEach(function(part, index) {
+                            part['created_by'] = part._enc_created_by===true ? decrypt(part.created_by) : part.created_by;;
+                          })
                         if (doc[0].track_record.length > 0) {
                            
                             var myFilterData1 = doc[0].track_record.filter((value, key) =>
@@ -177,6 +181,9 @@ router.get('/patient/:patient_id', function (req, res, next) {
                     promise.then((upcoming_appointment) => {
               
                         doc[0].track_record.sort(mySorter);
+                        doc[0].track_record.forEach(function(part, index) {
+                            part['created_by'] = part._enc_created_by===true ? decrypt(part.created_by) : part.created_by;;
+                          })
                         if (doc[0].track_record.length > 0) {
                            
                             var myFilterData1 = doc[0].track_record.filter((value, key) =>

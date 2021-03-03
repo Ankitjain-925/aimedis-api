@@ -3025,7 +3025,7 @@ router.post('/abletocancel/:doctor_id', function (req, res, next) {
                console.log('appot[0].appointment_hours', appot[0].appointment_hours)
                if(appot && appot.length>0 && appot[0].appointment_hours)
                {
-                   if(req.body.timedifference > appot[0].appointment_hours)
+                   if(req.body.timedifference >= appot[0].appointment_hours)
                    {
                         res.json({ status: 200, hassuccessed: true, msg: "this is able to remove" });
                    }
