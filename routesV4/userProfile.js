@@ -1529,16 +1529,34 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                                             res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                                         }
                                         else {
-                                            var dhtml = 'Your Prescription Request Accepted.<br/>' +
-                                                'And prescription added in to your timeline.<br/>' +
-                                                '<b>Your Aimedis team </b>'
-                                            var mailOptions = {
-                                                from: "contact@aimedis.com",
-                                                to: updatedata.patient_email,
-                                                subject: 'Prescription Accepted',
-                                                html: dhtml
-                                            };
-                                            var sendmail = transporter.sendMail(mailOptions)
+                                            var lan1 = getMsgLang(userdata.patient_id)
+                                                lan1.then((result)=>{
+                                                    var sendData='Your Prescription Request Accepted.<br/>' +
+                                                        'And prescription added in to your timeline.<br/>' +
+                                                        '<b>Your Aimedis team </b>';
+                                    
+                                                    result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+                                    
+                                                    trans(sendData, { source: "en", target: result }).then((res) => {
+                                                        var mailOptions = {
+                                                        from: "contact@aimedis.com",
+                                                        to: updatedata.patient_email,
+                                                        subject: 'Prescription Accepted',
+                                                       html: res.replace(/ @ /g, '@')
+                                                        };
+                                                        var sendmail = transporter.sendMail(mailOptions)
+                                                      });
+                                                })
+                                            // var dhtml = 'Your Prescription Request Accepted.<br/>' +
+                                            //     'And prescription added in to your timeline.<br/>' +
+                                            //     '<b>Your Aimedis team </b>'
+                                            // var mailOptions = {
+                                            //     from: "contact@aimedis.com",
+                                            //     to: updatedata.patient_email,
+                                            //     subject: 'Prescription Accepted',
+                                            //     html: dhtml
+                                            // };
+                                            // var sendmail = transporter.sendMail(mailOptions)
                                             if(req.body.sendPharmacy){
                                                 const messageToSearchWith = new User({profile_id :req.body.sendPharmacy });
                                                 messageToSearchWith.encryptFieldsSync();
@@ -1552,11 +1570,9 @@ router.put('/GetPrescription/:Prescription_id', function (req, res, next) {
                                                             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
                                                         } else {
                                                             if (doc.nModified == '0') {
-                                                                console.log('I am heereee056')
                                                                 res.json({ status: 200, hassuccessed: false, msg: 'Pharmacy is not found' })
                                                             }
                                                             else {
-                                                                console.log('I am heereee to send on Pharmcay too.')
                                                                 res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                                                             }
                                                         }
@@ -1831,23 +1847,23 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                 if (req.body.status === "accept" && userdata.attachfile.length == 0) {
                     req.body.status = "pending";
                 }
-                if (req.body.status === "decline") {
-                    var data = {
-                        message_header: 'Decline Sick certificate request',
-                        message_text: 'Dear Patient, your request is declined for sick certificate by - ' + legit.name + '. Thanks Aimedis Team',
-                        sent_date: new Date(),
-                        sender_id: legit.id,
-                        reciever_id: [userdata.patient_id]
-                    }
-                    var messages = new message(data);
-                    messages.save(function (err, messages_data) {
-                        if (err && !messages_data) {
-                            console.log(err);
-                        } else {
-                            console.log(messages_data);
-                        }
-                    })
-                }
+                // if (req.body.status === "decline") {
+                //     var data = {
+                //         message_header: 'Decline Sick certificate request',
+                //         message_text: 'Dear Patient, your request is declined for sick certificate by - ' + legit.name + '. Thanks Aimedis Team',
+                //         sent_date: new Date(),
+                //         sender_id: legit.id,
+                //         reciever_id: [userdata.patient_id]
+                //     }
+                //     var messages = new message(data);
+                //     messages.save(function (err, messages_data) {
+                //         if (err && !messages_data) {
+                //             console.log(err);
+                //         } else {
+                //             console.log(messages_data);
+                //         }
+                //     })
+                // }
                 Sick_certificate.findOneAndUpdate({ _id: userdata._id }, { $set: { status: req.body.status, accept_datetime: dt.format('Y-m-d H:M:S') } }, { new: true }, function (err, updatedata) {
                     if (err && !updatedata) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
@@ -1876,16 +1892,34 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                                                 res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                                             }
                                             else {
-                                                var dhtml = 'Your Sick certificate Request Accepted.<br/>' +
+                                                var lan1 = getMsgLang(userdata.patient_id)
+                                                lan1.then((result)=>{
+                                                    var sendData='Your Sick certificate Request Accepted.<br/>' +
                                                     'And sick certificate added in to your timeline.<br/>' +
-                                                    '<b>Your Aimedis team </b>'
-                                                var mailOptions = {
-                                                    from: "contact@aimedis.com",
-                                                    to: updatedata.patient_email,
-                                                    subject: 'Sick certificate Accepted',
-                                                    html: dhtml
-                                                };
-                                                var sendmail = transporter.sendMail(mailOptions)
+                                                    '<b>Your Aimedis team </b>';
+                                    
+                                                    result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+                                    
+                                                    trans(sendData, { source: "en", target: result }).then((res) => {
+                                                        var mailOptions = {
+                                                        from: "contact@aimedis.com",
+                                                        to: updatedata.patient_email,
+                                                        subject: 'Sick certificate Accepted',
+                                                       html: res.replace(/ @ /g, '@')
+                                                        };
+                                                        var sendmail = transporter.sendMail(mailOptions)
+                                                      });
+                                                })
+                                                // var dhtml = 'Your Sick certificate Request Accepted.<br/>' +
+                                                //     'And sick certificate added in to your timeline.<br/>' +
+                                                //     '<b>Your Aimedis team </b>'
+                                                // var mailOptions = {
+                                                //     from: "contact@aimedis.com",
+                                                //     to: updatedata.patient_email,
+                                                //     subject: 'Sick certificate Accepted',
+                                                //     html: dhtml
+                                                // };
+                                                // var sendmail = transporter.sendMail(mailOptions)
                                                 res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                                             }
                                         }
@@ -1919,24 +1953,26 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                 if (err) {
                     res.json({ status: 200, hassuccessed: false, message: " not found", error: err })
                 } else {
+                    var lan1 = getMsgLang(userdata.patient_id)
                     var dt = dateTime.create();
                     if(userdata && typeof userdata =='object') userdata= userdata.toObject()
                     if (req.body.status === "decline") {
-                        var data = {
-                            message_header: 'Decline Second Opinion request',
-                            message_text: 'Dear Patient, your request is declined for Prescription by - ' + legit.name + '. Thanks Aimedis Team',
-                            sent_date: new Date(),
-                            sender_id: legit.id,
-                            reciever_id: [userdata.patient_id]
-                        }
-                        var messages = new message(data);
-                        messages.save(function (err, messages_data) {
-                            if (err && !messages_data) {
-                                console.log(err);
-                            } else {
-                                console.log(messages_data);
-                            }
-                        })
+                        
+                        // var data = {
+                        //     message_header: 'Decline Second Opinion request',
+                        //     message_text: 'Dear Patient, your request is declined for Prescription by - ' + legit.name + '. Thanks Aimedis Team',
+                        //     sent_date: new Date(),
+                        //     sender_id: legit.id,
+                        //     reciever_id: [userdata.patient_id]
+                        // }
+                        // var messages = new message(data);
+                        // messages.save(function (err, messages_data) {
+                        //     if (err && !messages_data) {
+                        //         console.log(err);
+                        //     } else {
+                        //         console.log(messages_data);
+                        //     }
+                        // })
                     }
                     if (req.body.status === "accept" && userdata.attachfile.length == 0) {
                         req.body.status = "pending";
@@ -1970,16 +2006,33 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                                                 res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                                             }
                                             else {
-                                                var dhtml = 'Your Second opinion Request Accepted.<br/>' +
+                                                lan1.then((result)=>{
+                                                    var sendData='Your Second opinion Request Accepted.<br/>' +
                                                     'And  Second opinion added in to your timeline.<br/>' +
-                                                    '<b>Your Aimedis team </b>'
-                                                var mailOptions = {
-                                                    from: "contact@aimedis.com",
-                                                    to: updatedata.patient_email,
-                                                    subject: ' Second opinion Accepted',
-                                                    html: dhtml
-                                                };
-                                                var sendmail = transporter.sendMail(mailOptions)
+                                                    '<b>Your Aimedis team </b>';
+                                    
+                                                    result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+                                    
+                                                    trans(sendData, { source: "en", target: result }).then((res) => {
+                                                        var mailOptions = {
+                                                        from: "contact@aimedis.com",
+                                                        to: updatedata.patient_email,
+                                                        subject: ' Second opinion Accepted',
+                                                       html: res.replace(/ @ /g, '@')
+                                                        };
+                                                        var sendmail = transporter.sendMail(mailOptions)
+                                                      });
+                                                })
+                                                // var dhtml = 'Your Second opinion Request Accepted.<br/>' +
+                                                //     'And  Second opinion added in to your timeline.<br/>' +
+                                                //     '<b>Your Aimedis team </b>'
+                                                // var mailOptions = {
+                                                //     from: "contact@aimedis.com",
+                                                //     to: updatedata.patient_email,
+                                                //     subject: ' Second opinion Accepted',
+                                                //     html: dhtml
+                                                // };
+                                                // var sendmail = transporter.sendMail(mailOptions)
                                            
                                                 res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                                             }
@@ -3135,25 +3188,42 @@ router.put('/GetAppointment/:GetAppointment_id', function (req, res, next) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
                     } else {
                         if (req.body.status === 'accept') {
-                           
-                            if (req.body.lan === 'de') {
-                                var dhtml = 'Ihre Terminanfrage wurde von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-                                    '<b>Ihr Aimedis Team </b>'
+                            var lan1 = getMsgLang(userdata.patient)
+                            lan1.then((result)=>{
+                                var sendData= 'Your Appointment Request Accepted by ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                                '<b>Your Aimedis team </b>';
+                
+                                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+                
+                                trans(sendData, { source: "en", target: result }).then((res) => {
+                                    var mailOptions = {
+                                    from: "contact@aimedis.com",
+                                    to: req.body.email,
+                                    subject: 'Appointment Accepted',
+                                   html: res.replace(/ @ /g, '@')
+                                    };
+                                    var sendmail = transporter.sendMail(mailOptions)
+                                  });
+                            })
+                        
+                            // if (req.body.lan === 'de') {
+                            //     var dhtml = 'Ihre Terminanfrage wurde von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                            //         '<b>Ihr Aimedis Team </b>'
 
-                            }
-                            else {
-                                var dhtml = 'Your Appointment Request Accepted by ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-                                    '<b>Your Aimedis team </b>'
+                            // }
+                            // else {
+                            //     var dhtml = 'Your Appointment Request Accepted by ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                            //         '<b>Your Aimedis team </b>'
 
-                            }
+                            // }
 
-                            var mailOptions = {
-                                from: "contact@aimedis.com",
-                                to: req.body.email,
-                                subject: 'Appointment Accepted',
-                                html: dhtml
-                            };
-                            var sendmail = transporter.sendMail(mailOptions)
+                            // var mailOptions = {
+                            //     from: "contact@aimedis.com",
+                            //     to: req.body.email,
+                            //     subject: 'Appointment Accepted',
+                            //     html: dhtml
+                            // };
+                            // var sendmail = transporter.sendMail(mailOptions)
                         }
                         res.json({ status: 200, hassuccessed: true, msg: 'track is updated', data: updatedata })
                     }
@@ -4042,6 +4112,7 @@ router.put('/setpassword', function (req, res, next) {
 })
 
 //Added by Ankita
+//Changes for multiple languages - 
 router.post('/GetUserInfo/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -4053,7 +4124,6 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
         messageToSearchWith.encryptFieldsSync();
         messageToSearchWith1.encryptFieldsSync();
         User.findOne( {$or:[ {alies_id : messageToSearchWith1.alies_id},{ profile_id :  messageToSearchWith.profile_id}, {alies_id : req.params.UserId}, { profile_id : req.params.UserId }]})
-
             .exec(function (err, doc) {
                 if (err && !dofc) {
                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
@@ -4065,92 +4135,66 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
                     else {
                         var m = new Date();
                         var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
+                        
+                    var lan1 = getMsgLang(doc._id)
                        
-                        if (req.body.lan === 'de') {
+                        lan1.then((result)=>{
+                            result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+                            var sms1 ='There was an emergency an access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString;
+                            trans(sms1, { source: "en", target: result }).then((res1) => {
+                                sendSms(doc.mobile, res1 ).then(result => {
+                            
+                                }).catch(e => {
+                                    console.log('Message is not sent', e)
+                                })
+                              });
+                            
+                            if(doc.emergency_number && doc.emergency_number !== ''){
+                                var sms2 ='There was an emergency access to the data in'+ doc.first_name+' '+doc.last_name +' Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString;
+                                trans(sms2, { source: "en", target: result }).then((res1) => {
+                                    sendSms(doc.emergency_number, res1 ).then(result => {
+                                
+                                    }).catch(e => {
+                                        console.log('Message is not sent', e)
+                                    })
+                                  });
+                            }
 
-
-                            var dhtml =
-                                'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profil.<br/>' +
-                                'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
-                                'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
-                                'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
-                                'Herzliche Grüße und alles Gute<br/>' +
-                                '<b>Ihr Aimedis Team </b>'
-
-                        }
-                        else {
                             var dhtml = 'There was an emergency access to the data in your Aimedis profile.<br/>' +
                                 'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
                                 'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
                             'Best regards<br/>' +
-                                '<b>Your Aimedis team </b>'
-                        }
-                        if (req.body.lan === 'de') {
-                            var dhtml2 = 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profils von </b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' ).</b><br/>' +
-                                'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
-                                'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
-                                'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
-                                'Herzliche Grüße und alles Gute<br/>' +
-                                '<b>Ihr Aimedis Team </b>'
-                        }
-                        else {
-                            var dhtml2 = 'There was an emergency access to the data in your Aimedis profile of <b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' )</b><br/>' +
+                                '<b>Your Aimedis team </b>';
+
+                            trans(dhtml, { source: "en", target: result }).then((res1) => {
+                                var mailOptions = {
+                                from: "contact@aimedis.com",
+                                to: doc.email,
+                                subject: 'Emergency Access',
+                               html: res1.replace(/ @ /g, '@')
+                                };
+                                var sendmail = transporter.sendMail(mailOptions)
+                              });
+                            if (doc.emergency_email && doc.emergency_email !== '') {
+                                var dhtml2 = 'There was an emergency access to the data in your Aimedis profile of <b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' )</b><br/>' +
                                 'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
                                 'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
-                            'Best regards<br/>' +
-                                '<b>Your Aimedis team </b>'
-                        }
-                        var mailOptions = {
-                            from: "contact@aimedis.com",
-                            to: doc.email,
-                            subject: 'Emergency Access',
-                            html: dhtml
-                        };
-                        sendSms(doc.mobile, 'There was an emergency an access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
-                           
-                        }).catch(e => {
-                            console.log('Message is not sent', e)
-                        })
-                        if(doc.emergency_number && doc.emergency_number !== ''){
-                            sendSms(doc.emergency_number, 'There was an emergency access to the data in'+ doc.first_name+' '+doc.last_name +' Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
-                             
-                            }).catch(e => {
-                                console.log('Message is not sent', e)
-                            })
-                        }
-                        if (req.body.comefrom === 'pharmacy') {
-                            
-                            if (req.body.pin && req.body.pin == doc.pin && req.body.pin !== "") {
-                               
-                                var sendmail = transporter.sendMail(mailOptions)
-                                if (doc.emergency_email && doc.emergency_email !== '') {
+                                'Best regards<br/>' +
+                                '<b>Your Aimedis team </b>';
+                
+                                trans(dhtml2, { source: "en", target: result }).then((res) => {
                                     var mailOptions2 = {
                                         from: "contact@aimedis.com",
                                         to: doc.emergency_email,
                                         subject: 'Emergency Access',
-                                        html: dhtml2
+                                    html: res.replace(/ @ /g, '@')
                                     };
-                                    var sendmail2 = transporter.sendMail(mailOptions2)
-                                }
-                                res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
+                                    var sendmail = transporter.sendMail(mailOptions2)
+                                    });
                             }
-                            else {
-                                res.json({ status: 200, hassuccessed: false, msg: 'Pin is not correct' })
-                            }
-                        }
-                        else {
-                            var sendmail = transporter.sendMail(mailOptions)
-                            if (doc.emergency_email && doc.emergency_email !== '') {
-                                var mailOptions2 = {
-                                    from: "contact@aimedis.com",
-                                    to: doc.emergency_email,
-                                    subject: 'Emergency Access',
-                                    html: dhtml2
-                                };
-                                var sendmail2 = transporter.sendMail(mailOptions2)
-                            }
-                            res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
-                        }
+                        })
+                      
+                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
                     }
                 }
             });
@@ -4159,6 +4203,123 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+
+// router.post('/GetUserInfo/:UserId', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         const profile_id = req.params.UserId;
+//         const alies_id = req.params.UserId;
+//         const messageToSearchWith = new User({profile_id});
+//         const messageToSearchWith1 = new User({alies_id});
+//         messageToSearchWith.encryptFieldsSync();
+//         messageToSearchWith1.encryptFieldsSync();
+//         User.findOne( {$or:[ {alies_id : messageToSearchWith1.alies_id},{ profile_id :  messageToSearchWith.profile_id}, {alies_id : req.params.UserId}, { profile_id : req.params.UserId }]})
+//             .exec(function (err, doc) {
+//                 if (err && !dofc) {
+//                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+//                 } else {
+//                     if (doc == null || doc == 'undefined') {
+//                         res.json({ status: 200, hassuccessed: false, msg: 'User is not exist' })
+
+//                     }
+//                     else {
+//                         var m = new Date();
+//                         var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
+                       
+//                         if (req.body.lan === 'de') {
+
+
+//                             var dhtml =
+//                                 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profil.<br/>' +
+//                                 'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
+//                                 'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
+//                                 'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
+//                                 'Herzliche Grüße und alles Gute<br/>' +
+//                                 '<b>Ihr Aimedis Team </b>'
+
+//                         }
+//                         else {
+//                             var dhtml = 'There was an emergency access to the data in your Aimedis profile.<br/>' +
+//                                 'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
+//                                 'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
+//                             'Best regards<br/>' +
+//                                 '<b>Your Aimedis team </b>'
+//                         }
+//                         if (req.body.lan === 'de') {
+//                             var dhtml2 = 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profils von </b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' ).</b><br/>' +
+//                                 'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
+//                                 'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
+//                                 'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
+//                                 'Herzliche Grüße und alles Gute<br/>' +
+//                                 '<b>Ihr Aimedis Team </b>'
+//                         }
+//                         else {
+//                             var dhtml2 = 'There was an emergency access to the data in your Aimedis profile of <b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' )</b><br/>' +
+//                                 'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
+//                                 'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
+//                             'Best regards<br/>' +
+//                                 '<b>Your Aimedis team </b>'
+//                         }
+//                         var mailOptions = {
+//                             from: "contact@aimedis.com",
+//                             to: doc.email,
+//                             subject: 'Emergency Access',
+//                             html: dhtml
+//                         };
+//                         sendSms(doc.mobile, 'There was an emergency an access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
+                           
+//                         }).catch(e => {
+//                             console.log('Message is not sent', e)
+//                         })
+//                         if(doc.emergency_number && doc.emergency_number !== ''){
+//                             sendSms(doc.emergency_number, 'There was an emergency access to the data in'+ doc.first_name+' '+doc.last_name +' Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
+                             
+//                             }).catch(e => {
+//                                 console.log('Message is not sent', e)
+//                             })
+//                         }
+//                         if (req.body.comefrom === 'pharmacy') {
+                            
+//                             if (req.body.pin && req.body.pin == doc.pin && req.body.pin !== "") {
+                               
+//                                 var sendmail = transporter.sendMail(mailOptions)
+//                                 if (doc.emergency_email && doc.emergency_email !== '') {
+//                                     var mailOptions2 = {
+//                                         from: "contact@aimedis.com",
+//                                         to: doc.emergency_email,
+//                                         subject: 'Emergency Access',
+//                                         html: dhtml2
+//                                     };
+//                                     var sendmail2 = transporter.sendMail(mailOptions2)
+//                                 }
+//                                 res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
+//                             }
+//                             else {
+//                                 res.json({ status: 200, hassuccessed: false, msg: 'Pin is not correct' })
+//                             }
+//                         }
+//                         else {
+//                             var sendmail = transporter.sendMail(mailOptions)
+//                             if (doc.emergency_email && doc.emergency_email !== '') {
+//                                 var mailOptions2 = {
+//                                     from: "contact@aimedis.com",
+//                                     to: doc.emergency_email,
+//                                     subject: 'Emergency Access',
+//                                     html: dhtml2
+//                                 };
+//                                 var sendmail2 = transporter.sendMail(mailOptions2)
+//                             }
+//                             res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
+//                         }
+//                     }
+//                 }
+//             });
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// });
 
 router.post('/forgotPassword', function (req, res, next) {
     var token;
@@ -4176,64 +4337,91 @@ router.post('/forgotPassword', function (req, res, next) {
                         type: user_data1.type,
                     }
                     token = jwtconfig.sign(payload);
+                    setTimeout(() => resolve(user_data1, token), 500);
+                    promise.then((user_data1) => {
+                        console.log('userdata1', user_data1)
+                        if (token !== '') {
+                            console.log('userdata2',token)
+                            var link = 'https://sys.aimedis.io/change-password';
+                            if (req.body.passFrom === 'landing') {
+                                link = '/change-password';
+                                // link = 'https://aidoc.io/change-password'
+                                link = 'https://sys.aimedis.io/change-password';
+                            }
+                            // link = 'http://localhost:3000/change-password';
+                            var lan1 = getMsgLang(user_data1._id)
+                            lan1.then((result)=>{
+                                var sendData='You forgot your password and requested a new one.<br/>' +
+                                'Please click this link to choose a new password:<br/>' +
+                                '<a href="'+ link + '?token=' + token+'" >LINK TO RESET PASSWORD </a><br/>' +
+                                'If you have lost your access to 2-factor authentication, please contact us via contact@aimedis.com. Alternatively, please contact us via WhatsApp.<br/><br/><br/>' +
+                                '<b>Best regards</b><br/>'
+                            '<b>Your Aimedis team </b>';
+                
+                                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+                
+                                trans(sendData, { source: "en", target: result }).then((res1) => {
+                                    var mailOptions = {
+                                        from: "contact@aimedis.com",
+                                        to: req.query.email,
+                                        subject: 'Forgot Password',
+                                        html: res1.replace(/ @ /g, '@')
+                                    };
+                                    var sendmail = transporter.sendMail(mailOptions)
+                                    if (sendmail) {
+                                        res.json({ status: 200, hassuccessed: true, msg: 'Mail is sent' })
+                                    }
+                                    else {
+                                       res.json({ status: 200, hassuccessed: false, msg: 'Mail is not sent' })
+                                    }
+                                });
+                            })
+                            // if (req.body.lan === 'de') {
+                            //     var dhtml = 'Sie haben Ihr Passwort vergessen und ein neues angefordert.<br/>' +
+                            //         'Bitte klicken Sie auf diesen Link, um ein neues Passwort zu wählen:<br/>' +
+                            //         '<a href="' + link + '?token=' + token + '">LINK TO RESET PASSWORD </a><br/>' +
+                            //         'Sollten Sie Ihren Zugang zur 2 Faktor Authentifizierung verloren haben, setzen Sie sich bitte mit uns via contact@aimedis.com in Verbindung. Alternativ kontaktieren Sie uns bitte via WhatsApp. <br/><br/><br/>' +
+                            //         '<b>Herzliche Grüße </b><br/>'
+                            //     '<b>Ihr Aimedis Team </b>'
+                
+                            // }
+                            // else {
+                            //     var dhtml = 'You forgot your password and requested a new one.<br/>' +
+                            //         'Please click this link to choose a new password:<br/>' +
+                            //         '<a href="' + link + '?token=' + token + '">LINK TO RESET PASSWORD </a><br/>' +
+                            //         'If you have lost your access to 2-factor authentication, please contact us via contact@aimedis.com. Alternatively, please contact us via WhatsApp.<br/><br/><br/>' +
+                            //         '<b>Best regards</b><br/>'
+                            //     '<b>Your Aimedis team </b>'
+                            // }
+                
+                            // var mailOptions = {
+                            //     from: "contact@aimedis.com",
+                            //     to: req.query.email,
+                            //     subject: 'Forgot Password',
+                            //     html: dhtml
+                            // };
+                    
+                            // var sendmail = transporter.sendMail(mailOptions)
+                            // if (sendmail) {
+                            //     res.json({ status: 200, msg: 'Mail is sent' })
+                            // }
+                            // else {
+                            //    res.json({ status: 200, msg: 'Mail is not sent' })
+                            // }
+                
+                        }
+                        else {
+                            res.json({ status: 450, msg: 'User does not exist' })
+                        }
+                
+                    })
                 }
                 else {
                     res.json({ status: 450, msg: 'User does not exist' })
-                }
-
+                } 
             })
-        setTimeout(() => resolve(token), 500);
-
     });
-    promise.then((token) => {
-        if (token !== '') {
-            var link = 'https://sys.aimedis.io/change-password';
-            if (req.body.passFrom === 'landing') {
-                link = '/change-password';
-                // link = 'https://aidoc.io/change-password'
-                link = 'https://sys.aimedis.io/change-password';
-            }
-            // var link = 'http://aidoc.io/change-password';
-           
-            if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben Ihr Passwort vergessen und ein neues angefordert.<br/>' +
-                    'Bitte klicken Sie auf diesen Link, um ein neues Passwort zu wählen:<br/>' +
-                    '<a href="' + link + '?token=' + token + '">LINK TO RESET PASSWORD </a><br/>' +
-                    'Sollten Sie Ihren Zugang zur 2 Faktor Authentifizierung verloren haben, setzen Sie sich bitte mit uns via contact@aimedis.com in Verbindung. Alternativ kontaktieren Sie uns bitte via WhatsApp. <br/><br/><br/>' +
-                    '<b>Herzliche Grüße </b><br/>'
-                '<b>Ihr Aimedis Team </b>'
-
-            }
-            else {
-                var dhtml = 'You forgot your password and requested a new one.<br/>' +
-                    'Please click this link to choose a new password:<br/>' +
-                    '<a href="' + link + '?token=' + token + '">LINK TO RESET PASSWORD </a><br/>' +
-                    'If you have lost your access to 2-factor authentication, please contact us via contact@aimedis.com. Alternatively, please contact us via WhatsApp.<br/><br/><br/>' +
-                    '<b>Best regards</b><br/>'
-                '<b>Your Aimedis team </b>'
-            }
-
-            var mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.query.email,
-                subject: 'Forgot Password',
-                html: dhtml
-            };
-    
-            var sendmail = transporter.sendMail(mailOptions)
-            if (sendmail) {
-                res.json({ status: 200, msg: 'Mail is sent' })
-            }
-            else {
-               res.json({ status: 200, msg: 'Mail is not sent' })
-            }
-
-        }
-        else {
-            res.json({ status: 450, msg: 'User does not exist' })
-        }
-
-    })
+   
 })
 
 router.post('/AskPatient1/:id', function (req, res, next) {
@@ -4321,34 +4509,61 @@ router.post('/AskPatient/:id', function (req, res, next) {
                 if (user_data1) {
                     // var Link1 = 'https://aidoc.io/patient'
                     var Link1 = 'https://sys.aimedis.io/patient'
-                    if (req.body.lan === 'de') {
-                        var dhtml = 'Sie haben die Anfrage erhalten, einen neuen DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ')' +
-                            ' zu Ihrer Liste vertrauenswürdiger privater Ärzte hinzuzufügen. Um diese Anfrage anzunehmen / abzulehnen / zu verschieben, folgen Sie bitte dem <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
-                            '<b>Ihr Aimedis Team</b><br/>' +
-                            '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                            '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
-                    }
-                    else {
-                        var dhtml = 'You got a request to add a new DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ')'+
-                            ' to your trusted private doctor list. To accept / decline / postpone this request please follow the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
-                            '<b>Your Aimedis team</b><br/>' +
-                            '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                            '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
-                    }
+                    
+                    var lan1 = getMsgLang(user_data1._id)
+                    lan1.then((result)=>{
+                        var sendData='You got a request to add a new DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ')'+
+                        ' to your trusted private doctor list. To accept / decline / postpone this request please follow the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                        '<b>Your Aimedis team</b><br/>' +
+                        '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                        '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
+        
+                        result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+        
+                        trans(sendData, { source: "en", target: result }).then((res1) => {
+                            var mailOptions = {
+                                from: "contact@aimedis.com",
+                                to: user_data1.email,
+                                subject: 'Private doctor request',
+                                html: res1.replace(/ @ /g, '@')
+                            };
+                            var sendmail = transporter.sendMail(mailOptions)
+                            if (sendmail) {
+                                res.json({ status: 200, hassuccessed: true, msg: 'Mail is sent' })
+                            }
+                            else {
+                               res.json({ status: 200, hassuccessed: false, msg: 'Mail is not sent' })
+                            }
+                        });
+                    })
+                    // if (req.body.lan === 'de') {
+                    //     var dhtml = 'Sie haben die Anfrage erhalten, einen neuen DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ')' +
+                    //         ' zu Ihrer Liste vertrauenswürdiger privater Ärzte hinzuzufügen. Um diese Anfrage anzunehmen / abzulehnen / zu verschieben, folgen Sie bitte dem <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                    //         '<b>Ihr Aimedis Team</b><br/>' +
+                    //         '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                    //         '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
+                    // }
+                    // else {
+                    //     var dhtml = 'You got a request to add a new DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ')'+
+                    //         ' to your trusted private doctor list. To accept / decline / postpone this request please follow the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                    //         '<b>Your Aimedis team</b><br/>' +
+                    //         '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                    //         '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
+                    // }
 
-                    var mailOptions = {
-                        from: "contact@aimedis.com",
-                        to: user_data1.email,
-                        subject: 'Private doctor request',
-                        html: dhtml
-                    };
-                    var sendmail = transporter.sendMail(mailOptions)
-                    if (sendmail) {
-                        res.json({ status: 200, hassuccessed: true, msg: 'Mail is sent' })
-                    }
-                    else {
-                       res.json({ status: 200, hassuccessed: false, msg: 'Mail is not sent' })
-                    }
+                    // var mailOptions = {
+                    //     from: "contact@aimedis.com",
+                    //     to: user_data1.email,
+                    //     subject: 'Private doctor request',
+                    //     html: dhtml
+                    // };
+                    // var sendmail = transporter.sendMail(mailOptions)
+                    // if (sendmail) {
+                    //     res.json({ status: 200, hassuccessed: true, msg: 'Mail is sent' })
+                    // }
+                    // else {
+                    //    res.json({ status: 200, hassuccessed: false, msg: 'Mail is not sent' })
+                    // }
                 }
                 else {
                     res.json({ status: 450, hassuccessed: false, msg: 'User does not exist' })
