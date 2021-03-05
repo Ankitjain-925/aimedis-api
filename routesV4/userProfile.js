@@ -4345,15 +4345,14 @@ router.post('/forgotPassword', function (req, res, next) {
                             var link = 'https://sys.aimedis.io/change-password';
                             if (req.body.passFrom === 'landing') {
                                 link = '/change-password';
-                                // link = 'https://aidoc.io/change-password'
-                                link = 'https://sys.aimedis.io/change-password';
+                                link = 'https://aidoc.io/change-password'
+                                // link = 'https://sys.aimedis.io/change-password';
                             }
                             // link = 'http://localhost:3000/change-password';
                             var lan1 = getMsgLang(user_data1._id)
                             lan1.then((result)=>{
                                 var sendData='You forgot your password and requested a new one.<br/>' +
-                                'Please click this link to choose a new password:<br/>' +
-                                '<a href="'+ link + '?token=' + token+'" >LINK TO RESET PASSWORD </a><br/>' +
+                                'Please click the link to choose a new password, Link is provided below.<br/>' +
                                 'If you have lost your access to 2-factor authentication, please contact us via contact@aimedis.com. Alternatively, please contact us via WhatsApp.<br/><br/><br/>' +
                                 '<b>Best regards</b><br/>'
                             '<b>Your Aimedis team </b>';
@@ -4361,6 +4360,7 @@ router.post('/forgotPassword', function (req, res, next) {
                                 result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
                 
                                 trans(sendData, { source: "en", target: result }).then((res1) => {
+                                    res1 = res1 + '<br/> <br/> <a href="'+ link + '?token=' + token+'" >LINK TO RESET PASSWORD </a><br/>';
                                     var mailOptions = {
                                         from: "contact@aimedis.com",
                                         to: req.query.email,
@@ -4507,13 +4507,13 @@ router.post('/AskPatient/:id', function (req, res, next) {
             {alies_id : messageToSearchWith1.alies_id},{ profile_id :  messageToSearchWith.profile_id},{profile_id: req.params.id },{alies_id :req.params.id  }]}).exec()
             .then((user_data1) => {
                 if (user_data1) {
-                    // var Link1 = 'https://aidoc.io/patient'
-                    var Link1 = 'https://sys.aimedis.io/patient'
+                    var Link1 = 'https://aidoc.io/patient'
+                    // var Link1 = 'https://sys.aimedis.io/patient'
                     
                     var lan1 = getMsgLang(user_data1._id)
                     lan1.then((result)=>{
                         var sendData='You got a request to add a new DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ')'+
-                        ' to your trusted private doctor list. To accept / decline / postpone this request please follow the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
+                        ' to your trusted private doctor list. To accept / decline / postpone this request please follow the link given below.<br/><br/><br/> ' +
                         '<b>Your Aimedis team</b><br/>' +
                         '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
                         '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
@@ -4521,6 +4521,7 @@ router.post('/AskPatient/:id', function (req, res, next) {
                         result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
         
                         trans(sendData, { source: "en", target: result }).then((res1) => {
+                            res1 = res1+'<br/><br/><a target="_blank" href="' + Link1 + '">LINK</a>.<br/>';
                             var mailOptions = {
                                 from: "contact@aimedis.com",
                                 to: user_data1.email,

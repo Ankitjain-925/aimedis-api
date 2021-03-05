@@ -937,7 +937,7 @@ function getAlltrack(data) {
                         return new_data;
                     })
                     
-                } 
+                }
                 if(!data.archive)
                 {
                     trackrecord1.push(new_data);
