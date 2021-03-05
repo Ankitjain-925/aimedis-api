@@ -33,6 +33,11 @@ var SettingSchema = new Schema({
        type: String,
        required: false,
        unique: false
+    },
+    msg_language: {
+      type: String,
+      required: false,
+      unique: false
     }
 },
 { strict: false },

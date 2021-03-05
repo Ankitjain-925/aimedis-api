@@ -24,7 +24,7 @@ const { join } = require('path');
 var shortid = require('shortid');
 var aws = require('aws-sdk');
 const axios = require("axios");
-
+const { getMsgLang, trans } = require('./GetsetLang');
 var fs = require("fs")
 var converter = require('json-2-csv');
 var pdf = require('dynamic-html-pdf');
@@ -270,18 +270,42 @@ router.post('/UserLogin', function (req, res, next) {
                                             type: user_data.type,
                                         }
                                         token1 = jwtconfig.sign(payload1);
-                                        let link = 'https://aidoc.io/change-password';
-                                        var mailOptions1 = {
-                                            from: "contact@aimedis.com",
-                                            to: user_data.email,
-                                            subject: 'Reset Your Password immediately!!',
-                                            html: '<div>Please reset Your Password immediately.</br>'
-                                                + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
-                                                '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>' +
-                                                'You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
-                                                '<b>Your Aimedis team </b>'
-                                        };
-                                        var sendmail = transporter.sendMail(mailOptions1)
+                                        var lan1 = getMsgLang(user_data._id)
+
+                                    lan1.then((result)=>{
+                                        let link = 'https://sys.aimedis.io/change-password';
+                                        var sendData= '<div>Please reset Your Password immediately.</br>'
+                                        + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
+                                        '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>' +
+                                        'You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br></br>' +
+                                        'Your Aimedis team';
+
+                                        result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                                        trans(sendData, { source: "en", target: result }).then((res) => {
+                                            var mailOptions = {
+                                                from: "contact@aimedis.com",
+                                                to: user_data.email,
+                                                subject: 'Reset Your Password immediately!!',
+                                            html: res.replace(/ @ /g, '@')
+                                            };
+                                            var sendmail = transporter.sendMail(mailOptions)
+                                        
+                                        });
+                                   
+                                    })
+                                        
+                                        // var mailOptions1 = {
+                                        //     from: "contact@aimedis.com",
+                                        //     to: user_data.email,
+                                        //     subject: 'Reset Your Password immediately!!',
+                                        //     html: '<div>Please reset Your Password immediately.</br>'
+                                        //         + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
+                                        //         '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>' +
+                                        //         'You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
+                                        //         '<b>Your Aimedis team </b>'
+                                        // };
+                                        // var sendmail = transporter.sendMail(mailOptions1)
                                         User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: count, isblock : true } }, { new: true }, (err, doc1) => {});
                                     }
                                     else{
@@ -403,16 +427,36 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                             type: user_data.type,
                                         }
                                         token1 = jwtconfig.sign(payload1);
-                                        let link = 'https://aidoc.io/admin/change-password';
-                                        var mailOptions1 = {
-                                            from: "contact@aimedis.com",
-                                            to: "aakash.webnexus@gmail.com",
-                                            subject: 'Admin - Reset Your Password immediately!!',
-                                            html: '<div>Admin Aimedis Please reset Your Password immediately.</br>'
-                                                + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
-                                                '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>'
-                                        };
-                                        var sendmail = transporter.sendMail(mailOptions1)
+                                        var lan1 = getMsgLang(user_data._id)
+
+                                        lan1.then((result)=>{
+                                            let link = 'https://sys.aimedis.io/admin/change-password';
+                                            var sendData=  '<div>Admin Aimedis Please reset Your Password immediately.</br>'
+                                            + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
+                                            '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>';
+    
+                                            result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+    
+                                            trans(sendData, { source: "en", target: result }).then((res) => {
+                                                var mailOptions1 = {
+                                                    from: "contact@aimedis.com",
+                                                    to: "aakash.webnexus@gmail.com",
+                                                    subject: 'Admin - Reset Your Password immediately!!',
+                                                    html: res.replace(/ @ /g, '@')
+            
+                                                };
+                                                var mailOptions1 = {
+                                                    from: "contact@aimedis.com",
+                                                    to: "aakash.webnexus@gmail.com",
+                                                    subject: 'Admin - Reset Your Password immediately!!',
+                                                html: res.replace(/ @ /g, '@')
+                                                };
+                                                var sendmail = transporter.sendMail(mailOptions1)
+                                            
+                                            });
+                                       
+                                        })
+                                        // var sendmail = transporter.sendMail(mailOptions1)
                                     }
                                     User.findOneAndUpdate({ _id: user_data._id }, { $set: { logWrongPass: count } }, { new: true }, (err, doc1) => {});
                                     res.json({ status: 450, message: "Wrong password", hassuccessed: false })
@@ -1263,43 +1307,80 @@ router.post('/Prescription', function (req, res, next) {
             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
         } else {
 
-            if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben ein Rezept (prescription) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
-                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
-                    'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
-                    '<b>Ihr Aimedis Team </b>'
+            var lan1 = getMsgLang(req.body.patient_id)
+            var lan2 = getMsgLang(req.body.doctor_id)
+           
+            lan1.then((result)=>{
+                var sendData='You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                        req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+                        'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+                        'Your Aimedis team';
 
-            }
-            else {
-                var dhtml = 'You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
-                    'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
-                    '<b>Your Aimedis team </b>'
-            }
-            if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
-                    'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
-                    '<b>Ihr Aimedis Team </b>'
-            }
-            else {
-                var dhtml2 = 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
-                    'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
-                    '<b>Your Aimedis team </b>'
-            }
-            var mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.patient_info.email,
-                subject: 'Prescription Request',
-                html: dhtml
-            };
-            var mailOptions2 = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: 'Prescription Request',
-                html: dhtml2
-            };
-            var sendmail = transporter.sendMail(mailOptions)
-            var sendmail2 = transporter.sendMail(mailOptions2)
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: req.body.patient_info.email,
+                        subject: 'Prescription Request',
+                        html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+            lan2.then((result)=>{
+                var sendData= 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+                        'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+                        'Your Aimedis team ';
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: req.body.docProfile.email,
+                        subject: 'Prescription Request',
+                        html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+            // if (req.body.lan === 'de') {
+            //     var dhtml = 'Sie haben ein Rezept (prescription) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+            //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+            //         'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+            //         '<b>Ihr Aimedis Team </b>'
+
+            // }
+            // else {
+            //     var dhtml = 'You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+            //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+            //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+            //         '<b>Your Aimedis team </b>'
+            // }
+            // if (req.body.lan === 'de') {
+            //     var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+            //         'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+            //         '<b>Ihr Aimedis Team </b>'
+            // }
+            // else {
+            //     var dhtml2 = 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+            //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+            //         '<b>Your Aimedis team </b>'
+            // }
+            // var mailOptions = {
+            //     from: "contact@aimedis.com",
+            //     to: req.body.patient_info.email,
+            //     subject: 'Prescription Request',
+            //     html: dhtml
+            // };
+            // var mailOptions2 = {
+            //     from: "contact@aimedis.com",
+            //     to: req.body.docProfile.email,
+            //     subject: 'Prescription Request',
+            //     html: dhtml2
+            // };
+            // var sendmail = transporter.sendMail(mailOptions)
+            // var sendmail2 = transporter.sendMail(mailOptions2)
 
             res.json({ status: 200, hassuccessed: true, message: "success" })
         }
@@ -1515,43 +1596,80 @@ router.post('/SickCertificate', function (req, res, next) {
         if (err && !data) {
             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
         } else {
-            if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben eine AU (sick certificate) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
-                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
-                    'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
-                    '<b>Ihr Aimedis Team </b>'
+            var lan1 = getMsgLang(req.body.patient_id)
+            var lan2 = getMsgLang(req.body.doctor_id)
+           
+            lan1.then((result)=>{
+                var sendData='You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                        req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+                        'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+                        'Your Aimedis team';
 
-            }
-            else {
-                var dhtml = 'You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
-                    'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
-                    '<b>Your Aimedis team </b>'
-            }
-            if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
-                    'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
-                    '<b>Ihr Aimedis Team </b>'
-            }
-            else {
-                var dhtml2 = 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
-                    'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
-                    '<b>Your Aimedis team </b>'
-            }
-            var mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.patient_info.email,
-                subject: 'Sick Certificate Request',
-                html: dhtml
-            };
-            var mailOptions2 = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: 'Sick Certificate Request',
-                html: dhtml2
-            };
-            var sendmail = transporter.sendMail(mailOptions)
-            var sendmail2 = transporter.sendMail(mailOptions2)
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: req.body.patient_info.email,
+                        subject: 'Sick Certificate Request',
+                        html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+            lan2.then((result)=>{
+                var sendData= 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+                        'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+                        'Your Aimedis team';
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: req.body.docProfile.email,
+                        subject: 'Sick Certificate Request',
+                        html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+            // if (req.body.lan === 'de') {
+            //     var dhtml = 'Sie haben eine AU (sick certificate) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+            //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+            //         'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+            //         '<b>Ihr Aimedis Team </b>'
+
+            // }
+            // else {
+            //     var dhtml = 'You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+            //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+            //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+            //         '<b>Your Aimedis team </b>'
+            // }
+            // if (req.body.lan === 'de') {
+            //     var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+            //         'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+            //         '<b>Ihr Aimedis Team </b>'
+            // }
+            // else {
+            //     var dhtml2 = 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+            //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+            //         '<b>Your Aimedis team </b>'
+            // }
+            // var mailOptions = {
+            //     from: "contact@aimedis.com",
+            //     to: req.body.patient_info.email,
+            //     subject: 'Sick Certificate Request',
+            //     html: dhtml
+            // };
+            // var mailOptions2 = {
+            //     from: "contact@aimedis.com",
+            //     to: req.body.docProfile.email,
+            //     subject: 'Sick Certificate Request',
+            //     html: dhtml2
+            // };
+            // var sendmail = transporter.sendMail(mailOptions)
+            // var sendmail2 = transporter.sendMail(mailOptions2)
             res.json({ status: 200, hassuccessed: true, message: "success" })
         }
     })
@@ -2343,42 +2461,79 @@ router.post('/second_opinion', function (req, res, next) {
         if (err && !user_data) {
             res.json({ status: 200, message: 'Something went wrong.', error: err });
         } else {
-            if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben eine Zweitmeinung (second opinion) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
-                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
-                    'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
-                    '<b>Ihr Aimedis Team </b>'
-            }
-            else {
-                var dhtml = 'You have requested a second opinion from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-                    req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
-                    'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
-                    '<b>Your Aimedis team </b>'
-            }
-            if (req.body.lan === 'de') {
-                var dhtml2 = ' Sie haben eine Zweitmeinung (second opinion) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
-                    'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
-                    '<b>Ihr Aimedis Team </b>'
-            }
-            else {
-                var dhtml2 = 'You have received a second opinion inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
-                    'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
-                    '<b>Your Aimedis team </b>'
-            }
-            var mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.patient_info.email,
-                subject: 'Second Opinion Request',
-                html: dhtml
-            };
-            var mailOptions2 = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: 'Second Opinion Request',
-                html: dhtml2
-            };
-            var sendmail = transporter.sendMail(mailOptions)
-            var sendmail2 = transporter.sendMail(mailOptions2)
+            var lan1 = getMsgLang(req.body.patient_id)
+            var lan2 = getMsgLang(req.body.doctor_id)
+           
+            lan1.then((result)=>{
+                var sendData='You have requested a second opinion from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+                        req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+                        'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+                        'Your Aimedis team';
+
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: req.body.patient_info.email,
+                        subject: 'Second Opinion Request',
+                        html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+            lan2.then((result)=>{
+                var sendData=  'You have received a second opinion inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+                        'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+                        'Your Aimedis team';
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: req.body.docProfile.email,
+                        subject: 'Second Opinion Request',
+                        html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+            // if (req.body.lan === 'de') {
+            //     var dhtml = 'Sie haben eine Zweitmeinung (second opinion) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+            //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+            //         'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+            //         '<b>Ihr Aimedis Team </b>'
+            // }
+            // else {
+            //     var dhtml = 'You have requested a second opinion from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+            //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+            //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+            //         '<b>Your Aimedis team </b>'
+            // }
+            // if (req.body.lan === 'de') {
+            //     var dhtml2 = ' Sie haben eine Zweitmeinung (second opinion) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+            //         'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+            //         '<b>Ihr Aimedis Team </b>'
+            // }
+            // else {
+            //     var dhtml2 = 'You have received a second opinion inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+            //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+            //         '<b>Your Aimedis team </b>'
+            // }
+            // var mailOptions = {
+            //     from: "contact@aimedis.com",
+            //     to: req.body.patient_info.email,
+            //     subject: 'Second Opinion Request',
+            //     html: dhtml
+            // };
+            // var mailOptions2 = {
+            //     from: "contact@aimedis.com",
+            //     to: req.body.docProfile.email,
+            //     subject: 'Second Opinion Request',
+            //     html: dhtml2
+            // };
+            // var sendmail = transporter.sendMail(mailOptions)
+            // var sendmail2 = transporter.sendMail(mailOptions2)
             res.json({ status: 200, message: 'Added Successfully', hassuccessed: true, data: user_data });
         }
     })
@@ -4532,14 +4687,33 @@ router.put('/SuggestTimeSlot', function (req, res, next) {
         timeslot = req.body.timeslot
         return Appointment.update({_id:apppinment_id},{status:'cancel'}).exec()
             .then((chnageData)=>{
-                let mailOptions = {
-                    from:'contact@aimedis.com',
-                    to : email,
-                    subject: 'Appoinment Cancel And New Time Suggestion',
-                    html: `<div>The appoinment with Dr. ${doctorProfile.first_name+ ' '+ doctorProfile.last_name} on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div> `
-                };
+
+                var lan1 = getMsgLang(req.body.patient_id)
+                lan1.then((result)=>{
+                    var sendData=`<div>The appoinment with Dr. ${doctorProfile.first_name+ ' '+ doctorProfile.last_name} on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>` +
+                            'Your Aimedis team';
+    
+                    result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+    
+                    trans(sendData, { source: "en", target: result }).then((res) => {
+                        var mailOptions = {
+                            from: "contact@aimedis.com",
+                            to : email,
+                            subject: 'Appoinment Cancel And New Time Suggestion',
+                            html: res.replace(/ @ /g, '@')
+                        };
+                        var sendmail = transporter.sendMail(mailOptions)
+                      });
+                })
+                
+                // let mailOptions = {
+                //     from:'contact@aimedis.com',
+                //     to : email,
+                //     subject: 'Appoinment Cancel And New Time Suggestion',
+                //     html: `<div>The appoinment with Dr. ${doctorProfile.first_name+ ' '+ doctorProfile.last_name} on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div> `
+                // };
                
-                let sendmail = transporter.sendMail(mailOptions)
+                // let sendmail = transporter.sendMail(mailOptions)
 
                 res.json({ status: 200, hassuccessed: true, msg: 'Request Send succesfully' })
             })

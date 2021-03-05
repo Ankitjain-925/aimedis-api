@@ -11,6 +11,7 @@ const uuidv1 = require('uuid/v1');
 const {join} = require('path');
 const sendSms = require("./sendSms")
 const moment = require('moment');
+const { getMsgLang, trans } = require('./GetsetLang');
 const {promisify} = require('util');
 const read = promisify(require('fs').readFile);
 const handlebars = require('handlebars');
@@ -255,29 +256,59 @@ router.put('/HandlePrescriptions/:UserId/:TrackId', function (req, res, next) {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                     }
                     else {
-                        console.log('created_by', created_by)
+                       
                         user.findOne({ _id: created_by  }).then(docUser => {
                             if (docUser) {
                                 var data = req.body.data;
-                            let dhtml = 'Hi <b>' + docUser.first_name +' '+ docUser.last_name + "</b>,<br/><br/>" +
-                                "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name + '.<br/>' +
-                                'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
-                                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
-                                '<b>Your Aimedis team </b>'
-                                var mailOptions = {
-                                    from: "contact@aimedis.com",
-                                    to: docUser.email,
-                                    subject: 'Precription Handeled Report',
-                                    html: dhtml
-                                };
-                                let sendmail = transporter.sendMail(mailOptions)
-                                if(sendmail){
-                                    console.log('Mail is sent')
-                                }
-                                let sentSMS = sendSms(docUser.mobile, "Patient " + data.patient_name + "'s precription is handled by " + data.pharma.name+" at "+ data.created_on +" Regards, Aimedis team.")
-                                if(sentSMS){
-                                    console.log('Message is sent .....')
-                                }
+                                var lan1 = getMsgLang(docUser._id)
+
+                                lan1.then((result)=>{
+                                    var sendData= 'Hi' + docUser.first_name +' '+ docUser.last_name + ",<br/><br/>" +
+                                    "Patient " + data.patient_name + "'s prescription is handled by " + data.pharma.name + '.<br/>' +
+                                    'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
+                                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/></br>' +
+                                    'Your Aimedis team';
+
+                                    result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                                    trans(sendData, { source: "en", target: result }).then((res) => {
+                                        var mailOptions = {
+                                            from: "contact@aimedis.com",
+                                            to: docUser.email,
+                                            subject: 'Prescription handled Report',
+                                           html: res.replace(/ @ /g, '@')
+                                        };
+                                        var sendmail = transporter.sendMail(mailOptions)
+                                        if(sendmail){
+                                            console.log('Mail is sent')
+                                        }
+                                    });
+                                    var sendData2= "Patient " + data.patient_name + "'s prescription is handled by " + data.pharma.name+" at "+ data.created_on +" Regards, Aimedis team."
+                                    trans(sendData2, { source: "en", target: result }).then((res) => {
+                                      
+                                        let sentSMS = sendSms(docUser.mobile, res )
+                                        if(sentSMS){
+                                            console.log('Message is sent .....')
+                                        }
+                                    });
+                                })
+                            // let dhtml =  'Hi <b>' + docUser.first_name +' '+ docUser.last_name + "</b>,<br/><br/>" +
+                            // "Patient " + data.patient_name + "'s prescription is handled by " + data.pharma.name + '.<br/>' +
+                            // 'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
+                            // 'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
+                            // '<b>Your Aimedis team </b>'
+                                
+                            //     var mailOptions = {
+                            //         from: "contact@aimedis.com",
+                            //         to: docUser.email,
+                            //         subject: 'Prescription handled Report',
+                            //         html: dhtml
+                            //     };
+                            //     let sendmail = transporter.sendMail(mailOptions)
+                            //     if(sendmail){
+                            //         console.log('Mail is sent')
+                            //     }
+   
                             }
                             
                         })
@@ -546,55 +577,93 @@ router.post('/appointment', function (req, res) {
             res.json({ status: 200, message: 'Something went wrong.', error: err });
         } else {
             var date = getDate(moment(req.body.date).format('YYYY/MM/DD'), 'YYYY/MM/DD')
-            if (req.body.lan === 'de') {
-                var dhtml = 'Sie haben am   DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' ONLINE/OFFLINE vereinbart. .<br/>'+ 
-                'Sollten Sie den Termin nicht wahrnehmen können, sagen Sie den Termin bitte spätestens 24 Stunden vor Terminbeginn ab. <br/>'+
-                'Kontaktieren Sie bei Fragen Ihren behandelnden Arzt unter PRACTICE PHONE NUMBER. <br/>'+
-                'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten. '+
-            
-                '<b>Ihr Aimedis Team </b>'
-            
-            }
-            else {
-                var dhtml = 'You have got an ONLINE / OFFLINE appointment with '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+date +' at TIME '+ req.body.start_time+'.<br/>'+ 
-                'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins. <br/>'+
+            var lan1 = getMsgLang(req.body.patient)
+            var lan2 = getMsgLang(req.body.doctor_id)
+           
+            lan1.then((result)=>{
+                var sendData= 'You have got an ONLINE / OFFLINE appointment with '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+date +' at TIME '+ req.body.start_time+'.<br/>'+ 
+                'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins.<br/>'+
                 'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>'+
-                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
-                
-                '<b>Your Aimedis team </b>'
+                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/><br/>'+
+                'Your Aimedis Team ';
+
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                    from: "contact@aimedis.com",
+                    to:req.body.patient_info.email ,
+                    subject: 'Appointment Request',
+                   html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+            lan2.then((result)=>{
+                var sendData= 'You have got an ONLINE / OFFLINE appointment with '+ req.body.patient_info.patient_id+' on DATE '+ date  +' at TIME '+ req.body.start_time+'.<br/>'+ 
+                    'Please accept the appointment inside the system.<br/>'+ 
+                    'If you have any questions, contact the patient via '+req.body.patient_info.email+'.<br/>'+ 
+                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/><br/>'+
+                    'Your Aimedis team';
+
+                result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                trans(sendData, { source: "en", target: result }).then((res) => {
+                    var mailOptions = {
+                    from: "contact@aimedis.com",
+                    to: req.body.docProfile.email,
+                    subject: 'Appointment Request',
+                   html: res.replace(/ @ /g, '@')
+                    };
+                    var sendmail = transporter.sendMail(mailOptions)
+                  });
+            })
+           
+            // if (req.body.lan === 'de') {
+            //     var dhtml = 'Sie haben am   DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' ONLINE/OFFLINE vereinbart. .<br/>'+ 
+            //     'Sollten Sie den Termin nicht wahrnehmen können, sagen Sie den Termin bitte spätestens 24 Stunden vor Terminbeginn ab. <br/>'+
+            //     'Kontaktieren Sie bei Fragen Ihren behandelnden Arzt unter PRACTICE PHONE NUMBER. <br/>'+
+            //     'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten. '+
+            //     '<b>Ihr Aimedis Team </b>'
             
-            }
-            if (req.body.lan === 'de') {
+            // }
+            // else {
+            //     var dhtml = 'You have got an ONLINE / OFFLINE appointment with '+ req.body.docProfile.first_name+' '+req.body.docProfile.last_name+' on DATE '+date +' at TIME '+ req.body.start_time+'.<br/>'+ 
+            //     'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins. <br/>'+
+            //     'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>'+
+            //     'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
+            //     '<b>Your Aimedis team </b>'
             
-                var dhtml2 = ' Sie haben für den  DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.patient_info.patient_id+'ONLINE/OFFLINE vereinbart. .<br/>'+ 
-                'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>'+
-                'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an'+req.body.patient_info.email+'. <br/>'+
-                'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> '+
+            // }
+            // if (req.body.lan === 'de') {
             
-                '<b>Ihr Aimedis Team </b>'
-            }
-            else {
-                var dhtml2 ='You have got an ONLINE / OFFLINE appointment with '+ req.body.patient_info.patient_id+' on DATE '+ date  +' at TIME '+ req.body.start_time+'.<br/>'+ 
-                'Please accept the appointment inside the system.<br/>'+ 
-                'If you have any questions, contact the patient via '+req.body.patient_info.email+'.<br/>'+ 
-                'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
-                
-                '<b>Your Aimedis team </b>'
-            }
-            var mailOptions = {
-                from: "contact@aimedis.com",
-                to:req.body.patient_info.email ,
-                subject: 'Appointment Request',
-                html: dhtml
-            };
-            var mailOptions2 = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: 'Appointment Request',
-                html: dhtml2
-            };
-            var sendmail = transporter.sendMail(mailOptions)
-            var sendmail2 = transporter.sendMail(mailOptions2)
+            //     var dhtml2 = ' Sie haben für den  DATE'+ date + 'um TIME '+req.body.start_time+' einen Termin bei '+req.body.patient_info.patient_id+'ONLINE/OFFLINE vereinbart. .<br/>'+ 
+            //     'Bitte bestätigen Sie den Termin innerhalb des Systems. <br/>'+
+            //     'Sollten Sie Rückfragen an den Patienten haben, schreiben Sie ihm bitte eine E-Mail an'+req.body.patient_info.email+'. <br/>'+
+            //     'Alternativ können Sie uns unter contact@aimedis.com oder WhatApp kontaktieren, falls Sie Schwierigkeiten haben, mit Ihrem Arzt in Kontakt zu treten.<br/> '+
+            //     '<b>Ihr Aimedis Team </b>'
+            // }
+            // else {
+            //     var dhtml2 ='You have got an ONLINE / OFFLINE appointment with '+ req.body.patient_info.patient_id+' on DATE '+ date  +' at TIME '+ req.body.start_time+'.<br/>'+ 
+            //     'Please accept the appointment inside the system.<br/>'+ 
+            //     'If you have any questions, contact the patient via '+req.body.patient_info.email+'.<br/>'+ 
+            //     'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/>'+
+            //     '<b>Your Aimedis team </b>'
+            // }
+            // var mailOptions = {
+            //     from: "contact@aimedis.com",
+            //     to:req.body.patient_info.email ,
+            //     subject: 'Appointment Request',
+            //     html: dhtml
+            // };
+            // var mailOptions2 = {
+            //     from: "contact@aimedis.com",
+            //     to: req.body.docProfile.email,
+            //     subject: 'Appointment Request',
+            //     html: dhtml2
+            // };
+            // var sendmail = transporter.sendMail(mailOptions)
+            // var sendmail2 = transporter.ssendMail(mailOptions2)
             res.json({ status: 200, message: 'Added Successfully', hassuccessed: true, data: user_data });
         }
     })
