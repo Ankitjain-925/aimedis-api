@@ -10,6 +10,7 @@ const {encrypt, decrypt} = require("./Cryptofile.js")
 var trackrecord1 = [];
 var trackrecord2 = [];
 var trackrecord9 = [];
+var trackrecord331 = [];
 //get the emergency record of the patient
 router.get('/:UserId', function (req, res, next) {
     const token = (req.headers.token)
@@ -562,27 +563,32 @@ router.get('/pharmacyPrescription/:UserId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        var storedPrescriptions = [];
+       trackrecord331 = [];
         user.findOne({ _id: req.params.UserId}, function (err, doc) {
             if (err && !doc) {
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
             } else {
                 if(doc){
-                    if (doc.track_record.length > 0) {
-                        doc.track_record.forEach((element, index) => {
-                            if(element.type==='prescription')
-                            {
-                                storedPrescriptions.push(element)
-                            }
-                        }) 
-                    }
-                    else 
-                    {
-                        storedPrescriptions = [];
-                    }
-                    storedPrescriptions.sort(mySorter)
-                    data = {first_name: doc.first_name, last_name: doc.last_name, _id: doc._id, profile_id: doc.profile_id, email: doc.email, track_record: storedPrescriptions }
-                    res.json({ status: 200, hassuccessed: true, msg: 'Data is found', data : data })
+                    // if (doc.track_record.length > 0) {
+                    //     doc.track_record.forEach((element, index) => {
+                    //         if(element.type==='prescription')
+                    //         {
+                    //             storedPrescriptions.push(element)
+                    //         }
+                    //     }) 
+                    // }
+                    // else 
+                    // {
+                    //     storedPrescriptions = [];
+                    // }
+                    // storedPrescriptions.sort(mySorter)
+                    forEachPromise(doc.track_record, getAlltrack33)
+                    .then((result) => {
+                        console.log('trackrecord331')
+                        data = {first_name: doc.first_name, last_name: doc.last_name, _id: doc._id, profile_id: doc.profile_id, email: doc.email, track_record: trackrecord331 }
+                        res.json({ status: 200, hassuccessed: true, msg: 'Data is found', data : data })
+                    })
+                   
                 }
             }
         })
@@ -734,7 +740,37 @@ function getAlltrack(data) {
         });
     });
 }
-
+function getAlltrack33(data) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+            var created_by = data._enc_created_by===true ? decrypt(data.created_by) : data.created_by;
+            user.findOne({_id: created_by}).exec()
+            .then(function(doc3){
+                var new_data = data;
+                if(doc3){
+                    if (doc3.last_name) {
+                        var created_by = doc3.first_name + ' ' + doc3.last_name;
+                    }
+                    else {
+                        var created_by = doc3.first_name;
+                    }
+                    new_data.created_by_temp = created_by;
+                    new_data.created_by = doc3._id;
+                    new_data.created_by_image = doc3.image;
+                }
+                return new_data;
+            }).then(function(new_data){
+                if(!data.archive && data.type==='prescription')
+                { 
+                    console.log('dffdsf', new_data)
+                    trackrecord331.push(new_data);
+                }
+                resolve(trackrecord331);
+                
+            })
+        });
+    });
+}
 function mySorter(a, b) {
     var x = a.datetime_on.toLowerCase();
     var y = b.datetime_on.toLowerCase();

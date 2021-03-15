@@ -124,7 +124,7 @@ router.get('/patient', function (req, res, next) {
                             else{
                                 info ={birthday: doc[0].birthday, last_name: doc[0].last_name, first_name: doc[0].first_name , image:doc[0].image, profile_id: doc[0].profile_id}
                                 res.json({status: 200, hassuccessed: true, data : {info: info, last_dia: last_dia, last_dv: trackrecord1, last_con:last_con, weight_bmi: weight_bmi, 
-                                upcoming_appointment: upcoming_appointment,prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result,
+                                upcoming_appointment: upcoming_appointment, prescriptions: prescriptions, blood_sugar: blood_sugar, sick_certificates : sick_certificates, blood_pressure : blood_pressure, laboratory_result : laboratory_result,
                                 respiration: respiration}})
                             }  
                     })
@@ -281,7 +281,11 @@ function forEachPromise(items, fn) {
 function getAlltrack(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
-            user.findOne({$or: [{profile_id: data.doctor_id}, {alies_id: data.doctor_id}]}).exec()
+            const messageToSearchWith = new user({profile_id :data.doctor_id });
+            messageToSearchWith.encryptFieldsSync();
+            const messageToSearchWith1 = new user({alies_id :data.doctor_id });
+            messageToSearchWith1.encryptFieldsSync();
+            user.findOne({$or: [{profile_id: data.doctor_id}, {alies_id: data.doctor_id}, {profile_id: messageToSearchWith.profile_id}, {alies_id: messageToSearchWith1.alies_id}]}).exec()
             .then(function(doc3){
                 if(doc3){
                     var new_data = data;

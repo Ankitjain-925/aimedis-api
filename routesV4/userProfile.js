@@ -179,7 +179,11 @@ router.post('/UserLogin', function (req, res, next) {
         const email = req.body.email;
         const messageToSearchWith = new User({email});
         messageToSearchWith.encryptFieldsSync();
-        User.findOne({ $or :[{email: { $regex: req.body.email, $options: "i" }}, {email: { $regex: messageToSearchWith.email, $options: "i" }}]}).exec()
+        const messageToSearchWith1 = new User({email : req.body.email.toLowerCase()});
+        messageToSearchWith1.encryptFieldsSync();
+        const messageToSearchWith2 = new User({email : req.body.email.toUpperCase()});
+        messageToSearchWith2.encryptFieldsSync();
+        User.findOne({ $or :[{email: { $regex: req.body.email, $options: "i" }}, {email: { $regex: messageToSearchWith.email, $options: "i" }}, {email: { $regex: messageToSearchWith1.email, $options: "i" }}, {email: { $regex: messageToSearchWith2.email, $options: "i" }}]}).exec()
             .then((user_data) => {
                 if (user_data) {
                     if (user_data.isblock === true) {
@@ -337,7 +341,11 @@ router.post('/UserLoginAdmin', function (req, res, next) {
         const email = req.body.email;
         const messageToSearchWith = new User({email});
         messageToSearchWith.encryptFieldsSync();
-        User.findOne({ $or :[{email: { $regex: req.body.email, $options: "i" }}, {email: { $regex: messageToSearchWith.email, $options: "i" }}]}).exec()
+        const messageToSearchWith1 = new User({email : req.body.email.toLowerCase()});
+        messageToSearchWith1.encryptFieldsSync();
+        const messageToSearchWith2 = new User({email : req.body.email.toUpperCase()});
+        messageToSearchWith2.encryptFieldsSync();
+        User.findOne({ $or :[{email: { $regex: req.body.email, $options: "i" }}, {email: { $regex: messageToSearchWith.email, $options: "i" }}, {email: { $regex: messageToSearchWith1.email, $options: "i" }}, {email: { $regex: messageToSearchWith2.email, $options: "i" }}]}).exec()
             .then((user_data) => {
                 if (user_data) {
                     if (user_data.isblock === true) {
@@ -408,7 +416,6 @@ router.post('/UserLoginAdmin', function (req, res, next) {
                                                 res.json({ status: 450, message: "User does not exist", hassuccessed: false })
                                             }
                                         }
-
                                         else {
                                             res.json({ status: 450, message: "Can not get Mobile number for the notification", hassuccessed: false })
                                         }
@@ -1259,15 +1266,19 @@ router.put('/organDonor', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
             } else {
-                if(typeof req.body.OptionData ==='string'){
-                    var optionData = encrypt(req.body.OptionData)
+                if(req.body.OptionData){
+                    if(typeof req.body.OptionData ==='string'){
+                        var optionData = encrypt(req.body.OptionData)
+                    }
+                    else{
+                        var optionData = encrypt(JSON.stringify(req.body.OptionData));
+                    }
+                    
+                    req.body.OptionData = optionData;
+                    req.body._enc_OptionData = true
                 }
-                else{
-                    var optionData = encrypt(JSON.stringify(req.body.OptionData));
-                }
+              
                
-                req.body.OptionData = optionData;
-                req.body._enc_OptionData = true
                 User.findByIdAndUpdate({ _id: userdata._id }, { $set: { organ_donor: req.body } }
                     , function (err, updatedata) {
                         if (err && !updatedata) {
