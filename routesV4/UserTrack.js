@@ -12,6 +12,12 @@ const { join } = require('path');
 const sendSms = require("./sendSms")
 const moment = require('moment');
 const { getMsgLang, trans } = require('./GetsetLang');
+const {
+    getSubject,
+    SUBJECT_KEY,
+    EMAIL,
+    generateTemplate,
+    } = require("../emailTemplate/index.js");
 const { promisify } = require('util');
 const read = promisify(require('fs').readFile);
 const handlebars = require('handlebars');
@@ -231,6 +237,7 @@ router.put('/HandlePrescriptions/:UserId/:TrackId', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
+        console.log('req.body.data.created_by', req.body.data.created_by)
         var created_by = req.body.data.created_by
         req.body.data.created_by = encrypt(req.body.data.created_by);
         req.body.data._enc_created_by = true;
@@ -253,33 +260,85 @@ router.put('/HandlePrescriptions/:UserId/:TrackId', function (req, res, next) {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not found' })
                     }
                     else {
-
+                        console.log('created_by', created_by)
                         user.findOne({ _id: created_by }).then(docUser => {
                             if (docUser) {
                                 var data = req.body.data;
                                 var lan1 = getMsgLang(docUser._id)
 
                                 lan1.then((result) => {
-                                    var sendData = 'Hi' + docUser.first_name + ' ' + docUser.last_name + ",<br/><br/>" +
-                                        "Patient " + data.patient_name + "'s prescription is handled by " + data.pharma.name + '.<br/>' +
-                                        'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
-                                        'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/></br>' +
-                                        'Your Aimedis team';
+                                    // var sendData = 'Hi' + docUser.first_name + ' ' + docUser.last_name + ",<br/><br/>" +
+                                    //     "Patient " + data.patient_name + "'s prescription is handled by " + data.pharma.name + '.<br/>' +
+                                    //     'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
+                                    //     'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/></br>' +
+                                    //     'Your Aimedis team';
+                                        console.log('I am here')
+                                        generateTemplate(EMAIL.doctorEmail.handledPrescriptionnSystem(result, {
+                                            doctor_name: docUser.first_name + ' ' + docUser.last_name,
+                                             patient_id: data.alies_id,
+                                             patient_name : data.patient_name,
+                                             date : getDate(moment(data.created_on).format('YYYY/MM/DD'), 'YYYY/MM/DD')|| '',
+                                             time : getDate(moment(data.created_on).format('YYYY/MM/DD'), 'YYYY/MM/DD')|| '',
+                                             pharmacy_id : data.pharma.alies_id || '',
+                                             pharmacy_name : data.pharma.name || ''
+                                        }),(error,html)=>{
+                                            if(!error){
+                                                console.log('I am ghtf')
+                                                let mailOptions = {
+                                                    from: "contact@aimedis.com",
+                                                    to: docUser.email,
+                                                    subject: 'Prescription handled Report',
+                                                    html: html,
+                                                };
+                                                let sendmail = transporter.sendMail(mailOptions);
+                                                if(sendmail){
+                                                    console.log('Mail is sent ');
+                                                }
+                                            }
+                                         
+                                        });
+                                        // generateTemplate(
+                                        //     EMAIL.doctorEmail.handledPrescriptionnSystem(result, {
+                                        //      doctor_name: docUser.first_name + ' ' + docUser.last_name,
+                                        //      patient_id: data.alies_id,
+                                        //      patient_name : data.patient_name,
+                                        //      date : getDate(moment(data.created_on).format('YYYY/MM/DD'), 'YYYY/MM/DD')|| '',
+                                        //      time : getDate(moment(data.created_on).format('YYYY/MM/DD'), 'YYYY/MM/DD')|| '',
+                                        //      pharmacy_id : data.pharma.alies_id || '',
+                                        //      pharmacy_name : data.pharma.name || '',
+                                        //      pharmacy_email : data.pharma.email || '',
+                                        //      pharmacy_phone : data.pharma.mobile || ''
+                                        //     }),
+                                        //     (err, data) => {
+                                        //         console.log('I am here22')
+                                        //       if (!err) {
+                                        //         var mailOptions = {
+                                        //                     from: "contact@aimedis.com",
+                                        //                     to: 'ankita.webnexus@gmail.com',
+                                        //                     subject: 'Prescription handled Report',
+                                        //                     html: 
+                                        //                 };
+                                        //                 var sendmail = transporter.sendMail(mailOptions)
+                                        //                 if (sendmail) {
+                                        //                     console.log('Mail is sent')
+                                        //                 }
+                                        //       }
+                                        //     }
+                                        //   );
+                                    // result = result === 'ch' ? 'zh' : result === 'sp' ? 'es' : result === 'rs' ? 'ru' : result;
 
-                                    result = result === 'ch' ? 'zh' : result === 'sp' ? 'es' : result === 'rs' ? 'ru' : result;
-
-                                    trans(sendData, { source: "en", target: result }).then((res) => {
-                                        var mailOptions = {
-                                            from: "contact@aimedis.com",
-                                            to: docUser.email,
-                                            subject: 'Prescription handled Report',
-                                            html: res.replace(/ @ /g, '@')
-                                        };
-                                        var sendmail = transporter.sendMail(mailOptions)
-                                        if (sendmail) {
-                                            console.log('Mail is sent')
-                                        }
-                                    });
+                                    // trans(sendData, { source: "en", target: result }).then((res) => {
+                                    //     var mailOptions = {
+                                    //         from: "contact@aimedis.com",
+                                    //         to: docUser.email,
+                                    //         subject: 'Prescription handled Report',
+                                    //         html: res.replace(/ @ /g, '@')
+                                    //     };
+                                    //     var sendmail = transporter.sendMail(mailOptions)
+                                    //     if (sendmail) {
+                                    //         console.log('Mail is sent')
+                                    //     }
+                                    // });
                                     var sendData2 = "Patient " + data.patient_name + "'s prescription is handled by " + data.pharma.name + " at " + data.created_on + " Regards, Aimedis team."
                                     trans(sendData2, { source: "en", target: result }).then((res) => {
 
@@ -574,46 +633,91 @@ router.post('/appointment', function (req, res) {
             res.json({ status: 200, message: 'Something went wrong.', error: err });
         } else {
             var date = getDate(moment(req.body.date).format('YYYY/MM/DD'), 'YYYY/MM/DD')
+            console.log('dates', date);
             var lan1 = getMsgLang(req.body.patient)
             var lan2 = getMsgLang(req.body.doctor_id)
 
             lan1.then((result) => {
-                var sendData = 'You have got an ONLINE / OFFLINE appointment with ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' on DATE ' + date + ' at TIME ' + req.body.start_time + '.<br/>' +
-                    'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins.<br/>' +
-                    'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>' +
-                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/><br/>' +
-                    'Your Aimedis Team ';
-
-                result = result === 'ch' ? 'zh' : result === 'sp' ? 'es' : result === 'rs' ? 'ru' : result;
-
-                trans(sendData, { source: "en", target: result }).then((res) => {
-                    var mailOptions = {
-                        from: "contact@aimedis.com",
-                        to: req.body.patient_info.email,
-                        subject: 'Appointment Request',
-                        html: res.replace(/ @ /g, '@')
-                    };
-                    var sendmail = transporter.sendMail(mailOptions)
+                generateTemplate(EMAIL.patientEmail.appointmentSystem(result, {
+                    doctor_name: req.body.docProfile.first_name+ ' '+req.body.docProfile.last_name,
+                    patient_name: req.body.patient_info.first_name+ ' '+req.body.patient_info.last_name,
+                    date:date,
+                    time: req.body.start_time,
+                    doctor_phone: req.body.patient_info.phone,
+                }),(error,html)=>{
+                    if(!error){
+                        let mailOptions = {
+                            from: "contact@aimedis.com",
+                            to: req.body.patient_info.email,
+                            subject: getSubject(result, SUBJECT_KEY.aimedis_appointment_system),
+                            html: html,
+                        };
+                        let sendmail = transporter.sendMail(mailOptions);
+                        if(sendmail){
+                            console.log('Mail is sent ');
+                        }
+                    }
+                 
                 });
+                // var sendData = 'You have got an ONLINE / OFFLINE appointment with ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' on DATE ' + date + ' at TIME ' + req.body.start_time + '.<br/>' +
+                //     'If you cannot take the appointment, please cancel the appointment at least 24 hours before it begins.<br/>' +
+                //     'If you have any questions, contact your doctor via PRACTICE PHONE NUMBER.<br/>' +
+                //     'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/><br/>' +
+                //     'Your Aimedis Team ';
+
+                // result = result === 'ch' ? 'zh' : result === 'sp' ? 'es' : result === 'rs' ? 'ru' : result;
+
+                // trans(sendData, { source: "en", target: result }).then((res) => {
+                //     var mailOptions = {
+                //         from: "contact@aimedis.com",
+                //         to: req.body.patient_info.email,
+                //         subject: 'Appointment Request',
+                //         html: res.replace(/ @ /g, '@')
+                //     };
+                //     var sendmail = transporter.sendMail(mailOptions)
+                // });
             })
             lan2.then((result) => {
-                var sendData = 'You have got an ONLINE / OFFLINE appointment with ' + req.body.patient_info.patient_id + ' on DATE ' + date + ' at TIME ' + req.body.start_time + '.<br/>' +
-                    'Please accept the appointment inside the system.<br/>' +
-                    'If you have any questions, contact the patient via ' + req.body.patient_info.email + '.<br/>' +
-                    'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/><br/>' +
-                    'Your Aimedis team';
-
-                result = result === 'ch' ? 'zh' : result === 'sp' ? 'es' : result === 'rs' ? 'ru' : result;
-
-                trans(sendData, { source: "en", target: result }).then((res) => {
-                    var mailOptions = {
-                        from: "contact@aimedis.com",
-                        to: req.body.docProfile.email,
-                        subject: 'Appointment Request',
-                        html: res.replace(/ @ /g, '@')
-                    };
-                    var sendmail = transporter.sendMail(mailOptions)
+                generateTemplate(EMAIL.doctorEmail.appointmentSystem(result, {
+                    doctor_name: req.body.docProfile.first_name+ ' '+req.body.docProfile.last_name,
+                    patient_id: req.body.patient_info.patient_id,
+                    patient_name: req.body.patient_info.first_name+ ' '+req.body.patient_info.last_name,
+                    date: date,
+                    time: req.body.start_time,
+                    patient_email: req.body.patient_info.email,
+                    patient_phone: req.body.patient_info.phone,
+                }),(error,html)=>{
+                    if(!error){
+                        let mailOptions = {
+                            from: "contact@aimedis.com",
+                            to: req.body.docProfile.email,
+                            subject: getSubject(result, SUBJECT_KEY.aimedis_appointment_system),
+                            html: html,
+                        };
+                        let sendmail = transporter.sendMail(mailOptions);
+                        if(sendmail){
+                            console.log('Mail is sent ');
+                        }
+                    }
+                 
                 });
+                // var sendData = 'You have got an ONLINE / OFFLINE appointment with ' + req.body.patient_info.patient_id + ' on DATE ' + date + ' at TIME ' + req.body.start_time + '.<br/>' +
+                //     'Please accept the appointment inside the system.<br/>' +
+                //     'If you have any questions, contact the patient via ' + req.body.patient_info.email + '.<br/>' +
+                //     'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/><br/>' +
+                //     'Your Aimedis team';
+
+                // result = result === 'ch' ? 'zh' : result === 'sp' ? 'es' : result === 'rs' ? 'ru' : result;
+
+                // trans(sendData, { source: "en", target: result }).then((res) => {
+                //     var mailOptions = {
+                //         from: "contact@aimedis.com",
+                //         to: req.body.docProfile.email,
+                //         subject: 'Appointment Request',
+                //         html: res.replace(/ @ /g, '@')
+                //     };
+                //     var sendmail = transporter.sendMail(mailOptions)
+                // });
             })
 
             // if (req.body.lan === 'de') {
@@ -677,6 +781,25 @@ function getDate(date, dateFormat) {
     if (dateFormat === 'YYYY/DD/MM') { return year + ' / ' + day + ' / ' + month; }
     else if (dateFormat === 'DD/MM/YYYY') { return day + ' / ' + month + ' / ' + year; }
     else { return month + ' / ' + day + ' / ' + year; }
+}
+function getTime (date, timeFormat){
+    date = new Date(date);
+    if(timeFormat ==='12')
+    {   
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+    else {
+        var h = (date.getHours() < 10 ? '0' : '') + date.getHours();
+        var m = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+        return h + ':' + m;
+    }   
 }
 
 //for emergency access by doctor
