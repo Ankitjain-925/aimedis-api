@@ -250,7 +250,16 @@
         .hidesection {
             display: none;
         }
-
+        .imgaeWrap{
+            width: 48px !important;
+            height: 45px !important;
+            overflow: hidden;
+        }
+        .imgaeWrapName{
+            width: 100px !important;
+            height: 100px !important;
+            overflow: hidden;
+        }
         /* aimedis  */
         @media only screen and (max-device-width: 480px),
         only screen and (max-width: 480px) {
@@ -323,8 +332,11 @@
                             <strong>{{{title}}}</strong>
                         </td>
                         <td align="right">
-                            <img src="https://topicolist.com/wp-content/uploads/2018/06/aimedis.png" width="48px"
-                                height="45px" />
+                            <div class="imgaeWrap" style="overflow: hidden; height: 45px; width: 48px;">
+                                <!-- <img src="https://topicolist.com/wp-content/uploads/2018/06/aimedis.png" width="48px" height="45px" /> -->
+                                <img src="https://sys.aimedis.io/emailTemplate/aimedis.png" width="48px" height="45px" />
+                            
+                            </div>
                         </td>
                     </tr>
                 </table>
@@ -333,8 +345,8 @@
                         <td style="font-size: 15px;text-align: justify;">
                             {{{content}}}
 
-                            <br></br><br class="hidesection"></br>
-                            <strong>{{{AimTeam}}}</strong>
+                            <br></br><br class="hidesection"></br><br>
+                            <strong>{{{AimTeam}}}</strong><br>
                             <br></br><br class="hidesection"></br>
                             {{{Loginvia}}}
 
@@ -344,14 +356,14 @@
                             <br></br>
                             {{{orvisit}}} <strong>
 
-                                <a href="https://aimedis.io" style="color:black;">https://aimedis.io<a /> </strong>
+                                <a href="https://aimedis.io" style="color:black;">https://aimedis.io</a> </strong>
                         </td>
                     </tr>
-                    <tr>
+                    <tr><br /><br />
                         <table width="100%" class="comontable">
                             <tr>
                                 <td style="font-size:14px; padding-bottom: 10px;" width="30%">
-                                    <strong>Aimedis B.V.</strong>
+                                    <strong>Aimedis B.V.</strong><br />
                                     Sint Michaëlstraat 4<p></p>
                                     5935 BL Steyl<p></p>
                                     Netherlands<p></p>
@@ -360,8 +372,11 @@
                                 </td>
                                 <td align="left" float="left" class="imgalign"
                                     style="display: flex;align-items: flex-start;justify-content: flex-start;">
-                                    <img src="https://mms.businesswire.com/media/20180601005370/en/660737/5/Aimedis_Logo_rgb-01.jpg"
-                                        width="100px" height="100px" />
+                                    <div class="imgaeWrapName" style="overflow: hidden; height: 100px; width: 100px;"> 
+                                        <!-- <img src="https://mms.businesswire.com/media/20180601005370/en/660737/5/Aimedis_Logo_rgb-01.jpg"
+                                            width="100px" height="100px" /> -->
+                                            <img src="https://sys.aimedis.io/emailTemplate/newName.png" />
+                                    </div>
                                 </td>
                             </tr>
                         </table>

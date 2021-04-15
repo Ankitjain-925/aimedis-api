@@ -976,6 +976,8 @@ router.put('/Bookservice', (req, res) => {
     var paymentData = {
         created: moment(new Date()).format("MM/DD/YYYY"),
         description: req.body.description,
+        payment_info: req.body.payment_info,
+        subscription_info : req.body.subscription_info
     }
     User.updateOne({ _id: legit.id }, { $push: { paid_services: paymentData } },
         { safe: true, upsert: true }, function (err, doc) {
@@ -1527,6 +1529,18 @@ router.put('/Metdata/:Metdata_id', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
             } else {
                 res.json({ status: 200, hassuccessed: true, message: "user updated", data: userdata })
+            }
+        })
+})
+
+
+router.post('/Metdata/i_a_p', function (req, res, next) {
+    Metadata.updateOne({}, { $push: { "in_app_purchase": req.body.in_app_purchase } },
+        { safe: true, upsert: true }, function (err, updatedata) {
+            if (err && !updatedata) {
+                res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, message: "Metadata updated", data: updatedata })
             }
         })
 })
@@ -4890,11 +4904,11 @@ router.post('/forgotPassword', function (req, res, next) {
                     promise.then((user_data1) => {
                         console.log('userdata1', user_data1)
                         if (token !== '') {
-                            var link = 'https://sys.aimedis.io/change-password';
+                            var link = 'https://sys.aimedis.io/change-password?token=' + token;
                             if (req.body.passFrom === 'landing') {
                                 // link = '/change-password';
                                 // link = 'https://aidoc.io/change-password'
-                                link = 'https://sys.aimedis.io/change-password';
+                                link = 'https://sys.aimedis.io/change-password?token=' + token;
                             }
                             // link = 'http://localhost:3000/change-password';
                             var lan1 = getMsgLang(user_data1._id)
