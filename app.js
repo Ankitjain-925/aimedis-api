@@ -79,15 +79,15 @@ var UserProfile4 = require('./routesV4/userProfile');
 var SaveCSV4    = require('./routesV4/saveCsv');
 var emergency_record4 = require('./routesV4/emergencyrecord');
 var rightinfo4   = require('./routesV4/rightsideinfo');
-var stripeCheckout4 = require('./routesV4/stripeCheckout')
-var lms_stripeCheckout4 = require('./routesV4/lms_stripeCheckout')
-var lms4 = require('./routesV4/lms')
-var certificate4 = require('./routesV4/certificate')
-var adminse4 = require('./routesV4/superadmin')
-var Uploadcerts4 = require('./routesV4/uploadcerts')
+var stripeCheckout4 = require('./routesV4/stripeCheckout');
+var lms_stripeCheckout4 = require('./routesV4/lms_stripeCheckout');
+var lms4 = require('./routesV4/lms');
+var certificate4 = require('./routesV4/certificate');
+var adminse4 = require('./routesV4/superadmin');
+var Uploadcerts4 = require('./routesV4/uploadcerts');
 var bloackchain4 = require("./routesV4/blockchain");
-var cronPrecess4 = require("./routesV4/cron")
-
+var cronPrecess4 = require("./routesV4/cron");
+var vspecialty4 = require("./routesV4/virtual_specialty");
 
 app.use('/api/v1/User', UserData);
 app.use('/api/v1/UserProfile', UserProfile);
@@ -143,6 +143,7 @@ app.use('/api/v4/admin', adminse4);
 app.use('/api/v4/aws', Uploadcerts4);
 app.use("/api/v4/blockchain", bloackchain4);
 app.use("/api/v4/cron", cronPrecess4)
+app.use("/api/v4/specilty", vspecialty4)
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
