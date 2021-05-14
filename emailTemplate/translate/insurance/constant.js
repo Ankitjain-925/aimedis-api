@@ -54,7 +54,12 @@ const welcome_message_insurance_ar = `الصحية${arabicContainerstart}
 مع Aimedis ،  تستطيع دوما أن تكون بجانب المرضى وعلى اتصال مباشر بالأطباء وفريق دعم Aimedis.<br><br>
  ايضا تستطيع الوصول إلى سجلات المرضى عن طريق إدخال رقم التعريف الشخصي والمعرف ، وإضافة المعلومات والبيانات الحيوية أو الوصول إلى سجلات الطوارئ الخاصة بهم في حالة الضرورة. وتلقي البيانات العلمية والبحثية من المرضى والأطباء في Aimedis   
 سيتم فتح حسابك في غضون 24 ساعة بعد توقيع عقد التعاون.<br><br>
-إذا كانت لديك أسئلة ، يمكنك الوصول إلينا عبردردشة الدعم  Aimedis داخل النظام أو البريد الإلكتروني عبر ${emailLink}. ${divclose}`;
+إذا كانت لديك أسئلة ، يمكنك الوصول إلينا عبردردشة الدعم  Aimedis داخل النظام أو البريد الإلكتروني عبر ${emailLink}.`;
+const welcome_message_emergency_tr=`Aimedis ile hep hastanızın yanındasınız ve doktorlarla ve Aimedis destek ekibi ile direk bağlantıdasınız. <br><br
+Hastaların bilgilerine şifreyi ve kimliği girerek ulaşabilirsiniz, vital bilgiler veya belgeler ekleyebilirsiniz yada gerektiğinde acil belgelerine giriş yapabilirsiniz. Hastalardan, doktorlardan ve Aimedisden bilimsel bilgiler ve araştırma bilgileri elde edebilirsiniz.<br><br
+Hesabınız kooperasyon sözleşmesi imzalandığından sonra 24 saat içinde açılacak. 
+Sorularınız varsa, bize sistemin içinde bulunan Aimedis Destek Chat yoluyla veya ${emailLink} ‘a emay göndererek ulaşabilirsiniz. 
+`
 const if_lost_2fa_en = `If you have lost your access to the 2-factor authentication, please contact us <br>via ${emailLink} or the Aimedis support chat.
 `;
 const if_lost_2fa_nl = `Als u uw toegang tot de 2-factor authenticatie kwijt bent, neem dan contact met ons op via ${emailLink} of de Aimedis support chat.
@@ -74,6 +79,8 @@ const if_lost_2fa_ru = `Если вы потеряли доступ к сист�
 `;
 const if_lost_2fa_ar = `${arabicContainerstart}إذا فقدت إمكانية الوصول إلى المصادقة الثنائية ، فيرجى الاتصال بنا <br> عبر ${emailLink} أو دردشة دعم Aimedis.${divclose}`;
 const if_lost_2fa_fr = `Si vous avez perdu votre accès à l'authentification à deux facteurs, veuillez nous contacter <br> via ${emailLink} ou via le chat d'assistance d'Aimedis.`;
+const if_lost_2fa_tr = `Eğer iki faktörlü kimlik doğrulamasına girişinizi kaybettiyseniz, lütfen bizimle ${emailLink} veya Aimedis destek chat yoluyla temas haline geçin.
+`;
 module.exports = {
   welcome_message_insurance_de,
   welcome_message_insurance_en,
@@ -85,6 +92,7 @@ module.exports = {
   welcome_message_insurance_pt,
   welcome_message_insurance_ar,
   welcome_message_insurance_fr,
+  welcome_message_emergency_tr,
   if_lost_2fa_en,
   if_lost_2fa_de,
   if_lost_2fa_nl,
@@ -95,4 +103,5 @@ module.exports = {
   if_lost_2fa_sw,
   if_lost_2fa_ar,
   if_lost_2fa_fr,
+  if_lost_2fa_tr
 };

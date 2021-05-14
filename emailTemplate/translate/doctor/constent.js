@@ -49,6 +49,11 @@ const welcomeEmail_ar = `${arabicContainerstart}
 و إذا كانت اية لديك أسئلة ، يمكنك التواصل معنا عبر دردشة الدعم  لAimedis داخل النظام أو عبر البريد الإلكتروني عبر ${emailLink}
 <br><br>
 `;
+const welcomeEmail_tr=`Aimedis ile hep hastanızın yanındasınız. Hastanızın bilgilerine erişebilirsiniz ve organize edebilirsiniz, onlarla videochat yoluyla konuşabilirsiniz, reçeteler ve hasta raporları yazabilirsiniz ve ikinci fikirler gönderebilirsiniz. Acil evraklara erişebilirsiniz, Aimedis eLearning & eTeaching modülüne erişebilirsiniz, eczanelere bir tıklamayla reçeteler gönderebilirsiniz ve çok daha fazlası. YouTube kanalımızı ziyaret ederek  Aimedis hakkında daha fazla bilgi edinebilirsiniz.<br><br>
+Kayıdınızla birlikte lisansınızı yüklediyseniz hesabınız 24 saat içinde açılacaktır. Eğer yüklemediyseniz o zaman lisansınızı lütfen   ${licenceEmail}.com ‘a gönderin.<br><br>
+Sorularınız varsa, bize sistemin içinde bulunan Aimedis Destek Chat yoluyla veya ${emailLink}
+<br><br>‘a emay göndererek ulaşabilirsiniz.
+`
 const appointment_en = `Dear {0}.<br><br>
 You have got an {1} appointment with {2},{3} on {4} at {5}.<br><br>
 Please accept the appointment inside your Aimedis profile. If you have any questions, please contact the patient via {6} or {7}. Alternatively, you can contact us via  ${emailLink} or the Aimedis support chat if you have difficulties contacting the patient.`;
@@ -83,6 +88,9 @@ const appointment_ar = `<div class"arabic">عزيز {0}.<br><br><br>
  ${emailLink}  
 أو  في حالة انك تواجه صعوبات في الاتصال بالمريض  تواصل معنا عبر دردشة دعم Aimedis.
 `;
+const appointment_tr=`Sayın {0}. <br> <br>
+{4}, {5} tarihinde {2} ile {3} arasında bir {1} randevunuz var. <br> <br>
+Lütfen Aimedis profilinizdeki randevuyu kabul edin. Herhangi bir sorunuz varsa, lütfen hastayla {6} veya {7} aracılığıyla iletişime geçin. Alternatif olarak, hastayla iletişim kurmakta güçlük çekiyorsanız, $ {emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçebilirsiniz.`
 
 const appointment_pt = `Caro {0}.<br><br><br>
 Você tem um {1} compromisso com {2}, {3} em {4} às {5}.<br><br>
@@ -135,6 +143,9 @@ const precription_pt = `Caro {0}.<br><br><br>
 Você recebeu uma nova <br> solicitação de receita </br> de {1}, {2}, em {3} às {4}. <br><br>
 Por favor, consulte a solicitação dentro do seu perfil Aimedis. Se você tiver alguma dúvida, entre em contato com o paciente por meio de {5} ou {6}. Alternativamente, pode nos contatar via ${emailLink} ou no chat de suporte Aimedis se tiver dificuldades para entrar em contato com o paciente.
 `;
+const precription_tr=`Sayın {0}. <br> <br>
+{4} {3} tarihinde {1}, {2} adresinden yeni bir reçete talebi </br> aldınız. <br> <br>
+Lütfen Aimedis profilinizdeki isteği kontrol edin. Herhangi bir sorunuz varsa, lütfen hastayla {5} veya {6} aracılığıyla iletişime geçin. Alternatif olarak, hastayla iletişim kurmakta güçlük çekiyorsanız, $ {emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçebilirsiniz.`
 ///
 module.exports = {
   welcomeEmail_en,
@@ -148,6 +159,7 @@ module.exports = {
   welcomeEmail_pt,
   welcomeEmail_sw,
   welcomeEmail_ar,
+  welcomeEmail_tr,
   appointment_en,
   appointment_rs,
   appointment_nl,
@@ -158,6 +170,7 @@ module.exports = {
   appointment_fr,
   appointment_ar,
   appointment_pt,
+  appointment_tr,
   precription_ar,
   precription_ch,
   precription_de,
@@ -168,4 +181,5 @@ module.exports = {
   precription_rs,
   precription_sp,
   precription_sw,
+  precription_tr
 };

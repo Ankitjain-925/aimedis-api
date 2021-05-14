@@ -9,6 +9,7 @@ const {
   welcome_message_emergency_pt,
   welcome_message_emergency_fr,
   welcome_message_emergency_ar,
+  welcome_message_emergency_tr
 } = require("./constent");
 
 module.exports.emergencyLang = {
@@ -23,5 +24,6 @@ module.exports.emergencyLang = {
     pt: welcome_message_emergency_pt,
     ar: welcome_message_emergency_ar,
     fr: welcome_message_emergency_fr,
+    tr:welcome_message_emergency_tr
   },
 };

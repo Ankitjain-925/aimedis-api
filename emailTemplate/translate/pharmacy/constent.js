@@ -56,6 +56,12 @@ const welcome_message_pharmacy_ar = `${arabicContainerstart}الصحية
 سيتم إلغاء قفل حسابك في غضون 24 ساعة ، فقط إذا قمت بتحميل الترخيص الخاص بك اثناء تسجيلك. إذا لم يكن كذلك ، يرجى إرساله إلى ${licenseLink} .<br><br>
 
 إذا كانت لديك أسئلة ، يمكنك الوصول إلينا من خلال دردشة الدعم الخاصة بAimedis داخل النظام أو البريد الإلكتروني عبر ${emailLink}`;
+const welcome_message_pharmacy_tr = `Aimedis ile hep hastanızın yanındasınız ve bağlı olduğunuz doktorlarla direk bağlantıdasınız. Reçeteleri gerçek zaman içinde teslim alabiliyorsunuz ve işleyebiliyorsunuz ve doktorlarla ve hastalarla haberleşebiliyorsunuz.<br><br>
+Sorularınız olduğunda veya acil bir durumda hastalarınızın ihtiyaçlarını daha iyi anlıyabilmek için acil bilgilerine giriş yapabilirsiniz.<br><br>
+Kayıdınızla birlikte lisansınızı yüklediyseniz hesabınız 24 saat içinde açılacaktır. Eğer yüklemediyseniz o zaman lisansınızı lütfen  license@aimedis.com ‘a gönderin.<br><br>
+Sorularınız varsa, bize sistemin içinde bulunan Aimedis Destek Chat yoluyla veya ${licenseLink} . emay göndererek ulaşabilirsiniz.  
+
+`
 
 module.exports = {
   welcome_message_pharmacy_de,
@@ -68,4 +74,5 @@ module.exports = {
   welcome_message_pharmacy_pt,
   welcome_message_pharmacy_fr,
   welcome_message_pharmacy_ar,
+  welcome_message_pharmacy_tr
 };

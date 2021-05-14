@@ -10,6 +10,7 @@ const {
   welcomeEmail_pt,
   welcomeEmail_sw,
   welcomeEmail_ar,
+  welcomeEmail_tr,
   appointment_en,
   appointment_rs,
   appointment_nl,
@@ -20,6 +21,7 @@ const {
   appointment_fr,
   appointment_ar,
   appointment_pt,
+  appointment_tr,
   precription_ar,
   precription_ch,
   precription_de,
@@ -30,6 +32,8 @@ const {
   precription_rs,
   precription_sp,
   precription_sw,
+  precription_tr
+
 } = require("./constent");
 
 module.exports.doctorLang = {
@@ -44,6 +48,7 @@ module.exports.doctorLang = {
     pt: welcomeEmail_pt,
     sw: welcomeEmail_sw,
     ar: welcomeEmail_ar,
+    tr:welcomeEmail_tr
   },
   apponitment_doctor: {
     en: appointment_en,
@@ -56,6 +61,7 @@ module.exports.doctorLang = {
     fr: appointment_fr,
     pt: appointment_pt,
     ar: appointment_ar,
+    tr:appointment_tr
   },
   prescription_sys_doc: {
     en: precription_en,
@@ -68,6 +74,7 @@ module.exports.doctorLang = {
     ar: precription_ar,
     fr: precription_fr,
     ch: precription_ch,
+    tr:precription_tr
   },
   sickc_system_doc: {
     en: `Dear {0}.<br><br><br>
@@ -109,6 +116,10 @@ module.exports.doctorLang = {
     ch: `亲{0}。<br><br><br>
          您收到了来自{1}，{2}，{3}和{4}的新病假证明请求。
          请检查您的Aimedis个人资料中的请求。 如有任何疑问，请通过{5}或{6}与患者联系。 或者，您可以通过以下方式与我们联系${emailLink} 或Aimedis支持聊天，如果你有困难联系病人。`,
+    tr:`Sayın {0}. <br> <br> <br>
+    {3} tarihinde, {4} tarihinde {1}, {2} tarafından yeni bir hastalık raporu talebi aldınız. <br> <br>
+    Lütfen Aimedis profilinizdeki isteği kontrol edin.
+    Herhangi bir sorunuz varsa, lütfen hastayla {5} veya {6} aracılığıyla iletişime geçin. Alternatif olarak, hastayla iletişim kurmakta güçlük çekiyorsanız, $ {emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçebilirsiniz.`
   },
   second_openion_doc: {
     en: `Dear {0}.<br><br>
@@ -157,6 +168,10 @@ Por favor, consulte a solicitação dentro do seu perfil Aimedis. Se você tiver
 您收到了{1}，{2}在{3}在{4}发出的新的<b>第二意见</ b>请求。<br><br>
 请检查您的Aimedis个人资料中的请求。 如有任何疑问，请通过{5}或{6}与患者联系。 或者，您可以通过以下方式与我们联系${emailLink} 或Aimedis支持聊天，如果你有困难联系病人。
 `,
+tr:`Sayın {0}. <br> <br>
+{4} tarihinde {3} tarihinde {1}, {2} tarafından yeni bir <b> ikinci görüş </b> isteği aldınız. <br> <br>
+Lütfen Aimedis profilinizdeki isteği kontrol edin.
+Herhangi bir sorunuz varsa, lütfen hastayla {5} veya {6} aracılığıyla iletişime geçin. Alternatif olarak, hastayla iletişim kurmakta güçlük çekiyorsanız, $ {emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçebilirsiniz.`
   },
   handled_prescription_doc: {
     en: `Dear {0}.<br><br><br>
@@ -201,6 +216,9 @@ Por favor, consulte a solicitação dentro do seu perfil Aimedis. Se você tiver
 
     {4}在{3}的{1} {2}處方由{10}在{9}的{5}，{6}藥房處理。
     如有任何疑问，请通过{7}或{8}与药房联系。 或者，您可以通过以下方式与我们联系${emailLink} 如果您在联系药房时遇到困难，请联系Aimedis支持聊天。`,
+    tr:`Sayın {0}. <br> <br> <br>
+    {4} adresindeki {3} {1}, {2} reçetesi, {10} {9} tarihinde eczane {5} tarafından {6} ele alındı. <br> <br>
+    Herhangi bir sorunuz varsa, lütfen {7} veya {8} aracılığıyla eczaneye başvurun. Eczaneyle iletişime geçmekte güçlük çekiyorsanız, alternatif olarak, $ {emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçebilirsiniz.`
   },
 };
 

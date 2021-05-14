@@ -26,6 +26,7 @@ module.exports.common = {
     sw: "Aimedis - Kuweka upya nenosiri",
     fr: "Aimedis - Réinitialisation du mot de passe",
     ar: `${arabicContainerstart}Aimedis - إعادة تعيين كلمة المرور${divclose}`,
+    tr:`Aimedis – şifrenin yeniden düzenlenmesi`
   },
   dear: {
     en: "Dear",
@@ -38,6 +39,7 @@ module.exports.common = {
     sw: "BIMA Mpendwa",
     fr: "Cher",
     ar: "عزيزي",
+    tr:'Sayın'
   },
   you_got_new_one: {
     en: "You forgot your password and requested a new one.",
@@ -51,6 +53,7 @@ module.exports.common = {
     sw: "Umesahau nywila yako na umeomba mpya.",
     fr: "Vous avez oublié votre mot de passe et en avez demandé un nouveau.",
     ar: `${arabicContainerstart} لقد نسيت كلمة المرور الخاصة بك وطلبت كلمة مرور جديدة. ${divclose}`,
+    tr:`Şifrenizi unuttunuz ve yeni bir tane istediniz.`
   },
   please_click_password: {
     en: "Please click this link to choose a new password:",
@@ -65,6 +68,7 @@ module.exports.common = {
     sw: "Tafadhali bonyeza kitufe hiki kuchagua nywila mpya:",
     fr: "Veuillez cliquer sur ce lien pour choisir un nouveau mot de passe:",
     ar: `${arabicContainerstart} الرجاء النقر فوق هذا الارتباط لاختيار كلمة مرور جديدة: ${divclose}`,
+    tr:`Yeni bir şifre seçmek için lütfen bu bağlantıyı tıklayın:`
   },
   link_rest: {
     en: "LINK TO RESET PASSWORD",
@@ -77,6 +81,7 @@ module.exports.common = {
     pt: "LINK PARA REDEFINIR SENHA",
     ar: `${arabicContainerstart} رابط لإعادة تعيين كلمة المرور ${divclose}`,
     fr: "LIEN POUR RÉINITIALISER LE MOT DE PASSE",
+    tr:'ŞİFRE SIFIRLAMA BAĞLANTISI'
   },
   is2fa_lost: {
     en: if_lost_2fa_en,
@@ -101,6 +106,7 @@ module.exports.common = {
     sw: "Ingia sasa kupitia",
     fr: "Votre équipe Aimedis",
     ar: `${arabicContainerstart} فريق Aimedis الخاص بك ${divclose}`,
+    tr:`Aimedis ekibiniz`
   },
   login_via: {
     en: "Log in now via",
@@ -113,6 +119,7 @@ module.exports.common = {
     sw: "Timu yako ya Aimedis",
     fr: "Connectez-vous maintenant via",
     ar: `تسجيل الدخول الآن عبر `,
+    tr:"Şimdi giriş yapın"
   },
   or_visit: {
     en: "or visit",
@@ -125,6 +132,7 @@ module.exports.common = {
     sw: "au tembelea",
     fr: "ou visiter",
     ar: `أو زيارة`,
+    tr:"veya ziyaret et"
   },
   welcome_title_aimedis: {
     en: "Welcome to Aimedis – your health platform",
@@ -137,6 +145,7 @@ module.exports.common = {
     sw: "Karibu Aimedis - Jukwaa lako la afya",
     fr: "Bienvenue sur Aimedis - votre plateforme de santé",
     ar: `${arabicContainerstart}Aimedis – مرحبا بكم في منصتكم `,
+    tr:"Sağlık platformunuz Aimedis'e hoş geldiniz"
   },
   on: {
     en: "on",
@@ -149,6 +158,7 @@ module.exports.common = {
     sw: "mnamo",
     fr: "le",
     ar: "تشغيل",
+    tr:'açık'
   },
   aimedis_appointment_system: {
     en: "Aimedis – appointment system",
@@ -161,6 +171,7 @@ module.exports.common = {
     pt: "Aimedis – sistema de marcar cita",
     rs: "Aimedis: система записи на прием",
     fr: "Aimedis - système de rendez-vous",
+    tr:"Aimedis - Randevu Sistemi"
   },
   aimedis_prescription_system: {
     en: "Aimedis – prescription system",
@@ -173,6 +184,7 @@ module.exports.common = {
     pt: "Aimedis – sistema de prescrição",
     rs: "Aimedis: Система выписки рецептов",
     fr: "Aimedis - Système de prescription",
+    tr:"Aimedis - reçete sistemi"
   },
   aimedis_sick_cert_system: {
     en: `Aimedis – sick certificate system`,
@@ -185,6 +197,7 @@ module.exports.common = {
     de: `Aimedis – Online AU(Arbeitsunfähigkeitsbescheinigung)`,
     sw: `Aimedis - mfumo wa cheti cha wagonjwa`,
     ar: "<div class='arabic'>Aimedis- نظام الشهادات المرضيةد</div>",
+    tr:"Aimedis - hastalık sertifika sistemi"
   },
   aimedis_second_opinion_system: {
     en: `Aimedis – second opinion system`,
@@ -197,6 +210,7 @@ module.exports.common = {
     de: `Aimedis – Zweitmeinungsportal`,
     sw: `Aimedis - Mfumo wa maoni ya pili`,
     ar: "<div class='arabic'>Aimedis- نظام الرأي الثاني</div>",
+    tr:"Aimedis - ikinci görüş sistemi"
   },
   dear_with_name: {
     en: "Dear {6} <br><br>",
@@ -209,6 +223,7 @@ module.exports.common = {
     sw: "BIMA Mpendwa {6}<br><br>",
     fr: "Cher {6}<br><br>",
     ar: "{6} عزيزي <br><br>",
+    tr: "Sayın {6} <br><br>",
   },
   dear_with_name_onzero: {
     en: "Dear {0} .<br><br>",
@@ -221,6 +236,7 @@ module.exports.common = {
     sw: "BIMA Mpendwa {0}.<br><br>",
     fr: "Cher {0}<br><br>",
     ar: "{0} عزيزي <br><br>",
+    tr: "Sayın {0} <br><br>",
   },
   aimedis_emergency_access: {
     en: "Aimedis – emergency access",
@@ -234,5 +250,6 @@ module.exports.common = {
     rs: "Aimedis - экстренный доступ",
     fr: "Aimedis - Accès d'urgence",
     ar: `${arabicContainerstart} Aimedis - الوصول في حالات الطوارئ ${divclose}`,
+    tr:"Aimedis - acil erişim"
   },
 };

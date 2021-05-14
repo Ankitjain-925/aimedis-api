@@ -81,7 +81,13 @@ Dans la pièce jointe de ce message, vous trouverez les conditions générales a
 
 Vous pouvez nous joindre via le chat d'assistance Aimedis dans le système ou par e-mail via ${emailLink}.`;
 
-
+const welcome_message_emergency_tr=`Aimedis ile hep güvenilir taraftasınız çünkü hem tıbbi bilgileriniz hemde güvendiğiniz doktorlar size bütün dünyada günün 24 saati eşlik edecekler. <br><br>
+Aimedis’de siz ve doktorlarınız, terapistleriniz ve hastaneleriniz bilgilerinizi kayıt ediyorlar, sağlık hizmeti çalışanlarınla önemli bilgiler paylaşıyorsunuz ve bunlara her zaman erişebiliyorsunuz. Terminler ayarlamak, hasta raporu almak, planlanmış bir ameliyat hakkında ikinci fikir almak ve istediğiniz doktorla konuşmak günün ve gecenin her saatinde mümkün. 
+Yanlızca en yüksek veri güvenliğinden faydalanmıyorsunz bununla beraber Aimedis blok zincirindende faydalanıyorsunuz çünkü bunu kullanarak her an belgelerinizin yanlızca sizden ve dilediginiz sağlık işleri sunucusundan  görüntüleceğini sağlayabilirsiniz. Sizin bilgileriniz, sizin kararınız.
+Şu anki durumu ve SARS korona virüsünden dolaylanan problemleri göz önünde bulundurduğunuzda Aimedis buna uygun bir günlük hastalar ve praktisyenler için sunuyor artı Covid-19’la ilgili bütün konular hakkında parasız danışma imkanı sağlıyor. <br><br>
+Bu mesaja ek olarak koşullari ve şartlari ve ayni zamanda veri koruma düzenlemelerini bulacaksiniz. 
+Bize Aimedis Destek Chat yoluyla veya ${emailLink}‘a emay göndererek ulaşabilirsiniz. 
+`
 
 module.exports = {
   welcome_message_patient_de,
@@ -94,6 +100,7 @@ module.exports = {
   welcome_message_patient_pt,
   welcome_message_patient_fr,
   welcome_message_patient_ar,
+  welcome_message_emergency_tr,
   emailLink,
   licenseLink,
 };

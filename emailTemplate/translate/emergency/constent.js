@@ -61,6 +61,13 @@ const welcome_message_emergency_ar = `${arabicContainerstart}
 <br><br>
 . سيتم إلغاء قفل حسابك في غضون 24 ساعة ، فقط إذا قمت بتحميل الترخيص الخاص بك اثناء تسجيلك. إذا لم يكن كذلك ، يرجى إرساله إلى ${licenseLink} .<br><br>
 إذا كانت لديك أسئلة ، يمكنك الوصول إلينا من خلال دردشة الدعم الخاصة بAimedis داخل النظام أو البريد الإلكتروني عبر ${emailLink}<br><br>`;
+const welcome_message_emergency_tr=`
+Aimedis ile hep hastanızın yanındasınız ve doktorlarla ve Aimedis destek ekibiyle direk bağlantıdasınız
+Hastanın acil bilgilerine hastanın kimliğinin veya sağlık sigorta kartının üzerindeki karekodu tarayarak giriş sağlıyabilirsiniz.<br><br>
+Kayıdınızla birlikte lisansınızı yüklediyseniz hesabınız 24 saat içinde açılacaktır. Eğer yüklemediyseniz o zaman lisansınızı lütfen  ${licenseLink}.com ‘a gönderin.<br><br>
+Sorularınız varsa, bize sistemin içinde bulunan Aimedis Destek Chat yoluyla veya ${emailLink}<br><br>‘a emay göndererek ulaşabilirsiniz.
+
+`
 module.exports = {
   welcome_message_emergency_de,
   welcome_message_emergency_en,
@@ -72,4 +79,5 @@ module.exports = {
   welcome_message_emergency_pt,
   welcome_message_emergency_fr,
   welcome_message_emergency_ar,
+  welcome_message_emergency_tr
 };

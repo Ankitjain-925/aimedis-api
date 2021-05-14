@@ -9,6 +9,7 @@ const {
   welcome_message_insurance_pt,
   welcome_message_insurance_fr,
   welcome_message_insurance_ar,
+  welcome_message_emergency_tr
 } = require("./constant");
 
 module.exports.insuranceLang = {
@@ -23,5 +24,6 @@ module.exports.insuranceLang = {
     pt: welcome_message_insurance_pt,
     ar: welcome_message_insurance_ar,
     fr: welcome_message_insurance_fr,
+    tr:welcome_message_emergency_tr
   },
 };

@@ -9,6 +9,7 @@ const {
   welcome_message_patient_pt,
   welcome_message_patient_fr,
   welcome_message_patient_ar,
+  welcome_message_emergency_tr,
   emailLink,
   licenseLink,
 } = require("./constent");
@@ -26,6 +27,7 @@ module.exports.patientLang = {
     pt: welcome_message_patient_pt,
     ar: welcome_message_patient_ar,
     fr: welcome_message_patient_fr,
+    tr:welcome_message_emergency_tr
   },
   there_was_an_emergancy_access: {
     en: `${
@@ -59,6 +61,9 @@ module.exports.patientLang = {
     fr: `${
       common.dear_with_name.fr
     }Il y a eu un accès d'urgence aux données de votre profil Aimedis. L'accès d'urgence a été effectué par {2} - {0} le {3}. Si vous pensez que l'accès est inapproprié, veuillez nous contacter immédiatement via ${emailLink}`,
+    tr:`${
+      common.dear_with_name.tr
+    } ,Aimedis profilinizdeki verilere acil erişim vardı. <br> Acil durum erişimi {3} tarihinde {2} - {0} tarafından yapıldı. Erişimin uygunsuz olduğuna inanıyorsanız, <br> lütfen ${emailLink} üzerinden bize hemen ulaşın`,
   },
   apoointment_message_pat: {
     en: `${
@@ -109,6 +114,11 @@ module.exports.patientLang = {
     } Una miadi na {0} mnamo {5} saa {3}.<br><br>
         Ikiwa huwezi kufanya miadi, tafadhali ighairi angalau masaa 24 kabla.<br><br>
         Ikiwa una maswali yoyote, wasiliana na daktari wako kupitia <b>{4}<b>. Vinginevyo, unaweza kuwasiliana nasi kupitia ${emailLink}.com au mazungumzo ya msaada ya Aimedis ikiwa una shida kuwasiliana na daktari wako.`,
+  tr:`${
+    common.dear_with_name.tr
+  } <br><br><br> {0} ile {5}, {3} randevunuz var. <br> <br>
+  Randevu alamazsanız, lütfen en az 24 saat önce iptal edin. <br> <br>
+  Herhangi bir sorunuz varsa, <b> {4} </b> aracılığıyla doktorunuzla iletişime geçin. <br> Alternatif olarak, doktorunuzla iletişim kurmakta zorluk çekiyorsanız, ${emailLink} .com veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçebilirsiniz.`,
   },
   //0,6
   prescrtion_message_pat: {
@@ -143,6 +153,10 @@ module.exports.patientLang = {
         {0} kümmert sich um die Angelegenheit und wird Sie per E-Mail kontaktieren. Wir bitten um<br> Geduld für ca. 24 bis 48 Stunden. Bei Fragen wenden Sie sich bitte über ${emailLink} oder<br> den Aimedis-Support-Chat an uns.`,
     sw: `${common.dear_with_name.sw} Umeomba dawa kutoka kwa {0}.<br><br>
         {0} atashughulikia jambo hilo na kuwasiliana na wewe kupitia barua pepe.Tunaomba<br> uvumilivu kwa masaa 24 hadi 48. Ikiwa una maswali yoyote, tafadhali wasiliana nasi kupitia<br> ${emailLink} au mazungumzo ya msaada ya Aimedis.`,
+   tr:`${common.dear_with_name.tr} <br> <br> <br>
+        {0} 'den reçete istediniz. <br> <br>
+         {0} konuyla ilgilenecek ve sizinle e-posta yoluyla iletişim kuracak. 24 ila 48 <br> saat sabır istiyoruz. Herhangi bir sorunuz varsa, lütfen ${emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçin.`
+    
   },
   sick_cert_message_pat: {
     en: `${
@@ -180,6 +194,10 @@ module.exports.patientLang = {
       common.dear_with_name.sw
     } Umeomba cheti cha ugonjwa kutoka kwa {0}.<br><br>
         {0} atashughulikia jambo hilo na kuwasiliana na wewe kupitia barua pepe.Tunaomba uvumilivu kwa <br>masaa 24 hadi 48. Ikiwa una maswali yoyote, tafadhali wasiliana nasi kupitia ${emailLink} au<br> mazungumzo ya msaada ya Aimedis.`,
+    tr:`${
+      common.dear_with_name.tr
+    } <br> <br> <br> {0} firmasından bir hastalık raporu talep ettiniz. <br> <br>
+        {0} konuyla ilgilenecek ve sizinle e-posta yoluyla iletişim kuracak. 24 ila 48 <br> saat sabır istiyoruz. Herhangi bir sorunuz varsa, lütfen ${emailLink} veya Aimedis destek <br> sohbeti aracılığıyla bizimle iletişime geçin.`
   },
   second_opinion_message: {
     en: `${
@@ -218,6 +236,10 @@ module.exports.patientLang = {
     } Umeomba maoni ya pili kutoka kwa {0}.<br><br>
         {0} atashughulikia jambo hilo na kuwasiliana na wewe kupitia barua pepe.Tunaomba uvumilivu kwa <br> masaa 24 hadi 48. Ikiwa una maswali yoyote, tafadhali wasiliana nasi kupitia ${emailLink} au <br>mazungumzo ya msaada ya Aimedis.`,
   },
+  tr:`${
+    common.dear_with_name.tr
+     } {0} adlı kişiden ikinci bir görüş istediniz. <br> <br>
+         {0} konuyla ilgilenecek ve sizinle e-posta yoluyla iletişim kuracak. 24 ila 48 saat sabır istiyoruz. Herhangi bir sorunuz varsa, lütfen ${emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçin.`
 };
 
 let messageStuct = {

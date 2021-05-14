@@ -9,6 +9,7 @@ const {
     welcome_message_therapist_pt,
     welcome_message_therapist_fr,
     welcome_message_therapist_ar,
+    welcome_message_therapist_tr
 } = require("./constent");
 
 module.exports.therapistLang = {
@@ -23,5 +24,6 @@ module.exports.therapistLang = {
         pt: welcome_message_therapist_pt,
         ar: welcome_message_therapist_ar,
         fr: welcome_message_therapist_fr,
+        tr:welcome_message_therapist_tr
     }
 };

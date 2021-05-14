@@ -52,6 +52,11 @@ const welcome_message_nurse_ar = `<div class='arabic'>الصحية
 سيتم إلغاء قفل حسابك في غضون 24 ساعة ، فقط إذا قمت بتحميل الترخيص الخاص بك اثناء تسجيلك. إذا لم يكن كذلك ، يرجى إرساله إلى ${licenseLink} .<br><br>
 إذا كانت لديك أسئلة ، يمكنك الوصول إلينا من خلال دردشة الدعم الخاصة بAimedis داخل النظام أو البريد الإلكتروني عبر ${emailLink}.<br><br>
 `;
+const welcome_message_nurse_tr =`Aimedis ile hep hastanızın yanındasınız ve doktorlarla ve Aimedis destek ekibi ile direk bağlantıdasınız. 
+Hastaların bilgilerine şifreyi ve kimliği girerek ulaşabilirsiniz, vital bilgiler veya belgeler ekleyebilirsiniz yada gerektiğinde acil belgelerine giriş yapabilirsiniz.<br><br> 
+Kayıdınızla birlikte lisansınızı yüklediyseniz hesabınız 24 saat içinde açılacaktır. Eğer yüklemediyseniz o zaman lisansınızı lütfen   ${licenseLink}  ‘a gönderin.<br><br> 
+Sorularınız varsa, bize sistemin içinde bulunan Aimedis Destek Chat yoluyla veya  ${emailLink} ‘a emay göndererek ulaşabilirsiniz.  <br><br> 
+` 
 module.exports = {
   welcome_message_nurse_de,
   welcome_message_nurse_en,
@@ -63,4 +68,5 @@ module.exports = {
   welcome_message_nurse_pt,
   welcome_message_nurse_fr,
   welcome_message_nurse_ar,
+  welcome_message_nurse_tr
 };

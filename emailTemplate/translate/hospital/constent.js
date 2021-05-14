@@ -63,6 +63,14 @@ const welcome_message_hospital_ar = `${arabicContainerstart}مع Aimedis ، تس
 سيتم إلغاء قفل حسابك في غضون 24 ساعة ، بعد توقيع العقد .
 <br><br>
 إذا كانت لديك أسئلة ، يمكنك الوصول إلينا من خلال دردشة الدعم الخاصة بAimedis داخل النظام أو البريد الإلكتروني عبر ${emailLink}`;
+const welcome_message_hospital_tr =`Aimedis ile hep hastanızın, doktorlarınızın ve sağlık personelinizin yanındasınız. Kendinizin ve hastanızın bilgilerine erişebilirsiniz ve organize edebilirsiniz, onlarla videochat yoluyla konuşabilirsiniz, reçeteler ve hasta raporları yazabilirsiniz ve ikinci fikirler gönderebilirsiniz. Acil evraklara erişebilirsiniz, Aimedis eLearning & eTeaching modülüne erişebilirsiniz, eczanelere bir tıklamayla reçeteler gönderebilirsiniz ve çok daha fazlası. YouTube kanalımızı ziyaret ederek Aimedis hakkında daha fazla bilgi edinebilirsiniz.<br><br>
+Aimedis Sanal Hastanesi komple yeni bir hastane bilgi sistem tipi sunuyor ve bütün katılımcıları birbirileriyle bağlarken kuruluşun içindeki benzersiz iç dünyayıda size sunuyor.<br><br>
+Bu emaye özel bir kullanma kılavuzu eklendi ve Aimedis’in bütün fonksiyonlarını YouTube kanalından öğrenebilirsiniz.<br><br>
+Hesabınız sözleşme imzalandığından sonra 24 saat içinde açılacak.
+Sorularınız varsa, bize sistemin içinde bulunan Aimedis Destek Chat yoluyla veya  ${emailLink} ‘a emay göndererek ulaşabilirsiniz.
+
+`
+
 module.exports = {
   welcome_message_hospital_de,
   welcome_message_hospital_en,
@@ -74,4 +82,5 @@ module.exports = {
   welcome_message_hospital_pt,
   welcome_message_hospital_fr,
   welcome_message_hospital_ar,
+  welcome_message_hospital_tr
 };

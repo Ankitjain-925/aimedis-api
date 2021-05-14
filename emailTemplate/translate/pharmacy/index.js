@@ -9,6 +9,7 @@ const {
   welcome_message_pharmacy_pt,
   welcome_message_pharmacy_fr,
   welcome_message_pharmacy_ar,
+  welcome_message_pharmacy_tr
 } = require("./constent");
 
 const { common, arabicContainerstart } = require("../common");
@@ -62,7 +63,10 @@ const prescription_mssg_ar = `${arabicContainerstart}${common.dear_with_name.ar}
 لقد تلقيت وصفة طبية جديدة لـ {0} ، {1} ، في {5} الساعة {4} من {3} ، {2}. <br> <br>
 يرجى التحقق من الطلب الموجود داخل ملف تعريف Aimedis الخاص بك. إذا كانت لديك أية أسئلة ، فيرجى الاتصال بالطبيب عبر {7} أو {8}. بدلاً من ذلك ، يمكنك الاتصال بنا عبر {emailLink} أو دردشة دعم Aimedis إذا واجهتك صعوبات في الاتصال بالطبيب.
 `;
-
+const prescription_mssg_tr=`${
+  common.dear_with_name.tr
+} {0}, {1} için, {5} tarihinde, {3}, {2} adresinden {4} tarihinde yeni bir reçete aldınız. <br> <br>
+Lütfen Aimedis profilinizdeki isteği kontrol edin. Herhangi bir sorunuz varsa, lütfen {7} veya {8} aracılığıyla doktorla iletişime geçin. Alternatif olarak, doktorla iletişim kurmakta güçlük çekiyorsanız, ${emailLink} veya Aimedis destek sohbeti aracılığıyla bizimle iletişime geçebilirsiniz.`
 module.exports.pharmacyLang = {
   welcome_message_pharmacy: {
     en: welcome_message_pharmacy_en,
@@ -75,6 +79,7 @@ module.exports.pharmacyLang = {
     pt: welcome_message_pharmacy_pt,
     ar: welcome_message_pharmacy_ar,
     fr: welcome_message_pharmacy_fr,
+    tr:welcome_message_pharmacy_tr
   },
   prescription_mssg_pharmacy: {
     en: prescription_mssg_en,
@@ -87,6 +92,7 @@ module.exports.pharmacyLang = {
     pt: prescription_mssg_pt,
     ar: prescription_mssg_ar,
     fr: prescription_mssg_fr,
+    tr:prescription_mssg_tr
   },
 };
 

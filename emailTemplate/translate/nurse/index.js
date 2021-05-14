@@ -9,6 +9,7 @@ const {
   welcome_message_nurse_pt,
   welcome_message_nurse_fr,
   welcome_message_nurse_ar,
+  welcome_message_nurse_tr
 } = require("./constent");
 
 module.exports.nurseLang = {
@@ -23,5 +24,6 @@ module.exports.nurseLang = {
     pt: welcome_message_nurse_pt,
     ar: welcome_message_nurse_ar,
     fr: welcome_message_nurse_fr,
+    tr:welcome_message_nurse_tr
   },
 };
