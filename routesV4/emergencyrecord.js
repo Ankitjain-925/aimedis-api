@@ -254,6 +254,7 @@ router.get('/:UserId', function (req, res, next) {
                                     if(doc.organ_donor[0].selectedOption == 'yes_to_all')
                                     {
                                         statusbyp = {label_en : 'Transplantation of one or more organ / tissues of mine after doctors have pronounced me dead',
+                                        label_tr : 'Doktorlar öldüğümü bildirdikten sonra bir veya daha fazla organ / doku nakli',
                                         label_pt : 'Transplante de um ou mais órgãos / tecidos meus depois que os médicos me declararam morto',
                                         label_nl : 'Transplantatie van een of meer organen / weefsels van mij nadat doktoren mij dood hebben verklaard',
                                         label_rs : 'Трансплантация одного или нескольких моих органов / тканей после того, как врачи констатировали мою смерть',
@@ -269,6 +270,7 @@ router.get('/:UserId', function (req, res, next) {
                                     else if(doc.organ_donor[0].selectedOption == 'exclude_some')
                                     {
                                         statusbyp = {label_en : 'Transplantation of organ / tissues of mine after doctors have pronounced me dead except for following organ / tissues',
+                                        label_tr : 'Doktorlar öldüğümü ilan ettikten sonra organ / doku nakli aşağıdaki organ / dokular için kabul et',
                                         label_pt : 'Transplante de órgãos / tecidos meus depois que os médicos me declararam morto aceito para os seguintes órgãos / tecidos',
                                         label_nl : 'Transplantatie van orgaan / weefsels van mij nadat doktoren mij dood hebben verklaard, accepteren voor het volgen van orgaan / weefsels',
                                         label_rs : 'Трансплантация моего органа / тканей после того, как врачи объявили меня мертвым, согласны на следующие органы / ткани',
@@ -289,6 +291,7 @@ router.get('/:UserId', function (req, res, next) {
                                     else if(doc.organ_donor[0].selectedOption == 'include_some')
                                     {
                                         statusbyp = {label_en :'Transplantation of organ / tissues of mine after doctors have pronounced me dead only for following organ / tissues',
+                                        label_tr :'Sadece aşağıdaki organ / dokular için doktorlar öldüğümü ilan ettikten sonra organ / dokularımın nakli',
                                         label_pt : 'Transplante de órgãos / tecidos meus depois que os médicos me declararam morto apenas pelos seguintes órgãos / tecidos',
                                         label_nl : 'Transplantatie van orgaan / weefsels van mij nadat doktoren mij dood hebben verklaard, alleen voor het volgen van orgaan / weefsels',
                                         label_rs : 'Трансплантация моего органа / тканей после того, как врачи объявили меня мертвым, только для следующих органов / тканей',
@@ -309,6 +312,7 @@ router.get('/:UserId', function (req, res, next) {
                                     else if(doc.organ_donor[0].selectedOption == 'not_allowed')
                                     {
                                         statusbyp = {label_en :'NOT allow a transplantation of any of my organs or tissues',
+                                        label_tr :'Organlarımdan veya dokularımdan herhangi birinin nakline izin VERMEYİN',
                                         label_pt : 'NÃO permitir o transplante de nenhum dos meus órgãos ou tecidos',
                                         label_nl : 'GEEN transplantatie van mijn organen of weefsels toestaan',
                                         label_rs : 'НЕ разрешать трансплантацию любого из моих органов или тканей',
@@ -322,6 +326,7 @@ router.get('/:UserId', function (req, res, next) {
                                     else if(doc.organ_donor[0].selectedOption == 'decided_by_following')
                                     {
                                         statusbyp = {label_en : 'Transplantation of one or more organ / tissues of mine after doctors have pronounced me dead YES or NO shall be decided by the following person',
+                                        label_tr : 'Doktorlar öldüğümü bildirdikten sonra bir veya daha fazla organ / doku nakline aşağıdaki kişi tarafından EVET veya HAYIR karar verilecektir.',
                                         label_pt : 'O transplante de um ou mais órgãos / tecidos meus após os médicos me declararem morto SIM ou NÃO será decidido pela seguinte pessoa',
                                         label_nl : 'Transplantatie van een of meer organen / weefsels van mij nadat doktoren mij dood hebben verklaard JA of NEE wordt beslist door de volgende persoon',
                                         label_rs : 'Решение о трансплантации одного или нескольких моих органов / тканей после того, как врачи объявили меня умершим ДА или НЕТ, принимает следующий человек',
@@ -342,6 +347,7 @@ router.get('/:UserId', function (req, res, next) {
                                     {
                                         statusbyp = {label_en : 'Nothing',
                                         label_pt : 'Nada',
+                                        label_tr: "Hiçbir şey değil",
                                         label_nl : 'Niets',
                                         label_rs : 'Ничего',
                                         label_de : 'Nichts',
@@ -360,6 +366,7 @@ router.get('/:UserId', function (req, res, next) {
                             else {
                                 statusbyp = {label_en : 'Nothing',
                                 label_pt : 'Nada',
+                                label_tr: "Hiçbir şey değil",
                                 label_nl : 'Niets',
                                 label_rs : 'Ничего',
                                 label_de : 'Nichts',
