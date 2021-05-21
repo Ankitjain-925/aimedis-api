@@ -983,6 +983,8 @@ router.put('/Bookservice', (req, res) => {
     var paymentData = {
         created: moment(new Date()).format("MM/DD/YYYY"),
         description: req.body.description,
+        payment_info: req.body.payment_info,
+        subscription_info : req.body.subscription_info
     }
     User.updateOne({ _id: legit.id }, { $push: { paid_services: paymentData } },
         { safe: true, upsert: true }, function (err, doc) {
@@ -5256,7 +5258,7 @@ router.post('/downloadPdf', function (req, res, next) {
     var Data = [];
     {
         Object.entries(req.body.Dieseases).map(([key, value]) => {
-            if (key !== 'event_date' && key !== 'SARS' && key !== 'Positive_SARS' && key !== 'attachfile' && key !== 'created_by_image' && key !== 'created_by_profile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'created_on' && key !== 'publicdatetime' && key !== 'track_id') {
+            if (key !== 'event_date' && key !== 'reminder_time_taken' && key !== 'data_of_vaccination' && key !== 'reminder_date_taken' && key !== 'time_taken' && key !== 'SARS' && key !== 'Positive_SARS' && key !== 'attachfile' && key !== 'created_by_image' && key !== 'created_by_profile' && key !== 'created_by_temp2' && key !== 'type' && key !== 'created_by_temp' && key !== 'created_by' && key !== 'created_on' && key !== 'publicdatetime' && key !== 'track_id') {
                 if (Array.isArray(value)) {
                     Data.push({ 'k': key.replace(/_/g, ' '), 'v': Array.prototype.map.call(value, s => s.label).toString().split(/[,]+/).join(',  ') })
                 }
@@ -5269,9 +5271,6 @@ router.post('/downloadPdf', function (req, res, next) {
                         || key === 'last_visit_date' || key === 'date_measured' || key === 'prescribed_on' || key === 'until' || key === 'from_when' || key === 'until_when'
                         || key === 'data_of_vaccination') {
                         Data.push({ 'k': key.replace(/_/g, ' '), 'v': getDate(value, 'YYYY/MM/DD') })
-                    }
-                    else if (key === 'reminder_time_taken' || key === 'time_taken') {
-                        Data.push({ 'k': key.replace(/_/g, ' '), 'v': getReminder(value, '24') })
                     }
                     else if (key === 'time_measured') {
                         Data.push({ 'k': key.replace(/_/g, ' '), 'v': getTime(value, '24') })
