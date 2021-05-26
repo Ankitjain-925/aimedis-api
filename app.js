@@ -143,7 +143,7 @@ app.use('/api/v4/admin', adminse4);
 app.use('/api/v4/aws', Uploadcerts4);
 app.use("/api/v4/blockchain", bloackchain4);
 app.use("/api/v4/cron", cronPrecess4)
-app.use("/api/v4/specilty", vspecialty4)
+app.use("/api/v4/vh", vspecialty4)
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

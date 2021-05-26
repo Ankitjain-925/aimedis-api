@@ -9,11 +9,12 @@ const RoomsAdd = new mongoose.Schema({
         required: false,
         unique: false
      },
-     beds:{
+    beds:{
         type: Number,
         required: false,
         unique: false 
-     }
+     },
+     current_patients: {type : Array}
 },{ strict: false });
 
 RoomsAdd.plugin(mongooseFieldEncryption, {
@@ -50,6 +51,11 @@ var SpecialtySchema = new Schema({
       required: false,
       unique: false
     },
+    background_color:{
+        type: String,
+        required: false,
+        unique: false
+    },
     wards: [WardsAdd],
     virtual_hospital_id: {
         type: String,
@@ -58,10 +64,9 @@ var SpecialtySchema = new Schema({
     }
 },{ strict: false });
 
-SpecialtySchema.plugin(mongooseFieldEncryption, { fields: [ "specialty_name", "color"], secret: process.env.SOME_32BYTE_BASE64_STRING,
+SpecialtySchema.plugin(mongooseFieldEncryption, { fields: [ "specialty_name", "color", "background_color"], secret: process.env.SOME_32BYTE_BASE64_STRING,
 saltGenerator: function (secret) {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
   } });
 var Virtual_Specialty = mongoose.model('virtual_specialty', SpecialtySchema);
 module.exports = Virtual_Specialty;
- 
