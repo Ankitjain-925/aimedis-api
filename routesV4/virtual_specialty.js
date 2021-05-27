@@ -2,7 +2,9 @@ require('dotenv').config();
 var express = require('express');
 let router = express.Router();
 var Virtual_Specialty = require('../schema/virtual_specialty');
-var virtual_Task = require('../schema/tasks.js');
+var virtual_Task = require('../schema/virtual_tasks.js');
+var virtual_Service = require('../schema/virtual_services.js');
+var virtual_Invoice = require('../schema/virtual_invoice.js');
 var jwtconfig = require('../jwttoken');
 
 router.delete('/AddSpecialty/:specialty_id', function (req, res, next) {
@@ -206,7 +208,7 @@ router.post('/ProfessionalTaskComment/:task_id', function (req, res, next) {
                     res.json({ status: 200, hassuccessed: false, msg: 'Task is not found' })
                 }
                 else {
-                        res.json({ status: 200, hassuccessed: true, msg: 'comment is added' })
+                        res.json({ status: 200, hassuccessed: true, msg: 'Comment is added' })
                     }
                 }
             });
@@ -237,10 +239,10 @@ router.put('/ProfessionalTaskComment/:task_id/:comment_id', function (req, res, 
                     res.json({ status: 200, hassuccessed: false, msg: 'Task is not found' })
                 }
                 else {
-                        res.json({ status: 200, hassuccessed: true, msg: 'comment is updated' })
-                    }
+                    res.json({ status: 200, hassuccessed: true, msg: 'Comment is updated' })
                 }
-            });
+            }
+        });
     } else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
@@ -261,7 +263,7 @@ router.delete('/ProfessionalTaskComment/:task_id/:comment_id', function (req, re
                     res.json({ status: 200, hassuccessed: false, msg: 'Comment is not found' })
                 }
                 else {
-                        res.json({ status: 200, hassuccessed: true, msg: 'comment is deleted' })
+                        res.json({ status: 200, hassuccessed: true, msg: 'Comment is deleted' })
                     }
                 }
             });
@@ -269,4 +271,143 @@ router.delete('/ProfessionalTaskComment/:task_id/:comment_id', function (req, re
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
+
+router.delete('/AddService/:service_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        virtual_Service.findByIdAndRemove(req.params.service_id, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, hassuccessed: true, message: 'Service is Deleted Successfully' });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.put('/AddService/:service_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        virtual_Service.updateOne({ _id: req.params.service_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, msg: 'Service is updated', data: userdata })
+            }
+        })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.post('/AddService', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        var Virtual_Services = new virtual_Service(req.body);
+        Virtual_Services.save(function (err, user_data) {
+            if (err && !user_data) {
+                res.json({ status: 200, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, message: 'Added Successfully', hassuccessed: true });
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.get('/AddService/:virtual_hospital_id:', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        virtual_Service.find({ virtual_hospital_id: req.params.virtual_hospital_id }, function (err, userdata) {
+            if (err && !userdata) {
+                res.json({ status: 200, hassuccessed: false, message: "services not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: userdata })
+            }
+        })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.delete('/AddInvoice/:bill_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        virtual_Invoice.findByIdAndRemove(req.params.bill_id, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, hassuccessed: true, message: 'Invoice is Deleted Successfully' });
+            }
+        });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.put('/AddInvoice/:bill_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        virtual_Invoice.updateOne({ _id: req.params.bill_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, msg: 'Invoice is updated', data: userdata })
+            }
+        })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.post('/AddInvoice', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        var virtual_Invoices = new virtual_Invoice(req.body);
+        virtual_Invoices.save(function (err, user_data) {
+            if (err && !user_data) {
+                res.json({ status: 200, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, message: 'Added Successfully', hassuccessed: true });
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.get('/AddInvoice/:virtual_hospital_id/:status', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        var search = { virtual_hospital_id: req.params.virtual_hospital_id }
+        if(req.params.status !=='all'){
+            var search = { virtual_hospital_id: req.params.virtual_hospital_id, status: req.params.status }
+        }
+        virtual_Invoice.find(search, function (err, userdata) {
+            if (err && !userdata) {
+                res.json({ status: 200, hassuccessed: false, message: "invoice not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: userdata })
+            }
+        })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
 module.exports = router;
