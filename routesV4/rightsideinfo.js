@@ -309,84 +309,84 @@ function getAlltrack(data) {
 }
 
 //Get doctor info
-router.get('/doctor', function (req, res, next) {
-    const token = (req.headers.token)
-    var prescriptions = 0, patients = 0, sickcertificate = 0,appointments = 0, lastpatient={};
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        user.find(
-            {
-                '_id':legit.id,    
-            },
-            function (err, doc) {
-                    if (err && !doc) {
-                        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
-                    } else {
-                        var info =doc[0];
-                        let promise = new Promise(function (resolve, reject) {
-                        prescription.count({doctor_id: legit.id},function (err, count) {
-                            if(err){}
-                            else{
-                                prescriptions = count;
-                            }
-                        })
-                        sick_certificate.count({doctor_id: legit.id},function (err, count) {
-                            if(err){}
-                            else{
-                                sickcertificate = count;
-                            }
-                        })
-                        appointment.count({doctor_id: legit.id},function (err, count) {
-                            if(err){}
-                            else{
-                                appointments = count;
-                            }
-                        })
-                        user.count({parent_id: legit.id},function (err, count) {
-                            if(err){}
-                            else{
-                                patients = count;
-                            }
-                        })
-                        setTimeout(() => resolve(), 1000);
+// router.get('/doctor', function (req, res, next) {
+//     const token = (req.headers.token)
+//     var prescriptions = 0, patients = 0, sickcertificate = 0,appointments = 0, lastpatient={};
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         user.find(
+//             {
+//                 '_id':legit.id,    
+//             },
+//             function (err, doc) {
+//                     if (err && !doc) {
+//                         res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
+//                     } else {
+//                         var info =doc[0];
+//                         let promise = new Promise(function (resolve, reject) {
+//                         prescription.count({doctor_id: legit.id},function (err, count) {
+//                             if(err){}
+//                             else{
+//                                 prescriptions = count;
+//                             }
+//                         })
+//                         sick_certificate.count({doctor_id: legit.id},function (err, count) {
+//                             if(err){}
+//                             else{
+//                                 sickcertificate = count;
+//                             }
+//                         })
+//                         appointment.count({doctor_id: legit.id},function (err, count) {
+//                             if(err){}
+//                             else{
+//                                 appointments = count;
+//                             }
+//                         })
+//                         user.count({parent_id: legit.id},function (err, count) {
+//                             if(err){}
+//                             else{
+//                                 patients = count;
+//                             }
+//                         })
+//                         setTimeout(() => resolve(), 1000);
 
-                    });
-                    promise.then(()=>{
-                        res.json({status: 200, hassuccessed: true, data :{ info: info, prescriptions: prescriptions, sickcertificate:sickcertificate, appointments:appointments,patients:patients}});
-                    })
-                    }
-            });
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
-});
+//                     });
+//                     promise.then(()=>{
+//                         res.json({status: 200, hassuccessed: true, data :{ info: info, prescriptions: prescriptions, sickcertificate:sickcertificate, appointments:appointments,patients:patients}});
+//                     })
+//                     }
+//             });
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// });
 
 
 //Get nurse info
-router.get('/other', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        // var track_id = {track_id : req.params.TrackId}
-        var data = req.body.data
-        user.find(
-            {
-                '_id':legit.id,    
-            },
-            function (err, doc) {
-                if (err && !doc) {
-                    res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-                } else {
-                        var info = doc[0]
-                        res.json({status: 200, hassuccessed: true, data : {info: info}});
-                    }
-            });
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
-});
+// router.get('/other', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         // var track_id = {track_id : req.params.TrackId}
+//         var data = req.body.data
+//         user.find(
+//             {
+//                 '_id':legit.id,    
+//             },
+//             function (err, doc) {
+//                 if (err && !doc) {
+//                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+//                 } else {
+//                         var info = doc[0]
+//                         res.json({status: 200, hassuccessed: true, data : {info: info}});
+//                     }
+//             });
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// });
 
 function mySorter(a, b) {
     var x = a.datetime_on.toLowerCase();

@@ -39,32 +39,32 @@ var track2 = [];
 
 //var paths= "http:/localhost:5000/uploads/Trackrecord"
 var paths = "https://aimedis1.com/public/uploads/Trackrecord"
-var storage = multer.diskStorage(
-    {
-        destination: function (req, file, cb) {
-            cb(null, 'public/uploads/Trackrecord')
-        },
-        filename: function (req, file, cb) {
+// var storage = multer.diskStorage(
+//     {
+//         destination: function (req, file, cb) {
+//             cb(null, 'public/uploads/Trackrecord')
+//         },
+//         filename: function (req, file, cb) {
 
-            cb(null, Date.now() + '-' + file.originalname)
-        }
+//             cb(null, Date.now() + '-' + file.originalname)
+//         }
 
-    })
+//     })
 
-var storage1 = multer.diskStorage(
-    {
-        destination: function (req, file, cb) {
-            cb(null, 'public/uploads/KYC')
-        },
-        filename: function (req, file, cb) {
+// var storage1 = multer.diskStorage(
+//     {
+//         destination: function (req, file, cb) {
+//             cb(null, 'public/uploads/KYC')
+//         },
+//         filename: function (req, file, cb) {
 
-            cb(null, Date.now() + '-' + file.originalname)
-        }
-    })
+//             cb(null, Date.now() + '-' + file.originalname)
+//         }
+//     })
 
-var upload = multer({ storage: storage }).single("UploadTrackImage");
-var upload1 = multer({ storage: storage }).array("UploadTrackImageMulti", 5);
-var upload2 = multer({ storage: storage1 }).single("Uploadkyc");
+// var upload = multer({ storage: storage }).single("UploadTrackImage");
+// var upload1 = multer({ storage: storage }).array("UploadTrackImageMulti", 5);
+// var upload2 = multer({ storage: storage1 }).single("Uploadkyc");
 
 //Temprary for add the User
 
@@ -132,26 +132,26 @@ router.get('/getAllKyc', function (req, res, next) {
     }
 });
 
-router.post('/Uploadkyc', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        upload2(req, res, function (err) {
-            if (err instanceof multer.MulterError) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Please upload images less than 6', error: err })
-            } else if (err) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-            }
-            else {
-                var file_entry = { filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }
-                res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
-            }
-        })
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
-});
+// router.post('/Uploadkyc', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         upload2(req, res, function (err) {
+//             if (err instanceof multer.MulterError) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Please upload images less than 6', error: err })
+//             } else if (err) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+//             }
+//             else {
+//                 var file_entry = { filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }
+//                 res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
+//             }
+//         })
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// });
 
 router.post('/Addkyc', function (req, res, next) {
     const token = (req.headers.token)
@@ -467,51 +467,51 @@ router.delete('/AddTrack/:UserId/:TrackId', function (req, res, next) {
 
 
 //for upload the image 
-router.post('/AddTrack/TrackUploadImage', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
+// router.post('/AddTrack/TrackUploadImage', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
 
-    if (legit) {
-        upload(req, res, function (err) {
-            if (err instanceof multer.MulterError) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Please upload images less than 6', error: err })
-            } else if (err) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-            }
-            else {
-                var file_entry = [{ filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }]
-                res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
-            }
-        })
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
-});
+//     if (legit) {
+//         upload(req, res, function (err) {
+//             if (err instanceof multer.MulterError) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Please upload images less than 6', error: err })
+//             } else if (err) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+//             }
+//             else {
+//                 var file_entry = [{ filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }]
+//                 res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
+//             }
+//         })
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// });
 
-router.post('/AddTrack/TrackUploadImageMulti', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        upload1(req, res, function (err) {
-            if (err instanceof multer.MulterError) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Please upload images less than 6', error: err })
-            } else if (err) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-            }
-            else {
-                var file_entry = [];
-                res.req.files.forEach((item, index) => {
-                    file_entry.push({ filename: item.filename, filetype: item.mimetype, url: item.destination + '/' + item.filename })
-                })
-                res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
-            }
-        })
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
-});
+// router.post('/AddTrack/TrackUploadImageMulti', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         upload1(req, res, function (err) {
+//             if (err instanceof multer.MulterError) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Please upload images less than 6', error: err })
+//             } else if (err) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+//             }
+//             else {
+//                 var file_entry = [];
+//                 res.req.files.forEach((item, index) => {
+//                     file_entry.push({ filename: item.filename, filetype: item.mimetype, url: item.destination + '/' + item.filename })
+//                 })
+//                 res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
+//             }
+//         })
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// });
 
 router.get('/AppointOfDate/:date', function (req, res, next) {
     const token = (req.headers.token)
@@ -1290,134 +1290,134 @@ function getAlltrack1(data, right_management) {
     });
 }
 
-router.post('/DowloadTrack/:Patientid', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        user.findOne({ '_id': req.params.Patientid, type: 'patient' }, function (err, data) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
-            }
-            else {
-            }
-        })
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
-})
+// router.post('/DowloadTrack/:Patientid', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         user.findOne({ '_id': req.params.Patientid, type: 'patient' }, function (err, data) {
+//             if (err) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
+//             }
+//             else {
+//             }
+//         })
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// })
 
 //for second opinion mailss
-router.post('/mailenglish', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
+// router.post('/mailenglish', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
 
-        var html = 'Dear Mr./Mrs.' + legit.name + '<br/>' +
-            'you sent a second opinion request with <b>the following information:<br/><br/>' +
-            'Selected specialist:</b>   ' + req.body.specialist + '<br/>' +
-            '<b>Way of transfer:</b>   ' + req.body.online_offline + '<br/>' +
-            '<b>Selected specialty:</b>   ' + req.body.speciality + '<br/>' +
-            '<b>How are you?:</b>   ' + req.body.how_are_you + '<br/>' +
-            '<b>Knows diseases:    ' + req.body.know_diseases + '</b><br/>' +
-            '<b>Medication:   ' + req.body.medication + '</b><br/>' +
-            '<b>Allergies:   ' + req.body.allergies + '</b><br/>' +
-            '<b>Profession:   ' + req.body.professions + '</b><br/>' +
-            '<b>Uploaded files:   attached to this mail</b><br/>' +
-            '<b>Detailed questions:   ' + req.body.details + '</b><br/><br/>' +
-            'We will get back to you as soon as possible. Prof. Barker might be willing to arrange a videocall with you. He will contact you via your Aimedis mail system and email if this is the case.' +
-            'Before the second opinion is processed, we will send you an estimate of costs, that has to be paid via bank wire, via credit card or via cryptocurrencies such as Bitcoin (BTC), Ethereum (ETH) or the Aimedis token (AIM) (AIM will give you a 10% discount compared to all other payment methods.' +
-            'Please contact us to learn more about buying and spending AIM tokens. Optionally you can send us an assumption of costs by your health insurance company.<br/><br/>' +
-            'Thanks for your trust.<br/>' +
-            'Kind regards<br/>' +
-            'Your Aimedis Second Opinion Team<br/><br/>' +
+//         var html = 'Dear Mr./Mrs.' + legit.name + '<br/>' +
+//             'you sent a second opinion request with <b>the following information:<br/><br/>' +
+//             'Selected specialist:</b>   ' + req.body.specialist + '<br/>' +
+//             '<b>Way of transfer:</b>   ' + req.body.online_offline + '<br/>' +
+//             '<b>Selected specialty:</b>   ' + req.body.speciality + '<br/>' +
+//             '<b>How are you?:</b>   ' + req.body.how_are_you + '<br/>' +
+//             '<b>Knows diseases:    ' + req.body.know_diseases + '</b><br/>' +
+//             '<b>Medication:   ' + req.body.medication + '</b><br/>' +
+//             '<b>Allergies:   ' + req.body.allergies + '</b><br/>' +
+//             '<b>Profession:   ' + req.body.professions + '</b><br/>' +
+//             '<b>Uploaded files:   attached to this mail</b><br/>' +
+//             '<b>Detailed questions:   ' + req.body.details + '</b><br/><br/>' +
+//             'We will get back to you as soon as possible. Prof. Barker might be willing to arrange a videocall with you. He will contact you via your Aimedis mail system and email if this is the case.' +
+//             'Before the second opinion is processed, we will send you an estimate of costs, that has to be paid via bank wire, via credit card or via cryptocurrencies such as Bitcoin (BTC), Ethereum (ETH) or the Aimedis token (AIM) (AIM will give you a 10% discount compared to all other payment methods.' +
+//             'Please contact us to learn more about buying and spending AIM tokens. Optionally you can send us an assumption of costs by your health insurance company.<br/><br/>' +
+//             'Thanks for your trust.<br/>' +
+//             'Kind regards<br/>' +
+//             'Your Aimedis Second Opinion Team<br/><br/>' +
 
-            '<b>Aimedis B.V.</b><br/>' +
-            'Sint Michaëlstraat 4<br/>' +
-            '5935 BL Steyl<br/>' +
-            'Netherlands<br/>' +
-            'secondopinion@aimedis.com<br/>' +
-            '+31 (0) 20 262 29 02<br/><br/><br/><br/>' +
-            '<hr/><br/><I>Aimedis B.V. Netherlands<br/>' +
-            'Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO<br/>' +
-            'VAT No.: NL858194478B01<br/>' +
-            '<hr/><br/>' +
-            'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.' +
-            '</I><hr/>';
+//             '<b>Aimedis B.V.</b><br/>' +
+//             'Sint Michaëlstraat 4<br/>' +
+//             '5935 BL Steyl<br/>' +
+//             'Netherlands<br/>' +
+//             'secondopinion@aimedis.com<br/>' +
+//             '+31 (0) 20 262 29 02<br/><br/><br/><br/>' +
+//             '<hr/><br/><I>Aimedis B.V. Netherlands<br/>' +
+//             'Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO<br/>' +
+//             'VAT No.: NL858194478B01<br/>' +
+//             '<hr/><br/>' +
+//             'The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and / or privileged information and may be legally protected from disclosure. If you are not the intended recipient of this message or their agent, or if this message has been addressed to you in error, please immediately alert the sender by reply email and then delete this message and any attachments. If you are not the intended recipient, you are hereby notified that any use, dissemination, copying, or storage of this message or its attachments is strictly prohibited.' +
+//             '</I><hr/>';
 
-        if (req.body.filename) {
-            var mailOptions = {
-                from: 'ankita.webnexus@gmail.com',
-                to: 'aakash.webnexus@gmail.com',
-                subject: 'Aimedis Second Opinion',
-                html: html,
-                attachments: [
-                    {
-                        filename: req.body.filename,
-                        path: './public/uploads/' + req.body.filename,
-                        cid: 'uniq-' + req.body.filename,
-                    }
-                ]
+//         if (req.body.filename) {
+//             var mailOptions = {
+//                 from: 'ankita.webnexus@gmail.com',
+//                 to: 'aakash.webnexus@gmail.com',
+//                 subject: 'Aimedis Second Opinion',
+//                 html: html,
+//                 attachments: [
+//                     {
+//                         filename: req.body.filename,
+//                         path: './public/uploads/' + req.body.filename,
+//                         cid: 'uniq-' + req.body.filename,
+//                     }
+//                 ]
 
-            };
-        }
-        else {
-            var mailOptions = {
-                from: 'ankita.webnexus@gmail.com',
-                to: 'aakash.webnexus@gmail.com',
-                subject: 'Aimedis Second Opinion',
-                html: html
-            }
-        }
+//             };
+//         }
+//         else {
+//             var mailOptions = {
+//                 from: 'ankita.webnexus@gmail.com',
+//                 to: 'aakash.webnexus@gmail.com',
+//                 subject: 'Aimedis Second Opinion',
+//                 html: html
+//             }
+//         }
 
-        // var sendmail = transporter.sendMail(mailOptions);
-        // var sendmail1 = sendmailteam(req.body, legit);
-        if (sendmail && sendmail1) {
-            res.json({ status: 200, hassuccessed: true, msg: 'mail is sent' })
-        }
-        else {
-            res.json({ status: 200, hassuccessed: true, msg: 'something went wrong' })
-        }
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
+//         // var sendmail = transporter.sendMail(mailOptions);
+//         // var sendmail1 = sendmailteam(req.body, legit);
+//         if (sendmail && sendmail1) {
+//             res.json({ status: 200, hassuccessed: true, msg: 'mail is sent' })
+//         }
+//         else {
+//             res.json({ status: 200, hassuccessed: true, msg: 'something went wrong' })
+//         }
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
 
-})
+// })
 
-router.post('/mailgerman', function (req, res, next) {
+// router.post('/mailgerman', function (req, res, next) {
 
-    // const token = (req.headers.token)
-    // let legit = jwtconfig.verify(token)
-    // if (legit) {
-    // var mailOptions = {
-    //     from    : 'ankita.webnexus@gmail.com',
-    //     to      : 'ankita.webnexus@gmail.com, aakash.webnexus@gmail.com',
-    //     subject : 'Aimedis zweite Meinung',
-    //     html    : '<div>Demo for second opinion mail</div>',
-    //     attachments: [
-    //         {
+//     // const token = (req.headers.token)
+//     // let legit = jwtconfig.verify(token)
+//     // if (legit) {
+//     // var mailOptions = {
+//     //     from    : 'ankita.webnexus@gmail.com',
+//     //     to      : 'ankita.webnexus@gmail.com, aakash.webnexus@gmail.com',
+//     //     subject : 'Aimedis zweite Meinung',
+//     //     html    : '<div>Demo for second opinion mail</div>',
+//     //     attachments: [
+//     //         {
 
-    //           filename: req.body.filename,
-    //           path:  __dirname + '/'+ req.body.filename,
-    //           cid: 'uniq-mailtrap.png' 
-    //         }
-    //       ]
-    // };
-    // var sendmail = transporter.sendMail(mailOptions)
-    // if(sendmail)
-    // {
-    //     res.json({ status: 200, hassuccessed: true, msg: 'mail is sent' })
-    // }
-    // else
-    // {
-    //     res.json({ status: 200, hassuccessed: true, msg: 'something went wrong' })
-    // }
-    // }
-    // else {
-    //     res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    // }
-})
+//     //           filename: req.body.filename,
+//     //           path:  __dirname + '/'+ req.body.filename,
+//     //           cid: 'uniq-mailtrap.png' 
+//     //         }
+//     //       ]
+//     // };
+//     // var sendmail = transporter.sendMail(mailOptions)
+//     // if(sendmail)
+//     // {
+//     //     res.json({ status: 200, hassuccessed: true, msg: 'mail is sent' })
+//     // }
+//     // else
+//     // {
+//     //     res.json({ status: 200, hassuccessed: true, msg: 'something went wrong' })
+//     // }
+//     // }
+//     // else {
+//     //     res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     // }
+// })
 
 function sendmailteam(data, legit) {
 

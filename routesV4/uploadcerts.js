@@ -41,7 +41,6 @@ s3.getSignedUrl('getObject', params, function(err, url){
 });
 })
 
-
 router.post('/sign_s3', (req, res) => {
 
   if(req.body.bucket && req.body.bucket!=='undefined' && req.body.bucket !=='')

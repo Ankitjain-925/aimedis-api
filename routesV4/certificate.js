@@ -47,37 +47,37 @@ router.get('/DoctorUsersP', function (req, res, next) {
     }
 })
 
-router.get('/allprescriptions', function (req, res, next) {
-    const token = (req.headers.token)
-    let   legit = jwtconfig.verify(token)
-    if (legit) {
-        prescription.find({patient_id : legit.id , status: 'accept'}, function (err, Userinfo) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
-            } else {
-                res.json({status: 200, hassuccessed: true, data : Userinfo});
-            }
-        });
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-    }
-})
+// router.get('/allprescriptions', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let   legit = jwtconfig.verify(token)
+//     if (legit) {
+//         prescription.find({patient_id : legit.id , status: 'accept'}, function (err, Userinfo) {
+//             if (err) {
+//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
+//             } else {
+//                 res.json({status: 200, hassuccessed: true, data : Userinfo});
+//             }
+//         });
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+//     }
+// })
 
-router.get('/allsickcertificates', function (req, res, next) {
-    const token = (req.headers.token)
-    let   legit = jwtconfig.verify(token)
-    if (legit) {
-        prescription.find({patient_id : legit.id , status: 'accept'}, function (err, Userinfo) {
-            if (err) {
-                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
-            } else {
-                res.json({status: 200, hassuccessed: true, data : Userinfo});
-            }
-        });
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-    }
-})
+// router.get('/allsickcertificates', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let   legit = jwtconfig.verify(token)
+//     if (legit) {
+//         prescription.find({patient_id : legit.id , status: 'accept'}, function (err, Userinfo) {
+//             if (err) {
+//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.' , error: err});
+//             } else {
+//                 res.json({status: 200, hassuccessed: true, data : Userinfo});
+//             }
+//         });
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+//     }
+// })
 module.exports = router;

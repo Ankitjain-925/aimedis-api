@@ -583,19 +583,6 @@ router.get('/pharmacyPrescription/:UserId', function (req, res, next) {
                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
             } else {
                 if(doc){
-                    // if (doc.track_record.length > 0) {
-                    //     doc.track_record.forEach((element, index) => {
-                    //         if(element.type==='prescription')
-                    //         {
-                    //             storedPrescriptions.push(element)
-                    //         }
-                    //     }) 
-                    // }
-                    // else 
-                    // {
-                    //     storedPrescriptions = [];
-                    // }
-                    // storedPrescriptions.sort(mySorter)
                     forEachPromise(doc.track_record, getAlltrack33)
                     .then((result) => {
                         console.log('trackrecord331')

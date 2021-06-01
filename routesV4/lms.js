@@ -10,15 +10,15 @@ let express = require("express"),
 var Payment = require("../schema/payment_schema");
 var Rating = require("../schema/lms_rating");
 var Cart = require("../schema/cart.js")
-var lmsStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/uploads/lmsFile')
-    },
-    filename: function (req, file, cb) {
-            cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-var upload = multer({ storage: lmsStorage }).single("uploadFile");
+// var lmsStorage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'public/uploads/lmsFile')
+//     },
+//     filename: function (req, file, cb) {
+//             cb(null, Date.now() + '-' + file.originalname)
+//     }
+// })
+// var upload = multer({ storage: lmsStorage }).single("uploadFile");
 var AllCourse = [];
 
 router.post("/addLms", (req, res) => {
@@ -255,26 +255,26 @@ router.post("/getWishlist", (req, res, next) => {
     }
 })
 
-router.post('/uploadFile', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        upload(req, res, function (err, data) {
-            if (err instanceof multer.MulterError) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
-            } else if (err) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-            }
-            else {
-                var file_entry = { filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }
-                res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
-            }
-        })
-    }
-    else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-    }
-});
+// router.post('/uploadFile', function (req, res, next) {
+//     const token = (req.he`aders.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         upload(req, res, function (err, data) {
+//             if (err instanceof multer.MulterError) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
+//             } else if (err) {
+//                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+//             }
+//             else {
+//                 var file_entry = { filename: res.req.file.filename, filetype: req.file.mimetype, url: res.req.file.destination + '/' + res.req.file.filename }
+//                 res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
+//             }
+//         })
+//     }
+//     else {
+//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+//     }
+// });
 
 
 router.get("/getAllLms", (req, res, next) => {
