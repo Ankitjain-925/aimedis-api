@@ -13,7 +13,7 @@ const ProfessionalInfo = new mongoose.Schema({
         type: String,
         required: false,
         unique: false
-    },
+    }, 
     profile_id:{
         type: String,
         required: false,
@@ -33,48 +33,69 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
         return "1234567890123456"; // should ideally use the secret to return a string of length 16
 } });
 
-var invoiceSchema = new Schema({
-    patient: ProfessionalInfo,
-    status: {
+var TaskSchema = new Schema({
+    assinged_to: [ProfessionalInfo],
+    task_name:{
         type: String,
-        required: false,
+        required: true,
         unique: false
     },
-    invoice_id:{
-        type: String,
-        required: false,
-        unique: false
+    description:{
+      type: String,
+      required: false,
+      unique: false
     },
-    created_at: {
-        type: String,
+    attachments: {
+        type : Array,
         required: false,
-        unique: false
-    },
-    services:{
-        type: Array,
-        required: false,
-        unique: false
-    },
-    total_amount:{
-        type: Number,
-        required: false,
-        unique: false
+        unique: false 
     },
     house_id: {
         type: String,
         required: true,
         unique: false
     },
-    case_id: {
+    archived: {
+        type: Boolean,
+        required: false,
+        unique: false
+    },
+    comments:{
+        type : Array,
+        required: false,
+        unique: false 
+    },
+    created_at: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    status:{
         type: String,
         required: true,
+        unique: false
+    },
+    patient: ProfessionalInfo,
+    priority: {
+        type: Number,
+        required: false,
+        unique: false
+    },
+    patient_id: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    case_id:{
+        type: String,
+        required: false,
         unique: false
     }
 },{ strict: false });
 
-invoiceSchema.plugin(mongooseFieldEncryption, { fields: [ "invoice_id" ], secret: process.env.SOME_32BYTE_BASE64_STRING,
+TaskSchema.plugin(mongooseFieldEncryption, { fields: [ "task_name", "description", "patient_id" ], secret: process.env.SOME_32BYTE_BASE64_STRING,
 saltGenerator: function (secret) {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
   } });
-var virtual_Invoice = mongoose.model('virtual_invoice', invoiceSchema);
-module.exports = virtual_Invoice;
+var virtual_Task = mongoose.model('virtual_task', TaskSchema);
+module.exports = virtual_Task;

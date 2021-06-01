@@ -14,7 +14,6 @@ const RoomsAdd = new mongoose.Schema({
         required: false,
         unique: false 
      },
-     current_patients: {type : Array}
 },{ strict: false });
 
 RoomsAdd.plugin(mongooseFieldEncryption, {
@@ -57,7 +56,7 @@ var SpecialtySchema = new Schema({
         unique: false
     },
     wards: [WardsAdd],
-    virtual_hospital_id: {
+    house_id: {
         type: String,
         required: true,
         unique: false

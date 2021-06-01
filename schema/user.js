@@ -320,7 +320,7 @@ var UserSchema = new Schema({
         unique: false
     },
     institute_id:{
-        type: String,
+        type: Array,
         required: false,
         unique: false   
     },
@@ -350,7 +350,12 @@ var UserSchema = new Schema({
    required: false,
    unique: false
    },
-   myPatient: [PaitentList]
+   myPatient: [PaitentList],
+   houses: {
+      type: Array,
+      required: false,
+      unique: false  
+   }
 },
 { strict: false },
 { timestamps : true }

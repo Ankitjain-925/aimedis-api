@@ -19,7 +19,7 @@ var ServiceSchema = new Schema({
         required: false,
         unique: false 
     },
-    virtual_hospital_id: {
+    house_id: {
         type: String,
         required: true,
         unique: false

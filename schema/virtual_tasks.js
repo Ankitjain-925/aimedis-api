@@ -50,7 +50,7 @@ var TaskSchema = new Schema({
         required: false,
         unique: false 
     },
-    virtual_hospital_id: {
+    house_id: {
         type: String,
         required: true,
         unique: false
@@ -82,6 +82,11 @@ var TaskSchema = new Schema({
         unique: false
     },
     patient_id: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    case_id:{
         type: String,
         required: false,
         unique: false

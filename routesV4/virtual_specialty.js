@@ -58,11 +58,11 @@ router.post('/AddSpecialty', function (req, res, next) {
     }
 })
 
-router.get('/AddSpecialty/:virtual_hospital_id', function (req, res, next) {
+router.get('/AddSpecialty/:house_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        Virtual_Specialty.find({ virtual_hospital_id: req.params.virtual_hospital_id }, function (err, userdata) {
+        Virtual_Specialty.find({ house_id: req.params.house_id }, function (err, userdata) {
             if (err && !userdata) {
                 res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
             } else {
@@ -126,11 +126,11 @@ router.put('/AddTask/:task_id', function (req, res, next) {
     }
 })
 
-router.get('/GetAllTask/:virtual_hospital_id', function (req, res, next) {
+router.get('/GetAllTask/:house_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        virtual_Task.find({ virtual_hospital_id: req.params.virtual_hospital_id }, function (err, userdata) {
+        virtual_Task.find({ house_id: req.params.house_id }, function (err, userdata) {
             if (err && !userdata) {
                 res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
             } else {
@@ -323,11 +323,11 @@ router.post('/AddService', function (req, res, next) {
     }
 })
 
-router.get('/AddService/:virtual_hospital_id:', function (req, res, next) {
+router.get('/AddService/:house_id:', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        virtual_Service.find({ virtual_hospital_id: req.params.virtual_hospital_id }, function (err, userdata) {
+        virtual_Service.find({ house_id: req.params.house_id }, function (err, userdata) {
             if (err && !userdata) {
                 res.json({ status: 200, hassuccessed: false, message: "services not found", error: err })
             } else {
@@ -390,13 +390,13 @@ router.post('/AddInvoice', function (req, res, next) {
     }
 })
 
-router.get('/AddInvoice/:virtual_hospital_id/:status', function (req, res, next) {
+router.get('/AddInvoice/:house_id/:status', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        var search = { virtual_hospital_id: req.params.virtual_hospital_id }
+        var search = { house_id: req.params.house_id }
         if(req.params.status !=='all'){
-            var search = { virtual_hospital_id: req.params.virtual_hospital_id, status: req.params.status }
+            var search = { house_id: req.params.house_id, status: req.params.status }
         }
         virtual_Invoice.find(search, function (err, userdata) {
             if (err && !userdata) {
@@ -409,5 +409,7 @@ router.get('/AddInvoice/:virtual_hospital_id/:status', function (req, res, next)
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
+
+
 
 module.exports = router;
