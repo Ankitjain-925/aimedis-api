@@ -1171,120 +1171,6 @@ router.put('/Users/updateImage', function (req, res, next) {
     }
 })
 
-/*------A-D-D---M-E-M-B-E-R-H-I-P------*/
-
-// router.post('/Membership', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         User.findOne({ _id: legit.id }, function (err, changeStatus) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err })
-//             }
-//             else {
-//                 let user_id = { user_id: legit.id }
-//                 let user_type = { user_type: changeStatus.type }
-//                 datas = { ...req.body, ...user_type, ...user_id }
-//                 var memberships = new Membership(datas);
-//                 memberships.save(function (err, membershipData) {
-//                     if (err) {
-//                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
-//                     } else {
-//                         User.updateOne({ _id: legit.id }, { $push: { membership: membershipData } },
-//                             { safe: true, upsert: true }, function (err, doc) {
-//                                 if (err && !doc) {
-//                                     res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
-//                                 } else {
-//                                     res.json({ status: 200, hassuccessed: true, message: 'Updated', data: doc })
-//                                 }
-//                             });
-//                     }
-//                 })
-//             }
-//         })
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
-
-/*------U-P-D-A-T-E---U-S-E-R---M-E-M-B-E-R-S-H-I-P------*/
-
-// router.put('/Membership/:Membership_id', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         Membership.findByIdAndUpdate({ _id: req.params.Membership_id }, req.body, function (err, doc) {
-//             if (err && !doc) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
-//             } else {
-//                 // res.json({ status: 200, hassuccessed: true, message: 'Updated', data :doc })
-//                 User.findOneAndUpdate({ _id: doc.user_id }, { $set: { membership: doc } }, { new: true }, (err, doc1) => {
-//                     if (err && !doc1) {
-//                         res.json({ status: 200, hassuccessed: false, message: 'update data failed', error: err })
-//                     } else {
-//                         res.json({ status: 200, hassuccessed: true, message: 'Updated', data: doc1 })
-//                     }
-//                 });
-//             }
-//         });
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
-
-/*----------G-E-T---M-E-M-B-E-R-S-H-I-P---------*/
-
-// router.get('/Membership/:Membership_id', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         Membership.findOne({ _id: req.params.Membership_id }, function (err, Userinfo) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//             } else {
-//                 res.json({ status: 200, hassuccessed: true, data: Userinfo });
-//             }
-//         });
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
-
-/*----------D-E-L-E-T-E---M-E-M-B-E-R-S-H-I-P----------*/
-
-// router.delete('/Membership/:Membership_id', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         var memId = req.params.Membership_id;
-//         Membership.findByIdAndRemove(req.params.Membership_id, function (err, data) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//             } else {
-//                 User.updateOne({ _id: legit.id },
-//                     { $pull: { membership: { _id: memId } } },
-//                     { multi: true },
-//                     function (err, doc) {
-//                         if (err && !doc) {
-//                             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-//                         } else {
-//                             if (doc.nModified == '0') {
-//                                 res.json({ status: 200, hassuccessed: false, msg: ' record is not found' })
-//                             } else {
-//                                 res.json({ status: 200, hassuccessed: true, msg: 'membership is deleted' })
-//                             }
-//                         }
-//                     });
-//             }
-//         });
-//     } else {
-//         res.status(401).json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-//     }
-// });
-
 /*-----------M-E-T-E-D-A-T-A----------*/
 
 router.post('/Metadata', function (req, res, next) {
@@ -2032,23 +1918,7 @@ router.put('/GetSickCertificate/:sick_certificate_id', function (req, res, next)
                 if (req.body.status === "accept" && userdata.attachfile.length == 0) {
                     req.body.status = "pending";
                 }
-                // if (req.body.status === "decline") {
-                //     var data = {
-                //         message_header: 'Decline Sick certificate request',
-                //         message_text: 'Dear Patient, your request is declined for sick certificate by - ' + legit.name + '. Thanks Aimedis Team',
-                //         sent_date: new Date(),
-                //         sender_id: legit.id,
-                //         reciever_id: [userdata.patient_id]
-                //     }
-                //     var messages = new message(data);
-                //     messages.save(function (err, messages_data) {
-                //         if (err && !messages_data) {
-                //             console.log(err);
-                //         } else {
-                //             console.log(messages_data);
-                //         }
-                //     })
-                // }
+                
                 Sick_certificate.findOneAndUpdate({ _id: userdata._id }, { $set: { status: req.body.status, accept_datetime: dt.format('Y-m-d H:M:S') } }, { new: true }, function (err, updatedata) {
                     if (err && !updatedata) {
                         res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
@@ -2156,21 +2026,7 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                 if (userdata && typeof userdata == 'object') userdata = userdata.toObject()
                 if (req.body.status === "decline") {
 
-                    // var data = {
-                    //     message_header: 'Decline Second Opinion request',
-                    //     message_text: 'Dear Patient, your request is declined for Prescription by - ' + legit.name + '. Thanks Aimedis Team',
-                    //     sent_date: new Date(),
-                    //     sender_id: legit.id,
-                    //     reciever_id: [userdata.patient_id]
-                    // }
-                    // var messages = new message(data);
-                    // messages.save(function (err, messages_data) {
-                    //     if (err && !messages_data) {
-                    //         console.log(err);
-                    //     } else {
-                    //         console.log(messages_data);
-                    //     }
-                    // })
+                    
                 }
                 if (req.body.status === "accept" && userdata.attachfile.length == 0) {
                     req.body.status = "pending";
@@ -2222,28 +2078,8 @@ router.put('/GetSecondOpinion/:Prescription_id', function (req, res, next) {
                                                             }
                                                         }
                                                     })
-                                                    // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-                                                    // trans(sendData, { source: "en", target: result }).then((res) => {
-                                                    //     var mailOptions = {
-                                                    //     from: "contact@aimedis.com",
-                                                    //     to: updatedata.patient_email,
-                                                    //     subject: ' Second opinion Accepted',
-                                                    //    html: res.replace(/ @ /g, '@')
-                                                    //     };
-                                                    //     var sendmail = transporter.sendMail(mailOptions)
-                                                    //   });
+                                                    
                                                 })
-                                                // var dhtml = 'Your Second opinion Request Accepted.<br/>' +
-                                                //     'And  Second opinion added in to your timeline.<br/>' +
-                                                //     '<b>Your Aimedis team </b>'
-                                                // var mailOptions = {
-                                                //     from: "contact@aimedis.com",
-                                                //     to: updatedata.patient_email,
-                                                //     subject: ' Second opinion Accepted',
-                                                //     html: dhtml
-                                                // };
-                                                // var sendmail = transporter.sendMail(mailOptions)
 
                                                 res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
                                             }
@@ -2828,34 +2664,6 @@ router.post('/second_opinion', function (req, res, next) {
     })
 })
 
-// router.post('/Second_opinion/UploadDocument', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-
-//     if (legit) {
-//         upload1(req, res, function (err) {
-
-//             if (err instanceof multer.MulterError) {
-
-//                 res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
-//             } else if (err) {
-
-//                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-//             } else {
-
-//                 var file_entry = [];
-//                 res.req.files.forEach((item, index) => {
-//                     file_entry.push({ filename: item.filename, filetype: item.mimetype, url: item.destination + '/' + item.filename })
-//                 })
-//                 res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
-//             }
-//         })
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-//     }
-// });
-
 /*----------D-O-C-T-O-R---A-P-P-O-I-N-T-M-E-N-T---S-C-H-E-D-U-L-E----------*/
 
 router.put('/private_appointments/:doctor_id', function (req, res, next) {
@@ -2959,25 +2767,6 @@ router.get('/DoctorUsersChat', function (req, res, next) {
     }
 })
 
-
-// router.get('/UserlistSize', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         User.find().exec(function (err, results) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//             } else {
-//                 var count = results.length
-//                 res.json({ status: 200, hassuccessed: true, data: count });
-//             }
-//         });
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
-
 router.get('/PatientUsersChat', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -3025,32 +2814,6 @@ router.get('/DoctorProfile/:doctor_id', function (req, res, next) {
 })
 
 /*----------E-N-D----------*/
-
-/*----------S-T-R-I-P-E---P-A-Y-M-E-N-T----------*/
-// router.put('/paid_services', function (req, res, next) {
-
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         User.findOne({ _id: legit.id }, function (err, userdata) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
-//             } else {
-//                 User.findByIdAndUpdate({ _id: userdata._id }, { $push: { paid_services: req.body } }
-//                     , function (err, updatedata) {
-//                         if (err && !updatedata) {
-//                             res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
-//                         } else {
-//                             res.json({ status: 200, hassuccessed: true, message: "user updated", data: userdata })
-//                         }
-//                     })
-//             }
-//         })
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
 
 /*----------A-D-D---F-A-V-O-I-R-I-T-E---D-O-C-T-O-R----------*/
 
@@ -3310,25 +3073,6 @@ router.delete('/favPatients/:User_id/:doctor_id', function (req, res, next) {
     }
 })
 
-
-/*----------U-P-L-O-A-D---L-I-C-E-N-C-E----------*/
-// router.post('/UploadLicence', function (req, res, next) {
-//     upload1(req, res, function (err) {
-//         if (err instanceof multer.MulterError) {
-//             res.json({ status: 200, hassuccessed: false, msg: 'Problem in uploading the file', error: err })
-//         } else if (err) {
-//             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
-//         } else {
-//             var file_entry = [];
-//             res.req.files.forEach((item, index) => {
-//                 file_entry.push({ filename: item.filename, filetype: item.mimetype, url: item.destination + '/' + item.filename })
-//             })
-//             res.json({ status: 200, hassuccessed: true, msg: 'image is uploaded', data: file_entry })
-//         }
-//     })
-// });
-
-/**/
 router.put('/UpdatePrescription/:prescription_id', function (req, res, next) {
 
     const token = (req.headers.token)
@@ -4147,181 +3891,6 @@ router.get('/allusers', function (req, res, next) {
     }
 })
 
-// router.post('/sendMessages', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         if (req.body.pin) {
-//             User.findOne({ _id: req.body.reciever_id }, { type: 'patient' }).exec().then((err, data) => {
-//                 if (err) {
-//                     res.json({ status: 200, hassuccessed: false, message: 'User not found', error: err });
-//                 } else {
-//                     if (data.pin == req.body.pin) {
-//                         var data = {
-//                             message_header: req.body.message_header,
-//                             message_text: req.body.message_text,
-//                             sent_date: req.body.sent_date,
-//                             sender_id: req.body.sender_id,
-//                             reciever_id: req.body.reciever_id,
-//                             sent_date: req.body.sent_date,
-//                             attachment: {
-//                                 file_url: req.body.file_url,
-//                                 filename: req.body.filename
-//                             }
-//                         }
-//                         var messages = new message(data);
-//                         messages.save(function (err, messages_data) {
-//                             if (err && !messages_data) {
-//                                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', err: err });
-//                             } else {
-//                                 res.json({ status: 200, hassuccessed: true, msg: 'messages is added Successfully' });
-//                             }
-//                         })
-//                     } else {
-//                         res.json({ status: 200, hassuccessed: false, msg: 'User pin not matched', err: err });
-//                     }
-//                 }
-//             });
-//         }
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-//     }
-// });
-
-// router.post('/sendMessages1', function (req, res, next) {
-
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         if (req.body.pin) {
-//             User.findOne({ _id: req.body.reciever_id, type: 'patient' }, function (err, Userinfo) {
-//                 if (err) {
-//                     res.json({ status: 200, hassuccessed: false, message: 'No user found.', error: err });
-//                 } else {
-//                     if (Userinfo.pin == req.body.pin) {
-//                         var data = {
-//                             message_header: req.body.message_header,
-//                             message_text: req.body.message_text,
-//                             sent_date: req.body.sent_date,
-//                             sender_id: req.body.sender_id,
-//                             reciever_id: req.body.reciever_id
-//                         }
-//                         var messages = new message(data);
-//                         messages.save(function (err, messages_data) {
-//                             if (err && !messages_data) {
-//                                 res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', err: err });
-//                             } else {
-//                                 res.json({ status: 200, hassuccessed: true, msg: 'messages is added Successfully' });
-//                             }
-//                         })
-//                     } else {
-//                         res.json({ status: 200, hassuccessed: false, msg: 'User pin not matched', err: err });
-//                     }
-//                 }
-//             });
-//         } else {
-//             var data = {
-//                 message_header: req.body.message_header,
-//                 message_text: req.body.message_text,
-//                 sent_date: req.body.sent_date,
-//                 sender_id: req.body.sender_id,
-//                 reciever_id: req.body.reciever_id
-//             }
-//             var messages = new message(data);
-//             messages.save(function (err, messages_data) {
-//                 if (err && !messages_data) {
-//                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', err: err });
-//                 } else {
-//                     res.json({ status: 200, hassuccessed: true, msg: 'messages is added Successfully' });
-//                 }
-//             })
-//         }
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-//     }
-// });
-
-// router.get('/getMessages', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         message.find({ reciever_id: legit.id }
-//             , function (err, recieve_message) {
-//                 if (err && !recieve_message) {
-
-//                     res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong1.' });
-//                 } else {
-//                     message.find({ sender_id: legit.id }, function (err, send_message) {
-//                         if (err && !recieve_message) {
-
-//                             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong2.' });
-//                         } else {
-//                             var messages = { recieve: recieve_message, sents: send_message }
-//                             res.json({ status: 200, hassuccessed: true, messages: messages });
-//                         }
-//                     })
-//                 }
-//             })
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-//     }
-// });
-
-// router.get('/Docallusers', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         User.find({ $or: [{ type: 'hospitaladmin' }, { type: 'pharmacy' }, { type: 'superadmin' }, { type: 'doctor' }, { type: 'patient' }] }, function (err, Userinfo) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//             } else {
-//                 res.json({ status: 200, hassuccessed: true, data: Userinfo });
-//             }
-//         });
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
-
-// router.get('/Nurseallusers', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         User.find({ $or: [{ type: 'hospitaladmin' }, { type: 'superadmin' }, { type: 'doctor' }] }, function (err, Userinfo) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//             } else {
-//                 res.json({ status: 200, hassuccessed: true, data: Userinfo });
-//             }
-//         });
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
-
-// router.get('/Pharmacyallusers', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         User.find({ $or: [{ type: 'superadmin' }, { type: 'doctor' }, { type: 'patient' }] }, function (err, Userinfo) {
-//             if (err) {
-//                 res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//             } else {
-//                 res.json({ status: 200, hassuccessed: true, data: Userinfo });
-//             }
-//         });
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-//     }
-// })
-
-
 router.put('/setpassword', function (req, res, next) {
     const token = (req.headers.token);
 
@@ -4465,123 +4034,6 @@ router.post('/GetUserInfo/:UserId', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
-
-// router.post('/GetUserInfo/:UserId', function (req, res, next) {
-//     const token = (req.headers.token)
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         const profile_id = req.params.UserId;
-//         const alies_id = req.params.UserId;
-//         const messageToSearchWith = new User({profile_id});
-//         const messageToSearchWith1 = new User({alies_id});
-//         messageToSearchWith.encryptFieldsSync();
-//         messageToSearchWith1.encryptFieldsSync();
-//         User.findOne( {$or:[ {alies_id : messageToSearchWith1.alies_id},{ profile_id :  messageToSearchWith.profile_id}, {alies_id : req.params.UserId}, { profile_id : req.params.UserId }]})
-//             .exec(function (err, doc) {
-//                 if (err && !dofc) {
-//                     res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
-//                 } else {
-//                     if (doc == null || doc == 'undefined') {
-//                         res.json({ status: 200, hassuccessed: false, msg: 'User is not exist' })
-
-//                     }
-//                     else {
-//                         var m = new Date();
-//                         var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
-
-//                         if (req.body.lan === 'de') {
-
-
-//                             var dhtml =
-//                                 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profil.<br/>' +
-//                                 'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
-//                                 'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
-//                                 'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
-//                                 'Herzliche Grüße und alles Gute<br/>' +
-//                                 '<b>Ihr Aimedis Team </b>'
-
-//                         }
-//                         else {
-//                             var dhtml = 'There was an emergency access to the data in your Aimedis profile.<br/>' +
-//                                 'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
-//                                 'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
-//                             'Best regards<br/>' +
-//                                 '<b>Your Aimedis team </b>'
-//                         }
-//                         if (req.body.lan === 'de') {
-//                             var dhtml2 = 'Es gab einen Notfallzugriff auf die Daten in Ihrem Aimedis Profils von </b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' ).</b><br/>' +
-//                                 'Der Notfallzugriff erfolgte durch <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' am ' + dateString + '</b>.<br/>' +
-//                                 'Sollte es sich Ihrer Meinung nach um einen missbräuchlichen Zugriff handeln, so wenden Sie sich bitte<br/>' +
-//                                 'unverzüglich unter der E-Mail Adresse contact@aimedis.com an uns.<br/> <br/>' +
-//                                 'Herzliche Grüße und alles Gute<br/>' +
-//                                 '<b>Ihr Aimedis Team </b>'
-//                         }
-//                         else {
-//                             var dhtml2 = 'There was an emergency access to the data in your Aimedis profile of <b>' + doc.first_name + ' ' + doc.last_name + ' ( ' + doc.profile_id + ' )</b><br/>' +
-//                                 'The emergency access was made by <b>' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString + '</b>.<br/>' +
-//                                 'If you believe that the access is improper, please contact us immediately via contact@aimedis.com.<br/><br/>'
-//                             'Best regards<br/>' +
-//                                 '<b>Your Aimedis team </b>'
-//                         }
-//                         var mailOptions = {
-//                             from: "contact@aimedis.com",
-//                             to: doc.email,
-//                             subject: 'Emergency Access',
-//                             html: dhtml
-//                         };
-//                         sendSms(doc.mobile, 'There was an emergency an access to the data in your Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
-
-//                         }).catch(e => {
-//                             console.log('Message is not sent', e)
-//                         })
-//                         if(doc.emergency_number && doc.emergency_number !== ''){
-//                             sendSms(doc.emergency_number, 'There was an emergency access to the data in'+ doc.first_name+' '+doc.last_name +' Aimedis profile ( ' + doc.profile_id + ' ) by Doctor - ' + req.body.current_info.profile_id + ' - ' + req.body.current_info.first_name + ' ' + req.body.current_info.last_name + ' on ' + dateString).then(result => {
-
-//                             }).catch(e => {
-//                                 console.log('Message is not sent', e)
-//                             })
-//                         }
-//                         if (req.body.comefrom === 'pharmacy') {
-
-//                             if (req.body.pin && req.body.pin == doc.pin && req.body.pin !== "") {
-
-//                                 var sendmail = transporter.sendMail(mailOptions)
-//                                 if (doc.emergency_email && doc.emergency_email !== '') {
-//                                     var mailOptions2 = {
-//                                         from: "contact@aimedis.com",
-//                                         to: doc.emergency_email,
-//                                         subject: 'Emergency Access',
-//                                         html: dhtml2
-//                                     };
-//                                     var sendmail2 = transporter.sendMail(mailOptions2)
-//                                 }
-//                                 res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
-//                             }
-//                             else {
-//                                 res.json({ status: 200, hassuccessed: false, msg: 'Pin is not correct' })
-//                             }
-//                         }
-//                         else {
-//                             var sendmail = transporter.sendMail(mailOptions)
-//                             if (doc.emergency_email && doc.emergency_email !== '') {
-//                                 var mailOptions2 = {
-//                                     from: "contact@aimedis.com",
-//                                     to: doc.emergency_email,
-//                                     subject: 'Emergency Access',
-//                                     html: dhtml2
-//                                 };
-//                                 var sendmail2 = transporter.sendMail(mailOptions2)
-//                             }
-//                             res.json({ status: 200, hassuccessed: true, msg: 'User is found', user_id: doc._id })
-//                         }
-//                     }
-//                 }
-//             });
-//     }
-//     else {
-//         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
-//     }
-// });
 
 router.post('/forgotPassword', function (req, res, next) {
     var token;
@@ -4806,26 +4258,6 @@ router.post('/AskPatient/:id', function (req, res, next) {
         res.status(401).json({ status: 401, success: false, message: 'Authentication required.' })
     }
 })
-
-// router.get('/AllusersMessages', function (req, res, next) {
-//     const token = (req.headers.token);
-//     let legit = jwtconfig.verify(token)
-//     if (legit) {
-//         User.find()
-//             .exec(function (err, Userinfo) {
-//                 if (err) {
-//                     res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
-//                 } else {
-//                     res.json({ status: 200, hassuccessed: true, data: Userinfo });
-//                 }
-//             });
-
-//     }
-//     else {
-//         res.status(401).json({ status: 401, success: false, message: 'Authentication required.' })
-//     }
-// }
-// )
 
 ///Add by Ankita (17-04-2020)
 
@@ -5115,52 +4547,6 @@ router.post('/downloadfullPdf', function (req, res, next) {
     //     });
 
 })
-// router.post('/downloadfullPdf', function (req, res, next) {
-//     // Custom handlebar helper
-//     pdf.registerHelper('ifCond', function (v1, v2, options) {
-//         if (v1 === v2) {
-//             return options.fn(this);
-//         }
-//         return options.inverse(this);
-//     })
-
-//     var options = {
-//         format: "A3",
-//         orientation: "portrait",
-//         border: "10mm"
-//     };
-//     var Data = [];
-//     {
-
-//         Object.entries(req.body.Dieseases).map(([key, value]) => {
-//                 if (Array.isArray(value)) {
-//                     Data.push({ 'k': key.replace(/_/g, ' '), 'v':  Array.prototype.map.call(value, s => s).toString().split(/[,]+/).join('<br/> ') })
-//                 }
-//         })
-//     }
-
-//     var filename = 'GeneratedReport.pdf'
-//     var document = {
-//         type: 'file',     // 'file' or 'buffer'
-//         template: html1,
-//         context: {
-//             Dieseases: Data,
-//             pat_info: req.body.patientData,
-
-//         },
-//         path: `${__dirname}/${filename}`  // it is not required if type is buffer
-//     };
-//     pdf.create(document, options)
-//         .then(res22 => {
-//             const file = `${__dirname}/${filename}`;
-
-//             res.download(file); // Set disposition and send it.  
-//         })
-//         .catch(error => {
-//             res.json({ status: 200, hassuccessed: true, filename: filename });
-//         });
-
-// })
 
 function getReminder(reminder, timeFormat) {
     if (reminder && reminder.length > 0) {
@@ -5335,6 +4721,5 @@ router.post("/verifyStripe",(req,res)=>{
     }
      
 })
-
 
 module.exports = router;

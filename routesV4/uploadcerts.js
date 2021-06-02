@@ -96,7 +96,4 @@ const returnData = {
   });
 })
 
-
-
-
 module.exports = router;

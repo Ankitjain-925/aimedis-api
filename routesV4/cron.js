@@ -4,7 +4,6 @@ let router = express.Router();
 var nodemailer = require('nodemailer');
 var User = require('../schema/user.js');
 
-
 var transporter = nodemailer.createTransport({
     host : process.env.MAIL_HOST,
     port : 25,
@@ -65,11 +64,8 @@ function sendreminder(req, res)
     })
 }
 
-
 router.get('/', (req, res) => {
     sendreminder(req, res);    
 });
-
-
 
 module.exports = router;

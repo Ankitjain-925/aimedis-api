@@ -5,8 +5,10 @@ var Virtual_Specialty = require('../schema/virtual_specialty');
 var virtual_Task = require('../schema/virtual_tasks.js');
 var virtual_Service = require('../schema/virtual_services.js');
 var virtual_Invoice = require('../schema/virtual_invoice.js');
+var User = require('../schema/user.js')
+var Institute = require('../schema/institute');
 var jwtconfig = require('../jwttoken');
-
+var fullinfo = [];
 router.delete('/AddSpecialty/:specialty_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
@@ -410,6 +412,75 @@ router.get('/AddInvoice/:house_id/:status', function (req, res, next) {
     }
 })
 
+router.put('/institute/:institute_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Institute.updateOne({ _id: req.params.institute_id }, req.body, function (err, userdata) {
+            if (err && !userdata) {
+                res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: userdata })
+            }
+        })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.get('/institute/:institute_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        Institute.findOne({ _id: req.params.institute_id }, function (err, userdata) {
+            if (err && !userdata) {
+                res.json({ status: 200, hassuccessed: false, message: "institute is not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: userdata })
+            }
+        })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
 
 
+router.post('/infoOfHouses', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        fullInfo = [];
+        User.findOne({ _id: legit.id }, function (err, userdata) {
+            if (err && !userdata) {
+                if(userdata && userdata.houses && userdata.houses.length>0){
+                    forEachPromise(userdata.houses, getfullInfo).then((result) => {
+                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord1 })
+                    })
+                }
+                // res.json({ status: 200, hassuccessed: false, message: "institute is not found", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, data: userdata })
+            }
+        })
+    } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+function getfullInfo(data) {
+    return new Promise((resolve, reject) => {
+        process.nextTick(() => {
+            Institute.findOne({  'institute_groups.houses.house_id' : data.value }).exec()
+            .then(function (doc3) {
+                pos = fullinfo.map(function(e) { return e._id; }).indexOf(doc3._id);
+                if(!pos)
+                {
+                    console.log('dsfsdf')
+                    fullInfo.push(doc3)
+                }
+                resolve(fullInfo);
+            })
+        });
+    });
+}
 module.exports = router;
