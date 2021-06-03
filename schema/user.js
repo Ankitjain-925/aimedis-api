@@ -355,6 +355,11 @@ var UserSchema = new Schema({
       type: Array,
       required: false,
       unique: false  
+   },
+   assosiated_by:{
+      type: Array,
+      required: false,
+      unique: false
    }
 },
 { strict: false },

@@ -88,6 +88,7 @@ var Uploadcerts4 = require('./routesV4/uploadcerts');
 var bloackchain4 = require("./routesV4/blockchain");
 var cronPrecess4 = require("./routesV4/cron");
 var vspecialty4 = require("./routesV4/virtual_specialty");
+var hadmin4 = require("./routesV4/h_admin")
 
 app.use('/api/v1/User', UserData);
 app.use('/api/v1/UserProfile', UserProfile);
@@ -142,9 +143,9 @@ app.use('/api/v4/certificate', certificate4);
 app.use('/api/v4/admin', adminse4);
 app.use('/api/v4/aws', Uploadcerts4);
 app.use("/api/v4/blockchain", bloackchain4);
-app.use("/api/v4/cron", cronPrecess4)
-app.use("/api/v4/vh", vspecialty4)
-
+app.use("/api/v4/cron", cronPrecess4);
+app.use("/api/v4/vh", vspecialty4);
+app.use("/api/v4/hospitaladmin", hadmin4);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -168,8 +169,7 @@ app.use(function(req, res, next) {
    next(err);
 });
 
-
-  // error handler
+// error handler
 app.use(function(err, req, res, next) {
   //  return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
   console.log('err', err)

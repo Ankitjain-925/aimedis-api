@@ -3046,7 +3046,6 @@ router.delete('/favDocs/:User_id/:patient_id', function (req, res, next) {
     }
 })
 
-
 router.delete('/favPatients/:User_id/:doctor_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)

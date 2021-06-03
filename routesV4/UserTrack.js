@@ -466,7 +466,6 @@ router.get('/AppointmentByDate1', function (req, res, next) {
         const patient = legit.id;
         const messageToSearchWith = new Appointment({ patient });
         messageToSearchWith.encryptFieldsSync();
-
         Appointment.aggregate(
             [
                 {
@@ -796,10 +795,6 @@ router.get('/AddTrack/:UserId', function (req, res, next) {
                         res.json({ status: 200, hassuccessed: false, msg: 'User is not found', error: err })
                     } else {
                         if (doc && doc.length > 0) {
-                            // if (doc && doc[0] && doc[0].Rigt_management &&  doc[0].Rigt_management.length>0) {
-                            //     if(doc.Rigt_management[0] && doc.Rigt_management[0].emergency_access === 'yes')
-                            //     {
-
                             var finaloutput = [];
                             doc[0].track_record.sort(mySorter);
                             if (doc[0].track_record.length > 0) {
@@ -813,16 +808,6 @@ router.get('/AddTrack/:UserId', function (req, res, next) {
                             else {
                                 res.json({ status: 200, hassuccessed: false, msg: 'No data' })
                             }
-                            //     }
-                            //     else
-                            //     {
-                            //         res.json({ status: 200, hassuccessed: false, msg: 'No authority access to get inforamtion' })
-                            //     }
-                            // } 
-                            // else 
-                            // {
-                            //     res.json({ status: 200, hassuccessed: false, msg: 'No authority access to get inforamtion' })
-                            // }     
                         }
                         else {
                             res.json({ status: 200, hassuccessed: false, msg: 'No data' })

@@ -50,11 +50,6 @@ var Institutes = new Schema({
        required: false,
        unique: false
    },
-   assosiated_by:{
-      type: Array,
-      required: false,
-      unique: false
-   }
 },{ strict: false });
 
 Institutes.plugin(mongooseFieldEncryption, { fields: [ "institute_name", "created_by"], secret: process.env.SOME_32BYTE_BASE64_STRING,

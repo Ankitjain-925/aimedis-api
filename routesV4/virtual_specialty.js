@@ -115,7 +115,6 @@ router.put('/AddTask/:task_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-
         virtual_Task.updateOne({ _id: req.params.task_id }, req.body, function (err, userdata) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
@@ -412,57 +411,71 @@ router.get('/AddInvoice/:house_id/:status', function (req, res, next) {
     }
 })
 
-router.put('/institute/:institute_id', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        Institute.updateOne({ _id: req.params.institute_id }, req.body, function (err, userdata) {
-            if (err && !userdata) {
-                res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
-            } else {
-                res.json({ status: 200, hassuccessed: true, data: userdata })
-            }
-        })
-    } else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-    }
-})
-
-router.get('/institute/:institute_id', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        Institute.findOne({ _id: req.params.institute_id }, function (err, userdata) {
-            if (err && !userdata) {
-                res.json({ status: 200, hassuccessed: false, message: "institute is not found", error: err })
-            } else {
-                res.json({ status: 200, hassuccessed: true, data: userdata })
-            }
-        })
-    } else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-    }
-})
-
-
-router.post('/infoOfHouses', function (req, res, next) {
+router.get('/infoOfHouses', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
         fullInfo = [];
         User.findOne({ _id: legit.id }, function (err, userdata) {
             if (err && !userdata) {
+                res.json({ status: 200, hassuccessed: false, message: "user not found", error: err })
+            } else {
                 if(userdata && userdata.houses && userdata.houses.length>0){
                     forEachPromise(userdata.houses, getfullInfo).then((result) => {
-                        res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: trackrecord1 })
+                        res.json({ status: 200, hassuccessed: true, msg: 'Houses is found', data: fullInfo })
                     })
                 }
-                // res.json({ status: 200, hassuccessed: false, message: "institute is not found", error: err })
-            } else {
-                res.json({ status: 200, hassuccessed: true, data: userdata })
             }
         })
     } else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.post('/checkPatient', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.findOne({ _id: req.body.patient_id },
+        function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                var createCase = false;
+                if(req.body.pin){
+                    console.log('dfgdf', req.body.pin, userdata.pin)
+                    createCase = req.body.pin === userdata.pin ? true : false
+                }
+                else{
+                    var pos =  userdata && userdata.assosiated_by.filter((data)=> data.institute_id === req.body.institute_id);
+                    createCase = userdata.parent_id === req.body.institute_id ? true : (pos && pos.length>0) ? true : false;
+                }
+                if(createCase){
+                    res.json({ status: 200, hassuccessed: true, message: 'information get successfully', data: userdata });
+                }
+                else{
+                    if(req.body.pin){
+                        res.json({ status: 200, hassuccessed: false, message: 'pin is not correct' });
+                    }
+                    else{
+                        res.json({ status: 200, hassuccessed: false, message: 'user is not associated need pin to add' });
+                    }
+                }  
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.post('/addPatientToVH', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        
+    }
+    else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
@@ -472,15 +485,21 @@ function getfullInfo(data) {
         process.nextTick(() => {
             Institute.findOne({  'institute_groups.houses.house_id' : data.value }).exec()
             .then(function (doc3) {
-                pos = fullinfo.map(function(e) { return e._id; }).indexOf(doc3._id);
-                if(!pos)
+                pos = fullinfo.filter((data)=> data._id === doc3._id);
+                if(pos && pos.length === 0)
                 {
-                    console.log('dsfsdf')
                     fullInfo.push(doc3)
                 }
                 resolve(fullInfo);
             })
         });
     });
+}
+function forEachPromise(items, fn) {
+    return items.reduce(function (promise, item) {
+        return promise.then(function () {
+            return fn(item);
+        });
+    }, Promise.resolve());
 }
 module.exports = router;
