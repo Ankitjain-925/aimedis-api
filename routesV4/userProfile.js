@@ -614,6 +614,8 @@ router.post("/AddUser", function (req, res, next) {
                         var profile_id = "HA" + ids;
                     } else if (req.body.type == "doctor") {
                         var profile_id = "D_" + ids;
+                    } else if (req.body.type == "adminstaff") {
+                        var profile_id = "AS" + ids;
                     }
                     var isblock = { isblock: true };
 

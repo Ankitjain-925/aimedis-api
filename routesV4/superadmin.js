@@ -141,6 +141,8 @@ router.post('/Addadminuser', function (req, res, next) {
                 else if(req.body.type=='doctor')
                 {
                     var profile_id =  'D_'+ids;
+                } else if (req.body.type == "adminstaff") {
+                    var profile_id = "AS" + ids;
                 }
         var isblock = { isblock: false }
         var dt = dateTime.create();
@@ -166,7 +168,6 @@ router.post('/Addadminuser', function (req, res, next) {
             })
             .catch(err => res.json({ status: 200, message: 'Phone is not verified', error: err, hassuccessed: false })) 
             .then(regRes=>{
-                console.log('createdby', createdby)
                 var authyId = {authyId: regRes.user.id};
                 req.body.mobile = req.body.country_code.toUpperCase()+'-'+req.body.mobile;
             datas = { ...authyId, ...profile_id, ...req.body, ...institute_id, ...isblock, ...createdate,...createdby, ...usertoken, ...verified }

@@ -71,18 +71,18 @@ router.put('/AddGroup/:institute_id/:group_id', function (req, res, next) {
         },
         function (err, doc) {
             if (err && !doc) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err })
             } else {
                 if (doc.nModified == '0') {
-                    res.json({ status: 200, hassuccessed: false, msg: 'GroupInstitute is not found' })
+                    res.json({ status: 200, hassuccessed: false, message: 'GroupInstitute is not found' })
                 }
                 else {
-                    res.json({ status: 200, hassuccessed: true, msg: 'Group Institute is updated' })
+                    res.json({ status: 200, hassuccessed: true, message: 'Group Institute is updated' })
                 }
             }
         });
     } else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
 
@@ -98,18 +98,18 @@ router.put('/AddGroup/:institute_id', function (req, res, next) {
         { safe: true, upsert: true },
         function (err, doc) {
             if (err && !doc) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err })
             } else {
                 if (doc.nModified == '0') {
-                    res.json({ status: 200, hassuccessed: false, msg: 'Group Institute is not found' })
+                    res.json({ status: 200, hassuccessed: false, message: 'Group Institute is not found' })
                 }
                 else {
-                    res.json({ status: 200, hassuccessed: true, msg: 'Group Institute is added' })
+                    res.json({ status: 200, hassuccessed: true, message: 'Group Institute is added' })
                 }
             }
         });
     } else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
 
@@ -149,18 +149,18 @@ router.delete('/associatedTo/:user_id/:institute_id', function (req, res, next) 
             { multi: true },
         function (err, doc) {
             if (err && !doc) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err })
             } else {
                 if (doc.nModified == '0') {
-                    res.json({ status: 200, hassuccessed: false, msg: 'User/ Institute is not found' })
+                    res.json({ status: 200, hassuccessed: false, message: 'User/ Institute is not found' })
                 }
                 else {
-                    res.json({ status: 200, hassuccessed: true, msg: 'User associated with the hopital admin' })
+                    res.json({ status: 200, hassuccessed: true, message: 'User associated with the hopital admin' })
                 }
             }
         });
     } else {
-        res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
 

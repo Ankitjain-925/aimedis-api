@@ -1,12 +1,13 @@
 require('dotenv').config();
 var express = require('express');
 let router = express.Router();
-var Virtual_Specialty = require('../schema/virtual_specialty');
+var Virtual_Specialty = require('../schema/virtual_specialty.js');
+var virtual_Case = require('../schema/virtual_cases.js');
 var virtual_Task = require('../schema/virtual_tasks.js');
 var virtual_Service = require('../schema/virtual_services.js');
 var virtual_Invoice = require('../schema/virtual_invoice.js');
 var User = require('../schema/user.js')
-var Institute = require('../schema/institute');
+var Institute = require('../schema/institute.js');
 var jwtconfig = require('../jwttoken');
 var fullinfo = [];
 router.delete('/AddSpecialty/:specialty_id', function (req, res, next) {
@@ -34,7 +35,7 @@ router.put('/AddSpecialty/:specialty_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Specialty is updated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, message: 'Specialty is updated', data: userdata })
             }
         })
     } else {
@@ -119,7 +120,7 @@ router.put('/AddTask/:task_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Task is updated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, message: 'Task is updated', data: userdata })
             }
         })
     } else {
@@ -203,13 +204,13 @@ router.post('/ProfessionalTaskComment/:task_id', function (req, res, next) {
             { safe: true, upsert: true },
             function (err, doc) {
             if (err && !doc) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err })
             } else {
                 if (doc.nModified == '0') {
-                    res.json({ status: 200, hassuccessed: false, msg: 'Task is not found' })
+                    res.json({ status: 200, hassuccessed: false, message: 'Task is not found' })
                 }
                 else {
-                        res.json({ status: 200, hassuccessed: true, msg: 'Comment is added' })
+                        res.json({ status: 200, hassuccessed: true, message: 'Comment is added' })
                     }
                 }
             });
@@ -234,13 +235,13 @@ router.put('/ProfessionalTaskComment/:task_id/:comment_id', function (req, res, 
             },
             function (err, doc) {
             if (err && !doc) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err })
             } else {
                 if (doc.nModified == '0') {
-                    res.json({ status: 200, hassuccessed: false, msg: 'Task is not found' })
+                    res.json({ status: 200, hassuccessed: false, message: 'Task is not found' })
                 }
                 else {
-                    res.json({ status: 200, hassuccessed: true, msg: 'Comment is updated' })
+                    res.json({ status: 200, hassuccessed: true, message: 'Comment is updated' })
                 }
             }
         });
@@ -258,13 +259,13 @@ router.delete('/ProfessionalTaskComment/:task_id/:comment_id', function (req, re
         { multi: true },
         function (err, doc) {
             if (err && !doc) {
-                res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong', error: err })
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err })
             } else {
                 if (doc.nModified == '0') {
-                    res.json({ status: 200, hassuccessed: false, msg: 'Comment is not found' })
+                    res.json({ status: 200, hassuccessed: false, message: 'Comment is not found' })
                 }
                 else {
-                        res.json({ status: 200, hassuccessed: true, msg: 'Comment is deleted' })
+                        res.json({ status: 200, hassuccessed: true, message: 'Comment is deleted' })
                     }
                 }
             });
@@ -298,7 +299,7 @@ router.put('/AddService/:service_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Service is updated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, message: 'Service is updated', data: userdata })
             }
         })
     } else {
@@ -365,7 +366,7 @@ router.put('/AddInvoice/:bill_id', function (req, res, next) {
             if (err) {
                 res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
             } else {
-                res.json({ status: 200, hassuccessed: true, msg: 'Invoice is updated', data: userdata })
+                res.json({ status: 200, hassuccessed: true, message: 'Invoice is updated', data: userdata })
             }
         })
     } else {
@@ -422,7 +423,7 @@ router.get('/infoOfHouses', function (req, res, next) {
             } else {
                 if(userdata && userdata.houses && userdata.houses.length>0){
                     forEachPromise(userdata.houses, getfullInfo).then((result) => {
-                        res.json({ status: 200, hassuccessed: true, msg: 'Houses is found', data: fullInfo })
+                        res.json({ status: 200, hassuccessed: true, message: 'Houses is found', data: fullInfo })
                     })
                 }
             }
@@ -473,7 +474,48 @@ router.post('/addPatientToVH', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        
+        var virtual_Cases = new virtual_Case(req.body);
+        virtual_Cases.save(function (err, user_data) {
+            if (err && !user_data) {
+                res.json({ status: 200, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, message: 'Case number is assigned', hassuccessed: true });
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.put('/addPatientToVH/:case_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        virtual_Case.updateOne({ _id: req.params.case_id }, req.body, function (err, userdata) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: "Something went wrong", error: err })
+            } else {
+                res.json({ status: 200, hassuccessed: true, message: 'Case is updated', data: userdata })
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+router.delete('/addPatientToVH/:case_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        virtual_Case.findByIdAndRemove(req.params.case_id, function (err, data) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, hassuccessed: true, message: 'Case is Deleted Successfully' });
+            }
+        });
     }
     else {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
@@ -495,6 +537,7 @@ function getfullInfo(data) {
         });
     });
 }
+
 function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
         return promise.then(function () {
