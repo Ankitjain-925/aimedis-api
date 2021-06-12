@@ -522,6 +522,25 @@ router.delete('/addPatientToVH/:case_id', function (req, res, next) {
     }
 })
 
+router.post('/getPatientFromVH:/house_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        var virtual_Cases = new virtual_Case(req.body);
+        virtual_Cases.save(function (err, user_data) {
+            if (err && !user_data) {
+                res.json({ status: 200, message: 'Something went wrong.', error: err });
+            } else {
+                res.json({ status: 200, message: 'Case number is assigned', hassuccessed: true });
+            }
+        })
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+
 function getfullInfo(data) {
     return new Promise((resolve, reject) => {
         process.nextTick(() => {
