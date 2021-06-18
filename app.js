@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
 //var cookieParser = require('cookie-parser');
@@ -12,6 +13,9 @@ var swaggerUi = require('swagger-ui-express');
 var swaggerDocument = require('./swagger.json');
 const uuidv1 = require('uuid/v1');
 var base64 = require('base-64');
+var cron = require('node-cron');
+const { MongoTools, MTOptions } = require("node-mongotools")
+var mongoTools = new MongoTools();
 
 var moment = require('moment');
 mongoose.connect(config.database, { useNewUrlParser: true });
@@ -30,6 +34,45 @@ const appAdmin = express();
 appAdmin.use(express.static(path.join(__dirname, 'build/admin')));
 app.use(express.static(path.join(__dirname, 'build/main')));
 ////////////admin+main+end/////////////
+
+// cron.schedule('*/1 * * * *', () => {
+//   mongoTools.rotation({
+//     uri: config.database, 
+//     dropboxToken: process.env.DBT,
+//     path: "./backup", 
+//     rotationDryMode: true,
+//     rotationWindowsDays: 3 }
+//  )
+//   .then((success) => {
+//     if(success && success.filesystem && success.filesystem.cleanedFiles && success.filesystem.cleanedFiles.length){
+//       success.filesystem.cleanedFiles.forEach(element => {
+//           fs.unlink(element, function(err) {
+//             if (err) {
+//               throw err
+//             } else {
+//               console.log("Successfully deleted the file.")
+//             }
+//           })
+//       });
+//     }
+//   })
+//   .catch((err) => console.error("error", err) );
+// });
+
+// cron.schedule('*/1 * * * *', () => {
+// //  mongoTools.mongodump({ uri: config.database,
+// //  path: 'BackupDB',
+// //  dropboxToken: process.env.DBT, 
+// // })
+// // .then((success) =>{ console.info("success", success) 
+// // })
+// // .catch((err) => console.error("error", err) );
+//  mongoTools.list({ uri: config.database,
+//  path: 'BackupDB',
+//  dropboxToken: process.env.DBT, })
+// .then((success) => console.info("success", success) )
+// .catch((err) => console.error("error", err) );
+// });
 
 
 //app.use(express.static(path.join(__dirname, 'public')));
@@ -89,6 +132,7 @@ var bloackchain4 = require("./routesV4/blockchain");
 var cronPrecess4 = require("./routesV4/cron");
 var vspecialty4 = require("./routesV4/virtual_specialty");
 var hadmin4 = require("./routesV4/h_admin")
+var comet4 = require("./routesV4/cometUserList");
 
 app.use('/api/v1/User', UserData);
 app.use('/api/v1/UserProfile', UserProfile);
@@ -146,6 +190,10 @@ app.use("/api/v4/blockchain", bloackchain4);
 app.use("/api/v4/cron", cronPrecess4);
 app.use("/api/v4/vh", vspecialty4);
 app.use("/api/v4/hospitaladmin", hadmin4);
+app.use("/api/v4/cron", cronPrecess4)
+app.use("/api/v4/specilty", vspecialty4)
+app.use("/api/v4/cometUserList", comet4)
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
