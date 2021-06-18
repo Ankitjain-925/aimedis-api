@@ -4057,11 +4057,11 @@ router.post('/forgotPassword', function (req, res, next) {
                     promise.then((user_data1) => {
                         console.log('userdata1', user_data1)
                         if (token !== '') {
-                            var link = 'https://sys.aimedis.io/change-password';
+                            var link = 'https://sys.aimedis.io/change-password?token=' + token;
                             if (req.body.passFrom === 'landing') {
                                 // link = '/change-password';
                                 // link = 'https://aidoc.io/change-password'
-                                link = 'https://sys.aimedis.io/change-password';
+                                link = 'https://sys.aimedis.io/change-password?token=' + token;
                             }
                             // link = 'http://localhost:3000/change-password';
                             var lan1 = getMsgLang(user_data1._id)
