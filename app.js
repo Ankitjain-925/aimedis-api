@@ -88,6 +88,7 @@ var Uploadcerts4 = require('./routesV4/uploadcerts');
 var bloackchain4 = require("./routesV4/blockchain");
 var cronPrecess4 = require("./routesV4/cron");
 var vspecialty4 = require("./routesV4/virtual_specialty");
+var vstep4 = require("./routesV4/virtual_step");
 var hadmin4 = require("./routesV4/h_admin")
 
 app.use('/api/v1/User', UserData);
@@ -145,6 +146,7 @@ app.use('/api/v4/aws', Uploadcerts4);
 app.use("/api/v4/blockchain", bloackchain4);
 app.use("/api/v4/cron", cronPrecess4);
 app.use("/api/v4/vh", vspecialty4);
+app.use("/api/v4/step", vstep4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -180,8 +182,8 @@ app.use(function(err, req, res, next) {
 
 
 
-app.listen(5000, () => {
-    console.log('Server started on port 5000');
+app.listen(5001, () => {
+    console.log('Server started on port 5001');
 });
 
 // module.exports = app;

@@ -103,7 +103,7 @@ router.post('/AddStep', function (req, res, next) {
 
         router.delete('/Case_numbers/:step_id/:case_id', function (req, res, next) {
              virtual_step.updateOne({ _id: req.params.step_id },
-                { $pull: { case_numbers: { comment_id: req.params.comment_id } } },
+                { $pull: { case_numbers: { case_id: req.params.case_id } } },
                 { multi: true },
                 function (err, doc) {
                     if (err && !doc) {
@@ -121,5 +121,34 @@ router.post('/AddStep', function (req, res, next) {
                 });
             
         })
+        
+        router.put('/id_numbers/cases/:fromstep_id/:tostep_id', function (req, res, next) {
+            virtual_step.updateOne({ _id: req.params.fromstep_id },
+               { $pull: { case_numbers: { case_id: req.body.case_id } } },
+               { multi: true },
+               function (err, doc) {
+                
+                virtual_step.updateOne({ _id: req.params.tostep_id },
+                    { $push: { id_numbers: req.body } },
+                    { safe: true, upsert: true },
+                    function (err, doc) {
+                    if (err && !doc) {
+                        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong', error: err })
+                    } else {
+                        if (doc.nModified == '0') {
+                            res.json({ status: 200, hassuccessed: true, message: 'step is not found' })
+                        }
+                        else {
+                            res.json({ status: 200, hassuccessed: true, message: 'Case is moved between steps' })
+                        }
+                    }
+                });
+                    
+                }) 
+                  
+        })
+
+             
+       
         
  module.exports = router;
