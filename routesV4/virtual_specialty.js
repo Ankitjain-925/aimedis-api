@@ -325,11 +325,11 @@ router.post('/AddService', function (req, res, next) {
     }
 })
 
-router.get('/AddService/:house_id:', function (req, res, next) {
+router.get('/GetService/:house_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     if (legit) {
-        virtual_Service.find({ house_id: req.params.house_id }, function (err, userdata) {
+        virtual_Service.find({house_id: req.params.house_id}, function (err, userdata) {
             if (err && !userdata) {
                 res.json({ status: 200, hassuccessed: false, message: "services not found", error: err })
             } else {
