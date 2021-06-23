@@ -44,25 +44,20 @@ router.delete('/Question/:questionaire_id', function (req, res, next) {
                     }
                 })
             }) 
-            
-            router.get('/infoOfHouses', function (req, res, next) {
+            router.get('/GetQuestionaire/:house_id', function (req, res, next) {
                 const token = (req.headers.token)
                 let legit = jwtconfig.verify(token)
                 if (legit) {
-                    fullInfo = [];
-                    questionaire.findOne({ _id: legit.id }, function (err, userdata) {
+                    questionaire.find({house_id: req.params.house_id}, function (err, userdata) {
                         if (err && !userdata) {
                             res.json({ status: 200, hassuccessed: false, message: "questionaire not found", error: err })
                         } else {
-                            if(userdata && userdata.houses && userdata.houses.length>0){
-                                forEachPromise(userdata.houses, getfullInfo).then((result) => {
-                                    res.json({ status: 200, hassuccessed: true, message: 'Houses is found', data: fullInfo })
-                                })
-                            }
+                            res.json({ status: 200, hassuccessed: true, data: userdata })
                         }
                     })
                 } else {
                     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
                 }
             })
+            
     module.exports = router;

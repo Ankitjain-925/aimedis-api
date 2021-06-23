@@ -45,17 +45,21 @@ router.post('/AddStep', function (req, res, next) {
         
     })  
     
-    router.get('/GetStep/:house_id:', function (req, res, next) {
-
-        virtual_step.find({ house_id: req.params.house_id }, function (err, userdata) {
+    router.get('/GetStep/:house_id', function (req, res, next) {
+        const token = (req.headers.token)
+        let legit = jwtconfig.verify(token)
+        if (legit) {
+            virtual_step.find({house_id: req.params.house_id}, function (err, userdata) {
                 if (err && !userdata) {
-                    res.json({ status: 200, hassuccessed: false, message: "something went wrong", error: err })
+                    res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
                 } else {
                     res.json({ status: 200, hassuccessed: true, data: userdata })
                 }
             })
-        })
-
+        } else {
+            res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+        }
+    })
          
         router.post('/Case_numbers/:step_id', function (req, res, next) {
              virtual_step.updateOne({ _id: req.params.step_id },
