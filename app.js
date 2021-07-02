@@ -12,6 +12,10 @@ var swaggerUi = require('swagger-ui-express');
 var swaggerDocument = require('./swagger.json');
 const uuidv1 = require('uuid/v1');
 var base64 = require('base-64');
+var cron = require('node-cron');
+const { MongoTools, MTOptions } = require("node-mongotools")
+var mongoTools = new MongoTools();
+const axios = require("axios");
 
 var moment = require('moment');
 mongoose.connect(config.database, { useNewUrlParser: true });
@@ -30,6 +34,77 @@ const appAdmin = express();
 appAdmin.use(express.static(path.join(__dirname, 'build/admin')));
 app.use(express.static(path.join(__dirname, 'build/main')));
 ////////////admin+main+end/////////////
+
+// cron.schedule('*/1 * * * *', () => {
+//   mongoTools.rotation({
+//     uri: config.database, 
+//     dropboxToken: process.env.DBT,
+//     path: "/BackupDB", 
+//     rotationDryMode: true,
+//     rotationWindowsDays: 3 }
+//  )
+//   .then((success) => {
+//     if(success && success.filesystem && success.filesystem.cleanedFiles && success.filesystem.cleanedFiles.length){
+//       var new_arr = success.filesystem.cleanedFiles.slice(0, success.filesystem.cleanedFiles.length-7)
+//       console.log('new_arr', new_arr)
+//       new_arr.forEach(function(item,index){
+//           console.log(item);
+//           if (fs.existsSync(item)){
+//               fs.unlinkSync(item, function(err) {
+//                 if (err) {
+//                   throw err
+//                 } else {
+//                   const options = {
+//                     method: "POST",
+//                     headers: { "Content-Type": "application/json" ,
+//                     "Authorization" : "Bearer "+process.env.DBT
+//                   },
+//                     data: {"path": item},
+//                     url: "https://api.dropboxapi.com/2/files/delete_v2",
+//                   };
+//                   axios(options)
+//                     .then((rr) => {
+//                       console.log('eeee', rr.data);
+//                     })
+//                     .catch((e) => {
+//                       console.log('errrr', e);
+//                     });
+//                   console.log("Successfully deleted the file.")
+//                 }
+//               });
+//           }else{
+//               console.log('file not found');
+//           }
+//         })
+//       // success.filesystem.cleanedFiles.forEach(element => {
+//       //     fs.unlink(element, function(err) {
+//       //       if (err) {
+//       //         throw err
+//       //       } else {
+              
+//       //         console.log("Successfully deleted the file.")
+//       //       }
+//       //     })
+//       // });
+//     }
+//   })
+//   .catch((err) => console.error("error", err) );
+// });
+
+// cron.schedule('*/1 * * * *', () => {
+// //  mongoTools.mongodump({ uri: config.database,
+// //  path: 'BackupDB',
+// //  dropboxToken: process.env.DBT, 
+// // })
+// // .then((success) =>{ console.info("success", success) 
+// // })
+// // .catch((err) => console.error("error", err) );
+//  mongoTools.list({ uri: config.database,
+//  path: 'BackupDB',
+//  dropboxToken: process.env.DBT, })
+// .then((success) => console.info("success", success) )
+// .catch((err) => console.error("error", err) );
+// });
 
 
 //app.use(express.static(path.join(__dirname, 'public')));
@@ -90,7 +165,6 @@ var cronPrecess4 = require("./routesV4/cron");
 var vspecialty4 = require("./routesV4/virtual_specialty");
 var vstep4 = require("./routesV4/virtual_step");
 var questionaire4 = require("./routesV4/questionaire");
-var answerspatient4= require("./routesV4/answerspatient");
 var hadmin4 = require("./routesV4/h_admin")
 
 app.use('/api/v1/User', UserData);
@@ -150,7 +224,6 @@ app.use("/api/v4/cron", cronPrecess4);
 app.use("/api/v4/vh", vspecialty4);
 app.use("/api/v4/step", vstep4);
 app.use("/api/v4/questionaire", questionaire4);
-app.use("/api/v4/answerspatient",answerspatient4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
