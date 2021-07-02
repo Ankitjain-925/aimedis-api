@@ -16,6 +16,7 @@ var base64 = require('base-64');
 var cron = require('node-cron');
 const { MongoTools, MTOptions } = require("node-mongotools")
 var mongoTools = new MongoTools();
+const axios = require("axios");
 
 var moment = require('moment');
 mongoose.connect(config.database, { useNewUrlParser: true });
@@ -39,21 +40,53 @@ app.use(express.static(path.join(__dirname, 'build/main')));
 //   mongoTools.rotation({
 //     uri: config.database, 
 //     dropboxToken: process.env.DBT,
-//     path: "./backup", 
+//     path: "BackupDB", 
 //     rotationDryMode: true,
 //     rotationWindowsDays: 3 }
 //  )
 //   .then((success) => {
 //     if(success && success.filesystem && success.filesystem.cleanedFiles && success.filesystem.cleanedFiles.length){
-//       success.filesystem.cleanedFiles.forEach(element => {
-//           fs.unlink(element, function(err) {
-//             if (err) {
-//               throw err
-//             } else {
-//               console.log("Successfully deleted the file.")
-//             }
-//           })
-//       });
+//       var new_arr = success.filesystem.cleanedFiles.slice(0, success.filesystem.cleanedFiles.length-7)
+//       console.log('new_arr', new_arr)
+//       new_arr.forEach(function(item,index){
+//           console.log(item);
+//           if (fs.existsSync(item)){
+//               fs.unlinkSync(item, function(err) {
+//                 if (err) {
+//                   throw err
+//                 } else {
+//                   const options = {
+//                     method: "POST",
+//                     headers: { "Content-Type": "application/json" ,
+//                     "Authorization" : "Bearer "+process.env.DBT
+//                   },
+//                     data: {"path": item},
+//                     url: "https://api.dropboxapi.com/2/files/delete_v2",
+//                   };
+//                   axios(options)
+//                     .then((rr) => {
+//                       console.log('eeee', rr.data);
+//                     })
+//                     .catch((e) => {
+//                       console.log('errrr', e);
+//                     });
+//                   console.log("Successfully deleted the file.")
+//                 }
+//               });
+//           }else{
+//               console.log('file not found');
+//           }
+//         })
+//       // success.filesystem.cleanedFiles.forEach(element => {
+//       //     fs.unlink(element, function(err) {
+//       //       if (err) {
+//       //         throw err
+//       //       } else {
+              
+//       //         console.log("Successfully deleted the file.")
+//       //       }
+//       //     })
+//       // });
 //     }
 //   })
 //   .catch((err) => console.error("error", err) );
