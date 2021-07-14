@@ -4,7 +4,7 @@ const { promisify } = require("util");
 const read = promisify(require("fs").readFile);
 const axios = require("axios");
 //for certificate
-router.post("/dataManager", function(req, res, next) {
+router.post("/dataManager", function (req, res, next) {
   //   var options = {
   let { path, data, method, headers } = req.body;
   let baseUrl = "http://h2873135.stratoserver.net:2999/api/";
@@ -16,8 +16,8 @@ router.post("/dataManager", function(req, res, next) {
   };
   axios(options)
     .then((rr) => {
-      console.log('options',options)
-      console.log('rr',  rr)
+      console.log("options", options);
+      console.log("rr", rr);
       res.send(rr.data);
     })
     .catch((e) => {
