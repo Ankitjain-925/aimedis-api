@@ -1196,61 +1196,100 @@ router.get("/existorblock/:User_id", function (req, res, next) {
   }
 });
 
-router.get("/Users/:User_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: req.params.User_id })
-      .select("-password -track_record")
-      .exec(function (err, Userinfo) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          if (Userinfo) {
-            if (
-              Userinfo.organ_donor &&
-              Userinfo.organ_donor.length > 0 &&
-              Userinfo.organ_donor[0].OptionData &&
-              Userinfo.organ_donor[0]._enc_OptionData === true
-            ) {
-              if (
-                decrypt(Userinfo.organ_donor[0].OptionData).indexOf("{") !== -1
-              ) {
-                Userinfo.organ_donor[0].OptionData = JSON.parse(
-                  decrypt(Userinfo.organ_donor[0].OptionData)
-                );
-              } else {
-                Userinfo.organ_donor[0].OptionData = decrypt(
-                  Userinfo.organ_donor[0].OptionData
-                );
-              }
-            }
-            res.json({ status: 200, hassuccessed: true, data: Userinfo });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "User not found",
+router.get('/Users/:User_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    if (legit) {
+        User.findOne({ _id: req.params.User_id })
+            .select("-password -track_record")
+            .exec(function (err, Userinfo) {
+                if (err) {
+                    res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                } else {
+                    if (Userinfo) {
+                        if (Userinfo.organ_donor && Userinfo.organ_donor.length > 0 && Userinfo.organ_donor[0].OptionData && Userinfo.organ_donor[0]._enc_OptionData === true) {
+                          if(Userinfo.organ_donor[0].OptionData && Userinfo.organ_donor[0].OptionData.iv){
+                            if (decrypt(Userinfo.organ_donor[0].OptionData).indexOf("{") !== -1) {
+                                Userinfo.organ_donor[0].OptionData = JSON.parse(decrypt(Userinfo.organ_donor[0].OptionData));
+                            }
+                            else {
+                                Userinfo.organ_donor[0].OptionData = decrypt(Userinfo.organ_donor[0].OptionData);
+                            }
+                          }
+                          else{
+                            Userinfo.organ_donor[0].OptionData = Userinfo.organ_donor[0].OptionData;
+                          }
+                        }
+                        res.json({ status: 200, hassuccessed: true, data: Userinfo });
+                    } else {
+                        res.json({ status: 200, hassuccessed: false, message: 'User not found' });
+                    }
+                }
             });
-          }
-        }
-      });
-    // User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
+        // User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
 
-    // });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+        // });
+    }
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
+
+// router.get("/Users/:User_id", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     User.findOne({ _id: req.params.User_id })
+//       .select("-password -track_record")
+//       .exec(function (err, Userinfo) {
+//         if (err) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "Something went wrong.",
+//             error: err,
+//           });
+//         } else {
+//           if (Userinfo) {
+//             if (
+//               Userinfo.organ_donor &&
+//               Userinfo.organ_donor.length > 0 &&
+//               Userinfo.organ_donor[0].OptionData &&
+//               Userinfo.organ_donor[0]._enc_OptionData === true
+//             ) {
+//               if (
+//                 decrypt(Userinfo.organ_donor[0].OptionData).indexOf("{") !== -1
+//               ) {
+//                 Userinfo.organ_donor[0].OptionData = JSON.parse(
+//                   decrypt(Userinfo.organ_donor[0].OptionData)
+//                 );
+//               } else {
+//                 Userinfo.organ_donor[0].OptionData = decrypt(
+//                   Userinfo.organ_donor[0].OptionData
+//                 );
+//               }
+//             }
+//             res.json({ status: 200, hassuccessed: true, data: Userinfo });
+//           } else {
+//             res.json({
+//               status: 200,
+//               hassuccessed: false,
+//               message: "User not found",
+//             });
+//           }
+//         }
+//       });
+//     // User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
+
+//     // });
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
 router.put("/Users/changePass", function (req, res, next) {
   const token = req.headers.token;

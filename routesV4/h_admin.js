@@ -112,7 +112,7 @@ router.put("/AddGroup/:institute_id/:group_id", function (req, res, next) {
       },
       function (err, doc) {
         if (err && !doc) {
-          res.json({
+          res.json({ 
             status: 200,
             hassuccessed: false,
             message: "Something went wrong",
@@ -248,8 +248,7 @@ router.put("/associatedTo/:userid", function (req, res, next) {
   }
 });
 
-router.delete(
-  "/associatedTo/:user_id/:institute_id",
+router.delete("/associatedTo/:user_id/:institute_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
