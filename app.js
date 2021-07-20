@@ -165,6 +165,7 @@ var cronPrecess4 = require("./routesV4/cron");
 var vspecialty4 = require("./routesV4/virtual_specialty");
 var vstep4 = require("./routesV4/virtual_step");
 var questionaire4 = require("./routesV4/questionaire");
+var vcases4 = require("./routesV4/virtual_cases");
 var hadmin4 = require("./routesV4/h_admin")
 
 app.use('/api/v1/User', UserData);
@@ -224,6 +225,7 @@ app.use("/api/v4/cron", cronPrecess4);
 app.use("/api/v4/vh", vspecialty4);
 app.use("/api/v4/step", vstep4);
 app.use("/api/v4/questionaire", questionaire4);
+app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

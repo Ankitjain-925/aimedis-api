@@ -44,7 +44,7 @@ var CaseSchema = new Schema({
       required: true,
       unique: false
     },
-    patitent:{
+    patient:{
         type: Object,
         required: false,
         unique: false

@@ -99,33 +99,21 @@ router.delete("/Answer/:answerspatient_id", function (req, res, next) {
     }
 });
   
-router.get("/GetAnswerspatient/:house_id", function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
+router.get('/GetAnswerspatient/:house_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
     if (legit) {
-        answerspatient.find(
-        { house_id: req.params.house_id },
-        function (err, userdata) {
+        answerspatient.find({house_id: req.params.house_id}, function (err, userdata) {
             if (err && !userdata) {
-            res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "answerspatient not found",
-                error: err,
-            });
+                res.json({ status: 200, hassuccessed: false, message: "answerspatient not found", error: err })
             } else {
-            res.json({ status: 200, hassuccessed: true, data: userdata });
+                res.json({ status: 200, hassuccessed: true, data: userdata })
             }
-        }
-        );
+        })
     } else {
-        res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Authentication required.",
-        });
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
-});
+})
 
 router.post('/AddQuestionaire', function (req, res, next) {
     const token = (req.headers.token)
@@ -191,5 +179,6 @@ router.get('/GetQuestionaire/:house_id', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
     }
 })
-            
+
+
 module.exports = router;
