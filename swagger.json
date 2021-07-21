@@ -829,7 +829,453 @@
                     }
                 }
             }
+        },
+        "/step/AddStep/{step_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "step_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Patientflow"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "specialty deleted",
+                        "schema": {
+                            "$ref": "#/definitions/AddStep"
+                        }
+                    }
+                }
+            }
+        },
+        "/step/Case_numbers/{step_id}/{case_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "step_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "case_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+            ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Patientflow"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "case is deleted",
+                        "schema": {
+                            "$ref": "#/definitions/Case_numbers"
+                        }
+                    }
+                }
+            }
+        },
+        "/vh/AddSpecialty/{specialty_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "specialty_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "specialty is deleted",
+                        "schema": {
+                            "$ref": "#/definitions/AddSpecialty"
+                        }
+                    }
+                }
+            }
+        },
+        "/vh/AddTask/{task_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "task_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "task is deleted",
+                        "schema": {
+                            "$ref": "#/definitions/AddTask"
+                        }
+                    }
+                }
+            }
+        },
+        "/vh/AddInvoice/{bill_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "bill_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Invoice is deleted" ,
+                        "schema": {
+                            "$ref": "#/definitions/AddInvoice"
+                        }
+                    }
+                }
+            }
+        },
+        "/vh/addPatientToVH/{case_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "case_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "case is deleted" ,
+                        "schema": {
+                            "$ref": "#/definitions/addPatientToVH"
+                        }
+                    }
+                }
+            }
+        },
+        "/questionaire/Answer/{answerspatient_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "answerspatient_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Answers"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "answerspatient is deleted Successfully" ,
+                        "schema": {
+                            "$ref": "#/definitions/AddAnswerspatient"
+                        }
+                    }
+                }
+            }
+        },
+        "/questionaire/Question/{questionaire_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "questionaire_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Questions"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "questionaire is deleted Successfully" ,
+                        "schema": {
+                            "$ref": "#/definitions/AddQuestionaire"
+                        }
+                    }
+                }
+            }
+        },
+        "/vh/ProfessionalTaskComment/{task_id}/{comment_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "task_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "comment_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "comment is deleted",
+                        "schema": {
+                            "$ref": "#/definitions/ProfessionalTaskComment"
+                        }
+                    }
+                }
+            }
+        },
+        "/vh/AddService/{service_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "service_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+               
+             ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service is Deleted Successfully",
+                        "schema": {
+                            "$ref": "#/definitions/AddService"
+                        }
+                    }
+                }
+            }
+        },
+        "/hospitaladmin/AddGroup/{institute_id}/{group_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "institute_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                },
+                {
+                    "name": "group_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "Delete with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully"
+                        
+                    }
+                }
+            }
+        },
+        "/hospitaladmin/associatedTo/{user_id}/{institute_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                },
+                {
+                    "name": "institue_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "Delete with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully"
+                        
+                    }
+                }
+            }
+        },
+        "/hospitaladmin/assignedHouse/{user_id}/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "Delete with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully"
+                        
+                    }
+                }
+            }
         }
+        
+        
+
+        
+        
+    
+
+
+
 
 
         
