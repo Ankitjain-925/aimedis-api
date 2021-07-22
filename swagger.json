@@ -161,6 +161,21 @@
                         
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
             }
         },
         "/vh/AddSpecialty/{house_id}": {
@@ -858,6 +873,27 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Patientflow"
+                ],
+                "parameters": [
+                    {
+                        "name": "Patientflow",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Addstep"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
             }
         },
         "/step/Case_numbers/{step_id}/{case_id}":{
@@ -896,6 +932,27 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Patientflow"
+                ],
+                "parameters": [
+                    {
+                        "name": "Patientflow",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Case_numbers"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
             }
         },
         "/vh/AddSpecialty/{specialty_id}":{
@@ -925,6 +982,27 @@
                         "schema": {
                             "$ref": "#/definitions/AddSpecialty"
                         }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "parameters": [
+                    {
+                        "name": "Virtual_Specialty",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddSpecialty"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
                     }
                 }
             }
@@ -958,6 +1036,27 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "parameters": [
+                    {
+                        "name": "Virtual_Specialty",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddTask"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
             }
         },
         "/vh/AddInvoice/{bill_id}":{
@@ -987,6 +1086,27 @@
                         "schema": {
                             "$ref": "#/definitions/AddInvoice"
                         }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "parameters": [
+                    {
+                        "name": "Virtual_Specialty",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddInvoice"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
                     }
                 }
             }
@@ -1020,6 +1140,27 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "parameters": [
+                    {
+                        "name": "Virtual_Specialty",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/addPatientToVH"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
             }
         },
         "/questionaire/Answer/{answerspatient_id}":{
@@ -1051,7 +1192,29 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Answers"
+                ],
+                "parameters": [
+                    {
+                        "name": "Answers",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddAnswerspatient"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
             }
+            
         },
         "/questionaire/Question/{questionaire_id}":{
             "parameters": [
@@ -1080,6 +1243,27 @@
                         "schema": {
                             "$ref": "#/definitions/AddQuestionaire"
                         }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Questions"
+                ],
+                "parameters": [
+                    {
+                        "name": "Questions",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddQuestionaire"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
                     }
                 }
             }
@@ -1120,6 +1304,27 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "parameters": [
+                    {
+                        "name": "Virtual_Specialty",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ProfessionalTaskComment"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
             }
         },
         "/vh/AddService/{service_id}":{
@@ -1149,6 +1354,27 @@
                         "schema": {
                             "$ref": "#/definitions/AddService"
                         }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "parameters": [
+                    {
+                        "name": "Virtual_Specialty",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddService"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
                     }
                 }
             }
@@ -1189,7 +1415,24 @@
                         
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
             }
+        
+
         },
         "/hospitaladmin/associatedTo/{user_id}/{institute_id}": {
             "parameters": [
@@ -1266,7 +1509,156 @@
                     }
                 }
             }
+        },
+        "/hospitaladmin/AddGroup/{institute_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "institute_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+               
+            ],
+           
+            "put": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+        
+
+        },
+        "/hospitaladmin/associatedTo/{user_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+            
+        },
+        "/hospitaladmin/assignedHouse/{user_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+            
+        },
+        "/step/id_numbers/cases/{fromstep_id}/{tostep_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "fromstep_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "tostep_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+            ],
+            
+            "put": {
+                "tags": [
+                    "Patientflow"
+                ],
+                "parameters": [
+                    {
+                        "name": "Patientflow",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Addstep"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
+            }
         }
+         
+            
+        
+
         
         
 
@@ -1443,22 +1835,19 @@
         "ProfessionalTaskComment": {
             "required": [ ],
             "properties": {
-                "image": {
+                "text": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "name": {
+                "comment_by": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "profile_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "alies_id": {
+                "comment_id": {
                     "type": "string",
                     "uniqueItems": false
                 }
+               
                 
             }
         },
@@ -1525,21 +1914,28 @@
         "addPatientToVH": {
             "required": [ ],
         "properties": {
-                "": {
+                "case_number": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "": {
-                    "type": "string",
+                "patient": {
+                    "type": "object",
                     "uniqueItems": false
                 },
-                "": {
+                "inhospital": {
+                    "type": "boolean",
+                    "uniqueItems": true
+                },
+                "house_id": {
                     "type": "string",
-                    "uniqueItems": false
+                    "uniqueItems": true
                 }
+                
                 
             }
         }
+        
+       
         
     }
         
