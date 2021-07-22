@@ -20,6 +20,7 @@
     "dotenv": "^8.2.0",
     "dynamic-html-pdf": "^1.0.1",
     "express": "^4.17.1",
+    "fhir": "^4.9.0",
     "google-play-billing-validator": "^2.1.3",
     "handlebars": "^4.0.6",
     "html-pdf-node": "^1.0.7",

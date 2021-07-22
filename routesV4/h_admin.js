@@ -123,7 +123,7 @@ router.put("/AddGroup/:institute_id/:group_id", function (req, res, next) {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "GroupInstitute is not found",
+              message: "Group Institute is not found",
             });
           } else {
             res.json({
@@ -347,7 +347,7 @@ router.put("/assignedHouse/:userid", function (req, res, next) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "A uthentication required.",
+      message: "Authentication required.",
     });
   }
 });
