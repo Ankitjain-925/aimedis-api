@@ -377,9 +377,7 @@ router.post("/ProfessionalTaskComment/:task_id", function (req, res, next) {
   }
 });
 
-router.put(
-  "/ProfessionalTaskComment/:task_id/:comment_id",
-  function (req, res, next) {
+router.put("/ProfessionalTaskComment/:task_id/:comment_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
@@ -428,8 +426,7 @@ router.put(
   }
 );
 
-router.delete(
-  "/ProfessionalTaskComment/:task_id/:comment_id",
+router.delete("/ProfessionalTaskComment/:task_id/:comment_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
