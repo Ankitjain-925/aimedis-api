@@ -867,7 +867,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "specialty deleted",
+                        "description": "step deleted",
                         "schema": {
                             "$ref": "#/definitions/AddStep"
                         }
@@ -888,10 +888,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "Update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "step updated"
                     }
                 }
             }
@@ -947,10 +947,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "Update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "case is updated"
                     }
                 }
             }
@@ -999,10 +999,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "specialty updated"
                     }
                 }
             }
@@ -1051,10 +1051,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "task is updated"
                     }
                 }
             }
@@ -1103,10 +1103,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "Invoice is updated"
                     }
                 }
             }
@@ -1155,10 +1155,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "Case is updated"
                     }
                 }
             }
@@ -1207,10 +1207,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "answerspatient is updated"
                     }
                 }
             }
@@ -1260,10 +1260,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given Id",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "questionaire is updated"
                     }
                 }
             }
@@ -1319,10 +1319,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given Id",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "comment is updated"
                     }
                 }
             }
@@ -1371,10 +1371,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "service is update"
                     }
                 }
             }
@@ -1647,10 +1647,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given iD",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description":"updated successfully"
                     }
                 }
             }
