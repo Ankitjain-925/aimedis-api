@@ -59,6 +59,76 @@
         "application/json"
     ],
     "paths": {
+        "/hospitaladmin/associatedTo/{user_id}/{institute_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                },
+                {
+                    "name": "institue_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "Delete with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully"
+                        
+                    }
+                }
+            }
+        },
+        "/hospitaladmin/associatedTo/{user_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+            
+        },
         "/emergency_record/{UserId}": {
             "parameters": [
                 {

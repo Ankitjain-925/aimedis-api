@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.0.0",
+        "version": "1.4.0",
         "title": "Aimedis API",
         "description": "Manage the Api",
         "license": {
@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5001",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -163,6 +163,16 @@
                 }
             },
             "put": {
+                "parameters": [
+                    {
+                        "name": "UpdateInstitute",
+                        "in": "body",
+                        "description": "update the institute",
+                        "schema": {
+                            "$ref": "#/definitions/Institute"
+                        }
+                    }
+                ],
                 "tags": [
                     "Hospital_Admin"
                 ],
@@ -279,7 +289,7 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "task_ids",
+                    "name": "patient_profile_id",
                     "in": "path",
                     "required": true,
                     "description": "patient_profile_id",
@@ -310,7 +320,7 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "task_ids",
+                    "name": "patient_profile_id",
                     "in": "path",
                     "required": true,
                     "description": "patient_profile_id",
@@ -471,6 +481,11 @@
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
+                },
+                {
+                    "name": "step_id",
+                    "in": "path",
+                    "description": "Step id"
                 }
             ],
             "post": {
@@ -483,7 +498,7 @@
                         "in": "body",
                         "description": "patientflow",
                         "schema": {
-                            "$ref": "#/definitions/Case_numbers"
+                            "$ref": "#/definitions/StepAddCase"
                         }
                     }
                 ],
@@ -528,6 +543,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary": "Add question at house id --- please add option in form of array",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -661,6 +677,11 @@
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
+                },
+                {
+                    "name": "task_id",
+                    "in": "path",
+                    "description": "Task Id"
                 }
             ],
             "post": {
@@ -926,10 +947,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "case is deleted",
-                        "schema": {
-                            "$ref": "#/definitions/Case_numbers"
-                        }
+                        "description": "case is deleted"
                     }
                 }
             },
@@ -943,7 +961,7 @@
                         "in": "body",
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/Case_numbers"
+                            "$ref": "#/definitions/StepAddCase"
                         }
                     }
                 ],
@@ -1417,6 +1435,16 @@
                 }
             },
             "put": {
+                "parameters": [
+                    {
+                        "name": "AddtheGroup",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AddtheGroup"
+                        }
+                    }
+                ],
                 "tags": [
                     "Hospital_Admin"
                 ],
@@ -1434,44 +1462,7 @@
         
 
         },
-        "/hospitaladmin/associatedTo/{user_id}/{institute_id}": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                },
-                {
-                    "name": "user_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of institute",
-                    "type": "string"
-                },
-                {
-                    "name": "institue_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of institute",
-                    "type": "string"
-                }
-            ],
-            "delete": {
-                "tags": [
-                    "Hospital_Admin"
-                ],
-                "summary": "Delete with given ID",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Deleted successfully"
-                        
-                    }
-                }
-            }
-        },
+
         "/hospitaladmin/assignedHouse/{user_id}/{house_id}": {
             "parameters": [
                 {
@@ -1528,6 +1519,16 @@
             ],
            
             "put": {
+                "parameters": [
+                    {
+                        "name": "AddtheGroup",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AddtheGroup"
+                        }
+                    }
+                ],
                 "tags": [
                     "Hospital_Admin"
                 ],
@@ -1545,38 +1546,7 @@
         
 
         },
-        "/hospitaladmin/associatedTo/{user_id}": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                },
-                {
-                    "name": "user_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of institute",
-                    "type": "string"
-                }
-            ],
-            "put": {
-                "tags": [
-                    "Hospital_Admin"
-                ],
-                "summary": "update with given ID",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "updated successfully"
-                        
-                    }
-                }
-            }
-            
-        },
+       
         "/hospitaladmin/assignedHouse/{user_id}": {
             "parameters": [
                 {
@@ -1593,6 +1563,16 @@
                 }
             ],
             "put": {
+                "parameters": [
+                    {
+                        "name": "AssignedHouse",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AssignedHouse"
+                        }
+                    }
+                ],
                 "tags": [
                     "Hospital_Admin"
                 ],
@@ -1680,6 +1660,46 @@
 
     
     "definitions": {
+        "AddtheGroup":{
+            "required": ["group_name"],
+            "properties": {
+                "group_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "houses":{
+                    "type": "array",
+                    "items": {"type":"object"},
+                    "uniqueItems": false 
+                }
+            }
+        },
+        "AssignedHouse":{
+            "required": ["label", "value", "group_name"],
+            "properties": {
+                "label": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "value":{
+                    "type": "string",
+                    "uniqueItems": false 
+                },
+                "group_name":{
+                    "type": "string",
+                    "uniqueItems": false 
+                }
+            }
+        },
+        "Institute":{
+            "required": ["institute_name"],
+            "properties": {
+                "institute_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                } 
+            }
+        },
         "Addstep": {
             "required": ["step_name","house_id" ],
             "properties": {
@@ -1709,6 +1729,15 @@
                     "uniqueItems": false
                 },
                 "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "StepAddCase":{
+            "required": ["case_id"],
+            "properties": {
+                "case_id": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -1754,7 +1783,7 @@
                     "type": "string",
                     "uniqueItems": false
                 },
-                "Patient_id": {
+                "patient_id": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -1842,12 +1871,7 @@
                 "comment_by": {
                     "type": "string",
                     "uniqueItems": false
-                },
-                "comment_id": {
-                    "type": "string",
-                    "uniqueItems": false
                 }
-               
                 
             }
         },

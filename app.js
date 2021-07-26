@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
 //var cookieParser = require('cookie-parser');
@@ -39,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'build/main')));
 //   mongoTools.rotation({
 //     uri: config.database, 
 //     dropboxToken: process.env.DBT,
-//     path: "/BackupDB", 
+//     path: "BackupDB", 
 //     rotationDryMode: true,
 //     rotationWindowsDays: 3 }
 //  )
@@ -167,6 +168,7 @@ var vstep4 = require("./routesV4/virtual_step");
 var questionaire4 = require("./routesV4/questionaire");
 var vcases4 = require("./routesV4/virtual_cases");
 var hadmin4 = require("./routesV4/h_admin")
+var comet4 = require("./routesV4/cometUserList");
 
 app.use('/api/v1/User', UserData);
 app.use('/api/v1/UserProfile', UserProfile);
@@ -227,6 +229,8 @@ app.use("/api/v4/step", vstep4);
 app.use("/api/v4/questionaire", questionaire4);
 app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
+app.use("/api/v4/cometUserList", comet4)
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -257,12 +261,8 @@ app.use(function(err, req, res, next) {
   return err;
 });
 
-
-
-
-
-app.listen(5001, () => {
-    console.log('Server started on port 5001');
+app.listen(5000, () => {
+    console.log('Server started on port 5000');
 });
 
 // module.exports = app;
