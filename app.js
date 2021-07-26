@@ -229,8 +229,6 @@ app.use("/api/v4/step", vstep4);
 app.use("/api/v4/questionaire", questionaire4);
 app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
-app.use("/api/v4/cron", cronPrecess4)
-app.use("/api/v4/specilty", vspecialty4)
 app.use("/api/v4/cometUserList", comet4)
 
 

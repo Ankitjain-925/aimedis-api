@@ -26,13 +26,6 @@ module.exports = {
   return jwt.sign(payload, privateKEY, signOptions);
 },
 verify: (token) => {
-  /*
-   vOption = {
-    issuer: "Authorization/Resource/This server",
-    subject: "iam@user.me", 
-    audience: "Client_Identity" // this should be provided by client
-   }  
-  */
   var verifyOptions = {
       issuer:  config.issuer,
       subject:  config.subject,

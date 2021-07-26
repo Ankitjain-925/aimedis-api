@@ -1,14 +1,6 @@
-require("dotenv").config();
 var express = require("express");
 let router = express.Router();
-var Virtual_Specialty = require("../schema/virtual_specialty.js");
 var virtual_cases = require("../schema/virtual_cases.js");
-var virtual_Task = require("../schema/virtual_tasks.js");
-var virtual_Service = require("../schema/virtual_services.js");
-var virtual_Invoice = require("../schema/virtual_invoice.js");
-var virtual_step = require("../schema/virtual_step.js");
-var User = require("../schema/user.js");
-var Institute = require("../schema/institute.js");
 var jwtconfig = require("../jwttoken");
 var fullinfo = [];
 router.put("/AddRoom/:Room_id", function (req, res, next) {

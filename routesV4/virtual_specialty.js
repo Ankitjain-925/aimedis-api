@@ -1,4 +1,3 @@
-require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
