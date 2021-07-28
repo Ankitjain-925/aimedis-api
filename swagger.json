@@ -888,10 +888,8 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "step deleted",
-                        "schema": {
-                            "$ref": "#/definitions/AddStep"
-                        }
+                        "description": "step deleted"
+                        
                     }
                 }
             },
@@ -1634,7 +1632,79 @@
                     }
                 }
             }
+        }, 
+        "/step/Patient/{fromstep_id}/{tostep_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "fromstep_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "tostep_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+           ],
+            "put": {
+                "tags": [
+                    "Patientflow"
+                ],
+                "parameters": [
+                    {
+                        "name": "Patientflow",
+                        "in": "body",
+                        "description": ""
+                        
+                    }
+                ],
+                "summary": "Update with given ID",
+                "responses": {
+                    "200": {
+                        "description": "patient is moved between steps"
+                    }
+                }
+            }
+        },
+        "/step/Patient/{step_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "step_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Patientflow"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "patient is removed"
+                        
+                    }
+                }
+            }
+           
         }
+
          
             
         
