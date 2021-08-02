@@ -304,7 +304,7 @@ router.put(
         function (err, doc) {
           virtual_step.updateOne(
             { _id: req.params.tostep_id },
-            { $push: { id_numbers: req.body } },
+            { $push: {patient: req.body } },
             { safe: true, upsert: true },
             function (err, doc) {
               if (err && !doc) {
@@ -316,7 +316,7 @@ router.put(
                 });
               } else {
                 if (doc.nModified == "0") {
-                  res.json({
+                 res.json({
                     status: 200,
                     hassuccessed: true,
                     message: "step is not found",
@@ -385,8 +385,5 @@ router.delete("/Patient/:step_id", function (req, res, next) {
     }
   }),
 
-
-
-
-
-module.exports = router;
+  
+  module.exports = router;

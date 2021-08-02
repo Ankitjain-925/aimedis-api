@@ -49,4 +49,62 @@ router.put("/AddRoom/:Room_id", function (req, res, next) {
     }
   });
 
-  module.exports = router;
+  router.put("/AddCase/:speciality_id", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    // if (legit) {
+      virtual_cases.updateOne(
+        { _id: req.params.speciality_id },
+        req.body,
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "case is updated",
+              data: userdata,
+            });
+          }
+        }
+      );
+    // } else {
+    //   res.json({
+    //     status: 200,
+    //     hassuccessed: false,
+    //     message: "Authentication required.",
+    //   });
+    }
+  );  
+  router.post("/AddCase", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    // if (legit) {
+      var Virtual_Cases = new virtual_cases(req.body);
+      Virtual_Cases.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+          res.json({
+            status: 200,
+            message: "Added Successfully",
+            hassuccessed: true,
+          });
+        }
+      });
+    // } else {
+    //   res.json({
+    //     status: 200,
+    //     hassuccessed: false,
+    //     message: "Authentication required.",
+    //   });
+    }
+  );
+
+ module.exports = router;
