@@ -888,10 +888,8 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "specialty deleted",
-                        "schema": {
-                            "$ref": "#/definitions/AddStep"
-                        }
+                        "description": "step deleted"
+                        
                     }
                 }
             },
@@ -909,10 +907,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "Update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "step updated"
                     }
                 }
             }
@@ -965,10 +963,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "Update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "case is updated"
                     }
                 }
             }
@@ -1017,10 +1015,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "specialty updated"
                     }
                 }
             }
@@ -1069,10 +1067,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "task is updated"
                     }
                 }
             }
@@ -1121,10 +1119,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "Invoice is updated"
                     }
                 }
             }
@@ -1173,10 +1171,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "Case is updated"
                     }
                 }
             }
@@ -1225,10 +1223,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "answerspatient is updated"
                     }
                 }
             }
@@ -1278,10 +1276,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given Id",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "questionaire is updated"
                     }
                 }
             }
@@ -1337,10 +1335,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given Id",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "comment is updated"
                     }
                 }
             }
@@ -1389,10 +1387,10 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given ID",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description": "service is update"
                     }
                 }
             }
@@ -1627,14 +1625,86 @@
                         }
                     }
                 ],
-                "summary": "saved",
+                "summary": "update with given iD",
                 "responses": {
                     "200": {
-                        "description": "saved"
+                        "description":"updated successfully"
                     }
                 }
             }
+        }, 
+        "/step/Patient/{fromstep_id}/{tostep_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "fromstep_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "tostep_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+           ],
+            "put": {
+                "tags": [
+                    "Patientflow"
+                ],
+                "parameters": [
+                    {
+                        "name": "Patientflow",
+                        "in": "body",
+                        "description": ""
+                        
+                    }
+                ],
+                "summary": "Update with given ID",
+                "responses": {
+                    "200": {
+                        "description": "patient is moved between steps"
+                    }
+                }
+            }
+        },
+        "/step/Patient/{step_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "step_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Patientflow"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "patient is removed"
+                        
+                    }
+                }
+            }
+           
         }
+
          
             
         
@@ -1643,17 +1713,7 @@
         
 
         
-        
-    
-
-
-
-
-
-        
-        
-        
-    },
+},
 
 
 

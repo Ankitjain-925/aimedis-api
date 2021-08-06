@@ -291,4 +291,99 @@ router.put(
   }
 );
 
-module.exports = router;
+router.put(
+  "/Patient/:fromstep_id/:tostep_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    // if (legit) {
+      virtual_step.updateOne(
+        { _id: req.params.fromstep_id },
+        { $pull: { patient: { step_id: req.body.step_id } } },
+        { multi: true },
+        function (err, doc) {
+          virtual_step.updateOne(
+            { _id: req.params.tostep_id },
+            { $push: {patient: req.body } },
+            { safe: true, upsert: true },
+            function (err, doc) {
+              if (err && !doc) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                if (doc.nModified == "0") {
+                 res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "step is not found",
+                  });
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "patient is moved between steps",
+                  });
+                }
+              }
+            }
+          );
+        }
+      );
+    // } else {
+    //   res.json({
+    //     status: 200,
+    //     hassuccessed: false,
+    //     message: "Authentication required.",
+    //   });
+     });
+  
+
+
+router.delete("/Patient/:step_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+   if (legit) {
+    virtual_step.updateOne(
+      { _id: req.params.step_id },
+      { $pull: { patient: { step_id: req.params.step_id } } },
+      { multi: true },
+      function (err, doc) {
+        if (err && !doc) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          if (doc.nModified == "0") {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "step is not found",
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "patient is removed",
+            });
+          }
+        }
+      }
+    );
+   } else {
+     res.json({
+       status: 200,
+       hassuccessed: false,
+       message: "Authentication required.",
+     });
+    }
+  }),
+
+  
+  module.exports = router;
