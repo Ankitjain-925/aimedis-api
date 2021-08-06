@@ -8,6 +8,7 @@ var virtual_Invoice = require("../schema/virtual_invoice.js");
 var User = require("../schema/user.js");
 var Institute = require("../schema/institute.js");
 var jwtconfig = require("../jwttoken");
+const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
 router.delete("/AddSpecialty/:specialty_id", function (req, res, next) {
   const token = req.headers.token;
@@ -221,7 +222,35 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_Task.find(
-      { house_id: req.params.house_id },
+      { house_id: req.params.house_id, archived: { $ne: true } },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_Task.find(
+      { house_id: req.params.house_id, archived: true },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -891,12 +920,11 @@ router.delete("/addPatientToVH/:case_id", function (req, res, next) {
   }
 });
 
-router.post("/getPatientFromVH:/house_id", function (req, res, next) {
+router.get("/getPatientFromVH:/house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var virtual_Cases = new virtual_Case(req.body);
-    virtual_Cases.save(function (err, user_data) {
+    virtual_Case.find({ house_id : this.params.house_id, inhospital: true }, function (err, user_data) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
@@ -904,6 +932,7 @@ router.post("/getPatientFromVH:/house_id", function (req, res, next) {
           status: 200,
           message: "Case number is assigned",
           hassuccessed: true,
+          data: user_data
         });
       }
     });

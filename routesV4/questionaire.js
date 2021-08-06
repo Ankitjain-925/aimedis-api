@@ -184,45 +184,15 @@ router.put("/Question/:questionaire_id", function (req, res, next) {
   }
 });
 
-router.delete("/Question/:questionaire_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    questionaire.findByIdAndRemove(
-      { _id: req.params.questionaire_id },
-      req.body,
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "questionaire is deleted Successfully",
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
 router.get("/GetQuestionaire/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    const house_id = req.params.house_id;
+    const messageToSearchWith = new questionaire({ house_id });
+    messageToSearchWith.encryptFieldsSync();
     questionaire.find(
-      { house_id: req.params.house_id },
+      { house_id: messageToSearchWith.house_id },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -245,21 +215,21 @@ router.get("/GetQuestionaire/:house_id", function (req, res, next) {
   }
 });
 
-router.get('/GetQuestionaire/:house_id', function (req, res, next) {
-    const token = (req.headers.token)
-    let legit = jwtconfig.verify(token)
-    if (legit) {
-        questionaire.find({house_id: req.params.house_id}, function (err, userdata) {
-            if (err && !userdata) {
-                res.json({ status: 200, hassuccessed: false, message: "questionaire not found", error: err })
-            } else {
-                res.json({ status: 200, hassuccessed: true, data: userdata })
-            }
-        })
-    } else {
-        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-    }
-})
+// router.get('/GetQuestionaire/:house_id', function (req, res, next) {
+//     const token = (req.headers.token)
+//     let legit = jwtconfig.verify(token)
+//     if (legit) {
+//         questionaire.find({house_id: req.params.house_id}, function (err, userdata) {
+//             if (err && !userdata) {
+//                 res.json({ status: 200, hassuccessed: false, message: "questionaire not found", error: err })
+//             } else {
+//                 res.json({ status: 200, hassuccessed: true, data: userdata })
+//             }
+//         })
+//     } else {
+//         res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+//     }
+// })
 
 
 module.exports = router;

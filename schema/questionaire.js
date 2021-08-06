@@ -4,14 +4,9 @@ var Schema = mongoose.Schema;
 const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 
 var QuesSchema = new mongoose.Schema({
-    question:{
-        type: String,
-        required: true,
-        unique: false
-    },
-    options:{
+    questions:{
         type: Array,
-        required: false,
+        required: true,
         unique: false
     },
     house_id: {
