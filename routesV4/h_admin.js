@@ -385,4 +385,35 @@ router.delete("/assignedHouse/:userid/:house_id", function (req, res, next) {
   }
 });
 
+router.get("/GetProfessional/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    User.find(
+      {
+        $or : [{type: 'doctor'}, {type : 'nurse'}],
+        houses: { $elemMatch: { value: req.params.house_id } },
+      },
+      function (err2, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 module.exports = router;

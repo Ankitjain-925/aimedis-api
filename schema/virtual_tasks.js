@@ -90,6 +90,11 @@ var TaskSchema = new Schema({
         type: String,
         required: false,
         unique: false
+    },
+    done_on:{
+        type: String,
+        required: false,
+        unique: false
     }
 },{ strict: false });
 
