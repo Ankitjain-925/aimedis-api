@@ -405,7 +405,9 @@ router.post("/ProfessionalTaskComment/:task_id", function (req, res, next) {
   }
 });
 
-router.put("/ProfessionalTaskComment/:task_id/:comment_id", function (req, res, next) {
+router.put(
+  "/ProfessionalTaskComment/:task_id/:comment_id",
+  function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
@@ -454,7 +456,8 @@ router.put("/ProfessionalTaskComment/:task_id/:comment_id", function (req, res, 
   }
 );
 
-router.delete("/ProfessionalTaskComment/:task_id/:comment_id",
+router.delete(
+  "/ProfessionalTaskComment/:task_id/:comment_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -920,22 +923,29 @@ router.delete("/addPatientToVH/:case_id", function (req, res, next) {
   }
 });
 
-router.get("/getPatientFromVH:/house_id", function (req, res, next) {
+router.get("/getPatientFromVH/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    virtual_Case.find({ house_id : this.params.house_id, inhospital: true }, function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Case number is assigned",
-          hassuccessed: true,
-          data: user_data
-        });
+    virtual_Case.find(
+      { house_id: this.params.house_id, inhospital: true },
+      function (err, user_data) {
+        if (err && !user_data) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "Case number is assigned",
+            hassuccessed: true,
+            data: user_data,
+          });
+        }
       }
-    });
+    );
   } else {
     res.json({
       status: 200,
