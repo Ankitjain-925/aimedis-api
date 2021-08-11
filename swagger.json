@@ -468,6 +468,38 @@
                 }
             }
         },
+        "/vh/getPatientFromVH/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of house",
+                    "type": "string"
+                }
+                
+            ],
+            "get": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "summary": "Get patient from house",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Case number is assigned"
+                        
+                    }
+                }
+            }
+        },
         "/step/AddStep": {
             "parameters": [
                 {
