@@ -2,8 +2,9 @@ require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 var virtual_step = require("../schema/virtual_step.js");
+var virtual_cases = require("../schema/virtual_cases.js");
 var jwtconfig = require("../jwttoken");
-var fullinfo = [];
+var fullinfo = [], newDatafull=[];
 router.put("/AddStep/:step_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -95,11 +96,20 @@ router.get('/GetStep/:house_id', function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {
+    newDatafull = [];
     virtual_step.find({house_id: req.params.house_id}, function (err, userdata) {
           if (err && !userdata) {
               res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
           } else {
-              res.json({ status: 200, hassuccessed: true, data: userdata })
+              forEachPromise(userdata, getCaes).then((data)=>{
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "Steps is found",
+                  data: newDatafull,
+                });
+              })
+           
           }
       })
   } else {
@@ -339,7 +349,7 @@ router.put(
     //     hassuccessed: false,
     //     message: "Authentication required.",
     //   });
-     });
+});
   
 
 
@@ -383,7 +393,49 @@ router.delete("/Patient/:step_id", function (req, res, next) {
        message: "Authentication required.",
      });
     }
-  }),
+})
 
+function getCaes(data1){
+    return new Promise((resolve, reject) => {
+      process.nextTick(() => {
+      fullinfo = [];
+      if(data1.case_numbers && data1.case_numbers.length>0){
+        forEachPromise(data1.case_numbers, getfullInfo).then((data)=>{
+          var finald = data1;
+          finald.case_numbers = data;
+            newDatafull.push(finald);
+            resolve(newDatafull);
+        })
+      }
+      else{
+        newDatafull.push(data1);
+        resolve(newDatafull);
+      }
+  })
+  })
+}
+
+function getfullInfo(data) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      virtual_cases.findOne({ _id: data.case_id })
+        .exec()
+        .then(function (doc3) {
+          if(doc3){
+            fullinfo.push(doc3);
+            }
+          resolve(fullinfo);
+        });
+    });
+  });
+}
+  
+function forEachPromise(items, fn) {
+  return items.reduce(function (promise, item) {
+    return promise.then(function () {
+      return fn(item);
+    });
+  }, Promise.resolve());
+}
   
   module.exports = router;

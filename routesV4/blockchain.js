@@ -7,7 +7,7 @@ const axios = require("axios");
 router.post("/dataManager", function (req, res, next) {
   //   var options = {
   let { path, data, method, headers } = req.body;
-  let baseUrl = "http://h2873135.stratoserver.net:2999/api/";
+  let baseUrl = "http://aidoc.io:22000/api/";
   const options = {
     method: method ? method : "POST",
     headers: headers ? headers : { "Content-Type": "application/json" },
@@ -21,6 +21,7 @@ router.post("/dataManager", function (req, res, next) {
       res.send(rr.data);
     })
     .catch((e) => {
+      console.log("error", e);
       res.send(e);
     });
 });

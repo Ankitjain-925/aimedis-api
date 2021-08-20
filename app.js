@@ -32,9 +32,10 @@ app.use(express.urlencoded({ extended: false }));
 ////////////admin+main/////////////
 const appAdmin = express();
 
-appAdmin.use(express.static(path.join(__dirname, 'build/admin')));
-app.use(express.static(path.join(__dirname, 'build/main')));
+appAdmin.use(express.static(path.join(__dirname, './build/admin')));
+app.use(express.static(path.join(__dirname, './build/main')));
 ////////////admin+main+end/////////////
+
 
 // cron.schedule('*/1 * * * *', () => {
 //   mongoTools.rotation({

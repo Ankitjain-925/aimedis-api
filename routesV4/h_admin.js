@@ -394,7 +394,7 @@ router.get("/GetProfessional/:house_id", function (req, res, next) {
         $or : [{type: 'doctor'}, {type : 'nurse'}],
         houses: { $elemMatch: { value: req.params.house_id } },
       },
-      function (err2, userdata) {
+      function (err, userdata) {
         if (err && !userdata) {
           res.json({
             status: 200,

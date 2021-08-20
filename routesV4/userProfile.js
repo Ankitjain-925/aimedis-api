@@ -221,7 +221,7 @@ router.post("/sendRegisterationMail", function (req, res, next) {
 //For login the user
 
 router.post("/UserLogin", function (req, res, next) {
-  console.log("sfd");
+  console.log("sfd",  req.body);
   if (req.body.email == "" || req.body.password == "") {
     res.json({
       status: 450,

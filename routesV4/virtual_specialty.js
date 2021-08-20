@@ -848,6 +848,7 @@ router.post("/addPatientToVH", function (req, res, next) {
           status: 200,
           message: "Case number is assigned",
           hassuccessed: true,
+          data: user_data._id
         });
       }
     });
@@ -939,7 +940,7 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
         } else {
           res.json({
             status: 200,
-            message: "Case number is assigned",
+            message: "Get the patients",
             hassuccessed: true,
             data: user_data,
           });
