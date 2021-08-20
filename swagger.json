@@ -188,6 +188,37 @@
                 }
             }
         },
+        "/hospitaladmin/GetProfessional/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of house",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "Get professional info from house_id ",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "info is found"
+                        
+                    }
+                }
+            }
+        },
         "/vh/AddSpecialty/{house_id}": {
             "parameters": [
                 {
@@ -432,6 +463,38 @@
                 "responses": {
                     "200": {
                         "description": " invoice is found"
+                        
+                    }
+                }
+            }
+        },
+        "/vh/getPatientFromVH/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of house",
+                    "type": "string"
+                }
+                
+            ],
+            "get": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "summary": "Get patient from house",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Case number is assigned"
                         
                     }
                 }
@@ -1460,6 +1523,44 @@
         
 
         },
+        "/hospitaladmin/associatedTo/{user_id}/{institute_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of user",
+                    "type": "string"
+                },
+                {
+                    "name": "institute_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "Delete with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully"
+                        
+                    }
+                }
+            }
+        },
 
         "/hospitaladmin/assignedHouse/{user_id}/{house_id}": {
             "parameters": [
@@ -1569,6 +1670,46 @@
                         "schema": {
                             "$ref": "#/definitions/AssignedHouse"
                         }
+                    }
+                ],
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+            
+        },
+        "/hospitaladmin/associatedTo/{userid}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "userid",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of user",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "parameters": [
+                    {
+                        "name": "associatedTo",
+                        "in": "body",
+                        "description": "Already associated with the institute"
+                        
                     }
                 ],
                 "tags": [

@@ -928,8 +928,7 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    virtual_Case.find(
-      { house_id: this.params.house_id, inhospital: true },
+    virtual_Case.find({ $and: [ {house_id: req.params.house_id}, {inhospital: true}] },
       function (err, user_data) {
         if (err && !user_data) {
           res.json({

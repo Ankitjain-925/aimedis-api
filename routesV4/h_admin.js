@@ -242,7 +242,7 @@ router.put("/associatedTo/:userid", function (req, res, next) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "A uthentication required.",
+      message: "Authentication required.",
     });
   }
 });
