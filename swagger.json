@@ -888,7 +888,7 @@
                 }
             }
         },
-        "/step/AddStep/{step_id}":{
+        "/step/AddStep/{house_id}":{
             "parameters": [
                 {
                     "name": "token",
@@ -896,7 +896,7 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "step_id",
+                    "name": "house_id",
                     "in": "path",
                     "required": true,
                     "description": "ID",
@@ -1681,11 +1681,11 @@
             }
         },
         "Addstep": {
-            "required": ["step_name","house_id" ],
+            "required": ["house_id" ],
             "properties": {
-                "step_name": {
-                    "type": "string",
-                    "uniqueItems": false
+                "steps": {
+                    "type": "array",
+                    "items": {"type":"object"}
                 },
                "house_id": {
                     "type": "string",
