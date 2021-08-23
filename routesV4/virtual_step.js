@@ -6,12 +6,12 @@ var virtual_cases = require("../schema/virtual_cases.js");
 var jwtconfig = require("../jwttoken");
 var fullinfo = [], newDatafull=[];
 
-router.put("/AddStep/:step_id", function (req, res, next) {
+router.put("/AddStep/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_step.updateOne(
-      { _id: req.params.step_id },
+      { house_id: req.params.house_id },
       req.body,
       function (err, userdata) {
         if (err) {
@@ -103,20 +103,28 @@ router.get('/GetStep/:house_id', function (req, res, next) {
           if (err && !userdata) {
               res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
           } else {
-            console.log('userdata', userdata.steps)
-            // userdata.steps
-            if(userdata.steps && userdata.steps.length>0){
-              forEachPromise(userdata.steps, getCaes).then((data)=>{
+            if(userdata){
+              if(userdata.steps && userdata.steps.length>0){
+                forEachPromise(userdata.steps, getCaes).then((data)=>{
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Steps is found",
+                    data: newDatafull,
+                  });
+                })
+              }
+              else
+              {
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   message: "Steps is found",
-                  data: newDatafull,
+                  data: []
                 });
-              })
+              }
             }
-            else
-            {
+            else{
               res.json({
                 status: 200,
                 hassuccessed: true,
@@ -124,6 +132,7 @@ router.get('/GetStep/:house_id', function (req, res, next) {
                 data: []
               });
             }
+       
               // forEachPromise(userdata, getCaes).then((data)=>{
               //   res.json({
               //     status: 200,
