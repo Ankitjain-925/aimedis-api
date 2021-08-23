@@ -5,6 +5,7 @@ var virtual_step = require("../schema/virtual_step.js");
 var virtual_cases = require("../schema/virtual_cases.js");
 var jwtconfig = require("../jwttoken");
 var fullinfo = [], newDatafull=[];
+
 router.put("/AddStep/:step_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -38,6 +39,7 @@ router.put("/AddStep/:step_id", function (req, res, next) {
     });
   }
 });
+
 router.post("/AddStep", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -63,45 +65,48 @@ router.post("/AddStep", function (req, res, next) {
   }
 });
 
-router.delete("/AddStep/:step_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_step.findByIdAndRemove(req.params.step_id, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "Speciality is Deleted Successfully",
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+// router.delete("/AddStep/:step_id", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     virtual_step.findByIdAndRemove(req.params.step_id, function (err, data) {
+//       if (err) {
+//         res.json({
+//           status: 200,
+//           hassuccessed: false,
+//           message: "Something went wrong.",
+//           error: err,
+//         });
+//       } else {
+//         res.json({
+//           status: 200,
+//           hassuccessed: true,
+//           message: "Speciality is Deleted Successfully",
+//         });
+//       }
+//     });
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
 router.get('/GetStep/:house_id', function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {
     newDatafull = [];
-    virtual_step.find({house_id: req.params.house_id}, function (err, userdata) {
+    virtual_step.findOne({house_id: req.params.house_id}, function (err, userdata) {
           if (err && !userdata) {
               res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
           } else {
-              forEachPromise(userdata, getCaes).then((data)=>{
+            console.log('userdata', userdata.steps)
+            // userdata.steps
+            if(userdata.steps && userdata.steps.length>0){
+              forEachPromise(userdata.steps, getCaes).then((data)=>{
                 res.json({
                   status: 200,
                   hassuccessed: true,
@@ -109,7 +114,24 @@ router.get('/GetStep/:house_id', function (req, res, next) {
                   data: newDatafull,
                 });
               })
-           
+            }
+            else
+            {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Steps is found",
+                data: []
+              });
+            }
+              // forEachPromise(userdata, getCaes).then((data)=>{
+              //   res.json({
+              //     status: 200,
+              //     hassuccessed: true,
+              //     message: "Steps is found",
+              //     data: newDatafull,
+              //   });
+              // })
           }
       })
   } else {
@@ -117,285 +139,285 @@ router.get('/GetStep/:house_id', function (req, res, next) {
   }
 })
 
-router.post("/Case_numbers/:step_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_step.updateOne(
-      { _id: req.params.step_id },
-      { $push: { case_numbers: req.body } },
-      { safe: true, upsert: true },
-      function (err, doc) {
-        if (err && !doc) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          if (doc.nModified == "0") {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "step is not found",
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Case is added",
-            });
-          }
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+// router.post("/Case_numbers/:step_id", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     virtual_step.updateOne(
+//       { _id: req.params.step_id },
+//       { $push: { case_numbers: req.body } },
+//       { safe: true, upsert: true },
+//       function (err, doc) {
+//         if (err && !doc) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "Something went wrong",
+//             error: err,
+//           });
+//         } else {
+//           if (doc.nModified == "0") {
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "step is not found",
+//             });
+//           } else {
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "Case is added",
+//             });
+//           }
+//         }
+//       }
+//     );
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
-router.put("/Case_numbers/:step_id/:case_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_step.updateOne(
-      {
-        _id: req.params.step_id,
-        "case_numbers.case_id": req.params.case_id,
-      },
-      {
-        $set: {
-          "case_numbers.$": req.body,
-        },
-      },
-      function (err, doc) {
-        if (err && !doc) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          if (doc.nModified == "0") {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "step is not found",
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "case is updated",
-            });
-          }
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+// router.put("/Case_numbers/:step_id/:case_id", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     virtual_step.updateOne(
+//       {
+//         _id: req.params.step_id,
+//         "case_numbers.case_id": req.params.case_id,
+//       },
+//       {
+//         $set: {
+//           "case_numbers.$": req.body,
+//         },
+//       },
+//       function (err, doc) {
+//         if (err && !doc) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "Something went wrong",
+//             error: err,
+//           });
+//         } else {
+//           if (doc.nModified == "0") {
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "step is not found",
+//             });
+//           } else {
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "case is updated",
+//             });
+//           }
+//         }
+//       }
+//     );
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
-router.delete("/Case_numbers/:step_id/:case_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_step.updateOne(
-      { _id: req.params.step_id },
-      { $pull: { case_numbers: { case_id: req.params.case_id } } },
-      { multi: true },
-      function (err, doc) {
-        if (err && !doc) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          if (doc.nModified == "0") {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "step is not found",
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "case is deleted",
-            });
-          }
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+// router.delete("/Case_numbers/:step_id/:case_id", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     virtual_step.updateOne(
+//       { _id: req.params.step_id },
+//       { $pull: { case_numbers: { case_id: req.params.case_id } } },
+//       { multi: true },
+//       function (err, doc) {
+//         if (err && !doc) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "Something went wrong",
+//             error: err,
+//           });
+//         } else {
+//           if (doc.nModified == "0") {
+//             res.json({
+//               status: 200,
+//               hassuccessed: false,
+//               message: "step is not found",
+//             });
+//           } else {
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "case is deleted",
+//             });
+//           }
+//         }
+//       }
+//     );
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
-router.put(
-  "/id_numbers/cases/:fromstep_id/:tostep_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-      virtual_step.updateOne(
-        { _id: req.params.fromstep_id },
-        { $pull: { case_numbers: { case_id: req.body.case_id } } },
-        { multi: true },
-        function (err, doc) {
-          virtual_step.updateOne(
-            { _id: req.params.tostep_id },
-            { $push: { id_numbers: req.body } },
-            { safe: true, upsert: true },
-            function (err, doc) {
-              if (err && !doc) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                if (doc.nModified == "0") {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "step is not found",
-                  });
-                } else {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "Case is moved between steps",
-                  });
-                }
-              }
-            }
-          );
-        }
-      );
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Authentication required.",
-      });
-    }
-  }
-);
+// router.put(
+//   "/id_numbers/cases/:fromstep_id/:tostep_id",
+//   function (req, res, next) {
+//     const token = req.headers.token;
+//     let legit = jwtconfig.verify(token);
+//     if (legit) {
+//       virtual_step.updateOne(
+//         { _id: req.params.fromstep_id },
+//         { $pull: { case_numbers: { case_id: req.body.case_id } } },
+//         { multi: true },
+//         function (err, doc) {
+//           virtual_step.updateOne(
+//             { _id: req.params.tostep_id },
+//             { $push: { id_numbers: req.body } },
+//             { safe: true, upsert: true },
+//             function (err, doc) {
+//               if (err && !doc) {
+//                 res.json({
+//                   status: 200,
+//                   hassuccessed: false,
+//                   message: "Something went wrong",
+//                   error: err,
+//                 });
+//               } else {
+//                 if (doc.nModified == "0") {
+//                   res.json({
+//                     status: 200,
+//                     hassuccessed: true,
+//                     message: "step is not found",
+//                   });
+//                 } else {
+//                   res.json({
+//                     status: 200,
+//                     hassuccessed: true,
+//                     message: "Case is moved between steps",
+//                   });
+//                 }
+//               }
+//             }
+//           );
+//         }
+//       );
+//     } else {
+//       res.json({
+//         status: 200,
+//         hassuccessed: false,
+//         message: "Authentication required.",
+//       });
+//     }
+//   }
+// );
 
-router.put(
-  "/Patient/:fromstep_id/:tostep_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    // if (legit) {
-      virtual_step.updateOne(
-        { _id: req.params.fromstep_id },
-        { $pull: { patient: { step_id: req.body.step_id } } },
-        { multi: true },
-        function (err, doc) {
-          virtual_step.updateOne(
-            { _id: req.params.tostep_id },
-            { $push: {patient: req.body } },
-            { safe: true, upsert: true },
-            function (err, doc) {
-              if (err && !doc) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                if (doc.nModified == "0") {
-                 res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "step is not found",
-                  });
-                } else {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "patient is moved between steps",
-                  });
-                }
-              }
-            }
-          );
-        }
-      );
-    // } else {
-    //   res.json({
-    //     status: 200,
-    //     hassuccessed: false,
-    //     message: "Authentication required.",
-    //   });
-});
+// router.put(
+//   "/Patient/:fromstep_id/:tostep_id",
+//   function (req, res, next) {
+//     const token = req.headers.token;
+//     let legit = jwtconfig.verify(token);
+//     // if (legit) {
+//       virtual_step.updateOne(
+//         { _id: req.params.fromstep_id },
+//         { $pull: { patient: { step_id: req.body.step_id } } },
+//         { multi: true },
+//         function (err, doc) {
+//           virtual_step.updateOne(
+//             { _id: req.params.tostep_id },
+//             { $push: {patient: req.body } },
+//             { safe: true, upsert: true },
+//             function (err, doc) {
+//               if (err && !doc) {
+//                 res.json({
+//                   status: 200,
+//                   hassuccessed: false,
+//                   message: "Something went wrong",
+//                   error: err,
+//                 });
+//               } else {
+//                 if (doc.nModified == "0") {
+//                  res.json({
+//                     status: 200,
+//                     hassuccessed: true,
+//                     message: "step is not found",
+//                   });
+//                 } else {
+//                   res.json({
+//                     status: 200,
+//                     hassuccessed: true,
+//                     message: "patient is moved between steps",
+//                   });
+//                 }
+//               }
+//             }
+//           );
+//         }
+//       );
+//     // } else {
+//     //   res.json({
+//     //     status: 200,
+//     //     hassuccessed: false,
+//     //     message: "Authentication required.",
+//     //   });
+// });
   
 
-
-router.delete("/Patient/:step_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-   if (legit) {
-    virtual_step.updateOne(
-      { _id: req.params.step_id },
-      { $pull: { patient: { step_id: req.params.step_id } } },
-      { multi: true },
-      function (err, doc) {
-        if (err && !doc) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          if (doc.nModified == "0") {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "step is not found",
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "patient is removed",
-            });
-          }
-        }
-      }
-    );
-   } else {
-     res.json({
-       status: 200,
-       hassuccessed: false,
-       message: "Authentication required.",
-     });
-    }
-})
+// router.delete("/Patient/:step_id", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//    if (legit) {
+//     virtual_step.updateOne(
+//       { _id: req.params.step_id },
+//       { $pull: { patient: { step_id: req.params.step_id } } },
+//       { multi: true },
+//       function (err, doc) {
+//         if (err && !doc) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "Something went wrong",
+//             error: err,
+//           });
+//         } else {
+//           if (doc.nModified == "0") {
+//             res.json({
+//               status: 200,
+//               hassuccessed: false,
+//               message: "step is not found",
+//             });
+//           } else {
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "patient is removed",
+//             });
+//           }
+//         }
+//       }
+//     );
+//    } else {
+//      res.json({
+//        status: 200,
+//        hassuccessed: false,
+//        message: "Authentication required.",
+//      });
+//     }
+// })
 
 function getCaes(data1){
+  console.log('dataaaaa', data1)
     return new Promise((resolve, reject) => {
       process.nextTick(() => {
       fullinfo = [];
@@ -416,6 +438,7 @@ function getCaes(data1){
 }
 
 function getfullInfo(data) {
+  console.log('data34d', data)
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       virtual_cases.findOne({ _id: data.case_id })
