@@ -9,10 +9,6 @@ const StepSection = new mongoose.Schema({
         required: true,
         unique: false
      },
-    step_order:{
-        type: String,
-        required: false,
-     }, 
     case_numbers:Array,
     },{strict : false}); 
      
