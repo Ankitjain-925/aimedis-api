@@ -276,7 +276,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": " task is found"
+                        "description": "task is found"
                         
                     }
                 }
@@ -1622,24 +1622,9 @@
             
         }
          
-       
-       
-
-         
-            
-        
-
-        
-        
-
-        
 },
 
-
-
-
-    
-    "definitions": {
+"definitions": {
         "AddtheGroup":{
             "required": ["group_name"],
             "properties": {

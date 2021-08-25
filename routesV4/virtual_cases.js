@@ -107,4 +107,35 @@ router.put("/AddRoom/:Room_id", function (req, res, next) {
     }
   );
 
+  router.get("/AddCase/:case_id", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    // if (legit) {
+      virtual_cases.findOne(
+        virtual_cases.aggregate( [
+          { $completedno: { status: "completed task" } },
+          { $totalno: { _id: "$case_id", total: { $sum: "$no"  } }}
+       ] ),
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
+        }
+      );
+    // } else {
+    //   res.json({
+    //     status: 200,
+    //     hassuccessed: false,
+    //     message: "Authentication required.",
+    //   });
+    }
+  );
+
  module.exports = router;
