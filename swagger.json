@@ -31,7 +31,12 @@
         {
             "name": "Virtual_Specialty",
             "description": "API for  specialities"
+        },
+        {
+            "name": "virtual_cases",
+            "description": "API for cases"
         }
+
 
 
     ],
@@ -1620,7 +1625,162 @@
                 }
             }
             
+        },
+        "/cases/AddRoom/{Room_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "Room_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of room",
+                    "type": "string"
+                }
+               
+            ],
+           
+            "put": {
+                "parameters": [
+                    {
+                        "name": "virtual_cases",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+        
+
+        },
+        "/cases/AddCase/{speciality_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "speciality_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of room",
+                    "type": "string"
+                }
+               
+            ],
+           
+            "put": {
+                "parameters": [
+                    {
+                        "name": "virtual_cases",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+        
+
+        },
+        "/cases/AddCase": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "parameters": [
+                    {
+                        "name": "AddCase",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "added successfully",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/cases/AddCase/{case_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "case_id",
+                    "in": "path",
+                    "description": "Id of case"
+                }
+               
+            ],
+            "get": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Get information from case_id ",
+                  "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
         }
+       
          
 },
 
@@ -1897,6 +2057,45 @@
                 },
                 "house_id": {
                     "type": "string",
+                    "uniqueItems": true
+                }
+                
+                
+            }
+        },
+        "AddRoom": {
+            "required": ["case_number","house_id" ],
+        "properties": {
+                "case_number": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "speciality": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "patient": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "wards": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "room": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "bed": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "inhospital": {
+                    "type": "boolean",
                     "uniqueItems": true
                 }
                 
