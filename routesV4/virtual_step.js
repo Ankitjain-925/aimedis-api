@@ -42,18 +42,51 @@ router.post("/AddStep", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var Virtual_Steps = new virtual_step(req.body);
-    Virtual_Steps.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
+      virtual_step.findOne({house_id: req.body.house_id}, function (err, userdata) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        }
+      else{
+          if(userdata){
+            virtual_step.updateOne(
+              { house_id: req.body.house_id },
+              req.body,
+              function (err, userdata) {
+                if (err) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Specialty is updated",
+                    data: userdata,
+                  });
+                }
+              }
+            );
+          }
+          else{
+            var Virtual_Steps = new virtual_step(req.body);
+            Virtual_Steps.save(function (err, user_data) {
+              if (err && !user_data) {
+                res.json({ status: 200, message: "Something went wrong.", error: err });
+              } else {
+                res.json({
+                  status: 200,
+                  message: "Added Successfully",
+                  hassuccessed: true,
+                });
+              }
+            });
+          }
       }
-    });
+    })
+  
   } else {
     res.json({
       status: 200,

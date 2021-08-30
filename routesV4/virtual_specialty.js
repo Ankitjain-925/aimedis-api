@@ -776,7 +776,20 @@ router.post("/checkPatient", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    User.findOne({ _id: req.body.patient_id }, function (err, userdata) {
+    const profile_id = req.body.patient_id;
+    const messageToSearchWith = new User({ profile_id });
+    messageToSearchWith.encryptFieldsSync();
+    const alies_id = req.body.patient_id;
+    const messageToSearchWith1 = new User({ alies_id });
+    messageToSearchWith1.encryptFieldsSync();
+    User.findOne(  {
+      $or: [
+        { profile_id: messageToSearchWith.profile_id },
+        { alies_id: messageToSearchWith1.alies_id },
+        { profile_id: req.body.patient_id },
+        { alies_id: req.body.patient_id },
+      ],
+    }, function (err, userdata) {
       if (err) {
         res.json({
           status: 200,
@@ -785,45 +798,55 @@ router.post("/checkPatient", function (req, res, next) {
           error: err,
         });
       } else {
-        var createCase = false;
-        if (req.body.pin) {
-          console.log("dfgdf", req.body.pin, userdata.pin);
-          createCase = req.body.pin === userdata.pin ? true : false;
-        } else {
-          var pos =
-            userdata &&
-            userdata.assosiated_by.filter(
-              (data) => data.institute_id === req.body.institute_id
-            );
-          createCase =
-            userdata.parent_id === req.body.institute_id
-              ? true
-              : pos && pos.length > 0
-              ? true
-              : false;
-        }
-        if (createCase) {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "information get successfully",
-            data: userdata,
-          });
-        } else {
+        if(userdata){
+          var createCase = false;
           if (req.body.pin) {
+            createCase = req.body.pin == userdata.pin ? true : false;
+          } else {
+           
+            var pos =
+              userdata &&
+              userdata.assosiated_by.filter(
+                (data) => data.institute_id === req.body.institute_id
+              );
+            createCase =
+              userdata.parent_id === req.body.institute_id
+                ? true
+                : pos && pos.length > 0
+                ? true
+                : false;
+          }
+          if (createCase) {
             res.json({
               status: 200,
-              hassuccessed: false,
-              message: "pin is not correct",
+              hassuccessed: true,
+              message: "information get successfully",
+              data: userdata,
             });
           } else {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "user is not associated need pin to add",
-            });
+            if (req.body.pin) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "pin is not correct",
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "user is not associated need pin to add",
+              });
+            }
           }
         }
+        else{
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "patient is not exist",
+          });
+        }
+       
       }
     });
   } else {
