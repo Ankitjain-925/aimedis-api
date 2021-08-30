@@ -2,7 +2,9 @@ var express = require("express");
 let router = express.Router();
 var virtual_cases = require("../schema/virtual_cases.js");
 var jwtconfig = require("../jwttoken");
+const User = require("../schema/user.js");
 var fullinfo = [];
+
 router.put("/AddRoom/:Room_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -81,31 +83,58 @@ router.put("/AddRoom/:Room_id", function (req, res, next) {
     //     message: "Authentication required.",
     //   });
     }
-  );  
+  ); 
+
   router.post("/AddCase", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
-    // if (legit) {
-      var Virtual_Cases = new virtual_cases(req.body);
-      Virtual_Cases.save(function (err, user_data) {
-        if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
-        } else {
+    if (legit) {
+      virtual_cases.findOne({patient_id: req.body.patient_id, inhospital : true }, function (err, userdata) {
+        if (err) {
           res.json({
             status: 200,
-            message: "Added Successfully",
-            hassuccessed: true,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
           });
+        } else {
+          console.log('user+dia')
+          if(userdata){
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "case is already exist in hospital",
+            });
+          }
+          else{
+            var Virtual_Cases = new virtual_cases(req.body);
+            Virtual_Cases.save(function (err, user_data) {
+              if (err && !user_data) {
+                res.json({ status: 200, message: "Something went wrong.", error: err });
+              } else {
+                console.log('user_data._id', user_data._id, user_data)
+                res.json({
+                  status: 200,
+                  message: "Added Successfully",
+                  hassuccessed: true,
+                  data: user_data._id
+                });
+              }
+            });
+            
+          }
+         
         }
       });
-    // } else {
-    //   res.json({
-    //     status: 200,
-    //     hassuccessed: false,
-    //     message: "Authentication required.",
-    //   });
+     
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
     }
-  );
+  });
 
   router.get("/AddCase/:case_id", function (req, res, next) {
     const token = req.headers.token;

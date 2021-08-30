@@ -43,7 +43,8 @@ router.put("/AddStep/:house_id", function (req, res, next) {
 router.post("/AddStep", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // if (legit) {
+
+  if (legit) {
       virtual_step.findOne({house_id: req.body.house_id}, function (err, userdata) {
         if (err && !user_data) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
@@ -88,14 +89,13 @@ router.post("/AddStep", function (req, res, next) {
           }
       }
     })
-  
-  // } else {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     message: "Authentication required.",
-  //   });
-  // }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 // router.delete("/AddStep/:step_id", function (req, res, next) {
