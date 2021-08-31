@@ -130,19 +130,48 @@ router.get('/GetStep/:house_id', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   if (legit) {
     newDatafull = [];
-    virtual_step.find({house_id: req.params.house_id}, function (err, userdata) {
+    virtual_step.findOne({house_id: req.params.house_id}, function (err, userdata) {
           if (err && !userdata) {
               res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
           } else {
-              forEachPromise(userdata, getCaes).then((data)=>{
+            if(userdata){
+              if(userdata.steps && userdata.steps.length>0){
+                forEachPromise(userdata.steps, getCaes).then((data)=>{
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Steps is found",
+                    data: newDatafull,
+                  });
+                })
+              }
+              else
+              {
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   message: "Steps is found",
-                  data: newDatafull,
+                  data: []
                 });
-              })
-           
+              }
+            }
+            else{
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Steps is found",
+                data: []
+              });
+            }
+
+              // forEachPromise(userdata, getCaes).then((data)=>{
+              //   res.json({
+              //     status: 200,
+              //     hassuccessed: true,
+              //     message: "Steps is found",
+              //     data: newDatafull,
+              //   });
+              // })
           }
       })
   } else {
