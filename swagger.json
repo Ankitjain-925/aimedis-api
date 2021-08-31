@@ -31,7 +31,12 @@
         {
             "name": "Virtual_Specialty",
             "description": "API for  specialities"
+        },
+        {
+            "name": "virtual_cases",
+            "description": "API for cases"
         }
+
 
 
     ],
@@ -57,6 +62,7 @@
                     "in": "path",
                     "description": "Id of house"
                 }
+               
             ],
             "get": {
                 "tags": [
@@ -275,7 +281,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": " task is found"
+                        "description": "task is found"
                         
                     }
                 }
@@ -538,49 +544,7 @@
                 }
             }
         },
-        "/step/Case_numbers/{step_id}": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                },
-                {
-                    "name": "step_id",
-                    "in": "path",
-                    "description": "Step id"
-                }
-            ],
-            "post": {
-                "tags": [
-                    "Patientflow"
-                ],
-                "parameters": [
-                    {
-                        "name": "Case_numbers",
-                        "in": "body",
-                        "description": "patientflow",
-                        "schema": {
-                            "$ref": "#/definitions/StepAddCase"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "case added succefully",
-                        "schema": {
-                            "$ref": "#/definitions/Case_numbers"
-                        }
-                    },
-                    "500": {
-                        "description": "Something happened wrong"
-                    }
-                }
-            }
-        },
+       
         "/questionaire/AddQuestionaire": {
             "parameters": [
                 {
@@ -929,7 +893,7 @@
                 }
             }
         },
-        "/step/AddStep/{step_id}":{
+        "/step/AddStep/{house_id}":{
             "parameters": [
                 {
                     "name": "token",
@@ -937,25 +901,14 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "step_id",
+                    "name": "house_id",
                     "in": "path",
                     "required": true,
                     "description": "ID",
                     "type": "string"
                 }
             ],
-            "delete": {
-                "summary": "Delete with given ID",
-                "tags": [
-                    "Patientflow"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "step deleted"
-                        
-                    }
-                }
-            },
+           
             "put": {
                 "tags": [
                     "Patientflow"
@@ -978,62 +931,7 @@
                 }
             }
         },
-        "/step/Case_numbers/{step_id}/{case_id}":{
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                },
-                {
-                    "name": "step_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "ID",
-                    "type": "string"
-                },
-                {
-                    "name": "case_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "ID",
-                    "type": "string"
-                }
-                
-            ],
-            "delete": {
-                "summary": "Delete with given ID",
-                "tags": [
-                    "Patientflow"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "case is deleted"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Patientflow"
-                ],
-                "parameters": [
-                    {
-                        "name": "Patientflow",
-                        "in": "body",
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/StepAddCase"
-                        }
-                    }
-                ],
-                "summary": "Update with given ID",
-                "responses": {
-                    "200": {
-                        "description": "case is updated"
-                    }
-                }
-            }
-        },
+       
         "/vh/AddSpecialty/{specialty_id}":{
             "parameters": [
                 {
@@ -1728,7 +1626,7 @@
             }
             
         },
-        "/step/id_numbers/cases/{fromstep_id}/{tostep_id}":{
+        "/cases/AddRoom/{Room_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -1736,45 +1634,44 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "fromstep_id",
+                    "name": "Room_id",
                     "in": "path",
                     "required": true,
-                    "description": "ID",
-                    "type": "string"
-                },
-                {
-                    "name": "tostep_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "ID",
+                    "description": "Id of room",
                     "type": "string"
                 }
-                
+               
             ],
-            
+           
             "put": {
-                "tags": [
-                    "Patientflow"
-                ],
                 "parameters": [
                     {
-                        "name": "Patientflow",
+                        "name": "virtual_cases",
                         "in": "body",
-                        "description": "",
+                        "description": "Answers",
                         "schema": {
-                            "$ref": "#/definitions/Addstep"
+                            "$ref": "#/definitions/AddRoom"
                         }
                     }
                 ],
-                "summary": "update with given iD",
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
                     "200": {
-                        "description":"updated successfully"
+                        "description": "updated successfully"
+                        
                     }
                 }
             }
-        }, 
-        "/step/Patient/{fromstep_id}/{tostep_id}":{
+        
+
+        },
+        "/cases/AddCase/{speciality_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -1782,41 +1679,82 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "fromstep_id",
+                    "name": "speciality_id",
                     "in": "path",
                     "required": true,
-                    "description": "ID",
-                    "type": "string"
-                },
-                {
-                    "name": "tostep_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "ID",
+                    "description": "Id of room",
                     "type": "string"
                 }
-           ],
+               
+            ],
+           
             "put": {
+                "parameters": [
+                    {
+                        "name": "virtual_cases",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    }
+                ],
                 "tags": [
-                    "Patientflow"
+                    "virtual_cases"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+        
+
+        },
+        "/cases/AddCase": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "virtual_cases"
                 ],
                 "parameters": [
                     {
-                        "name": "Patientflow",
+                        "name": "AddCase",
                         "in": "body",
-                        "description": ""
-                        
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
                     }
                 ],
-                "summary": "Update with given ID",
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
                     "200": {
-                        "description": "patient is moved between steps"
+                        "description": "added successfully",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
                     }
                 }
             }
         },
-        "/step/Patient/{step_id}":{
+        "/cases/AddCase/{case_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -1824,43 +1762,29 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "step_id",
+                    "name": "case_id",
                     "in": "path",
-                    "required": true,
-                    "description": "ID",
-                    "type": "string"
+                    "description": "Id of case"
                 }
+               
             ],
-            "delete": {
-                "summary": "Delete with given ID",
+            "get": {
                 "tags": [
-                    "Patientflow"
+                    "virtual_cases"
                 ],
-                "responses": {
+                "summary": "Get information from case_id ",
+                  "responses": {
                     "200": {
-                        "description": "patient is removed"
-                        
+                        "description": "information is found"
                     }
                 }
             }
-           
         }
-
+       
          
-            
-        
-
-        
-        
-
-        
 },
 
-
-
-
-    
-    "definitions": {
+"definitions": {
         "AddtheGroup":{
             "required": ["group_name"],
             "properties": {
@@ -1902,39 +1826,19 @@
             }
         },
         "Addstep": {
-            "required": ["step_name","house_id" ],
+            "required": ["house_id" ],
             "properties": {
-                "step_name": {
-                    "type": "string",
-                    "uniqueItems": false
+                "steps": {
+                    "type": "array",
+                    "items": {"type":"object"}
                 },
-                "step_order": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_id": {
+               "house_id": {
                     "type": "string",
                     "uniqueItems": false
                 }
             }
         },
-        "Case_numbers": {
-            "required": ["step_name","house_id" ],
-            "properties": {
-                "step_name": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "step_order": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
+       
         "StepAddCase":{
             "required": ["case_id"],
             "properties": {
@@ -2153,6 +2057,45 @@
                 },
                 "house_id": {
                     "type": "string",
+                    "uniqueItems": true
+                }
+                
+                
+            }
+        },
+        "AddRoom": {
+            "required": ["case_number","house_id" ],
+        "properties": {
+                "case_number": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "speciality": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "patient": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "wards": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "room": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "bed": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "inhospital": {
+                    "type": "boolean",
                     "uniqueItems": true
                 }
                 
