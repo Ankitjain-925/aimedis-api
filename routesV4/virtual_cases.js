@@ -4,7 +4,7 @@ var virtual_cases = require("../schema/virtual_cases.js");
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
 var User = require("../schema/user.js");
 var jwtconfig = require("../jwttoken");
-const User = require("../schema/user.js");
+// const User = require("../schema/user.js");
 var fullinfo = [];
 
 router.put("/AddRoom/:Room_id", function (req, res, next) {
@@ -132,29 +132,35 @@ router.put("/AddCase/:speciality_id", function (req, res, next) {
   });
 
 router.post("/checkbedAvailability", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_cases.find(
-      {"wards._id":req.body.ward_id,
-      "specialty._id":req.body.specialty_id,
-        "room._id":req.body.room_id,
-        "house._id":req.body.house_id },function (err, userdata){
-          if(err && !userdata){
-            res.json({ status: 200, message: "Something went wrong.", error: err });
-          }
-          else{
-            console.log('userdata', userdata)
-            Virtual_Specialty.find({_id: req.body.specialty_id},function (err, userdata){
-              if(err && !userdata){
-                res.json({ status: 200, message: "", error: err }); 
-              }
-            })
-
-            }
-        }
-        )
-  }
+   const token = req.headers.token;
+   let legit = jwtconfig.verify(token);
+    //  if (legit) {
+      virtual_cases.find(
+         {"wards._id":req.body.ward_id,
+         "specialty._id":req.body.specialty_id,
+         "room._id":req.body.room_id,
+         "house._id":req.body.house_id,
+        },function (err, userdata){
+             if(err && !userdata){
+             res.json({ status: 200, message: "Something went wrong.", error: err });
+             }
+           else{
+           console.log('userdata', userdata)
+              Virtual_Specialty.find({_id: req.body.specialty_id},function (err, userdata){
+                if(err && !userdata){
+                 res.json({ status: 200, message: "", error: err }); 
+                 }
+           })
+  
+               }
+           }
+             )
+        
+        
+    // }
+    // else{
+    //   console.log('dfsdzfsdfsdfs')
+    // }
 })
       
       

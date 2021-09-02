@@ -45,7 +45,7 @@ router.delete("/AddSpecialty/:specialty_id", function (req, res, next) {
 router.put("/AddSpecialty/:specialty_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // if (legit) {
+  if (legit) {
     Virtual_Specialty.updateOne(
       { _id: req.params.specialty_id },
       req.body,
@@ -67,19 +67,19 @@ router.put("/AddSpecialty/:specialty_id", function (req, res, next) {
         }
       }
     );
-  // } else {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     message: "Authentication required.",
-  //   });
-  // }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 router.post("/AddSpecialty", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // if (legit) {
+  if (legit) {
     var Virtual_Specialtys = new Virtual_Specialty(req.body);
     Virtual_Specialtys.save(function (err, user_data) {
       if (err && !user_data) {
@@ -92,19 +92,19 @@ router.post("/AddSpecialty", function (req, res, next) {
         });
       }
     });
-  // } else {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     message: "Authentication required.",
-  //   });
-  // }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 router.get("/AddSpecialty/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // if (legit) {
+  if (legit) {
     Virtual_Specialty.find(
       { house_id: req.params.house_id },
       function (err, userdata) {
@@ -120,13 +120,13 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
         }
       }
     );
-  // } else {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     message: "Authentication required.",
-  //   });
-  // }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 router.post("/AddTask", function (req, res, next) {
