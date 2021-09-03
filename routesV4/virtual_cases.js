@@ -134,9 +134,10 @@ router.put("/AddCase/:speciality_id", function (req, res, next) {
 router.post("/checkbedAvailability", function (req, res, next) {
    const token = req.headers.token;
    let legit = jwtconfig.verify(token);
+   var bed = "11", newArray=[];
     //  if (legit) {
-      virtual_cases.find(
-         {"wards._id":req.body.ward_id,
+      virtual_cases.find( 
+        {"wards._id":req.body.ward_id,
          "specialty._id":req.body.specialty_id,
          "room._id":req.body.room_id,
          "house._id":req.body.house_id,
@@ -146,10 +147,39 @@ router.post("/checkbedAvailability", function (req, res, next) {
              }
            else{
            console.log('userdata', userdata)
-              Virtual_Specialty.find({_id: req.body.specialty_id},function (err, userdata){
+              Virtual_Specialty.findOne({_id: req.body.specialty_id},function (err, userdata){
                 if(err && !userdata){
                  res.json({ status: 200, message: "", error: err }); 
                  }
+                 else{
+                   var occumpiedbed = [{bed: "1"}, {bed: "5"}, {}]
+                    bed=parseInt(bed);
+                    for(var i=1; i<=bed; i++){
+                      occumpiedbed.map((item)=>{                      
+                        if(parseInt(item.bed) !== i){
+                          console.log('parseInt',i)
+                          if(newArray.indexOf(i)){
+                            newArray.push(i)
+                          }
+                         
+                        }
+                        // console.log('111', newArray)
+                        
+                      }) 
+                      // console.log('222', newArray)  
+                    }
+                    // console.log('333', newArray)
+                    
+                //  console.log(array);
+                  // for(var i=0;i<array.length;i++){
+                  // if(array[i] == 2)
+                  //   {continue;}
+                  //   console.log(array[i]);
+                  // }
+                  
+
+
+                   }       
            })
   
                }
