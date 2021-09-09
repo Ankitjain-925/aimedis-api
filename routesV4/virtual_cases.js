@@ -192,6 +192,38 @@ router.post("/checkbedAvailability", function (req, res, next) {
     //   console.log('dfsdzfsdfsdfs')
     // }
 })
+
+router.get('/GetInfo/:house_id', function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    virtual_cases.aggregate(
+      [
+          {
+              $match: {
+                _id: req.params.house_id,inhospital : true
+              }
+          },
+          {
+              $group: {
+                  _id: "$bed",
+                  count: { $sum: 1 },
+
+              }
+          }
+      ],
+      function (err, userdata) {
+          if (err && !userdata) {
+             res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong' }) 
+            }else { res.json({ status: 200, hassuccessed: true, data: userdata }) };
+      }
+  )
+    
+ } else {
+      res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+  }
+})
+  
       
       
       

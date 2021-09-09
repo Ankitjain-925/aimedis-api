@@ -181,25 +181,6 @@ router.get('/GetStep/:house_id', function (req, res, next) {
   }
 })
 
-router.get('/GetInfo/:house_id', function (req, res, next) {
-      const token = (req.headers.token)
-      let legit = jwtconfig.verify(token)
-      if (legit) {
-         virtual_step.count({_id: req.params.house_id}, function( err, count){
-          console.log( "Number of beds:", count );
-      }), function (err, userdata) {
-              if (err && !userdata) {
-                  res.json({ status: 200, hassuccessed: false, message: "Info not found", error: err })
-              } else {
-                  res.json({ status: 200, hassuccessed: true, data: userdata })
-              }
-          }
-      } else {
-          res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-      }
-  })
-
-
 
 // router.post("/Case_numbers/:step_id", function (req, res, next) {
 //   const token = req.headers.token;
