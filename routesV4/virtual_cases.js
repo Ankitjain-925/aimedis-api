@@ -5,7 +5,7 @@ var jwtconfig = require("../jwttoken");
 const User = require("../schema/user.js");
 var fullinfo = [];
 
-router.put("/AddRoom/:Room_id", function (req, res, next) {
+  router.put("/AddRoom/:Room_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
@@ -89,7 +89,7 @@ router.put("/AddRoom/:Room_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
-      virtual_cases.findOne({patient_id: req.body.patient_id, inhospital : true }, function (err, userdata) {
+      virtual_cases.findOne({patient_id: req.body.patient_id, inhospital : { $eq: true } }, function (err, userdata) {
         if (err) {
           res.json({
             status: 200,

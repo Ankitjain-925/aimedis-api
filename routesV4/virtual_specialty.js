@@ -250,7 +250,7 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_Task.find(
-      { house_id: req.params.house_id, archived: true },
+      { house_id: req.params.house_id,  archived: { $eq: true }},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
