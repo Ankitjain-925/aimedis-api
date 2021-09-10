@@ -224,6 +224,38 @@ router.get('/GetInfo/:house_id', function (req, res, next) {
       res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
   }
 })
+
+
+router.get("/AddCase/:case_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_cases.findOne(
+      virtual_cases.aggregate([
+        {$completedno :{status :"completed task"}},
+        {$totalno : {_id:"$case_id",total :{$sum : 1}}}
+      ]),
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
   
       
       

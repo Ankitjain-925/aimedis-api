@@ -506,6 +506,38 @@
                 }
             }
         },
+        "/vh/GetAllArchivedTask/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of house",
+                    "type": "string"
+                }
+                
+            ],
+            "get": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "summary": "Get All archived task from house",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Info is found"
+                        
+                    }
+                }
+            }
+        },
         "/step/AddStep": {
             "parameters": [
                 {
@@ -1750,6 +1782,70 @@
                     },
                     "500": {
                         "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/cases/checkbedAvailability": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "parameters": [
+                    {
+                        "name": "checkbedAvailability",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "added successfully",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/cases/GetInfo/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "description": "Id of house"
+                }
+               
+            ],
+            "get": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Get information from house_id ",
+                  "responses": {
+                    "200": {
+                        "description": "information is found"
                     }
                 }
             }
