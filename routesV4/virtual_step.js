@@ -165,7 +165,6 @@ router.get('/GetStep/:house_id', function (req, res, next) {
                 data: []
               });
             }
-       
               // forEachPromise(userdata, getCaes).then((data)=>{
               //   res.json({
               //     status: 200,

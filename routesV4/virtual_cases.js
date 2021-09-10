@@ -7,51 +7,52 @@ var jwtconfig = require("../jwttoken");
 // const User = require("../schema/user.js");
 var fullinfo = [];
 
-router.put("/AddRoom/:Room_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    if (req.body.room && req.body.bed) {
-      var changes = { room: req.body.room, bed: req.body.bed }
-    }
-    virtual_cases.updateOne(
-      { _id: req.params.room_id },
-      changes,
-      function (err, userdata) {
-        if (req.body.room) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "something went wrong",
-            error: err,
-          });
-        } else {
-          if (req.body.bed) {
+
+  router.put("/AddRoom/:Room_id", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+      if(req.body.room && req.body.bed){
+        var changes = {room : req.body.room , bed: req.body.bed}
+      } 
+      virtual_cases.updateOne(
+        { _id: req.params.room_id },
+       changes,
+        function (err, userdata) {
+          if (req.body.room) {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "Bed is updated",
+              message: "something went wrong",
               error: err,
             });
           } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Room is updated",
-              data: userdata,
-            });
+            if(req.body.bed){
+                 res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Bed is updated",
+                error: err,
+                 });
+            } else {
+                res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Room is updated",
+                data: userdata,
+              }); 
+         }
           }
         }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
   }
-});
+})
 
 router.put("/AddCase/:speciality_id", function (req, res, next) {
   const token = req.headers.token;
@@ -84,7 +85,7 @@ router.put("/AddCase/:speciality_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
-      virtual_cases.findOne({patient_id: req.body.patient_id, inhospital : true }, function (err, userdata) {
+      virtual_cases.findOne({patient_id: req.body.patient_id, inhospital : { $eq: true } }, function (err, userdata) {
         if (err) {
           res.json({
             status: 200,
