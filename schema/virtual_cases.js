@@ -84,6 +84,16 @@ var CaseSchema = new Schema({
         required: true,
         unique: false
     },
+    total_task: {
+        type: String,
+        required: true,
+        unique: false
+    },
+    done_task: { 
+        type: String,
+        required: true,
+        unique: false
+    },
     assinged_to: [ProfessionalInfo],
 },{ strict: false });
 

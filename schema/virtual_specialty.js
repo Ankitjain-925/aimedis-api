@@ -14,6 +14,11 @@ const RoomsAdd = new mongoose.Schema({
         required: false,
         unique: false 
      },
+     no_of_bed:{
+        type: String,
+        required: false,
+        unique: false 
+     }
 },{ strict: false });
 
 RoomsAdd.plugin(mongooseFieldEncryption, {
