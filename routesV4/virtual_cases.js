@@ -181,6 +181,42 @@ function returnNumberofBed(array, ward_id, room_id) {
   return bed;
 }
 
+//Add the track record
+
+router.put("/Discharge/:User_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var ids = { track_id: uuidv1() };
+    req.body.data.created_by = encrypt(req.body.data.created_by);
+    req.body.data._enc_created_by = true;
+    var full_record = { ...ids, ...req.body.data };
+    virtual_cases.updateOne(
+      { _id: req.params.UserId ,inhospital: { $eq: false} },
+      { $push: { track_record: full_record } },
+      { safe: true, upsert: true },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, message :"successfully discharge", data: userdata});
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 router.get("/GetInfo/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
