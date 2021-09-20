@@ -2,8 +2,11 @@ var express = require("express");
 let router = express.Router();
 var virtual_cases = require("../schema/virtual_cases.js");
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
+const { encrypt, decrypt } = require("./Cryptofile.js");
 var User = require("../schema/user.js");
+const uuidv1 = require("uuid/v1");
 var jwtconfig = require("../jwttoken");
+
 // const User = require("../schema/user.js");
 var fullinfo = [];
 
@@ -183,7 +186,7 @@ function returnNumberofBed(array, ward_id, room_id) {
 
 //Add the track record
 
-router.put("/Discharge/:User_id", function (req, res, next) {
+router.put("/Discharge/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -192,7 +195,7 @@ router.put("/Discharge/:User_id", function (req, res, next) {
     req.body.data._enc_created_by = true;
     var full_record = { ...ids, ...req.body.data };
     virtual_cases.updateOne(
-      { _id: req.params.UserId ,inhospital: { $eq: false} },
+      { _id: req.params.patient_Id ,inhospital: { $eq: false} },
       { $push: { track_record: full_record } },
       { safe: true, upsert: true },
       function (err, userdata) {
