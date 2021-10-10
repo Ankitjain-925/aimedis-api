@@ -128,7 +128,7 @@ router.post("/checkbedAvailability", function (req, res, next) {
   virtual_cases.find(
     {
       "wards._id": req.body.ward_id,
-      "specialty._id": req.body.specialty_id,
+      "speciality._id": req.body.specialty_id,
       "room._id": req.body.room_id,
       "house_id": req.body.house_id,
     },
@@ -136,31 +136,27 @@ router.post("/checkbedAvailability", function (req, res, next) {
       if (err && !userdata) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        console.log("userdata22222", userdata);
-        
-        Virtual_Specialty.findOne(
-          { _id: req.body.specialty_id },
-          function (err, userdata1) {
-            if (err && !userdata1) {
-              res.json({ status: 200, message: "", error: err });
-            } else {
-              // var occumpiedbed = [{ bed: "1" }, { bed: "5" }, {}];
-              // console.log('userdata1',userdata1)
-              bed =  returnNumberofBed(userdata1, req.body.ward_id, req.body.room_id)
-              for (var i = 1; i <= bed; i++) {
-                if(!userdata.some(e => e.bed == i)){
-                  newArray.push(i);
+          Virtual_Specialty.findOne(
+            { _id: req.body.specialty_id },
+            function (err, userdata1) {
+              if (err && !userdata1) {
+                res.json({ status: 200, message: "", error: err });
+              } else {
+                bed =  returnNumberofBed(userdata1, req.body.ward_id, req.body.room_id)
+                for (var i = 1; i <= bed; i++) {
+                  if(!userdata.some(e => e.bed == i)){
+                    newArray.push(i);
+                  }
                 }
+                res.json({
+                  status: 200,
+                  message: "Available beds found",
+                  hassuccessed: true,
+                  data: newArray,
+                });
               }
-              res.json({
-                status: 200,
-                message: "Available beds found",
-                hassuccessed: true,
-                data: newArray,
-              });
             }
-          }
-        );
+          );
       }
     }
   );

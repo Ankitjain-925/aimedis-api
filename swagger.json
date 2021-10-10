@@ -1658,7 +1658,7 @@
             }
             
         },
-        "/cases/AddRoom/{Room_id}": {
+        "/cases/AddRoom/{Case_Id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -1666,10 +1666,10 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "Room_id",
+                    "name": "Case_Id",
                     "in": "path",
                     "required": true,
-                    "description": "Id of room",
+                    "description": "Id of Case",
                     "type": "string"
                 }
                

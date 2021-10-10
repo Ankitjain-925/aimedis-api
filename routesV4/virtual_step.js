@@ -475,7 +475,9 @@ function getCaes(data1){
 function getfullInfo(data) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
-      virtual_cases.findOne({ _id: data.case_id })
+      console.log('data.case_id', data , data.case_id)
+      if(data.case_id){
+        virtual_cases.findOne({ _id: data.case_id })
         .exec()
         .then(function (doc3) {
           if(doc3){
@@ -514,6 +516,10 @@ function getfullInfo(data) {
             }
          
         });
+      }
+      else{
+        resolve(fullinfo);
+      }
     });
   });
 }

@@ -795,6 +795,36 @@ router.post("/verifyLogin", function (req, res, next) {
 /*-----------------------F-O-R---A-D-D-I-N-G---U-S-E-R-Ss-------------------------*/
 
 router.post("/AddUser", function (req, res, next) {
+  const token = req.headers.token;
+
+  const secret_key = "<your_secret_key>";
+ 
+  // Hitting POST request to the URL, Google will
+  // respond with success or error scenario.
+  const url =
+`https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`;
+ 
+  // Making POST request to verify captcha
+  fetch(url, {
+    method: "post",
+  })
+    .then((response) => response.json())
+    .then((google_response) => {
+ 
+      // google_response is the object return by
+      // google as a response
+      if (google_response.success == true) {
+        //   if captcha is verified
+        return res.send({ response: "Successful" });
+      } else {
+        // if captcha is not verified
+        return res.send({ response: "Failed" });
+      }
+    })
+    .catch((error) => {
+        // Some error while verify captcha
+      return res.json({ error });
+    });
   if (
     req.body.email == "" ||
     req.body.email == undefined ||
