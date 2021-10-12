@@ -17,6 +17,7 @@ var cron = require("node-cron");
 const { MongoTools, MTOptions } = require("node-mongotools");
 var mongoTools = new MongoTools();
 const axios = require("axios");
+var CryptoJS = require("crypto-js");
 
 var moment = require("moment");
 mongoose.connect(config.database, { useNewUrlParser: true });
@@ -95,6 +96,36 @@ app.use(express.static(path.join(__dirname, "./build/main")));
 // });
 
 //app.use(express.static(path.join(__dirname, 'public')));
+
+// var AuthCheck = function (req, res, next) {
+//   if(req.headers.authorization){
+  
+ 
+//     if(req.headers.authorization==="Aimedis23")
+//     {
+//       console.log('Hew1')
+//       next();
+//     }
+//     else{
+//       console.log('Hew2')
+//       return res.send({
+//         status: 401,
+//         hassuccessed: false,
+//         msg: "Authentication required.",
+//       })
+//     }
+//   }
+// else{
+//   console.log('Hew3')
+//   return res.send({
+//     status: 401,
+//     hassuccessed: false,
+//     msg: "Authentication required.",
+//   })
+// }
+// }
+
+// app.use(AuthCheck);
 
 var UserData = require("./routes/UserTrack");
 var UserProfile = require("./routes/userProfile");

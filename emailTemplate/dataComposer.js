@@ -16,10 +16,14 @@ const getFormatedData = (lang) => {
   return _data;
 };
 class insuranceEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, {  verifylink = ""   }) {
     let _data = getFormatedData(lang);
     _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_insurance");
+    let message =  getLanguage(lang, "welcome_message_insurance");
+    const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
   }
   static resetPassword(lang, data = { to: "", link: "" }) {
@@ -38,10 +42,14 @@ class insuranceEmail {
   }
 }
 class patientEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, { verifylink = "" }) {
     let _data = getFormatedData(lang);
     _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_patient");
+    let message =  getLanguage(lang, "welcome_message_patient");
+    const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
   }
   static prescriptionSystem(lang, { patient_name = "", doctor_name = "" }) {
@@ -156,10 +164,14 @@ class patientEmail {
   }
 }
 class doctorEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, {  verifylink = ""   }) {
     let _data = getFormatedData(lang);
     _data.title = _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_doctor");
+    let message =  getLanguage(lang, "welcome_message_doctor");
+      const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
   }
   static resetPassword(lang, data = { to: "", link: "" }) {
@@ -328,10 +340,14 @@ class doctorEmail {
 }
 
 class pharmacyEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, {  verifylink = ""   }) {
     let _data = getFormatedData(lang);
     _data.title = _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_pharmacy");
+    let message = getLanguage(lang, "welcome_message_pharmacy");
+    const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
   }
 
@@ -374,10 +390,14 @@ class pharmacyEmail {
   }
 }
 class therapistEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, {  verifylink = ""   }) {
     let _data = getFormatedData(lang);
     _data.title = _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_therapist");
+    let message =   getLanguage(lang, "welcome_message_therapist");
+    const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
   }
   static resetPassword(lang, data = { to: "", link: "" }) {
@@ -385,10 +405,14 @@ class therapistEmail {
   }
 }
 class emergencyEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, {  verifylink = ""   }) {
     let _data = getFormatedData(lang);
     _data.title = _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_emergency");
+    let message =   getLanguage(lang, "welcome_message_emergency");
+    const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
   }
   static resetPassword(lang, data = { to: "", link: "" }) {
@@ -397,11 +421,16 @@ class emergencyEmail {
 }
 
 class nursetEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, {  verifylink = ""   }) {
     let _data = getFormatedData(lang);
     _data.title = _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_nurse");
+    let message =   getLanguage(lang, "welcome_message_nurse");
+    const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
+
   }
   static resetPassword(lang, data = { to: "", link: "" }) {
     return insuranceEmail.resetPassword(lang, data);
@@ -409,10 +438,14 @@ class nursetEmail {
 }
 
 class hospitalEmail {
-  static welcomeEmail(lang) {
+  static welcomeEmail(lang, {  verifylink = ""   }) {
     let _data = getFormatedData(lang);
     _data.title = _data.title = getLanguage(lang, "welcome_title_aimedis");
-    _data.content = getLanguage(lang, "welcome_message_hospital");
+    let message =  getLanguage(lang, "welcome_message_hospital");
+    const messageBulider = new StringBuilder();
+    messageBulider.appendFormat(message, verifylink)
+    _data.content = messageBulider.toString();
+    messageBulider.clear();
     return _data;
   }
   static resetPassword(lang, data = { to: "", link: "" }) {
