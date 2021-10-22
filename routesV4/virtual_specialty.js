@@ -301,16 +301,16 @@ router.get("/AddTask/:task_ids", function (req, res, next) {
   }
 });
 
-router.get("/PatientsTask/:patient_profile_id", function (req, res, next) {
+router.get("/PatientsTask/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
     const messageToSearchWith = new virtual_Task({
-      patient_id: req.params.patient_profile_id,
+      patient_id: req.params.patient_id,
     });
     messageToSearchWith.encryptFieldsSync();
     virtual_Task.find(
-      { patient_profile_id: messageToSearchWith.patient_profile_id },
+      { patient_id: messageToSearchWith.patient_id },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({

@@ -795,7 +795,72 @@ router.post("/verifyLogin", function (req, res, next) {
 
   // res.status(200).json(tokenRes);
 });
-
+// for NFT User Check
+router.post("/UserntfCheck", function (req, res, next) {
+  if (!req.body.email || !req.body.password || req.body.email == "" || req.body.password == "") {
+    res.json({
+      status: 200,
+      message: "Email and password fields should not be empty",
+      hassuccessed: false,
+    });
+  } else {
+    const email = req.body.email;
+    const messageToSearchWith = new User({ email });
+    messageToSearchWith.encryptFieldsSync();
+    const messageToSearchWith1 = new User({
+      email: req.body.email.toLowerCase(),
+    });
+    messageToSearchWith1.encryptFieldsSync();
+    const messageToSearchWith2 = new User({
+      email: req.body.email.toUpperCase(),
+    });
+    messageToSearchWith2.encryptFieldsSync();
+    User.findOne({
+      $or: [
+        { email: { $regex: req.body.email, $options: "i" } },
+        { email: { $regex: messageToSearchWith.email, $options: "i" } },
+        { email: { $regex: messageToSearchWith1.email, $options: "i" } },
+        { email: { $regex: messageToSearchWith2.email, $options: "i" } },
+      ],
+    })
+      .exec()
+      .then((user_data) => {
+        if (user_data) {
+            if (user_data.isblock === true || user_data.verified === "false") {
+              res.json({
+                status: 200,
+                message: "User is blocked or not verified yet",
+                hassuccessed: false,
+                approveMinting: false
+              });
+            }
+            else if(user_data.type!=='patient'){
+              res.json({
+                status: 200,
+                message: "User is authenticated",
+                hassuccessed: true,
+                approveMinting: true
+              });
+            }
+            else{
+                res.json({
+                  status: 200,
+                  message: "User is authenticated",
+                  hassuccessed: true,
+                  approveMinting: false
+                });
+            
+            }
+        } else {
+          res.json({
+            status: 200,
+            message: "User does not exist",
+            hassuccessed: false,
+          });
+        }
+      });
+  }
+});
 /*-----------------------F-O-R---A-D-D-I-N-G---U-S-E-R-Ss-------------------------*/
 
 router.post("/AddUser", function (req, res, next) {
@@ -1447,6 +1512,107 @@ router.put("/Users/update", function (req, res, next) {
         //     var enpassword = base64.encode(req.body.password);
         //     req.body.password = enpassword;
         // }
+        if (req.body.mobile) {
+          var country_code = "";
+          var mob = req.body.mobile && req.body.mobile.split("-");
+          var mob1 = mob.pop();
+          if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
+            country_code = mob[0];
+            if (country_code && country_code === "") {
+              let tt = changeStatus.mobile.split("-");
+              if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
+                country_code === tt[0];
+              }
+            }
+          }
+
+          authy
+            .registerUser({
+              countryCode: country_code,
+              email: changeStatus.email,
+              phone: mob1,
+            })
+            .catch((err) =>
+              res.json({
+                status: 200,
+                message: "Phone is not verified",
+                error: err,
+                hassuccessed: false,
+              })
+            )
+            .then((regRes) => {
+              if (regRes && regRes.success) {
+                var authyId = { authyId: regRes.user.id };
+                datas = { ...authyId, ...req.body };
+                User.findByIdAndUpdate(
+                  { _id: changeStatus._id },
+                  datas,
+                  function (err, doc) {
+                    if (err && !doc) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "update data failed",
+                        error: err,
+                      });
+                    } else {
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "Updated",
+                      });
+                    }
+                  }
+                );
+              }
+            });
+        } else {
+          User.findByIdAndUpdate(
+            { _id: changeStatus._id },
+            req.body,
+            function (err, doc) {
+              if (err && !doc) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "update data failed",
+                  error: err,
+                });
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "Updated",
+                });
+              }
+            }
+          );
+        }
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+router.put("/Users/update/:user_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    User.findOne({ _id: req.params.user_id }, function (err, changeStatus) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+          error: err,
+        });
+      }
+      if (changeStatus) {
         if (req.body.mobile) {
           var country_code = "";
           var mob = req.body.mobile && req.body.mobile.split("-");

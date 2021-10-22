@@ -129,7 +129,7 @@ router.post("/checkbedAvailability", function (req, res, next) {
     {
       "wards._id": req.body.ward_id,
       "speciality._id": req.body.specialty_id,
-      "room._id": req.body.room_id,
+      "rooms._id": req.body.room_id,
       "house_id": req.body.house_id,
     },
     function (err, userdata) {
@@ -142,6 +142,7 @@ router.post("/checkbedAvailability", function (req, res, next) {
               if (err && !userdata1) {
                 res.json({ status: 200, message: "", error: err });
               } else {
+                newArray = [];
                 bed =  returnNumberofBed(userdata1, req.body.ward_id, req.body.room_id)
                 for (var i = 1; i <= bed; i++) {
                   if(!userdata.some(e => e.bed == i)){
@@ -170,10 +171,7 @@ router.post("/checkbedAvailability", function (req, res, next) {
 function returnNumberofBed(array, ward_id, room_id) {
   let ward = array.wards &&  array.wards.find(e => e._id == ward_id);
   let room = ward && ward.rooms && ward.rooms.find(e => e._id == room_id)
-  console.log('room', room)
-  console.log(room.no_of_bed)
   let bed = room.no_of_bed ? parseInt(room.no_of_bed) : 0;
-  console.log('bed', bed)
   return bed;
 }
 

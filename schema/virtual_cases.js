@@ -59,7 +59,7 @@ var CaseSchema = new Schema({
         required: false,
         unique: false
     },
-    room: {
+    rooms: {
         type: Object,
         required: false,
         unique: false
@@ -91,6 +91,21 @@ var CaseSchema = new Schema({
     },
     done_task: { 
         type: String,
+        required: false,
+        unique: false
+    },
+    status:{
+        type: Number,
+        required: false,
+        unique: false  
+    },
+    viewQuestionaire:{
+        type: Boolean,
+        required: false,
+        unique: false
+    },
+    submitQuestionaire:{
+        type: Boolean,
         required: false,
         unique: false
     },
