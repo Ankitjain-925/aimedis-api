@@ -173,7 +173,6 @@ router.get('/GetStep/:house_id', function (req, res, next) {
   }
 })
 
-
 // router.post("/Case_numbers/:step_id", function (req, res, next) {
 //   const token = req.headers.token;
 //   let legit = jwtconfig.verify(token);

@@ -1241,21 +1241,7 @@
                 }
                 
              ],
-            "delete": {
-                "summary": "Delete with given ID",
-                "tags": [
-                    "Questions"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "questionaire is deleted Successfully" ,
-                        "schema": {
-                            "$ref": "#/definitions/AddQuestionaire"
-                        }
-                    }
-                }
-            },
-            "put": {
+           "put": {
                 "tags": [
                     "Questions"
                 ],
@@ -1714,7 +1700,6 @@
                     "name": "speciality_id",
                     "in": "path",
                     "required": true,
-                    "description": "Id of room",
                     "type": "string"
                 }
                
@@ -1744,10 +1729,20 @@
                         
                     }
                 }
+            },
+            "get": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Get information from speciality_id ",
+                  "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
             }
-        
 
-        },
+       },
         "/cases/AddCase": {
             "parameters": [
                 {
@@ -1850,7 +1845,7 @@
                 }
             }
         },
-        "/cases/AddCase/{case_id}": {
+        "/Discharge/{patient_id}/{admin_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -1858,24 +1853,57 @@
                     "description": "JWT token User"
                 },
                 {
-                    "name": "case_id",
+                    "name": "patient_Id",
                     "in": "path",
-                    "description": "Id of case"
+                    "required": true,
+                    "description": "Id of patient",
+                    "type": "string"
+                },
+                {
+                    "name": "admin_Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of admin",
+                    "type": "string"
                 }
                
             ],
-            "get": {
+           
+            "put": {
+                "parameters": [
+                    {
+                        "name": "virtual_cases",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    }
+                ],
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "Get information from case_id ",
-                  "responses": {
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
                     "200": {
-                        "description": "information is found"
+                        "description": "updated successfully"
+                        
                     }
                 }
             }
+        
+
         }
+        
+           
+           
+            
+            
+        
+        
        
          
 },
@@ -2202,8 +2230,9 @@
        
         
     }
+}
         
-    }
+    
     
     
     

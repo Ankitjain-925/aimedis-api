@@ -2,8 +2,12 @@ var express = require("express");
 let router = express.Router();
 var virtual_cases = require("../schema/virtual_cases.js");
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
-var User = require("../schema/user.js");
+const { encrypt, decrypt } = require("./Cryptofile.js");
+// var User = require("../schema/user.js");
+var user = require("../schema/user");
+const uuidv1 = require("uuid/v1");
 var jwtconfig = require("../jwttoken");
+
 // const User = require("../schema/user.js");
 var fullinfo = [];
 
@@ -145,7 +149,7 @@ router.post("/AddCase", function (req, res, next) {
   }
 });
 
-//check the availablity of the bed in perticular specialty, ward, and room, and house
+//check the availablity of the bed in particular specialty, ward, and room, and house
 router.post("/checkbedAvailability", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -233,6 +237,55 @@ router.get("/GetInfo/:house_id", function (req, res, next) {
         }
       }
     );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+//API For Discharge Patient
+
+router.put("/Discharge/:patient_id/:admin_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_cases.updateOne(
+      { patient_id: req.params.patient_Id , },
+      {inhospital : false},
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "something went wrong",
+            error: err,
+          });
+        } else {
+          var ids = { track_id: uuidv1() };
+          // req.body.data.created_by = encrypt(req.params.admin_id);
+          // req.body.data._enc_created_by = true;
+          var full_record = { ...ids, ...req.body.data };
+          user.updateOne(
+            { _id: req.params.patient_Id , },
+            { $push: { track_record: full_record } },
+            { safe: true, upsert: true },
+            function (err, userdata) {
+              if (err && !userdata) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "something went wrong",
+                  error: err,
+                });
+              } else {
+                res.json({ status: 200, hassuccessed: true, message :"successfully discharge", data: userdata});
+              }
+            });
+          }
+      });
   } else {
     res.json({
       status: 200,

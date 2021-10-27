@@ -290,6 +290,49 @@
                 }
             }
         },
+        "/cases/Discharge/{patient_id}/{admin_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "patient_id",
+                    "in": "path",
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "admin_id",
+                    "in": "path",
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+           "put": {
+                "tags": [
+                    "TrackRecord"
+                ],
+                "parameters": [
+                    {
+                        "name": "Discharge",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/UserTrack"
+                        }
+                    }
+                ],
+                "summary": "update with given Id",
+                "responses": {
+                    "200": {
+                        "description": "successfully discharge"
+                    }
+                }
+            }
+        },
         "/UserProfile/AddUser/": {
             "parameters": [
                 {
