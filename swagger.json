@@ -1700,7 +1700,6 @@
                     "name": "speciality_id",
                     "in": "path",
                     "required": true,
-                    "description": "Id of room",
                     "type": "string"
                 }
                
@@ -1730,10 +1729,20 @@
                         
                     }
                 }
+            },
+            "get": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Get information from speciality_id ",
+                  "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
             }
-        
 
-        },
+       },
         "/cases/AddCase": {
             "parameters": [
                 {
@@ -1835,7 +1844,65 @@
                     }
                 }
             }
+        },
+        "/Discharge/{patient_id}/{admin_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "patient_Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of patient",
+                    "type": "string"
+                },
+                {
+                    "name": "admin_Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of admin",
+                    "type": "string"
+                }
+               
+            ],
+           
+            "put": {
+                "parameters": [
+                    {
+                        "name": "virtual_cases",
+                        "in": "body",
+                        "description": "Answers",
+                        "schema": {
+                            "$ref": "#/definitions/AddRoom"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+        
+
         }
+        
+           
+           
+            
+            
+        
         
        
          
@@ -2163,8 +2230,9 @@
        
         
     }
+}
         
-    }
+    
     
     
     
