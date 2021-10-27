@@ -474,45 +474,53 @@ function getCaes(data1){
 function getfullInfo(data) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
-      virtual_cases.findOne({ _id: data.case_id })
+      console.log('data.case_id', data , data.case_id)
+      if(data.case_id){
+        virtual_cases.findOne({ _id: data.case_id })
         .exec()
         .then(function (doc3) {
           if(doc3){
-            var data5= {}
-            data5 = doc3;
-            var Tasks = new Promise((resolve, reject)=>{
-              console.log('here243')
-              virtual_tasks.aggregate([
-                { "$facet": {
-                  "total_task": [
-                    { "$match" : {"case_id": data.case_id,  "status": { "$exists": true,  }}},
-                    { "$count": "total_task" },
-                  ],
-                  "done_task": [
-                    { "$match" : {"case_id": data.case_id,  "status": "done"}},
-                    { "$count": "done_task" }
-                  ]
-                }},
-                { "$project": {
-                  "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
-                  "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
-                }}
-              ], function (err, results) {
-                resolve(results)
-            })
-            }).then((data3)=>{
-              console.log('dasdasdta', data3)
-             if(data3 && data3.length>0){
-              data5.done_task = data3[0].done_task;
-              data5.total_task = data3[0].total_task;
-              fullinfo.push(data5);
-              resolve(fullinfo);
-             }
-            })
-   
+            if(doc3.inhospital===true){
+              var data5= {}
+              data5 = doc3;
+              var Tasks = new Promise((resolve, reject)=>{
+                console.log('here243')
+                virtual_tasks.aggregate([
+                  { "$facet": {
+                    "total_task": [
+                      { "$match" : {"case_id": data.case_id,  "status": { "$exists": true,  }}},
+                      { "$count": "total_task" },
+                    ],
+                    "done_task": [
+                      { "$match" : {"case_id": data.case_id,  "status": "done"}},
+                      { "$count": "done_task" }
+                    ]
+                  }},
+                  { "$project": {
+                    "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
+                    "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
+                  }}
+                ], function (err, results) {
+                  resolve(results)
+              })
+              }).then((data3)=>{
+               if(data3 && data3.length>0){
+                data5.done_task = data3[0].done_task;
+                data5.total_task = data3[0].total_task;
+                fullinfo.push(data5);
+                resolve(fullinfo);
+               }
+              })
             }
-         
+            else{
+              resolve(fullinfo);
+            }
+          }
         });
+      }
+      else{
+        resolve(fullinfo);
+      }
     });
   });
 }

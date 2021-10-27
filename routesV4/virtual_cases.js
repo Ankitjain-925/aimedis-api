@@ -132,39 +132,36 @@ router.post("/checkbedAvailability", function (req, res, next) {
   virtual_cases.find(
     {
       "wards._id": req.body.ward_id,
-      "specialty._id": req.body.specialty_id,
-      "room._id": req.body.room_id,
+      "speciality._id": req.body.specialty_id,
+      "rooms._id": req.body.room_id,
       "house_id": req.body.house_id,
     },
     function (err, userdata) {
       if (err && !userdata) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        console.log("userdata22222", userdata);
-        
-        Virtual_Specialty.findOne(
-          { _id: req.body.specialty_id },
-          function (err, userdata1) {
-            if (err && !userdata1) {
-              res.json({ status: 200, message: "", error: err });
-            } else {
-              // var occumpiedbed = [{ bed: "1" }, { bed: "5" }, {}];
-              // console.log('userdata1',userdata1)
-              bed =  returnNumberofBed(userdata1, req.body.ward_id, req.body.room_id)
-              for (var i = 1; i <= bed; i++) {
-                if(!userdata.some(e => e.bed == i)){
-                  newArray.push(i);
+          Virtual_Specialty.findOne(
+            { _id: req.body.specialty_id },
+            function (err, userdata1) {
+              if (err && !userdata1) {
+                res.json({ status: 200, message: "", error: err });
+              } else {
+                newArray = [];
+                bed =  returnNumberofBed(userdata1, req.body.ward_id, req.body.room_id)
+                for (var i = 1; i <= bed; i++) {
+                  if(!userdata.some(e => e.bed == i)){
+                    newArray.push(i);
+                  }
                 }
+                res.json({
+                  status: 200,
+                  message: "Available beds found",
+                  hassuccessed: true,
+                  data: newArray,
+                });
               }
-              res.json({
-                status: 200,
-                message: "Available beds found",
-                hassuccessed: true,
-                data: newArray,
-              });
             }
-          }
-        );
+          );
       }
     }
   );
@@ -178,10 +175,7 @@ router.post("/checkbedAvailability", function (req, res, next) {
 function returnNumberofBed(array, ward_id, room_id) {
   let ward = array.wards &&  array.wards.find(e => e._id == ward_id);
   let room = ward && ward.rooms && ward.rooms.find(e => e._id == room_id)
-  console.log('room', room)
-  console.log(room.no_of_bed)
   let bed = room.no_of_bed ? parseInt(room.no_of_bed) : 0;
-  console.log('bed', bed)
   return bed;
 }
 

@@ -19,6 +19,16 @@ const Questions = new mongoose.Schema({
         required: false,
         unique: false 
      },
+     title: {
+        type: String,
+        required: false,
+        unique: false 
+     },
+     description :{
+        type: String,
+        required: false,
+        unique: false 
+     },
 },{ strict: false });
 
 Questions.plugin(mongooseFieldEncryption, {
