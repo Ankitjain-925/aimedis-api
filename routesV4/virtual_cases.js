@@ -41,6 +41,33 @@ router.put("/AddRoom/:Case_Id", function (req, res, next) {
   }
 });
 
+router.get("/AddCase/:speciality_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  // if (legit) {
+  virtual_cases.findOne(
+    { _id: req.params.speciality_id },
+    req.body,
+    function (err, userdata) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+          error: err,
+        });
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          message: "case is updated",
+          data: userdata,
+        });
+      }
+    }
+  );
+});
+
 router.put("/AddCase/:speciality_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
