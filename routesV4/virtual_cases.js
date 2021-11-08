@@ -44,7 +44,7 @@ router.put("/AddRoom/:Case_Id", function (req, res, next) {
 router.get("/AddCase/:speciality_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // if (legit) {
+  if (legit) {
   virtual_cases.findOne(
     { _id: req.params.speciality_id },
     req.body,
@@ -66,12 +66,19 @@ router.get("/AddCase/:speciality_id", function (req, res, next) {
       }
     }
   );
+} else {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "Authentication required.",
+  });
+}
 });
 
 router.put("/AddCase/:speciality_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // if (legit) {
+  if (legit) {
   virtual_cases.updateOne(
     { _id: req.params.speciality_id },
     req.body,
@@ -93,6 +100,13 @@ router.put("/AddCase/:speciality_id", function (req, res, next) {
       }
     }
   );
+} else {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "Authentication required.",
+  });
+}
 });
 
 router.post("/AddCase", function (req, res, next) {
@@ -110,7 +124,6 @@ router.post("/AddCase", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("user+dia");
           if (userdata) {
             res.json({
               status: 200,

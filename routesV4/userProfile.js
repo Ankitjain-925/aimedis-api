@@ -1111,7 +1111,7 @@ router.put("/Bookservice", (req, res) => {
   var paymentData = {
     created: moment(new Date()).format("MM/DD/YYYY"),
     description: req.body.description,
-    payment_info: req.body.payment_info,
+    payment_info: JSON.stringify(req.body.payment_info),
     subscription_info: req.body.subscription_info,
   };
   User.updateOne(
