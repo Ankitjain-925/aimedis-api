@@ -136,7 +136,7 @@ router.get('/GetStep/:house_id', function (req, res, next) {
     virtual_step.findOne({house_id: req.params.house_id}, function (err, userdata) {
           if (err && !userdata) {
               res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
-          } else {
+               } else {
             if(userdata){
               if(userdata.steps && userdata.steps.length>0){
                 forEachPromise(userdata.steps, getCaes).then((data)=>{

@@ -1896,16 +1896,34 @@
             }
         
 
+        },
+        "/cases/patient/{patient_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "patient_id",
+                    "in": "path",
+                    "description": "Id of patient"
+                }
+               
+            ],
+            "get": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Get information from patient_id ",
+                  "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
         }
         
-           
-           
-            
-            
-        
-        
-       
-         
 },
 
 "definitions": {
