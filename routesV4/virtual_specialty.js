@@ -7,6 +7,7 @@ var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
 var User = require("../schema/user.js");
 var Institute = require("../schema/institute.js");
+var Appointments =require("../schema/appointments")
 var jwtconfig = require("../jwttoken");
 const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
@@ -977,6 +978,48 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
     });
   }
 });
+
+
+router.get('/Specialty/:House_id', function (req, res, next) {
+    const token = (req.headers.token)
+    let legit = jwtconfig.verify(token)
+    console.log("legit",legit)
+    if (legit) {
+      // var House_id=req.params.House_id
+      // const HouseidToSearchWith = new User({House_id});
+      // HouseidToSearchWith.encryptFieldsSync();
+      // console.log("HouseidToSearchWith",HouseidToSearchWith)
+
+        User.find({"houses.value":req.params.House_id, type : 'doctor'}, function (err, userdata) {
+            if (err && !userdata) {
+                res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
+            } else {
+                
+                console.log("userdata11",userdata)
+
+                let varr= userdata.map((element)=>element._id)
+                console.log("varr",varr)
+                
+                const AppointToSearchWith = new Appointments({varr});
+                AppointToSearchWith.encryptFieldsSync();
+                console.log("AppointToSearchWith",AppointToSearchWith)
+
+                Appointments.find({$or: [{doctor_id:{$in:varr}}, {doctor_id: {$in:AppointToSearchWith.varr}}]},function(err,list){
+                  if(err){
+                    console.log("error",err)
+                  res.json({status:200,hassuccessed: false,error:err})
+                  }else{
+                    console.log("list",list)
+                    res.json({status: 200, hassuccessed: true, data: list})
+                  }
+                })
+            }
+        })
+    } 
+    else {
+        res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    }
+})
 
 function getfullInfo(data) {
   return new Promise((resolve, reject) => {
