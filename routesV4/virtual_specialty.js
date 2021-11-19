@@ -1084,6 +1084,11 @@ router.get("/stasticsrightinfo/:House_id", function (req, res, next) {
 })
 
 
+// router.get("//",function(req,res,next){
+
+// })
+
+
 
 function User_Case(House_id) {
   return new Promise((resolve, reject) => {
