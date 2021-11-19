@@ -1953,8 +1953,107 @@
                     }
                 }
             }
-        }
-        
+        },
+
+        "/stasticsrightinfo/{House_id}":{
+            "get": {
+                "parameters": [
+                    {
+                      "name": "House_id",
+                      "in": "path",
+                      "required": true,
+                      "description": "ID",
+                      "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                  ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using house_id get Task",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                        
+                    }
+                }
+            }
+
+        },
+
+        "/statisticstopinfo/{House_id}":{
+            "get": {
+                "parameters": [
+                    {
+                      "name": "House_id",
+                      "in": "path",
+                      "required": true,
+                      "description": "ID",
+                      "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                  ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using house_id get Task",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                        
+                    }
+                }
+            }
+
+        },
+
+        "/getAppointTask1/{House_id}":{
+            "get": {
+                "parameters": [
+                    {
+                      "name": "House_id",
+                      "in": "path",
+                      "required": true,
+                      "description": "ID",
+                      "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                  ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using house_id get Task",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                        
+                    }
+                }
+            }
+
+        }      
+         
 },
 
 "definitions": {
