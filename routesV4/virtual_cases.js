@@ -9,6 +9,7 @@ var user = require("../schema/user");
 const uuidv1 = require("uuid/v1");
 var jwtconfig = require("../jwttoken");
 const { resolveContent } = require("nodemailer/lib/shared");
+var mongoose = require('mongoose');
 
 // const User = require("../schema/user.js");
 var fullinfo = [];
@@ -116,7 +117,7 @@ router.post("/AddCase", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_cases.findOne(
-      { patient_id: req.body.patient_id, inhospital: { $eq: true } },
+      { patient_id: req.body.patient_id, inhospital: { $eq: true }, house_id: req.body.house_id },
       function (err, userdata) {
         if (err) {
           res.json({
@@ -142,7 +143,6 @@ router.post("/AddCase", function (req, res, next) {
                   error: err,
                 });
               } else {
-                console.log("user_data._id", user_data._id, user_data);
                 res.json({
                   status: 200,
                   message: "Added Successfully",
@@ -207,11 +207,6 @@ router.post("/checkbedAvailability", function (req, res, next) {
       }
     }
   );
-
-  // }
-  // else{
-  //   console.log('dfsdzfsdfsdfs')
-  // }
 });
 
 function returnNumberofBed(array, ward_id, room_id) {
@@ -322,38 +317,29 @@ router.get('/patient/:patient_id', function (req, res, next) {
       } else {
         if(userdata){
      let tasks = new Promise((resolve, reject) => {
-           virtual_tasks.aggregate([
-            {
-              "$facet": {
-                "total_task": [
-                  { "$match": { "case_id": userdata._id, "status": { "$exists": true, } } },
-                  { "$count": "total_task" },
-                ],
-                "done_task": [
-                  { "$match": { "case_id": userdata._id, "status": "done" } },
-                  { "$count": "done_task" }]}
-            },
-            { "$project": {
-              "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
-              "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
-            }}
-            
-          ], function (err, results) {
-            resolve(results)
-        })
-        })
-   
-
-      tasks.then((data) =>{
-
-        console.log(
-          'data', data
-        )
-        if(data &&data.length>0){
-          console.log('data', data)
-          userdata.done_task = data[0].done_task;
-          userdata.total_task = data[0].total_task;
-          console.log('userdata', userdata)
+      var ids = userdata._id.toString();
+      virtual_tasks.aggregate([
+        { "$facet": {
+          "total_task": [
+            { "$match" : {case_id: ids,  status: { "$exists": true,  }}},
+            { "$count": "total_task" },
+          ],
+          "done_task": [
+            { "$match" : {case_id: ids,  status: "done"}},
+            { "$count": "done_task" }
+          ]
+        }},
+        { "$project": {
+          "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
+          "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
+        }}
+      ], function (err, results) {
+        resolve(results)
+    })
+    }).then((data3)=>{
+     if(data3 && data3.length>0){
+      userdata.done_task = data3[0].done_task;
+      userdata.total_task = data3[0].total_task;
           res.json({
             status: 200,
             hassuccessed:true,
@@ -371,14 +357,18 @@ router.get('/patient/:patient_id', function (req, res, next) {
         }
       
       }).catch((message)=>{
-          console.log(' this is in the catch  ' + message)
+        res.json({
+          status: 200,
+          hassuccessed:true,
+          message: "Patient is not found",
+        })
       })
      }
      else{
       res.json({
         status: 200,
         hassuccessed:true,
-        message: "Authentication required",
+        message: "Patient is not found",
       })
     }
   }
@@ -391,12 +381,6 @@ router.get('/patient/:patient_id', function (req, res, next) {
     })
    }
 })
-
-
-
-
-
-
 
 // router.post('/Patient/:patient_id/:pin', function (req, res, next) {
 //   const token = (req.headers.token)

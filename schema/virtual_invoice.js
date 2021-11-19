@@ -36,7 +36,7 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
 var invoiceSchema = new Schema({
     patient: ProfessionalInfo,
     status: {
-        type: String,
+        type: Object,
         required: false,
         unique: false
     },

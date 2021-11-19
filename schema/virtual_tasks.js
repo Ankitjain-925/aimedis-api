@@ -27,7 +27,7 @@ const ProfessionalInfo = new mongoose.Schema({
 },{ strict: false });
 
 ProfessionalInfo.plugin(mongooseFieldEncryption, {
-    fields: ["name", "image", "profile_id", "alies_id"],
+    fields: ["name", "image", "alies_id"],
     secret: process.env.SOME_32BYTE_BASE64_STRING,
     saltGenerator: function (secret) {
         return "1234567890123456"; // should ideally use the secret to return a string of length 16
