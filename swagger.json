@@ -1896,7 +1896,7 @@
             }
             
         },
-        "/Task/{House_id}":{
+        "/getAppointTask/{House_id}":{
             "get": {
                 "parameters": [
                     {
