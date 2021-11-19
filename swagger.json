@@ -9,8 +9,8 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5000",
-    "basePath": "/api/v4/vh",
+    "host": "virtualhospital.aimedis.io",
+    "basePath": "/api/v4",
     "tags": [
         {
             "name": "Patientflow",
@@ -1845,7 +1845,7 @@
                 }
             }
         },
-        "/Discharge/{patient_id}/{admin_id}": {
+        "/cases/Discharge/{patient_id}/{admin_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -1896,7 +1896,7 @@
             }
             
         },
-        "/getAppointTask/{House_id}":{
+        "/vh/getAppointTask/{House_id}":{
             "get": {
                 "parameters": [
                     {
@@ -1955,7 +1955,7 @@
             }
         },
 
-        "/stasticsrightinfo/{House_id}":{
+        "/vh/stasticsrightinfo/{House_id}":{
             "get": {
                 "parameters": [
                     {
@@ -1988,7 +1988,7 @@
 
         },
 
-        "/statisticstopinfo/{House_id}":{
+        "/vh/statisticstopinfo/{House_id}":{
             "get": {
                 "parameters": [
                     {
@@ -2021,7 +2021,7 @@
 
         },
 
-        "/getAppointTask1/{House_id}":{
+        "/vh/getAppointTask1/{House_id}":{
             "get": {
                 "parameters": [
                     {
