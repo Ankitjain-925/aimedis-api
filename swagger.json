@@ -9,8 +9,8 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aimedis.io",
-    "basePath": "/api/v4",
+    "host": "localhost:5000",
+    "basePath": "/api/v4/vh",
     "tags": [
         {
             "name": "Patientflow",
@@ -41,7 +41,7 @@
 
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -1894,7 +1894,38 @@
                     }
                 }
             }
-        
+            
+        },
+        "/Task/{House_id}":{
+            "get": {
+                "parameters": [
+                    {
+                      "name": "House_id",
+                      "in": "path",
+                      "required": true,
+                      "description": "ID",
+                      "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                  ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using house_id get Task",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                        
+                    }
+                }
+            }
 
         }
         
