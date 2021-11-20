@@ -10,7 +10,7 @@
         }
     },
     "host": "localhost:5000",
-    "basePath": "/api/v4/vh",
+    "basePath": "/api/v4",
     "tags": [
         {
             "name": "Patientflow",
@@ -1896,7 +1896,7 @@
             }
             
         },
-        "/getAppointTask/{House_id}":{
+        "/vh/getAppointTask/{House_id}":{
             "get": {
                 "parameters": [
                     {
@@ -1929,7 +1929,7 @@
 
         },
 
-        "/stasticsrightinfo/{House_id}":{
+        "/vh/stasticsrightinfo/{House_id}":{
             "get": {
                 "parameters": [
                     {
@@ -1962,7 +1962,7 @@
 
         },
 
-        "/statisticstopinfo/{House_id}":{
+        "/vh/statisticstopinfo/{House_id}":{
             "get": {
                 "parameters": [
                     {
@@ -1995,7 +1995,7 @@
 
         },
 
-        "/getAppointTask1/{House_id}":{
+        "/vh/getAppointTask1/{House_id}":{
             "get": {
                 "parameters": [
                     {
@@ -2015,6 +2015,38 @@
                     "virtual_cases"
                 ],
                 "summary": "using house_id get Task",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                        
+                    }
+                }
+            }
+
+        },
+        "/vh/sortinfo/{patient_id}":{
+            "get": {
+                "parameters": [
+                    {
+                      "name": "patient_id",
+                      "in": "path",
+                      "required": true,
+                      "description": "ID",
+                      "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                  ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using patient_id get data in decending order",
                 "produces": [
                     "application/json"
                 ],
@@ -2126,21 +2158,29 @@
             }
         },
         "AddAnswerspatient": {
-            "required": ["question_id"," question","house_id","Patient_id" ],
+            "required": ["question_id","answers","house_id","Patient_id" ],
             "properties": {
-                "question_id": {
+                "questionaire_id": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "question": {
+                "answers": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "selected_option": {
+                "patient": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_name": {
                     "type": "string",
                     "uniqueItems": false
                 },
                 "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_logo": {
                     "type": "string",
                     "uniqueItems": false
                 },
