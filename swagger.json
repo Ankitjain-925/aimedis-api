@@ -2058,7 +2058,47 @@
                 }
             }
 
+        },
+        "/vh/BedAvability/{specialty_id}/{ward_id}":{
+            "get": {
+                "parameters": [
+                    {
+                      "name": "specialty_id",
+                      "in": "path",
+                      "required": true,
+                      "description": "ID",
+                      "type": "string"
+                    },
+                    {
+                        "name": "ward_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                      },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                  ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using special_id and ward_id  get room availability",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                        
+                    }
+                }
+            }
+
         }
+
         
         
         

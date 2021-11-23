@@ -1009,7 +1009,7 @@ router.get('/getAppointTask/:House_id', function (req, res, next) {
         //     res.json({ status: 200, hassuccessed: true, data: list })
         //   }
         // })
-        Promise.all([virtualAppointment(userdata),virtualTask(userdata, req.params.House_id)]).then((list1,list)=>{
+        Promise.all([virtualAppointment(userdata), virtualTask(userdata, req.params.House_id)]).then((list1, list) => {
           res.json({ status: 200, hassuccessed: true, data: list, list1 })
 
         })
@@ -1068,55 +1068,102 @@ router.get("/stasticsrightinfo/:House_id", function (req, res, next) {
   let legit = jwtconfig.verify(token)
   console.log("legit", legit)
   if (legit) {
-  virtual_step.findOne({ house_id: req.params.House_id }, function (err, userdata) {
-    if (err) {
-      res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
+    virtual_step.findOne({ house_id: req.params.House_id }, function (err, userdata) {
+      if (err) {
+        res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
 
-    } else {
-      console.log("userdata", userdata)
-      if(userdata){
-        let count = userdata.steps && userdata.steps.length>0 && userdata.steps.map((element) => 
-        { return {'step_name': element.step_name, 'counts' : element.case_numbers?  element.case_numbers.length : 0}})
+      } else {
+        console.log("userdata", userdata)
+        if (userdata) {
+          let count = userdata.steps && userdata.steps.length > 0 && userdata.steps.map((element) => { return { 'step_name': element.step_name, 'counts': element.case_numbers ? element.case_numbers.length : 0 } })
           console.log("count", count)
-         
-          res.json({status: 200, hassuccessed: true, data: count})
-    
+
+          res.json({ status: 200, hassuccessed: true, data: count })
+
         }
-        else{
-          res.json({status: 200, hassuccessed: true, data: []})
+        else {
+          res.json({ status: 200, hassuccessed: true, data: [] })
         }
       }
-     
-  })
-}else{
-  res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
-}
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
 })
 
 
-router.get("/sortinfo/:patient_id",function(req,res,next){
+router.get("/sortinfo/:patient_id", function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   console.log("legit", legit)
   if (legit) {
-    Promise.all([virtualInvoiceforPatient(req.params.patient_id),virtualTasksforPatient(req.params.patient_id)]).then((data,data1)=>{
-      res.json({ status: 200, hassuccessed: true, data: data,data1})
+    Promise.all([virtualInvoiceforPatient(req.params.patient_id), virtualTasksforPatient(req.params.patient_id)]).then((data, data1) => {
+      res.json({ status: 200, hassuccessed: true, data: data, data1 })
 
     })
 
   }
-  else{
-  res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+  else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
   }
 })
+
+router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  let wards = {}
+
+  console.log("legit", legit)
+  if (legit) {
+    Virtual_Specialty.find({ _id: req.params.specialty_id }, function (err, data) {
+      if (err & !data) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: true, error: err })
+      }
+      else {
+        console.log("data", data[0].wards)
+        data[0].wards.forEach((element) => {
+          if (element._id == req.params.ward_id) {
+            wards.rooms = element.rooms
+          }
+        })
+        console.log("wards", wards)
+
+
+        virtual_Case.find(({ "wards._id": req.params.ward_id }), function (err, room) {
+          if (err & !room) {
+            res.json({ status: 200, hassuccessed: true, error: err })
+
+          }
+          else {
+            console.log("rooms", room[0].rooms._id)
+            console.log("wardsroom", wards.rooms[0]._id)
+            if (room[0].rooms._id == wards.rooms[0]._id) {
+            wards.cases=room
+              res.json({ status: 200, hassuccessed: true, data: wards})
+            }
+          }
+        })
+
+        // [{room1 : [case1, case2], room2: [case2, case3]}]
+
+      }
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
 
 function virtualInvoiceforPatient(patient_id) {
   console.log("patient_id", patient_id)
   return new Promise((resolve, reject) => {
 
-    virtual_Invoice.find({ "patient._id": patient_id}).sort({created_at:'desc'}).exec(function (err, data) {
+    virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
       if (err) {
         console.log("err", err)
         reject(err)
@@ -1135,7 +1182,7 @@ function virtualTasksforPatient(patient_id) {
     const VirtualtToSearchWith = new virtual_Task({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
     console.log("VirtualtToSearchWith", VirtualtToSearchWith)
-    virtual_Task.find({$or:[{ "patient_id": patient_id},{ "patient_id": VirtualtToSearchWith.patient_id}]}).sort({created_at:'desc'}).exec(function (err, data1) {
+    virtual_Task.find({ $or: [{ "patient_id": patient_id }, { "patient_id": VirtualtToSearchWith.patient_id }] }).sort({ created_at: 'desc' }).exec(function (err, data1) {
       if (err) {
         console.log("err", err)
         reject(err)
