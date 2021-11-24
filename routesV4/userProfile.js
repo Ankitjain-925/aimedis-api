@@ -1049,7 +1049,7 @@ axios(config)
                               }
                             }
                           );
-    
+     
                           User.findOne({ _id: user_id }, function (err, doc) {
                             if (err && !doc) {
                               res.json({

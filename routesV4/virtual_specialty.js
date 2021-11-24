@@ -1052,7 +1052,6 @@ router.get("/stasticsrightinfo/:House_id", function (req, res, next) {
   virtual_step.find({ house_id: req.params.House_id }, function (err, userdata) {
     if (err) {
       res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
-
     } else {
       let step_count = userdata.map((element) => element.steps)
       let count = step_count[0].map((element) => { return {'step_name': element.step_name, 'counts' : element.case_numbers?  element.case_numbers.length : 0}})
