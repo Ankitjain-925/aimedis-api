@@ -863,6 +863,74 @@ router.post("/UserntfCheck", function (req, res, next) {
 });
 /*-----------------------F-O-R---A-D-D-I-N-G---U-S-E-R-Ss-------------------------*/
 
+// router.post("/AddUser", function (req, res, next) {
+
+//   // Making POST request to verify captcha
+
+//       let token= "abchere"
+//       let link = "https://sys.aimedis.io/";
+//       var verifylink = `https://sys.aimedis.io/?token=${token}`
+//       let datacomposer = (lang, {verifylink}) => {
+//         return {};
+//       };
+//       var _usertype = req.body.type;
+//       let _language = req.body.lan || "en";
+//       switch (_usertype) {
+//         case UserType.patient:
+//           datacomposer = EMAIL.patientEmail.welcomeEmail;
+//           break;
+//         case UserType.doctor:
+//           datacomposer = EMAIL.doctorEmail.welcomeEmail;
+//           break;
+//         case UserType.pharmacy:
+//           datacomposer = EMAIL.pharmacyEmail.welcomeEmail;
+//           break;
+//         case UserType.insurance:
+//           datacomposer = EMAIL.insuranceEmail.welcomeEmail;
+//           break;
+//         case UserType.paramedic:
+//           datacomposer = EMAIL.insuranceEmail.welcomeEmail;
+//           break;
+//         case UserType.hospitaladmin:
+//           datacomposer = EMAIL.hospitalEmail.welcomeEmail;
+//           break;
+//         case UserType.nurse:
+//           datacomposer = EMAIL.nursetEmail.welcomeEmail;
+//           break;
+//       }
+//       generateTemplate(
+//         datacomposer(_language, {verifylink : verifylink}),
+//         (error, html) => {
+//           if (!error) {
+//             let mailOptions = {
+//               from: "contact@aimedis.com",
+//               to: req.body.email,
+//               subject: getSubject(
+//                 _language,
+//                 SUBJECT_KEY.welcome_title_aimedis
+//               ),
+//               html: html,
+//             };
+//             let sendmail = transporter.sendMail(mailOptions);
+//             if (sendmail) {
+//               res.json({
+//                 status: 200,
+//                 message: "User is added Successfully",
+//                 hassuccessed: true,
+//               });
+//             }
+//             else{
+//               res.json({
+//                 status: 200,
+//                 message: "User is not added Successfully",
+//                 hassuccessed: false,
+//               });
+//             }
+//           }
+//         }
+//       );
+// });
+
 router.post("/AddUser", function (req, res, next) {
   const response_key = req.body.token;
   // Making POST request to verify captcha

@@ -7,11 +7,12 @@ var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
 var User = require("../schema/user.js");
 var Institute = require("../schema/institute.js");
-var Appointments = require("../schema/appointments")
-var virtual_step = require("../schema/virtual_step")
+var Appointments = require("../schema/appointments");
+var virtual_step = require("../schema/virtual_step");
 var jwtconfig = require("../jwttoken");
 const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
+var Appoint = [];
 router.delete("/AddSpecialty/:specialty_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -340,7 +341,7 @@ router.get("/ProfessionalTask/:patient_profile_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_Task.find(
-      {"assinged_to.profile_id": req.params.patient_profile_id, },
+      { "assinged_to.profile_id": req.params.patient_profile_id },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -716,7 +717,10 @@ router.get("/AddInvoice/:house_id/:status", function (req, res, next) {
   if (legit) {
     var search = { house_id: req.params.house_id };
     if (req.params.status !== "all") {
-      var search = { house_id: req.params.house_id, "status.value": req.params.status };
+      var search = {
+        house_id: req.params.house_id,
+        "status.value": req.params.status,
+      };
     }
     virtual_Invoice.find(search, function (err, userdata) {
       if (err && !userdata) {
@@ -778,87 +782,86 @@ router.post("/checkPatient", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    if(req.body.patient_id){
+    if (req.body.patient_id) {
       const profile_id = req.body.patient_id;
       const messageToSearchWith = new User({ profile_id });
       messageToSearchWith.encryptFieldsSync();
       const alies_id = req.body.patient_id;
       const messageToSearchWith1 = new User({ alies_id });
       messageToSearchWith1.encryptFieldsSync();
-      User.findOne(  {
-        $or: [
-          { profile_id: messageToSearchWith.profile_id },
-          { alies_id: messageToSearchWith1.alies_id },
-          { profile_id: req.body.patient_id },
-          { alies_id: req.body.patient_id },
-        ],
-      }, function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          if(userdata){
-            var createCase = false;
-            if (req.body.pin) {
-              createCase = req.body.pin == userdata.pin ? true : false;
-            } else {
-             
-              var pos =
-                userdata &&
-                userdata.assosiated_by.filter(
-                  (data) => data.institute_id === req.body.institute_id
-                );
-              createCase =
-                userdata.parent_id === req.body.institute_id
-                  ? true
-                  : pos && pos.length > 0
-                  ? true
-                  : false;
-            }
-            if (createCase) {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "information get successfully",
-                data: userdata,
-              });
-            } else {
-              if (req.body.pin) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "pin is not correct",
-                });
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "user is not associated need pin to add",
-                });
-              }
-            }
-          }
-          else{
+      User.findOne(
+        {
+          $or: [
+            { profile_id: messageToSearchWith.profile_id },
+            { alies_id: messageToSearchWith1.alies_id },
+            { profile_id: req.body.patient_id },
+            { alies_id: req.body.patient_id },
+          ],
+        },
+        function (err, userdata) {
+          if (err) {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "patient is not exist",
+              message: "Something went wrong.",
+              error: err,
             });
+          } else {
+            if (userdata) {
+              var createCase = false;
+              if (req.body.pin) {
+                createCase = req.body.pin == userdata.pin ? true : false;
+              } else {
+                var pos =
+                  userdata &&
+                  userdata.assosiated_by.filter(
+                    (data) => data.institute_id === req.body.institute_id
+                  );
+                createCase =
+                  userdata.parent_id === req.body.institute_id
+                    ? true
+                    : pos && pos.length > 0
+                    ? true
+                    : false;
+              }
+              if (createCase) {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "information get successfully",
+                  data: userdata,
+                });
+              } else {
+                if (req.body.pin) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "pin is not correct",
+                  });
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "user is not associated need pin to add",
+                  });
+                }
+              }
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "patient is not exist",
+              });
+            }
           }
-         
         }
-      });
-    }
-    else{
+      );
+    } else {
       res.json({
         status: 200,
         hassuccessed: false,
         message: "Please enter patient id",
-      }); 
+      });
     }
   } else {
     res.json({
@@ -882,7 +885,7 @@ router.post("/addPatientToVH", function (req, res, next) {
           status: 200,
           message: "Case number is assigned",
           hassuccessed: true,
-          data: user_data._id
+          data: user_data._id,
         });
       }
     });
@@ -962,7 +965,8 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    virtual_Case.find({ $and: [{ house_id: req.params.house_id }, { inhospital: true }] },
+    virtual_Case.find(
+      { $and: [{ house_id: req.params.house_id }, { inhospital: true }] },
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -989,148 +993,221 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
   }
 });
 
-
-router.get('/getAppointTask/:House_id', function (req, res, next) {
-  const token = (req.headers.token)
-  let legit = jwtconfig.verify(token)
+router.get("/getAppointTask/:House_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
   if (legit) {
-    User.find({ "houses.value": req.params.House_id, type: 'doctor' }, function (err, userdata) {
-      if (err && !userdata) {
-        res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
-      } else {
-        Promise.all([virtualAppointment(userdata),virtualTask(userdata, req.params.House_id)]).then((list1,list)=>{
-          res.json({ status: 200, hassuccessed: true, data: list, list1 })
-
-        })
+    User.find(
+      { "houses.value": req.params.House_id, type: "doctor" },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "specialities not found",
+            error: err,
+          });
+        } else {
+          Promise.all([
+            virtualAppointment(userdata),
+            virtualTask(req.params.House_id),
+          ]).then((list1) => {
+            var flatArray = Array.prototype.concat.apply([], list1);
+            console.log("dsfgsdfsdfsdf",flatArray);
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              data: flatArray,
+            });
+          });
+        }
       }
-    })
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
   }
-  else {
-    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-  }
-})
+});
 
-router.get('/getAppointTask1/:House_id', function (req, res, next) {
-  const token = (req.headers.token)
-  let legit = jwtconfig.verify(token)
+router.get("/getAppointTask1/:House_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
   if (legit) {
-
-    User.find({ "houses.value": req.params.House_id, type: 'doctor' }, function (err, userdata) {
-      if (err && !userdata) {
-        res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
-      } else {
-        virtualTask(userdata, req.params.House_id).then((list) => {
-          res.json({ status: 200, hassuccessed: true, data: list })
-        })
+    User.find(
+      { "houses.value": req.params.House_id, type: "doctor" },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "specialities not found",
+            error: err,
+          });
+        } else {
+          virtualTask(req.params.House_id).then((list) => {
+            res.json({ status: 200, hassuccessed: true, data: list });
+          });
+        }
       }
-    })
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
   }
-  else {
-    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-  }
-})
-
+});
 
 router.get("/statisticstopinfo/:House_id", function (req, res, next) {
-  const token = (req.headers.token)
-  let legit = jwtconfig.verify(token)
-  
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
 
   if (legit) {
-    Promise.all([virtualCase(req.params.House_id), User_Case(req.params.House_id), User_Case1(req.params.House_id)]).then((count, list, list1) => {
-
-      res.json({ status: 200, hassuccessed: true, data: count, list, list1 })
-    })
+    Promise.all([
+      virtualCase(req.params.House_id),
+      User_Case(req.params.House_id),
+      User_Case1(req.params.House_id),
+    ]).then((count, list, list1) => {
+      res.json({ status: 200, hassuccessed: true, data: count, list, list1 });
+    });
   } else {
-    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
   }
-})
-
+});
 
 router.get("/stasticsrightinfo/:House_id", function (req, res, next) {
-  virtual_step.find({ house_id: req.params.House_id }, function (err, userdata) {
-    if (err) {
-      res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
-    } else {
-      let step_count = userdata.map((element) => element.steps)
-      let count = step_count[0].map((element) => { return {'step_name': element.step_name, 'counts' : element.case_numbers?  element.case_numbers.length : 0}})
-      res.json({status: 200, hassuccessed: true, data: count})
-
+  virtual_step.find(
+    { house_id: req.params.House_id },
+    function (err, userdata) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "specialities not found",
+          error: err,
+        });
+      } else {
+        let step_count = userdata.map((element) => element.steps);
+        let count = step_count[0].map((element) => {
+          return {
+            step_name: element.step_name,
+            counts: element.case_numbers ? element.case_numbers.length : 0,
+          };
+        });
+        res.json({ status: 200, hassuccessed: true, data: count });
+      }
     }
-  })
-})
+  );
+});
 
 function User_Case(House_id) {
   return new Promise((resolve, reject) => {
-    User.countDocuments({ "houses.value": House_id, type: 'doctor' }, function (err, userdata) {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(userdata)
+    User.countDocuments(
+      { "houses.value": House_id, type: "doctor" },
+      function (err, userdata) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(userdata);
+        }
       }
-    })
-  })
-
+    );
+  });
 }
 
 function User_Case1(House_id) {
   return new Promise((resolve, reject) => {
-    User.countDocuments({ "houses.value": House_id, type: 'nusre' }, function (err, userdata) {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(userdata)
+    User.countDocuments(
+      { "houses.value": House_id, type: "nusre" },
+      function (err, userdata) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(userdata);
+        }
       }
-    })
-  })
-
+    );
+  });
 }
 function virtualCase(House_id) {
   return new Promise((resolve, reject) => {
-    virtual_Case.countDocuments({ house_id: House_id, inhospital: true }, function (err, count) {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(count)
+    virtual_Case.countDocuments(
+      { house_id: House_id, inhospital: true },
+      function (err, count) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(count);
+        }
       }
-    })
-  })
+    );
+  });
 }
 
-function virtualTask(userdata, house_id) {
+function virtualTask(house_id) {
   return new Promise((resolve, reject) => {
-    let varr = userdata.map((element) => element._id)
-    const virtualToSearchWith = new virtual_Task({ varr });
-    virtualToSearchWith.encryptFieldsSync();
-    virtual_Task.find({ $or: [{ house_id: house_id }, { house_id: { $in: virtualToSearchWith.varr } }] }, function (err, list) {
+    virtual_Task.find({ house_id: house_id }, function (err, list) {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        var finaldata = [...list, ...userdata]
-        resolve(finaldata)
+        console.log('tasklist', list)
+        var finaldata = [...list];
+        resolve(finaldata);
       }
-    })
-
-  })
-
+    });
+  });
 }
 
 function virtualAppointment(userdata) {
   return new Promise((resolve, reject) => {
-    let varr = userdata.map((element) => element._id)
-    const AppointToSearchWith = new virtual_Task({ varr });
-    AppointToSearchWith.encryptFieldsSync();
-    Appointments.find({ $or: [{ doctor_id: { $in: varr } }, { doctor_id: { $in: AppointToSearchWith.varr } }] }, function (err, list1) {
-      if (err) {
-        reject(err)
+    Appoint = [];
+    forEachPromise(userdata, getApointsDoctor).then((result) => {
+      console.log("Appoint", Appoint);
+      resolve(Appoint);
+    });
+  });
+}
+
+function getApointsDoctor(user) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (user) {
+        const AppointToSearchWith = new Appointments({ doctor_id: user._id });
+        AppointToSearchWith.encryptFieldsSync();
+        Appointments.find(
+          {
+            $or: [
+              { doctor_id: user._id },
+              { doctor_id: AppointToSearchWith.doctor_id },
+            ],
+          },
+          function (err, list1) {
+            if (err) {
+              reject(err);
+            } else {
+              if (list1) {
+                console.log("list1", list1);
+                Appoint = [...Appoint, ...list1];
+                console.log("finalAppoint", Appoint);
+                resolve(Appoint);
+              }
+            }
+          }
+        );
       } else {
-        resolve(list1)
+        console.log("I am here");
+        resolve(Appoint);
       }
-    })
-
-  })
-
+    });
+  });
 }
 
 function getfullInfo(data) {
