@@ -949,7 +949,35 @@ router.get("/allusers/:type", function (req, res) {
   let legit = jwtconfig.verify(token);
   AllUser1 = [];
   if (legit) {
-    User.find({ type: req.params.type }, function (err, data){
+    User.find({ type: req.params.type}, function (err, data){
+
+      if (err && !data) {
+        console.log("err",err)
+        res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
+      } else {
+
+        console.log("userdata11",data)
+        res.json({ status: 200, hassuccessed: true, data: data })
+
+      }
+      
+    })  
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
+
+
+router.get("/allHospitalusers/:institute_id/:type", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  AllUser1 = [];
+  if (legit) {
+    User.find({ institute_id:req.params.institute_id,type: req.params.type}, function (err, data){
 
       if (err && !data) {
         console.log("err",err)
