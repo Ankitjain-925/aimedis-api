@@ -1234,8 +1234,19 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
         console.log("service1243",value)
         Data.push({
           k: key.replace(/_/g, " "),
-          v: value
+          v: value.map((element)=>{
+            console.log("element",element)
+            // return element
+           return element.price_per_quantity && element.quantity && element.service && element.price
+          })
+          // v: value
+          // v: Array.prototype.map
+          // .call(value, (s) => { return s.price_per_quantity,s.quantity,s.service,s.price})
+          // .toString()
+          // .split(/[,]+/)
+          // .join(",  "),
         });
+        console.log("data1232133",Data)
       }
      
       else if(
@@ -1260,7 +1271,6 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
   var htmlToSend = template({
     Invoice:Data,
     pat_info: req.body,
-    type: req.body.type.replace("_", " "),
   });
   var filename = "GeneratedReport.pdf",
     logo1 =
