@@ -944,24 +944,41 @@ router.put("/topic/:id", function (req, res, next) {
   }
 });
 
-router.get("/allusers/:type", function (req, res) {
+
+router.get("/allusers/:type/:pagenumber", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  AllUser1 = [];
+  
   if (legit) {
-    User.find({ type: req.params.type}, function (err, data){
+    User.find({ type: req.params.type}).count().lean().then((count) => {
+      console.log("count123",count)
+     let pagenumber=req.params.pagenumber
+     var page_limit=20
+    if(pagenumber && pagenumber !== 1){
+      console.log("next page")
+      const operations = [];
+      operations.push(
+        User.find({ type: req.params.type }).skip((pagenumber-1)*page_limit).limit(page_limit).lean().then((batchHandler) => {
+          console.log("batchHandler", batchHandler)
+          res.json({ status: 200, hassuccessed: true, data: batchHandler })
 
-      if (err && !data) {
-        console.log("err",err)
-        res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
-      } else {
-
-        console.log("userdata11",data)
-        res.json({ status: 200, hassuccessed: true, data: data })
-
-      }
+        })
+      )
+    }else{
+      User.find({ type: req.params.type }).skip(0).limit(20).lean().then((batchHandler) => {
       
-    })  
+        res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count:count })
+
+      })
+      
+    }
+    
+    }).catch((err) => {
+      console.log("err",err)
+      res.json({ status: 200, hassuccessed: true, err: err })
+
+    })
+
   } else {
     res.json({
       status: 200,
@@ -970,26 +987,26 @@ router.get("/allusers/:type", function (req, res) {
     });
   }
 });
+
 
 
 router.get("/allHospitalusers/:institute_id/:type", function (req, res) {
   const token = req.headers.token;
+  const batchSize = 10000;
   let legit = jwtconfig.verify(token);
-  AllUser1 = [];
   if (legit) {
-    User.find({ institute_id:req.params.institute_id,type: req.params.type}, function (err, data){
-
+    User.find({ institute_id: req.params.institute_id, type: req.params.type }, function (err, data) {
       if (err && !data) {
-        console.log("err",err)
+        console.log("err", err)
         res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
       } else {
 
-        console.log("userdata11",data)
+        console.log("userdata11", data)
         res.json({ status: 200, hassuccessed: true, data: data })
 
       }
-      
-    })  
+    })
+
   } else {
     res.json({
       status: 200,
@@ -998,6 +1015,37 @@ router.get("/allHospitalusers/:institute_id/:type", function (req, res) {
     });
   }
 });
+
+// router.get("/allSearchusers/:/:type", function (req, res) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   AllUser1 = [];
+//   if (legit) {
+//     User.find({ institute_id:req.params.institute_id,type: req.params.type}, function (err, data){
+
+//       if (err && !data) {
+//         console.log("err",err)
+//         res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
+//       } else {
+
+//         console.log("userdata11",data)
+//         res.json({ status: 200, hassuccessed: true, data: data })
+
+//       }
+
+//     })  
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       msg: "Authentication required.",
+//     });
+//   }
+// });
+
+
+
+
 
 function forEachPromise(items, fn) {
   return items.reduce(function (promise, item) {
