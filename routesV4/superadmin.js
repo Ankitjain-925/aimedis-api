@@ -954,13 +954,13 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
       console.log("count123", count)
       let pagenumber = req.params.pagenumber
       var page_limit = 20
-      if (pagenumber && pagenumber !== 1) {
+      if (pagenumber && pagenumber > 0) {
         console.log("next page")
         const operations = [];
         operations.push(
-          User.find({ type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).lean().then((batchHandler) => {
+          User.find({ type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).then((batchHandler) => {
             console.log("batchHandler", batchHandler)
-            res.json({ status: 200, hassuccessed: true, data: batchHandler })
+            res.json({ status: 200, hassuccessed: true, data: batchHandler,Total_count:count})
 
           })
         )
