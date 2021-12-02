@@ -164,6 +164,70 @@ router.post("/AddCase", function (req, res, next) {
   }
 });
 
+router.post("/checkbedAvailabilityByWard", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  var beds = [];
+  newArray = [];
+  //  if (legit) {
+  virtual_cases.find(
+    {
+      "wards._id": req.body.ward_id,
+      "speciality._id": req.body.specialty_id,
+      "house_id": req.body.house_id,
+      inhospital: true
+    },
+    function (err, userdata) {
+      if (err && !userdata) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        Virtual_Specialty.findOne(
+          { _id: req.body.specialty_id },
+          function (err, userdata1) {
+            if (err && !userdata1) {
+              res.json({ status: 200, message: "", error: err });
+            } else {
+              newArray = [];
+              beds = returnNumberofBedOnWard(userdata1, req.body.ward_id)
+              beds.forEach((item, index) => {
+              var NewUsers= userdata.filter((elem)=>(elem.rooms && elem.rooms._id === item.room_id.toString())) 
+              console.log('NewUsers', NewUsers)
+              for (var i = 1; i <= item.bed; i++) {
+
+                if (!NewUsers.some(e => {
+                  console.log('e.bed', e.bed, i );
+                  return (e.bed == i)})) {
+                  newArray.push(i);
+                }
+              }
+            })
+            console.log('newArray',newArray)
+              res.json({
+                status: 200,
+                message: "Available beds found",
+                hassuccessed: true,
+                data:newArray && newArray.length> 0 ? newArray.length : 0,
+              });
+            }
+          }
+        );
+      }
+    }
+  );
+});
+
+function returnNumberofBedOnWard(array, ward_id) {
+  let ward = array.wards && array.wards.find(e => e._id == ward_id);
+  var beds = [];
+  if(ward && ward.rooms && ward.rooms.length>0){
+    ward.rooms.forEach((item, index) => {
+      let bed = item.no_of_bed ? parseInt(item.no_of_bed) : 0;
+      beds.push({ room_id: item._id, bed: bed })
+    })
+  }
+  return beds;
+}
+
 //check the availablity of the bed in particular specialty, ward, and room, and house
 router.post("/checkbedAvailability", function (req, res, next) {
   const token = req.headers.token;
@@ -177,6 +241,7 @@ router.post("/checkbedAvailability", function (req, res, next) {
       "speciality._id": req.body.specialty_id,
       "rooms._id": req.body.room_id,
       "house_id": req.body.house_id,
+      inhospital: true
     },
     function (err, userdata) {
       if (err && !userdata) {

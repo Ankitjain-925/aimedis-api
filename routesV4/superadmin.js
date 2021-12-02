@@ -945,34 +945,60 @@ router.put("/topic/:id", function (req, res, next) {
 });
 
 
+router.get("/allusers/:type", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+      var batchSize = 10000;
+      User.find({ type: req.params.type}).count().then((count) => {
+  
+      //   const operations = [];
+      //   for (let i = 0; i < count; i += batchSize) {
+      //     operations.push(
+            User.find({type: req.params.type}).skip(0).limit(count).then((batchHandler) => {
+              res.json({ status: 200, hassuccessed: true, data: batchHandler })
+            })
+      //     )
+      //   }
+      }).catch((err)=>{
+        res.json({ status: 200, hassuccessed: true, err: err })
+  
+      })
+  //   User.find({ type: req.params.type }, function (err, data){
+  //     if (err && !data) {
+  //       res.json({ status: 200, hassuccessed: false, message: "Users not found", error: err })
+  //     } else {
+  //       res.json({ status: 200, hassuccessed: true, data: data })
+  //     }
+  //   })  
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
+
 router.get("/allusers/:type/:pagenumber", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-
   if (legit) {
     User.find({ type: req.params.type }).count().lean().then((count) => {
-      console.log("count123", count)
       let pagenumber = req.params.pagenumber
       var page_limit = 20
-      if (pagenumber && pagenumber !== 1) {
-        console.log("next page")
+      if (pagenumber && pagenumber > 0) {
         const operations = [];
         operations.push(
-          User.find({ type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).lean().then((batchHandler) => {
-            console.log("batchHandler", batchHandler)
-            res.json({ status: 200, hassuccessed: true, data: batchHandler })
-
+          User.find({ type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).then((batchHandler) => {
+              res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count:count})
           })
         )
       } else {
-        User.find({ type: req.params.type }).skip(0).limit(20).lean().then((batchHandler) => {
-
+        User.find({ type: req.params.type }).skip(0).limit(20).then((batchHandler) => {
           res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count: count })
-
         })
-
       }
-
     }).catch((err) => {
       console.log("err", err)
       res.json({ status: 200, hassuccessed: true, err: err })
@@ -997,13 +1023,9 @@ router.get("/allHospitalusers/:institute_id/:type", function (req, res) {
   if (legit) {
     User.find({ institute_id: req.params.institute_id, type: req.params.type }, function (err, data) {
       if (err && !data) {
-        console.log("err", err)
         res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
       } else {
-
-        console.log("userdata11", data)
         res.json({ status: 200, hassuccessed: true, data: data })
-
       }
     })
 
