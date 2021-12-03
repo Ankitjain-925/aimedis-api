@@ -1038,31 +1038,79 @@ router.get("/allHospitalusers/:institute_id/:type", function (req, res) {
   }
 });
 
-router.get("/allSearchusers/:first_name/:last_name/:email", function (req, res) {
+
+// router.post("/allSearchusers", function (req, res) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//   if(req.body.type && req.body.search){
+//       const Useremail = new User({ email: req.body.search });
+//       Useremail.encryptFieldsSync();
+//       const Useremail1 = new User({ email: req.body.search.toUpperCase() });
+//       Useremail1.encryptFieldsSync();
+//       const Useremail2 = new User({ email: req.body.search.toLowerCase() });
+//       Useremail2.encryptFieldsSync();
+//       const Userfirstname = new User({ first_name : req.body.search});
+//       Userfirstname.encryptFieldsSync();
+//       const Userfirstname1 = new User({ first_name : req.body.search.toUpperCase()});
+//       Userfirstname1.encryptFieldsSync();
+//       const Userfirstname2 = new User({ first_name : req.body.search.toLowerCase()});
+//       Userfirstname2.encryptFieldsSync();
+//       const Userlastname = new User({ last_name : req.body.search });
+//       Userlastname.encryptFieldsSync();
+//       const Userlastname1 = new User({ last_name : req.body.search.toUpperCase() });
+//       Userlastname1.encryptFieldsSync();
+//       const Userlastname2 = new User({ last_name : req.body.search.toLowerCase() });
+//       Userlastname2.encryptFieldsSync();
+     
+//         User.find({ $and: [{ type: req.body.type },
+//           {$or: [{ first_name: req.body.search }, { first_name: Userfirstname.first_name },{ first_name: Userfirstname1.first_name },{ first_name: Userfirstname2.first_name }, { email: Useremail.email },
+//             { last_name: req.body.search },{ last_name: req.body.search.toLowerCase() },{ last_name: req.body.search.toUpperCase() },{ first_name: req.body.search.toLowerCase() },{ first_name: req.body.search.toUpperCase() },
+//              { last_name: Userlastname.last_name },{ email: req.body.search },{ email: Useremail1.email },{ email: Useremail2.email }, { last_name: Userlastname1.last_name }, { last_name: Userlastname2.last_name },
+//              { last_name: req.body.search.toLowerCase() },{ last_name: req.body.search.toUpperCase() }, { email: req.body.search.toLowerCase() },{ email: req.body.search.toUpperCase() }]
+//           }] },function (err, data) {
+//           if (err && !data) {
+//             console.log("err", err)
+//             res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
+//           } else {
+//             res.json({ status: 200, hassuccessed: true, data: data })
+//           }
+//         })
+//   }
+//   else{
+//       res.json({
+//           status: 200,
+//           hassuccessed: false,
+//           msg: "Please send type and search data",
+//         });
+//   }  
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       msg: "Authentication required.",
+//     });
+//   }
+// });
+
+
+router.post("/allSearchusers", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var email = req.params.email
-    const Useremail = new User({ email });
-    Useremail.encryptFieldsSync();
-
-    var first_name = req.params.first_name
-    const Userfirstname = new User({ first_name });
-    Userfirstname.encryptFieldsSync();
-
-    var last_name = req.params.last_name
-    const Userlastname = new User({ last_name });
-    Userlastname.encryptFieldsSync();
-
-      User.find({ $or: [{ first_name: req.params.first_name }, { first_name: Userfirstname.first_name },
-        { last_name: req.params.last_name }, { last_name: Userlastname.last_name },{ email: req.params.email }, { email: Useremail.email }] },function (err, data) {
-        if (err && !data) {
-          console.log("err", err)
-          res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: data })
-        }
-      })
+  if(req.body.type && req.body.search){
+    User.find({ type: req.body.type }).then((data) => {
+      let serach_value = SearchUser(req.body.search, data )
+      res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
+    })
+  }
+  else{
+      res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Please send type and search data",
+        });
+  }  
   } else {
     res.json({
       status: 200,
@@ -1072,9 +1120,23 @@ router.get("/allSearchusers/:first_name/:last_name/:email", function (req, res) 
   }
 });
 
-
-
-
+function SearchUser (searchKey, searchInto) {
+  return searchInto.filter(user => {
+    searchKey = searchKey.toLowerCase()
+      let email = user.email.toLowerCase().search(searchKey)
+      let name = `${user.first_name} ${user.last_name}`
+      name = name.toLowerCase().search(searchKey)
+      if (name > -1) {
+          return user
+      }
+      else if (email > -1) {
+          return user
+      }
+      else {
+          return false
+      }
+  })
+};
 
 function forEachPromise(items, fn) {
   return items.reduce(function (promise, item) {

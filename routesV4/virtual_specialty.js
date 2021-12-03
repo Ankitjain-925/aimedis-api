@@ -1239,14 +1239,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
             // return element
            return element.price_per_quantity && element.quantity && element.service && element.price
           })
-          // v: value
-          // v: Array.prototype.map
-          // .call(value, (s) => { return s.price_per_quantity,s.quantity,s.service,s.price})
-          // .toString()
-          // .split(/[,]+/)
-          // .join(",  "),
         });
-        console.log("data1232133",Data)
       }
      
       else if(
