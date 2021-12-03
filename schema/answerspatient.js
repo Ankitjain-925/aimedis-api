@@ -46,7 +46,6 @@ var AnswSchema = new mongoose.Schema({
         required: false,
         unique: false
     },
-
     patient_id:{
         type: String,
         required: true,

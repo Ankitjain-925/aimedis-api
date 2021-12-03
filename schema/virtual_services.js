@@ -25,7 +25,7 @@ var ServiceSchema = new Schema({
         unique: false
     },
     speciality_id: {
-        type: String,
+        type: Array,
         required: false,
         unique: false
     },

@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5000",
+    "host": "virtualhospital.aimedis.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -41,7 +41,7 @@
 
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -1845,7 +1845,7 @@
                 }
             }
         },
-        "/Discharge/{patient_id}/{admin_id}": {
+        "/cases/Discharge/{patient_id}/{admin_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -1927,6 +1927,32 @@
                 }
             }
 
+        },
+        "/cases/patient/{patient_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "patient_id",
+                    "in": "path",
+                    "description": "Id of patient"
+                }
+               
+            ],
+            "get": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Get information from patient_id ",
+                  "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
         },
 
         "/vh/stasticsrightinfo/{House_id}":{
