@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aimedis.io",
+    "host": "localhost",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -38,7 +38,7 @@
         }
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -2143,6 +2143,66 @@
                     "virtual_cases"
                 ],
                 "summary": "get allhospitaluser by institute_id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vh/patientjourneyQue/{patient_id}": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "patient_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using patient_id get questionairs",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vh/patientjourney/{patient_id}": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "patient_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using patient_id get questionairs",
                 "produces": [
                     "application/json"
                 ],
