@@ -1404,9 +1404,10 @@ router.get("/patientjourney/:patient_id", function (req, res) {
       }
       else {
         console.log("data123",data)
-    Promise.all([ansfromhouseid(data),taskfromhouseid(data),invoicefromhouseid(data)]).then((ans,task,invoice) => {
-        console.log("1",ans,"ta",task,"inn",invoice)
-        var fulldata = [...ans, ...task, ...invoice]
+    Promise.all([ansfromhouseid(data),taskfromhouseid(data),invoicefromhouseid(data)]).then((final_data) => {
+        console.log("final_data",final_data)
+        // var fulldata = [...ans, ...task, ...invoice]
+        var fulldata =final_data
         console.log("fulldata",fulldata)
         res.json({ status: 200, hassuccessed: true, data: fulldata })
     })
