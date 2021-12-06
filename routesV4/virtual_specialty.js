@@ -6,9 +6,11 @@ var virtual_Task = require("../schema/virtual_tasks.js");
 var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
 var User = require("../schema/user.js");
+var questionaire = require("../schema/questionaire")
 var Institute = require("../schema/institute.js");
 var Appointments = require("../schema/appointments")
 var virtual_step = require("../schema/virtual_step")
+var answerspatient = require("../schema/answerspatient")
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
 const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
@@ -22,19 +24,19 @@ var html_to_pdf = require("html-pdf-node");
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
-      "01",
-      "02",
-      "03",
-      "04",
-      "05",
-      "06",
-      "07",
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-    ],
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ],
     month = monthNames[d.getMonth()],
     day = d.getDate(),
     year = d.getFullYear();
@@ -859,8 +861,8 @@ router.post("/checkPatient", function (req, res, next) {
                   userdata.parent_id === req.body.institute_id
                     ? true
                     : pos && pos.length > 0
-                    ? true
-                    : false;
+                      ? true
+                      : false;
               }
               if (createCase) {
                 res.json({
@@ -1051,7 +1053,7 @@ router.get("/getAppointTask/:House_id", function (req, res, next) {
             virtualTask(req.params.House_id),
           ]).then((list1) => {
             var flatArray = Array.prototype.concat.apply([], list1);
-            console.log("dsfgsdfsdfsdf",flatArray);
+            console.log("dsfgsdfsdfsdf", flatArray);
             res.json({
               status: 200,
               hassuccessed: true,
@@ -1200,8 +1202,8 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
             console.log("rooms", room[0].rooms._id)
             console.log("wardsroom", wards.rooms[0]._id)
             if (room[0].rooms._id == wards.rooms[0]._id) {
-            wards.cases=room
-              res.json({ status: 200, hassuccessed: true, data: wards})
+              wards.cases = room
+              res.json({ status: 200, hassuccessed: true, data: wards })
             }
           }
         })
@@ -1224,45 +1226,45 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
     }
     return options.inverse(this);
   });
-  
+
   var Data = [];
   {
     Object.entries(req.body).map(([key, value]) => {
-      console.log("value1",value)
-      console.log("key",key)
+      console.log("value1", value)
+      console.log("key", key)
       if (Array.isArray(value)) {
-        console.log("service1243",value)
+        console.log("service1243", value)
         Data.push({
           k: key.replace(/_/g, " "),
-          v: value.map((element)=>{
-            console.log("element",element)
+          v: value.map((element) => {
+            console.log("element", element)
             // return element
-           return element.price_per_quantity && element.quantity && element.service && element.price
+            return element.price_per_quantity && element.quantity && element.service && element.price
           })
         });
       }
-     
-      else if(
+
+      else if (
         key === "invoice_id" ||
         key === "case_id" ||
         key === "total_amount"
-       
-      ){
+
+      ) {
         Data.push({
           k: key.replace(/_/g, " "),
           v: value,
         });
       }
-      else if(key === "created_at"){
-        Data.push({ k: "created_at", v: getDate(value,"YYYY/MM/DD") });
+      else if (key === "created_at") {
+        Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
 
       }
     });
   }
-  console.log("Data",Data)
+  console.log("Data", Data)
   var template = handlebars.compile(html);
   var htmlToSend = template({
-    Invoice:Data,
+    Invoice: Data,
     pat_info: req.body,
   });
   var filename = "GeneratedReport.pdf",
@@ -1286,179 +1288,349 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
 
     html_to_pdf.generatePdfs(file, options).then((output) => {
       const file = `${__dirname}/${filename}`;
-      console.log("file",file)
+      console.log("file", file)
       res.download(file);
     });
   } else {
-    console.log("filename",filename)
+    console.log("filename", filename)
     res.json({ status: 200, hassuccessed: true, filename: filename });
   }
- 
+
 });
 
+router.get("/patientjourneyQue/:patient_id", function (req, res) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+
+  console.log("legit", legit)
+  if (legit) {
+    virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
+      if (err & !data) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: true, error: err })
+      }
+      else {
+        let house_id = data[0].house_id
+        const VirtualtToSearchWith = new questionaire({ house_id });
+        VirtualtToSearchWith.encryptFieldsSync();
+        questionaire.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }, function (err, data2) {
+          if (err & !data2) {
+            res.json({ status: 200, hassuccessed: true, error: err })
+
+          }
+          else {
+            res.json({ status: 200, hassuccessed: true, data: data2 })
+          }
+
+        })
+      }
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
+// router.get("/patientjourney/:patient_id", function (req, res) {
+//   const token = (req.headers.token)
+//   let legit = jwtconfig.verify(token)
+
+//   console.log("legit", legit)
+//   if (legit) {
+//     virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
+//       if (err & !data) {
+//         console.log("err", err)
+//         res.json({ status: 200, hassuccessed: true, error: err })
+//       }
+//       else {
+//         console.log("data",data)
+//         let house_id = data[0].house_id
+//         const VirtualtToSearchWith = new answerspatient({ house_id });
+//         VirtualtToSearchWith.encryptFieldsSync();
+//         answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, ans) {
+//           if (err & !ans) {
+//             res.json({ status: 200, hassuccessed: true, error: err })
+
+//           }
+//           else {
+//             let house_id = data[0].house_id
+//             const VirtualtToSearchWith = new virtual_Task({ house_id });
+//             VirtualtToSearchWith.encryptFieldsSync();
+//             virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, task) {
+//               if (err & !task) {
+//                 res.json({ status: 200, hassuccessed: true, error: err })
+
+//               } else {
+//                 let house_id = data[0].house_id
+//                 const VirtualtToSearchWith = new virtual_Invoice({ house_id });
+//                 VirtualtToSearchWith.encryptFieldsSync();
+//                 virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, invoice) {
+//                   if (err & !task) {
+//                     res.json({ status: 200, hassuccessed: true, error: err })
+
+//                   } else {
+//                     var fulldata = [...ans, ...task, ...invoice]
+//                     res.json({ status: 200, hassuccessed: true, data: fulldata })
+//                   }
+//                 })
+//               }
+//             })
+//           }
+//         })
+//       }
+
+//     })
+//   }
+
+//   else {
+//     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+//   }
+// })
 
 
 
+router.get("/patientjourney/:patient_id", function (req, res) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+
+  console.log("legit", legit)
+  if (legit) {
+    virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
+      if (err & !data) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: true, error: err })
+      }
+      else {
+        console.log("data123",data)
+    Promise.all([ansfromhouseid(data),taskfromhouseid(data),invoicefromhouseid(data)]).then((final_data) => {
+        console.log("final_data",final_data)
+        // var fulldata = [...ans, ...task, ...invoice]
+        var fulldata =final_data
+        console.log("fulldata",fulldata)
+        res.json({ status: 200, hassuccessed: true, data: fulldata })
+    })
+      }
+  })
+}
+  else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
+
+function ansfromhouseid(data) {
+  return new Promise((resolve, reject) => {
+    let house_id = data[0].house_id
+    const VirtualtToSearchWith = new answerspatient({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, ans) {
+      if (err) {
+        reject(err)
+      }
+      else {
+        console.log("ans",ans)
+        resolve(ans)
+      }
+    })
+  })
+}
+
+function taskfromhouseid(data) {
+  return new Promise((resolve, reject) => {
+    let house_id = data[0].house_id
+    const VirtualtToSearchWith = new virtual_Task({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, task) {
+      if (err) {
+        reject(err)
+      } else {
+        console.log("task",task)
+        resolve(task)
+      }
+    })
+  })
+}
+
+function invoicefromhouseid(data) {
+  return new Promise((resolve, reject) => {
+    let house_id = data[0].house_id
+    const VirtualtToSearchWith = new virtual_Task({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, invoice) {
+      if (err) {
+        console.log("err",err)
+        reject(err)
+      } else {
+        console.log("invoice",invoice)
+        resolve(invoice)
+      }
+    })
+  })
+}
 
 function virtualInvoiceforPatient(patient_id) {
-  console.log("patient_id", patient_id)
-  return new Promise((resolve, reject) => {
+        console.log("patient_id", patient_id)
+        return new Promise((resolve, reject) => {
 
-    virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
-      if (err) {
-        console.log("err", err)
-        reject(err)
-      } else {
-        console.log("data", data)
+          virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
+            if (err) {
+              console.log("err", err)
+              reject(err)
+            } else {
+              console.log("data", data)
 
-        resolve(data)
+              resolve(data)
+            }
+          })
+        })
       }
-    })
-  })
-}
 
 function virtualTasksforPatient(patient_id) {
-  console.log("patient_id", patient_id)
-  return new Promise((resolve, reject) => {
-    const VirtualtToSearchWith = new virtual_Task({ patient_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    console.log("VirtualtToSearchWith", VirtualtToSearchWith)
-    virtual_Task.find({ $or: [{ "patient_id": patient_id }, { "patient_id": VirtualtToSearchWith.patient_id }] }).sort({ created_at: 'desc' }).exec(function (err, data1) {
-      if (err) {
-        console.log("err", err)
-        reject(err)
-      } else {
-        console.log("data", data1)
+        console.log("patient_id", patient_id)
+        return new Promise((resolve, reject) => {
+          const VirtualtToSearchWith = new virtual_Task({ patient_id });
+          VirtualtToSearchWith.encryptFieldsSync();
+          console.log("VirtualtToSearchWith", VirtualtToSearchWith)
+          virtual_Task.find({ $or: [{ "patient_id": patient_id }, { "patient_id": VirtualtToSearchWith.patient_id }] }).sort({ created_at: 'desc' }).exec(function (err, data1) {
+            if (err) {
+              console.log("err", err)
+              reject(err)
+            } else {
+              console.log("data", data1)
 
-        resolve(data1)
+              resolve(data1)
+            }
+          })
+        })
       }
-    })
-  })
-}
 
 function User_Case(House_id) {
-  return new Promise((resolve, reject) => {
-    User.countDocuments(
-      { "houses.value": House_id, type: "doctor" },
-      function (err, userdata) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(userdata);
-        }
+        return new Promise((resolve, reject) => {
+          User.countDocuments(
+            { "houses.value": House_id, type: "doctor" },
+            function (err, userdata) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(userdata);
+              }
+            }
+          );
+        });
       }
-    );
-  });
-}
 
 function User_Case1(House_id) {
-  return new Promise((resolve, reject) => {
-    User.countDocuments(
-      { "houses.value": House_id, type: "nusre" },
-      function (err, userdata) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(userdata);
-        }
+        return new Promise((resolve, reject) => {
+          User.countDocuments(
+            { "houses.value": House_id, type: "nusre" },
+            function (err, userdata) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(userdata);
+              }
+            }
+          );
+        });
       }
-    );
-  });
-}
 function virtualCase(House_id) {
-  return new Promise((resolve, reject) => {
-    virtual_Case.countDocuments(
-      { house_id: House_id, inhospital: true },
-      function (err, count) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(count);
-        }
+        return new Promise((resolve, reject) => {
+          virtual_Case.countDocuments(
+            { house_id: House_id, inhospital: true },
+            function (err, count) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(count);
+              }
+            }
+          );
+        });
       }
-    );
-  });
-}
 
 function virtualTask(house_id) {
-  return new Promise((resolve, reject) => {
-    virtual_Task.find({ house_id: house_id }, function (err, list) {
-      if (err) {
-        reject(err);
-      } else {
-        console.log('tasklist', list)
-        var finaldata = [...list];
-        resolve(finaldata);
-      }
-    });
-  });
-}
-
-function virtualAppointment(userdata) {
-  return new Promise((resolve, reject) => {
-    Appoint = [];
-    forEachPromise(userdata, getApointsDoctor).then((result) => {
-      console.log("Appoint", Appoint);
-      resolve(Appoint);
-    });
-  });
-}
-
-function getApointsDoctor(user) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      if (user) {
-        const AppointToSearchWith = new Appointments({ doctor_id: user._id });
-        AppointToSearchWith.encryptFieldsSync();
-        Appointments.find(
-          {
-            $or: [
-              { doctor_id: user._id },
-              { doctor_id: AppointToSearchWith.doctor_id },
-            ],
-          },
-          function (err, list1) {
+        return new Promise((resolve, reject) => {
+          virtual_Task.find({ house_id: house_id }, function (err, list) {
             if (err) {
               reject(err);
             } else {
-              if (list1) {
-                console.log("list1", list1);
-                Appoint = [...Appoint, ...list1];
-                console.log("finalAppoint", Appoint);
-                resolve(Appoint);
-              }
+              console.log('tasklist', list)
+              var finaldata = [...list];
+              resolve(finaldata);
             }
-          }
-        );
-      } else {
-        console.log("I am here");
-        resolve(Appoint);
+          });
+        });
       }
-    });
-  });
-}
+
+function virtualAppointment(userdata) {
+        return new Promise((resolve, reject) => {
+          Appoint = [];
+          forEachPromise(userdata, getApointsDoctor).then((result) => {
+            console.log("Appoint", Appoint);
+            resolve(Appoint);
+          });
+        });
+      }
+
+function getApointsDoctor(user) {
+        return new Promise((resolve, reject) => {
+          process.nextTick(() => {
+            if (user) {
+              const AppointToSearchWith = new Appointments({ doctor_id: user._id });
+              AppointToSearchWith.encryptFieldsSync();
+              Appointments.find(
+                {
+                  $or: [
+                    { doctor_id: user._id },
+                    { doctor_id: AppointToSearchWith.doctor_id },
+                  ],
+                },
+                function (err, list1) {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    if (list1) {
+                      console.log("list1", list1);
+                      Appoint = [...Appoint, ...list1];
+                      console.log("finalAppoint", Appoint);
+                      resolve(Appoint);
+                    }
+                  }
+                }
+              );
+            } else {
+              console.log("I am here");
+              resolve(Appoint);
+            }
+          });
+        });
+      }
 
 function getfullInfo(data) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      Institute.findOne({ "institute_groups.houses.house_id": data.value })
-        .exec()
-        .then(function (doc3) {
-          pos = fullinfo.filter((data) => data._id === doc3._id);
-          if (pos && pos.length === 0) {
-            fullInfo.push(doc3);
-          }
-          resolve(fullInfo);
+        return new Promise((resolve, reject) => {
+          process.nextTick(() => {
+            Institute.findOne({ "institute_groups.houses.house_id": data.value })
+              .exec()
+              .then(function (doc3) {
+                pos = fullinfo.filter((data) => data._id === doc3._id);
+                if (pos && pos.length === 0) {
+                  fullInfo.push(doc3);
+                }
+                resolve(fullInfo);
+              });
+          });
         });
-    });
-  });
-}
+      }
 
 function forEachPromise(items, fn) {
-  return items.reduce(function (promise, item) {
-    return promise.then(function () {
-      return fn(item);
-    });
-  }, Promise.resolve());
-}
+        return items.reduce(function (promise, item) {
+          return promise.then(function () {
+            return fn(item);
+          });
+        }, Promise.resolve());
+      }
 module.exports = router;
