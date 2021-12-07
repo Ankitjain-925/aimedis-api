@@ -275,10 +275,15 @@ router.post("/checkbedAvailability", function (req, res, next) {
 });
 
 function returnNumberofBed(array, ward_id, room_id) {
-  let ward = array.wards && array.wards.find(e => e._id == ward_id);
-  let room = ward && ward.rooms && ward.rooms.find(e => e._id == room_id)
-  let bed = room.no_of_bed ? parseInt(room.no_of_bed) : 0;
-  return bed;
+  if(array){
+    let ward = array.wards && array.wards.find(e => e._id == ward_id);
+    let room = ward && ward.rooms && ward.rooms.find(e => e._id == room_id)
+    let bed = room.no_of_bed ? parseInt(room.no_of_bed) : 0;
+    return bed;
+  }
+  else{
+    return 0;
+  }
 }
 
 router.get("/GetInfo/:house_id", function (req, res, next) {
