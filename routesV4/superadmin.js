@@ -1016,19 +1016,32 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
 
 
 
-router.get("/allHospitalusers/:institute_id/:type", function (req, res) {
+router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, res) {
   const token = req.headers.token;
-  const batchSize = 10000;
+  
   let legit = jwtconfig.verify(token);
   if (legit) {
-    User.find({ institute_id: req.params.institute_id, type: req.params.type }, function (err, data) {
-      if (err && !data) {
-        res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
+    User.find({ institute_id: req.params.institute_id, type: req.params.type }).count().then((count)=>{
+      let pagenumber = req.params.pagenumber
+      var page_limit = 20
+      if (pagenumber && pagenumber > 0) {
+        const operations = [];
+        operations.push(
+          User.find({ institute_id: req.params.institute_id,type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).then((batchHandler) => {
+              res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count:count})
+          })
+        )
       } else {
-        res.json({ status: 200, hassuccessed: true, data: data })
+        User.find({institute_id: req.params.institute_id, type: req.params.type }).skip(0).limit(20).then((batchHandler) => {
+          res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count: count })
+        })
       }
-    })
 
+    }).catch((err) => {
+      console.log("err", err)
+      res.json({ status: 200, hassuccessed: true, err: err })
+
+    })
   } else {
     res.json({
       status: 200,
@@ -1120,8 +1133,39 @@ router.post("/allSearchusers", function (req, res) {
   }
 });
 
+router.post("/allHospitalusers", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+  if(req.body.institue_id && req.body.type && req.body.search){
+    User.find({ institute_id:req.body.institue_id, type:req.body.type }).then((data) => {
+      console.log("data",data)
+      let serach_value = SearchUser(req.body.search, data )
+      res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
+    })
+  }
+  else{
+      res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Please send type and search data",
+        });
+  }  
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
+
 function SearchUser (searchKey, searchInto) {
   return searchInto.filter(user => {
+    console.log("user",user.email)
+    console.log("userfirst",user.first_name,"userlast",user.last_name)
+    console.log("searchKey",searchKey)
+
     searchKey = searchKey.toLowerCase()
       let email = user.email.toLowerCase().search(searchKey)
       let name = `${user.first_name} ${user.last_name}`
