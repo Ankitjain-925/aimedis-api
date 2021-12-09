@@ -2331,7 +2331,10 @@
                     "uniqueItems": false
                 },
                 "answers": {
-                    "type": "string",
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
                     "uniqueItems": false
                 },
                 "patient": {
