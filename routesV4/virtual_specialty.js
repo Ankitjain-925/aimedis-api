@@ -1398,7 +1398,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
 
   console.log("legit", legit)
   if (legit) {
-    virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false}, function (err, data) {
+    virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false }, function (err, data) {
       if (err & !data) {
         console.log("err", err)
         res.json({ status: 200, hassuccessed: true, error: err })
@@ -1439,14 +1439,14 @@ router.post("/TaskFilter", function (req, res) {
       condition.patient_id = { $in: req.body.patient_id }
     }
 
-    virtual_Task.find(condition,function (err, data) {
+    virtual_Task.find(condition, function (err, data) {
 
       if (err & !data) {
         console.log("err", err)
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
-        let condition3 = {house_id: req.body.house_id }
+        let condition3 = { house_id: req.body.house_id }
         if (req.body.ward_id || req.body.room_id) {
           if (req.body.room_id) {
             condition3["rooms._id"] = req.body.room_id
@@ -1455,42 +1455,37 @@ router.post("/TaskFilter", function (req, res) {
             condition3["wards._id"] = req.body.ward_id
           }
 
-          virtual_Case.find(condition3 ,function (err, data1) {
+          virtual_Case.find(condition3, function (err, data1) {
             if (err) {
               console.log("6", err)
               res.json({ status: 200, hassuccessed: true, error: err })
             }
             else {
-              console.log("8",data)
-              console.log("7", data1)
               var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id);
               console.log("8", equals)
               if (equals) {
                 res.json({ status: 200, hassuccessed: true, data: data1 })
               }
-              //let  match={}
-              //   for ( var i = 0; i < data1.length; i++ ) {
-              //     for ( var e = 0; e < data.length; e++ ) {
-              //         if ( data1[i] === data2[e] ) matches.push( data1[i] );
-              //     }
-              // }
-              // res.json({ status: 200, hassuccessed: true, data: matches })
-          }
-        })
-  }
-  else {
-    console.log("data", data)
-    res.json({ status: 200, hassuccessed: true, data: data })
-  }
-}
+              else{
+                res.json({ status: 200, hassuccessed: true, message:"No data found" })
+  
+              }
+            }
+          })
+        }
+        else {
+          console.log("data", data)
+          res.json({ status: 200, hassuccessed: true, data: data })
+        }
+      }
     })
   } else {
-  res.json({
-    status: 200,
-    hassuccessed: false,
-    message: "Authentication required.",
-  });
-}
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 
