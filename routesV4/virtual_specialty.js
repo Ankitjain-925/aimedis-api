@@ -732,17 +732,36 @@ router.post("/AddInvoice", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     var virtual_Invoices = new virtual_Invoice(req.body);
-    virtual_Invoices.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
+    var invoice_id= req.body.invoice_id
+    const AppointToSearchWith = new virtual_Invoice({ invoice_id });
+    AppointToSearchWith.encryptFieldsSync();
+    virtual_Invoice.find({
+      $or:[{invoice_id:invoice_id},{invoice_id:AppointToSearchWith.invoice_id}]},function(err,data){
+      if(err){
+        console.log("errr",err)
+        res.json({status: 200, message: "Something went wrong.", error: err})
+      }else{
+        console.log("data",data)
+        if(data.length){
+          res.json({ status: 200, message: "Invoice Already Exits"})
+        }else{
+          virtual_Invoices.save(function (err, user_data) {
+            if (err && !user_data) {
+              console.log("err2",err)
+              res.json({ status: 200, message: "Something went wrong.", error: err });
+            } else {
+
+              res.json({
+                status: 200,
+                message: "Added Successfully",
+                hassuccessed: true,
+              });
+            }
+          });
+        }
       }
-    });
+    })
+  
   } else {
     res.json({
       status: 200,
@@ -1430,7 +1449,7 @@ router.post("/TaskFilter", function (req, res) {
       condition["assigned_to.user_id"] = { $in: req.body.assigned_to }
     }
     if (req.body.status) {
-      condition.status = req.body.status
+      condition.status = {$in:req.body.status}
     }
     if (req.body.speciality_id) {
       condition["speciality._id"] = req.body.speciality_id
