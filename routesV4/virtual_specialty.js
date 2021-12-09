@@ -1231,35 +1231,25 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
   var Data = [];
   {
     Object.entries(req.body).map(([key, value]) => {
-      console.log("value1", value)
-      console.log("key", key)
       if (Array.isArray(value)) {
-        console.log("service1243", value)
+        Object.entries(req.body).map(([key, value]) => {
         Data.push({
           k: key.replace(/_/g, " "),
-          v: value.map((element) => {
-            console.log("element", element)
-            // return element
-            return element.price_per_quantity && element.quantity && element.service && element.price
-          })
+          v: value
         });
+      })
+    }
+    else if (key === "created_at") {
+        Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+
       }
-
-      else if (
-        key === "invoice_id" ||
-        key === "case_id" ||
-        key === "total_amount"
-
-      ) {
+      else{
         Data.push({
           k: key.replace(/_/g, " "),
           v: value,
         });
       }
-      else if (key === "created_at") {
-        Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
-
-      }
+     
     });
   }
   console.log("Data", Data)
@@ -1430,7 +1420,7 @@ router.post("/TaskFilter", function (req, res) {
       condition["assigned_to.user_id"] = { $in: req.body.assigned_to }
     }
     if (req.body.status) {
-      condition.status = req.body.status
+      condition.status = { $in: req.body.status }
     }
     if (req.body.speciality_id) {
       condition["speciality._id"] = req.body.speciality_id
