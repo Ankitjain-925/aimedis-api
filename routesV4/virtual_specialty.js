@@ -19,6 +19,7 @@ var fs = require("fs");
 const { join } = require("path");
 var html = fs.readFileSync(join(`${__dirname}/Invoice.html`), "utf8");
 var html_to_pdf = require("html-pdf-node");
+const { virtual } = require("../schema/topic.js");
 
 
 function getDate(date, dateFormat) {
@@ -1403,24 +1404,114 @@ router.get("/patientjourney/:patient_id", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
-        console.log("data123",data)
-    Promise.all([ansfromhouseid(data),taskfromhouseid(data),invoicefromhouseid(data)]).then((final_data) => {
-        console.log("final_data",final_data)
-        // var fulldata = [...ans, ...task, ...invoice]
-        var fulldata =final_data
-        console.log("fulldata",fulldata)
-        res.json({ status: 200, hassuccessed: true, data: fulldata })
-    })
+        console.log("data123", data)
+        Promise.all([ansfromhouseid(data), taskfromhouseid(data), invoicefromhouseid(data)]).then((final_data) => {
+          res.json({ status: 200, hassuccessed: true, data: final_data })
+        })
       }
-  })
-}
+    })
+  }
   else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
   }
 })
 
+router.post("/TaskFilter", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var patient_id = req.body.patient_id
+    const VirtualtToSearchWith = new virtual_Task({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
 
+    var condition = { house_id: req.body.house_id };
+    if (req.body.assigned_to) {
+      condition["assigned_to.user_id"] = { $in: req.body.assigned_to }
+    }
+    if (req.body.status) {
+      condition.status = req.body.status
+    }
+    if (req.body.speciality_id) {
+      condition["speciality._id"] = req.body.speciality_id
+    }
+    if (req.body.patient_id) {
+      condition.patient_id = { $in: req.body.patient_id }
+    }
+
+    virtual_Task.find(condition,function (err, data) {
+
+      if (err & !data) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: true, error: err })
+      }
+      else {
+        let condition3 = {house_id: req.body.house_id }
+        if (req.body.ward_id || req.body.room_id) {
+          if (req.body.room_id) {
+            condition3["rooms._id"] = req.body.room_id
+          }
+          if (req.body.ward_id) {
+            condition3["wards._id"] = req.body.ward_id
+          }
+
+          virtual_Case.find(condition3 ,function (err, data1) {
+            if (err) {
+              console.log("6", err)
+              res.json({ status: 200, hassuccessed: true, error: err })
+            }
+            else {
+              console.log("8",data)
+              console.log("7", data1)
+              var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id);
+              console.log("8", equals)
+              if (equals) {
+                res.json({ status: 200, hassuccessed: true, data: data1 })
+              }
+              //let  match={}
+              //   for ( var i = 0; i < data1.length; i++ ) {
+              //     for ( var e = 0; e < data.length; e++ ) {
+              //         if ( data1[i] === data2[e] ) matches.push( data1[i] );
+              //     }
+              // }
+              // res.json({ status: 200, hassuccessed: true, data: matches })
+          }
+        })
+  }
+  else {
+    console.log("data", data)
+    res.json({ status: 200, hassuccessed: true, data: data })
+  }
+}
+    })
+  } else {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "Authentication required.",
+  });
+}
+});
+
+
+
+
+
+// function common(data) {
+//   return new Promise((resolve, reject) => {
+//     let house_id = data[0].house_id
+//     virtual_Case.find({ house_id: house_id }).exec(function (err, cases) {
+//       if (err) {
+//         reject(err)
+//       }
+//       else {
+//         console.log("ans", cases)
+//         resolve(cases)
+//       }
+//     })
+//   })
+
+// }
 
 function ansfromhouseid(data) {
   return new Promise((resolve, reject) => {
@@ -1432,7 +1523,7 @@ function ansfromhouseid(data) {
         reject(err)
       }
       else {
-        console.log("ans",ans)
+        console.log("ans", ans)
         resolve(ans)
       }
     })
@@ -1448,7 +1539,7 @@ function taskfromhouseid(data) {
       if (err) {
         reject(err)
       } else {
-        console.log("task",task)
+        console.log("task", task)
         resolve(task)
       }
     })
@@ -1462,10 +1553,10 @@ function invoicefromhouseid(data) {
     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, invoice) {
       if (err) {
-        console.log("err",err)
+        console.log("err", err)
         reject(err)
       } else {
-        console.log("invoice",invoice)
+        console.log("invoice", invoice)
         resolve(invoice)
       }
     })
@@ -1473,164 +1564,164 @@ function invoicefromhouseid(data) {
 }
 
 function virtualInvoiceforPatient(patient_id) {
-        console.log("patient_id", patient_id)
-        return new Promise((resolve, reject) => {
+  console.log("patient_id", patient_id)
+  return new Promise((resolve, reject) => {
 
-          virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
-            if (err) {
-              console.log("err", err)
-              reject(err)
-            } else {
-              console.log("data", data)
+    virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
+      if (err) {
+        console.log("err", err)
+        reject(err)
+      } else {
+        console.log("data", data)
 
-              resolve(data)
-            }
-          })
-        })
+        resolve(data)
       }
+    })
+  })
+}
 
 function virtualTasksforPatient(patient_id) {
-        console.log("patient_id", patient_id)
-        return new Promise((resolve, reject) => {
-          const VirtualtToSearchWith = new virtual_Task({ patient_id });
-          VirtualtToSearchWith.encryptFieldsSync();
-          console.log("VirtualtToSearchWith", VirtualtToSearchWith)
-          virtual_Task.find({ $or: [{ "patient_id": patient_id }, { "patient_id": VirtualtToSearchWith.patient_id }] }).sort({ created_at: 'desc' }).exec(function (err, data1) {
-            if (err) {
-              console.log("err", err)
-              reject(err)
-            } else {
-              console.log("data", data1)
+  console.log("patient_id", patient_id)
+  return new Promise((resolve, reject) => {
+    const VirtualtToSearchWith = new virtual_Task({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    console.log("VirtualtToSearchWith", VirtualtToSearchWith)
+    virtual_Task.find({ $or: [{ "patient_id": patient_id }, { "patient_id": VirtualtToSearchWith.patient_id }] }).sort({ created_at: 'desc' }).exec(function (err, data1) {
+      if (err) {
+        console.log("err", err)
+        reject(err)
+      } else {
+        console.log("data", data1)
 
-              resolve(data1)
-            }
-          })
-        })
+        resolve(data1)
       }
+    })
+  })
+}
 
 function User_Case(House_id) {
-        return new Promise((resolve, reject) => {
-          User.countDocuments(
-            { "houses.value": House_id, type: "doctor" },
-            function (err, userdata) {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(userdata);
-              }
-            }
-          );
-        });
+  return new Promise((resolve, reject) => {
+    User.countDocuments(
+      { "houses.value": House_id, type: "doctor" },
+      function (err, userdata) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(userdata);
+        }
       }
+    );
+  });
+}
 
 function User_Case1(House_id) {
-        return new Promise((resolve, reject) => {
-          User.countDocuments(
-            { "houses.value": House_id, type: "nusre" },
-            function (err, userdata) {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(userdata);
-              }
-            }
-          );
-        });
+  return new Promise((resolve, reject) => {
+    User.countDocuments(
+      { "houses.value": House_id, type: "nusre" },
+      function (err, userdata) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(userdata);
+        }
       }
+    );
+  });
+}
 function virtualCase(House_id) {
-        return new Promise((resolve, reject) => {
-          virtual_Case.countDocuments(
-            { house_id: House_id, inhospital: true },
-            function (err, count) {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(count);
-              }
-            }
-          );
-        });
+  return new Promise((resolve, reject) => {
+    virtual_Case.countDocuments(
+      { house_id: House_id, inhospital: true },
+      function (err, count) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(count);
+        }
       }
+    );
+  });
+}
 
 function virtualTask(house_id) {
-        return new Promise((resolve, reject) => {
-          virtual_Task.find({ house_id: house_id }, function (err, list) {
+  return new Promise((resolve, reject) => {
+    virtual_Task.find({ house_id: house_id }, function (err, list) {
+      if (err) {
+        reject(err);
+      } else {
+        console.log('tasklist', list)
+        var finaldata = [...list];
+        resolve(finaldata);
+      }
+    });
+  });
+}
+
+function virtualAppointment(userdata) {
+  return new Promise((resolve, reject) => {
+    Appoint = [];
+    forEachPromise(userdata, getApointsDoctor).then((result) => {
+      console.log("Appoint", Appoint);
+      resolve(Appoint);
+    });
+  });
+}
+
+function getApointsDoctor(user) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (user) {
+        const AppointToSearchWith = new Appointments({ doctor_id: user._id });
+        AppointToSearchWith.encryptFieldsSync();
+        Appointments.find(
+          {
+            $or: [
+              { doctor_id: user._id },
+              { doctor_id: AppointToSearchWith.doctor_id },
+            ],
+          },
+          function (err, list1) {
             if (err) {
               reject(err);
             } else {
-              console.log('tasklist', list)
-              var finaldata = [...list];
-              resolve(finaldata);
+              if (list1) {
+                console.log("list1", list1);
+                Appoint = [...Appoint, ...list1];
+                console.log("finalAppoint", Appoint);
+                resolve(Appoint);
+              }
             }
-          });
-        });
+          }
+        );
+      } else {
+        console.log("I am here");
+        resolve(Appoint);
       }
-
-function virtualAppointment(userdata) {
-        return new Promise((resolve, reject) => {
-          Appoint = [];
-          forEachPromise(userdata, getApointsDoctor).then((result) => {
-            console.log("Appoint", Appoint);
-            resolve(Appoint);
-          });
-        });
-      }
-
-function getApointsDoctor(user) {
-        return new Promise((resolve, reject) => {
-          process.nextTick(() => {
-            if (user) {
-              const AppointToSearchWith = new Appointments({ doctor_id: user._id });
-              AppointToSearchWith.encryptFieldsSync();
-              Appointments.find(
-                {
-                  $or: [
-                    { doctor_id: user._id },
-                    { doctor_id: AppointToSearchWith.doctor_id },
-                  ],
-                },
-                function (err, list1) {
-                  if (err) {
-                    reject(err);
-                  } else {
-                    if (list1) {
-                      console.log("list1", list1);
-                      Appoint = [...Appoint, ...list1];
-                      console.log("finalAppoint", Appoint);
-                      resolve(Appoint);
-                    }
-                  }
-                }
-              );
-            } else {
-              console.log("I am here");
-              resolve(Appoint);
-            }
-          });
-        });
-      }
+    });
+  });
+}
 
 function getfullInfo(data) {
-        return new Promise((resolve, reject) => {
-          process.nextTick(() => {
-            Institute.findOne({ "institute_groups.houses.house_id": data.value })
-              .exec()
-              .then(function (doc3) {
-                pos = fullinfo.filter((data) => data._id === doc3._id);
-                if (pos && pos.length === 0) {
-                  fullInfo.push(doc3);
-                }
-                resolve(fullInfo);
-              });
-          });
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      Institute.findOne({ "institute_groups.houses.house_id": data.value })
+        .exec()
+        .then(function (doc3) {
+          pos = fullinfo.filter((data) => data._id === doc3._id);
+          if (pos && pos.length === 0) {
+            fullInfo.push(doc3);
+          }
+          resolve(fullInfo);
         });
-      }
+    });
+  });
+}
 
 function forEachPromise(items, fn) {
-        return items.reduce(function (promise, item) {
-          return promise.then(function () {
-            return fn(item);
-          });
-        }, Promise.resolve());
-      }
+  return items.reduce(function (promise, item) {
+    return promise.then(function () {
+      return fn(item);
+    });
+  }, Promise.resolve());
+}
 module.exports = router;

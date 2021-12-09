@@ -98,7 +98,7 @@ var TaskSchema = new Schema({
     }
 },{ strict: false });
 
-TaskSchema.plugin(mongooseFieldEncryption, { fields: [ "task_name", "description", "patient_id" ], secret: process.env.SOME_32BYTE_BASE64_STRING,
+TaskSchema.plugin(mongooseFieldEncryption, { fields: [ "task_name", "description"], secret: process.env.SOME_32BYTE_BASE64_STRING,
 saltGenerator: function (secret) {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
   } });
