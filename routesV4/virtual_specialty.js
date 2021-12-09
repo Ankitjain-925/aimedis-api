@@ -1398,7 +1398,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
 
   console.log("legit", legit)
   if (legit) {
-    virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
+    virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false}, function (err, data) {
       if (err & !data) {
         console.log("err", err)
         res.json({ status: 200, hassuccessed: true, error: err })
