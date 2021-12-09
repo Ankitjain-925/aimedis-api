@@ -2681,11 +2681,11 @@
                     "uniqueItems": true
                 },
                 "assigned_to": {
-                    "type": "string",
+                    "type": "array",
                     "uniqueItems": true
                 },
                 "status": {
-                    "type": "string",
+                    "type": "array",
                     "uniqueItems": true
                 },
                 "speciality_id":{
@@ -2693,7 +2693,7 @@
                     "uniqueItems": true
                 },
                 "patient_id":{
-                    "type": "string",
+                    "type": "array",
                     "uniqueItems": true
                 }
                

@@ -13,7 +13,6 @@ var virtual_step = require("../schema/virtual_step")
 var answerspatient = require("../schema/answerspatient")
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
-const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
 var fs = require("fs");
 const { join } = require("path");
@@ -732,17 +731,36 @@ router.post("/AddInvoice", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     var virtual_Invoices = new virtual_Invoice(req.body);
-    virtual_Invoices.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
+    var invoice_id= req.body.invoice_id
+    const AppointToSearchWith = new virtual_Invoice({ invoice_id });
+    AppointToSearchWith.encryptFieldsSync();
+    virtual_Invoice.find({
+      $or:[{invoice_id:invoice_id},{invoice_id:AppointToSearchWith.invoice_id}]},function(err,data){
+      if(err){
+        console.log("errr",err)
+        res.json({status: 200, message: "Something went wrong.", error: err})
+      }else{
+        console.log("data",data)
+        if(data.length){
+          res.json({ status: 200, message: "Invoice Already Exits"})
+        }else{
+          virtual_Invoices.save(function (err, user_data) {
+            if (err && !user_data) {
+              console.log("err2",err)
+              res.json({ status: 200, message: "Something went wrong.", error: err });
+            } else {
+
+              res.json({
+                status: 200,
+                message: "Added Successfully",
+                hassuccessed: true,
+              });
+            }
+          });
+        }
       }
-    });
+    })
+  
   } else {
     res.json({
       status: 200,
@@ -1232,12 +1250,16 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
   {
     Object.entries(req.body).map(([key, value]) => {
       if (Array.isArray(value)) {
-        Object.entries(req.body).map(([key, value]) => {
+        Object.entries(value).map(([key, value]) => {
         Data.push({
           k: key.replace(/_/g, " "),
           v: value
         });
       })
+    }
+    else if (key === "status") {
+      Data.push({ k: "Status", v: value.label_en });
+
     }
     else if (key === "created_at") {
         Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
