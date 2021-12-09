@@ -2212,6 +2212,39 @@
                     }
                 }
             }
+        },
+        "/vh/TaskFilter": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "downloadinvoice",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/filtertask"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "using patient_id get questionairs",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2626,6 +2659,40 @@
                     "uniqueItems": true
                 },
                 "search": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+               
+            }
+        },
+        "filtertask":{
+            "required": [],
+            "properties": {
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "ward_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "room_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "assigned_to": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "status": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "speciality_id":{
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "patient_id":{
                     "type": "string",
                     "uniqueItems": true
                 }
