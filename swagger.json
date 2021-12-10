@@ -2682,10 +2682,16 @@
                 },
                 "assigned_to": {
                     "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
                     "uniqueItems": true
                 },
                 "status": {
                     "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
                     "uniqueItems": true
                 },
                 "speciality_id":{
@@ -2694,6 +2700,9 @@
                 },
                 "patient_id":{
                     "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
                     "uniqueItems": true
                 }
                
