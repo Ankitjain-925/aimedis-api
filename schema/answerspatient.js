@@ -58,7 +58,7 @@ var AnswSchema = new mongoose.Schema({
     },
     house_logo: {
         type: String,
-        required: true,
+        required: false,
         unique: false
     },
     house_id: {
