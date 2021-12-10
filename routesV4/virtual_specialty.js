@@ -1418,7 +1418,9 @@ router.get("/patientjourney/:patient_id", function (req, res) {
       else {
         console.log("data123", data)
         Promise.all([ansfromhouseid(data), taskfromhouseid(data), invoicefromhouseid(data)]).then((final_data) => {
-          res.json({ status: 200, hassuccessed: true, data: final_data })
+          var flatArray = Array.prototype.concat.apply([], final_data);
+          flatArray.sort(final_data[0].created_at)
+          res.json({ status: 200, hassuccessed: true, data: flatArray })
         })
       }
     })
@@ -1525,7 +1527,7 @@ function ansfromhouseid(data) {
     let house_id = data[0].house_id
     const VirtualtToSearchWith = new answerspatient({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, ans) {
+    answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, ans) {
       if (err) {
         reject(err)
       }
@@ -1542,7 +1544,7 @@ function taskfromhouseid(data) {
     let house_id = data[0].house_id
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, task) {
+    virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, task) {
       if (err) {
         reject(err)
       } else {
@@ -1558,7 +1560,7 @@ function invoicefromhouseid(data) {
     let house_id = data[0].house_id
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, invoice) {
+    virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, invoice) {
       if (err) {
         console.log("err", err)
         reject(err)
