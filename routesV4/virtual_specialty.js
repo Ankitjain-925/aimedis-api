@@ -731,10 +731,11 @@ router.post("/AddInvoice", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     var virtual_Invoices = new virtual_Invoice(req.body);
-    var invoice_id= req.body.invoice_id
+    var invoice_id = req.body.invoice_id
     const AppointToSearchWith = new virtual_Invoice({ invoice_id });
     AppointToSearchWith.encryptFieldsSync();
     virtual_Invoice.find({
+
       $or:[{invoice_id:invoice_id},{invoice_id:AppointToSearchWith.invoice_id}]},function(err,data){
       if(err){
         res.json({status: 200, hassuccessed: false, message: "Something went wrong.", error: err})
@@ -757,7 +758,7 @@ router.post("/AddInvoice", function (req, res, next) {
         }
       }
     })
-  
+
   } else {
     res.json({
       status: 200,
@@ -1489,14 +1490,111 @@ router.post("/TaskFilter", function (req, res) {
               if (equals) {
                 res.json({ status: 200, hassuccessed: true, data: data1 })
               }
-              else{
-                res.json({ status: 200, hassuccessed: true, message:"No data found" })
-  
+              else {
+                res.json({ status: 200, hassuccessed: true, message: "No data found" })
+
               }
             }
           })
         }
         else {
+          res.json({ status: 200, hassuccessed: true, data: data })
+        }
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
+router.post("/CalenderFilter", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var patient_id = req.body.patient_id
+    const VirtualtToSearchWith = new virtual_Task({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+
+    var condition = { house_id: req.body.house_id };
+    if (req.body.status) {
+      condition.status = { $in: req.body.status }
+    }
+    if (req.body.speciality_id) {
+      condition["speciality._id"] = req.body.speciality_id
+    }
+    if (req.body.patient_id) {
+      condition.patient_id = { $in: req.body.patient_id }
+    }
+
+    virtual_Task.find(condition, function (err, data) {
+
+      if (err & !data) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: true, error: err })
+      }
+      else {
+        let condition3 = { house_id: req.body.house_id }
+        if (req.body.ward_id || req.body.room_id) {
+          if (req.body.room_id) {
+            condition3["rooms._id"] = req.body.room_id
+          }
+          if (req.body.ward_id) {
+            condition3["wards._id"] = req.body.ward_id
+          }
+
+          virtual_Case.find(condition3, function (err, data1) {
+            if (err) {
+              console.log("6", err)
+              res.json({ status: 200, hassuccessed: false, error: err })
+            }
+            else {
+              // console.log("data",data)
+              // var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id)
+              // console.log("data1",data1[0].patient_id)
+
+              // console.log("8", equals)
+
+              Appointments.find({ patient: req.body.patient_id }, function (err, appointments) {
+                if (err) {
+                  console.log("err", err)
+                  res.json({ status: 200, hassuccessed: false, error: err })
+
+                } else {
+                  if (req.body.filter == "All") {
+                    console.log("all")
+                    let final_data=[...data,...data1,...appointments]
+                    res.json({ status: 200, hassuccessed: true, data: [data, data1, appointments] })
+                  }
+                  else if (req.body.filter == "task") {
+                    console.log("task")
+                    res.json({ status: 200, hassuccessed: true, data: data1 })
+
+                  }
+                  else {
+                    console.log("appo")
+                    res.json({ status: 200, hassuccessed: true, data: appointments })
+                  }
+
+
+                }
+              })
+
+              // res.json({ status: 200, hassuccessed: true, data: data1 })
+              // }
+              // else {
+              //   res.json({ status: 200, hassuccessed: false, message: "No data found" })
+
+              // }
+            }
+          })
+        }
+        else {
+          console.log("data", data)
           res.json({ status: 200, hassuccessed: true, data: data })
         }
       }
