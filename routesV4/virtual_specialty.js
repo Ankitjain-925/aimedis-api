@@ -1322,7 +1322,6 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
 router.get("/patientjourneyQue/:patient_id", function (req, res) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
-
   console.log("legit", legit)
   if (legit) {
     virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
@@ -1331,22 +1330,38 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
-        let house_id = data[0].house_id
-        const VirtualtToSearchWith = new questionaire({ house_id });
-        VirtualtToSearchWith.encryptFieldsSync();
-        questionaire.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }, function (err, data2) {
-          if (err & !data2) {
-            res.json({ status: 200, hassuccessed: true, error: err })
+        console.log("data", data)
+        var newcf = [];
 
+        const house = data.forEach((item) => {
+          const VirtualtToSearchWith = new questionaire({ house_id: item.house_id });
+          VirtualtToSearchWith.encryptFieldsSync();
+          console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
+          questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
+            if (err & !data2) {
+             console.log('sdfsdfdsf')
+  
+            }
+            else {
+              forEachPromise(data2).then((result) => {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  data: result,
+                });
+            })
           }
-          else {
-            res.json({ status: 200, hassuccessed: true, data: data2 })
-          }
-
+          })
         })
+
+        res.json({ status: 200, hassuccessed: true, data:house })
+          
+
+     
       }
     })
   } else {
+    console.log("wert")
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
   }
@@ -1566,8 +1581,8 @@ router.post("/CalenderFilter", function (req, res) {
                 } else {
                   if (req.body.filter == "All") {
                     console.log("all")
-                    let final_data=[...data,...data1,...appointments]
-                    res.json({ status: 200, hassuccessed: true, data: [data, data1, appointments] })
+                    let final_data = [...data, ...data1, ...appointments]
+                    res.json({ status: 200, hassuccessed: true, data: final_data })
                   }
                   else if (req.body.filter == "task") {
                     console.log("task")
