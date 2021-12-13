@@ -886,14 +886,6 @@ router.post("/checkPatient", function (req, res, next) {
                       : false;
               }
               if (createCase) {
-<<<<<<< HEAD
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "information get successfully",
-                  data: userdata,
-                });
-=======
                 virtual_Case.findOne({ patient_id: userdata._id, inhospital: true }, function (err, data) {
                   if (err & !data) {
                     res.json({ status: 200, hassuccessed: false, error: err })
@@ -930,7 +922,6 @@ router.post("/checkPatient", function (req, res, next) {
                    }
                   }
                 })
->>>>>>> bd555fdb83bdc72f476be915b1cb258347b726f5
               } else {
                 if (req.body.pin) {
                   res.json({
@@ -1612,12 +1603,7 @@ router.post("/CalenderFilter", function (req, res) {
 
                 } else {
                   if (req.body.filter == "All") {
-<<<<<<< HEAD
-                    console.log("all")
-                    let final_data = [...data, ...data1, ...appointments]
-=======
                     let final_data=[...data,...data1,...appointments]
->>>>>>> bd555fdb83bdc72f476be915b1cb258347b726f5
                     res.json({ status: 200, hassuccessed: true, data: final_data })
                   }
                   else if (req.body.filter == "task") {
