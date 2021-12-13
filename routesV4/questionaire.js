@@ -2,6 +2,7 @@ var express = require("express");
 let router = express.Router();
 var questionaire = require("../schema/questionaire.js");
 var answerspatient = require("../schema/answerspatient.js");
+var virtual_Case = require("../schema/virtual_cases.js");
 var jwtconfig = require("../jwttoken");
 var fullinfo = [];
 
@@ -14,11 +15,22 @@ router.post("/AddAnswerspatient", function (req, res, next) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
+        virtual_Case.findOneAndUpdate({ patient_id: req.body.patient_id, inhospital: false, viewQuestionaire: true, house_id: req.body.house_id }, {
+          $set: {
+            submitQuestionaire: true, viewQuestionaire: false
+          }
+        },function (err, data) {
+          if (err && !data) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          }
+          else {
+            res.json({
+              status: 200,
+              message: "Added Successfully",
+              hassuccessed: true,
+            });
+          }
+        })
       }
     });
   } else {
