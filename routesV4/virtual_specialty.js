@@ -15,6 +15,7 @@ var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
 const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
+var newcf = [];
 var fs = require("fs");
 const { join } = require("path");
 var html = fs.readFileSync(join(`${__dirname}/Invoice.html`), "utf8");
@@ -891,35 +892,35 @@ router.post("/checkPatient", function (req, res, next) {
                     res.json({ status: 200, hassuccessed: false, error: err })
                   }
                   else {
-                   if(data){
-                    Institute.findOne({ _id: req.body.institute_id })
-                    .exec()
-                    .then(function (doc3) {
-                      var infoHouse = {}
-                      doc3.institute_groups.map(function (dataa) {
-                          dataa.houses.map(function (data) {
-                            if (data.house_id == req.body.house_id) {
-                              infoHouse.house = data;
-                              infoHouse.institute_groups = {group_name : dataa.group_name, _id: dataa._id};
-                            }
-                      })
-                    })
+                    if (data) {
+                      Institute.findOne({ _id: req.body.institute_id })
+                        .exec()
+                        .then(function (doc3) {
+                          var infoHouse = {}
+                          doc3.institute_groups.map(function (dataa) {
+                            dataa.houses.map(function (data) {
+                              if (data.house_id == req.body.house_id) {
+                                infoHouse.house = data;
+                                infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
+                              }
+                            })
+                          })
+                          res.json({
+                            status: 200,
+                            hassuccessed: false,
+                            message: "Already in other hospital",
+                            data: infoHouse,
+                          });
+                        })
+                    }
+                    else {
                       res.json({
                         status: 200,
-                        hassuccessed: false,
-                        message: "Already in other hospital",
-                        data: infoHouse,
+                        hassuccessed: true,
+                        message: "information get successfully",
+                        data: userdata,
                       });
-                    })
-                   }
-                   else{
-                    res.json({
-                      status: 200,
-                      hassuccessed: true,
-                      message: "information get successfully",
-                      data: userdata,
-                    });
-                   }
+                    }
                   }
                 })
               } else {
@@ -1357,37 +1358,25 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
     virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
       if (err & !data) {
         console.log("err", err)
-        res.json({ status: 200, hassuccessed: true, error: err })
+        res.json({ status: 200, hassuccessed: false, error: err })
       }
       else {
         console.log("data", data)
-        var newcf = [];
+        // newcf = [];
+        // let uniqhouse={}
+        // let filtered = data.house_id.filter((obj) =>console.log("obj",obj),!uniqhouse[obj.house_id] && (uniqhouse[obj.house_id] = true))
+        // console.log("filtered",filtered)
+        const result1 = data.filter((thing, index, self) =>
+          index === self.findIndex((t) => (
+            t.house_id === thing.house_id
+          ))
+        )
+        console.log("result", result1)
+        forEachPromise(result1, GetAllQuestion).then((result) => {
+          res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: newcf })
 
-        const house = data.forEach((item) => {
-          const VirtualtToSearchWith = new questionaire({ house_id: item.house_id });
-          VirtualtToSearchWith.encryptFieldsSync();
-          console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
-          questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
-            if (err & !data2) {
-             console.log('sdfsdfdsf')
-  
-            }
-            else {
-              forEachPromise(data2).then((result) => {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  data: result,
-                });
-            })
-          }
-          })
         })
 
-        res.json({ status: 200, hassuccessed: true, data:house })
-          
-
-     
       }
     })
   } else {
@@ -1396,6 +1385,24 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
 
   }
 })
+
+function GetAllQuestion(item) {
+  return new Promise((resolve, reject) => {
+    const VirtualtToSearchWith = new questionaire({ house_id: item.house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
+    questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
+      if (err) {
+        reject(err)
+
+      }
+      else {
+        newcf.push(data2);
+        resolve(newcf)
+      }
+    })
+  })
+}
 
 
 // router.get("/patientjourney/:patient_id", function (req, res) {
@@ -1603,7 +1610,7 @@ router.post("/CalenderFilter", function (req, res) {
 
                 } else {
                   if (req.body.filter == "All") {
-                    let final_data=[...data,...data1,...appointments]
+                    let final_data = [...data, ...data1, ...appointments]
                     res.json({ status: 200, hassuccessed: true, data: final_data })
                   }
                   else if (req.body.filter == "task") {

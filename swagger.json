@@ -2744,6 +2744,10 @@
         "Calenderfilter":{
             "required": [],
             "properties": {
+                "filter": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
                 "house_id": {
                     "type": "string",
                     "uniqueItems": true
