@@ -886,12 +886,51 @@ router.post("/checkPatient", function (req, res, next) {
                       : false;
               }
               if (createCase) {
+<<<<<<< HEAD
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   message: "information get successfully",
                   data: userdata,
                 });
+=======
+                virtual_Case.findOne({ patient_id: userdata._id, inhospital: true }, function (err, data) {
+                  if (err & !data) {
+                    res.json({ status: 200, hassuccessed: false, error: err })
+                  }
+                  else {
+                   if(data){
+                    Institute.findOne({ _id: req.body.institute_id })
+                    .exec()
+                    .then(function (doc3) {
+                      var infoHouse = {}
+                      doc3.institute_groups.map(function (dataa) {
+                          dataa.houses.map(function (data) {
+                            if (data.house_id == req.body.house_id) {
+                              infoHouse.house = data;
+                              infoHouse.institute_groups = {group_name : dataa.group_name, _id: dataa._id};
+                            }
+                      })
+                    })
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Already in other hospital",
+                        data: infoHouse,
+                      });
+                    })
+                   }
+                   else{
+                    res.json({
+                      status: 200,
+                      hassuccessed: true,
+                      message: "information get successfully",
+                      data: userdata,
+                    });
+                   }
+                  }
+                })
+>>>>>>> bd555fdb83bdc72f476be915b1cb258347b726f5
               } else {
                 if (req.body.pin) {
                   res.json({
@@ -1567,30 +1606,25 @@ router.post("/CalenderFilter", function (req, res) {
               res.json({ status: 200, hassuccessed: false, error: err })
             }
             else {
-              // console.log("data",data)
-              // var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id)
-              // console.log("data1",data1[0].patient_id)
-
-              // console.log("8", equals)
-
               Appointments.find({ patient: req.body.patient_id }, function (err, appointments) {
                 if (err) {
-                  console.log("err", err)
                   res.json({ status: 200, hassuccessed: false, error: err })
 
                 } else {
                   if (req.body.filter == "All") {
+<<<<<<< HEAD
                     console.log("all")
                     let final_data = [...data, ...data1, ...appointments]
+=======
+                    let final_data=[...data,...data1,...appointments]
+>>>>>>> bd555fdb83bdc72f476be915b1cb258347b726f5
                     res.json({ status: 200, hassuccessed: true, data: final_data })
                   }
                   else if (req.body.filter == "task") {
-                    console.log("task")
                     res.json({ status: 200, hassuccessed: true, data: data1 })
 
                   }
                   else {
-                    console.log("appo")
                     res.json({ status: 200, hassuccessed: true, data: appointments })
                   }
 
@@ -1608,7 +1642,6 @@ router.post("/CalenderFilter", function (req, res) {
           })
         }
         else {
-          console.log("data", data)
           res.json({ status: 200, hassuccessed: true, data: data })
         }
       }
@@ -1634,7 +1667,7 @@ router.post("/CalenderFilter", function (req, res) {
 //         reject(err)
 //       }
 //       else {
-//         console.log("ans", cases)
+//         
 //         resolve(cases)
 //       }
 //     })
