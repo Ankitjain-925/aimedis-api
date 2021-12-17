@@ -1355,28 +1355,26 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
   let legit = jwtconfig.verify(token)
   console.log("legit", legit)
   if (legit) {
+    newcf = [];
     virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
       if (err & !data) {
-        console.log("err", err)
         res.json({ status: 200, hassuccessed: false, error: err })
       }
       else {
-        console.log("data", data)
-        // newcf = [];
-        // let uniqhouse={}
-        // let filtered = data.house_id.filter((obj) =>console.log("obj",obj),!uniqhouse[obj.house_id] && (uniqhouse[obj.house_id] = true))
-        // console.log("filtered",filtered)
-        const result1 = data.filter((thing, index, self) =>
+        if(data && data.length>0){
+          const result1 = data.filter((thing, index, self) =>
           index === self.findIndex((t) => (
             t.house_id === thing.house_id
           ))
         )
-        console.log("result", result1)
-        forEachPromise(result1, GetAllQuestion).then((result) => {
-          res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: newcf })
+          forEachPromise(result1, GetAllQuestion).then((result) => {
+            res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: newcf })
 
-        })
-
+          })
+        }
+        else{
+          res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: [] })
+        }
       }
     })
   } else {
@@ -1393,82 +1391,22 @@ function GetAllQuestion(item) {
     console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
     questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
       if (err) {
-        reject(err)
+        resolve(newcf)
 
       }
       else {
-        newcf.push(data2);
-        resolve(newcf)
+        if(data2.length>0){
+          newcf.push(data2);
+          resolve(newcf)
       }
+    }
     })
   })
 }
 
-
-// router.get("/patientjourney/:patient_id", function (req, res) {
-//   const token = (req.headers.token)
-//   let legit = jwtconfig.verify(token)
-
-//   console.log("legit", legit)
-//   if (legit) {
-//     virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
-//       if (err & !data) {
-//         console.log("err", err)
-//         res.json({ status: 200, hassuccessed: true, error: err })
-//       }
-//       else {
-//         console.log("data",data)
-//         let house_id = data[0].house_id
-//         const VirtualtToSearchWith = new answerspatient({ house_id });
-//         VirtualtToSearchWith.encryptFieldsSync();
-//         answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, ans) {
-//           if (err & !ans) {
-//             res.json({ status: 200, hassuccessed: true, error: err })
-
-//           }
-//           else {
-//             let house_id = data[0].house_id
-//             const VirtualtToSearchWith = new virtual_Task({ house_id });
-//             VirtualtToSearchWith.encryptFieldsSync();
-//             virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, task) {
-//               if (err & !task) {
-//                 res.json({ status: 200, hassuccessed: true, error: err })
-
-//               } else {
-//                 let house_id = data[0].house_id
-//                 const VirtualtToSearchWith = new virtual_Invoice({ house_id });
-//                 VirtualtToSearchWith.encryptFieldsSync();
-//                 virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, invoice) {
-//                   if (err & !task) {
-//                     res.json({ status: 200, hassuccessed: true, error: err })
-
-//                   } else {
-//                     var fulldata = [...ans, ...task, ...invoice]
-//                     res.json({ status: 200, hassuccessed: true, data: fulldata })
-//                   }
-//                 })
-//               }
-//             })
-//           }
-//         })
-//       }
-
-//     })
-//   }
-
-//   else {
-//     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-
-//   }
-// })
-
-
-
 router.get("/patientjourney/:patient_id", function (req, res) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
-
-  console.log("legit", legit)
   if (legit) {
     virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false }, function (err, data) {
       if (err & !data) {
@@ -1476,12 +1414,16 @@ router.get("/patientjourney/:patient_id", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
-        console.log("data123", data)
-        Promise.all([ansfromhouseid(data), taskfromhouseid(data), invoicefromhouseid(data)]).then((final_data) => {
-          var flatArray = Array.prototype.concat.apply([], final_data);
-          flatArray.sort(final_data[0].created_at)
-          res.json({ status: 200, hassuccessed: true, data: flatArray })
-        })
+        if(data && data.length>0){
+          Promise.all([ansfromhouseid(data), taskfromhouseid(data), invoicefromhouseid(data)]).then((final_data) => {
+            var flatArray = Array.prototype.concat.apply([], final_data);
+            flatArray.sort(mySorter);
+            res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: flatArray })
+          })
+        }
+        else{
+          res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: [] })
+        }
       }
     })
   }
@@ -1490,6 +1432,12 @@ router.get("/patientjourney/:patient_id", function (req, res) {
 
   }
 })
+
+function mySorter(a, b) {
+  var x = a.created_at.toLowerCase();
+  var y = b.created_at.toLowerCase();
+  return x > y ? -1 : x < y ? 1 : 0;
+}
 
 router.post("/TaskFilter", function (req, res) {
   const token = req.headers.token;
