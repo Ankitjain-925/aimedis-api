@@ -186,6 +186,8 @@ var vcases4 = require("./routesV4/virtual_cases");
 var hadmin4 = require("./routesV4/h_admin");
 var comet4 = require("./routesV4/cometUserList");
 
+var market = require("./routesV4/marketing")
+
 app.use("/api/v1/User", UserData);
 app.use("/api/v1/UserProfile", UserProfile);
 app.use("/api/v1/SaveCSV", SaveCSV);
@@ -244,6 +246,8 @@ app.use("/api/v4/questionaire", questionaire4);
 app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
+app.use("/api/v4/market",market);
+
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

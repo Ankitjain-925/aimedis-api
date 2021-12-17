@@ -1386,6 +1386,7 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
   }
 })
 
+
 function GetAllQuestion(item) {
   return new Promise((resolve, reject) => {
     const VirtualtToSearchWith = new questionaire({ house_id: item.house_id });
@@ -1397,8 +1398,11 @@ function GetAllQuestion(item) {
 
       }
       else {
-        newcf.push(data2);
-        resolve(newcf)
+        console.log("data2", data2)
+        if (data2.length > 0) {
+          newcf.push(data2);
+          resolve(newcf)
+        }
       }
     })
   })
@@ -1650,23 +1654,53 @@ router.post("/CalenderFilter", function (req, res) {
 
 
 
+router.post("/billfilter", function (req, res) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  console.log("legit", legit)
+  if (legit) {
+    virtual_Case.find({ patient_id: req.body.patient_id, "speciality.specialty_name": req.body.speciality }, function (err, data) {
+      if (err & !data) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, error: err })
+      }
+      else {
+        console.log("data", data)
+
+        forEachPromise(data, GetBilling).then((result) => {
+          res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: newcf })
+
+        })
+      }
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+function GetBilling(item) {
+  return new Promise((resolve, reject) => {
+    const VirtualtToSearchWith = new virtual_Invoice({ patient_id: item.patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
+    virtual_Invoice.find({ $or: [{ "patient._id": req.body.patient_id }, { "patient._id": VirtualtToSearchWith.patient_id }], "status.value": req.body.status }, function (err, data2) {
+      if (err) {
+        reject(err)
+
+      }
+      else {
+        console.log("data2", data2)
+        if (data2.length > 0) {
+          newcf.push(data2);
+          resolve(newcf)
+        }
+      }
+    })
+  })
+}
 
 
-// function common(data) {
-//   return new Promise((resolve, reject) => {
-//     let house_id = data[0].house_id
-//     virtual_Case.find({ house_id: house_id }).exec(function (err, cases) {
-//       if (err) {
-//         reject(err)
-//       }
-//       else {
-//         
-//         resolve(cases)
-//       }
-//     })
-//   })
 
-// }
 
 function ansfromhouseid(data) {
   return new Promise((resolve, reject) => {
