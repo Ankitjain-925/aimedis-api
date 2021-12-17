@@ -1409,62 +1409,6 @@ function GetAllQuestion(item) {
 }
 
 
-// router.get("/patientjourney/:patient_id", function (req, res) {
-//   const token = (req.headers.token)
-//   let legit = jwtconfig.verify(token)
-
-//   console.log("legit", legit)
-//   if (legit) {
-//     virtual_Case.find({ patient_id: req.params.patient_id, inhospital: false, viewQuestionaire: true }, function (err, data) {
-//       if (err & !data) {
-//         console.log("err", err)
-//         res.json({ status: 200, hassuccessed: true, error: err })
-//       }
-//       else {
-//         console.log("data",data)
-//         let house_id = data[0].house_id
-//         const VirtualtToSearchWith = new answerspatient({ house_id });
-//         VirtualtToSearchWith.encryptFieldsSync();
-//         answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, ans) {
-//           if (err & !ans) {
-//             res.json({ status: 200, hassuccessed: true, error: err })
-
-//           }
-//           else {
-//             let house_id = data[0].house_id
-//             const VirtualtToSearchWith = new virtual_Task({ house_id });
-//             VirtualtToSearchWith.encryptFieldsSync();
-//             virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, task) {
-//               if (err & !task) {
-//                 res.json({ status: 200, hassuccessed: true, error: err })
-
-//               } else {
-//                 let house_id = data[0].house_id
-//                 const VirtualtToSearchWith = new virtual_Invoice({ house_id });
-//                 VirtualtToSearchWith.encryptFieldsSync();
-//                 virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).sort({ created_at: 'desc' }).exec(function (err, invoice) {
-//                   if (err & !task) {
-//                     res.json({ status: 200, hassuccessed: true, error: err })
-
-//                   } else {
-//                     var fulldata = [...ans, ...task, ...invoice]
-//                     res.json({ status: 200, hassuccessed: true, data: fulldata })
-//                   }
-//                 })
-//               }
-//             })
-//           }
-//         })
-//       }
-
-//     })
-//   }
-
-//   else {
-//     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-
-//   }
-// })
 
 
 
@@ -1659,45 +1603,38 @@ router.post("/billfilter", function (req, res) {
   let legit = jwtconfig.verify(token)
   console.log("legit", legit)
   if (legit) {
-    virtual_Case.find({ patient_id: req.body.patient_id, "speciality.specialty_name": req.body.speciality }, function (err, data) {
+    virtual_Case.find({ patient_id: req.body.patient_id, "speciality._id": req.body.speciality }, function (err, data) {
       if (err & !data) {
         console.log("err", err)
         res.json({ status: 200, hassuccessed: false, error: err })
       }
       else {
-        console.log("data", data)
+       console.log("data",data)
+        data.forEach(element=>{
+          console.log("element",element.patient_id )
+          let patient_id= element.patient_id 
+          const VirtualtToSearchWith = new virtual_Invoice({patient_id});
+          VirtualtToSearchWith.encryptFieldsSync();
+          console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
+        
+        virtual_Invoice.find({ $or: [{ "patient._id": patient_id }, { "patient._id": VirtualtToSearchWith.patient_id }], "status.value": req.body.status }, function (err, data2) {
+          if (err & !data2) {
+            console.log("err", err)
+            res.json({ status: 200, hassuccessed: false, error: err })
+          }else {
+            let final_data=[...data,...data2]
+            console.log("final_data",final_data)
+            res.json({ status: 200, hassuccessed: true, data:final_data})
 
-        forEachPromise(data, GetBilling).then((result) => {
-          res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: newcf })
-
+          }
         })
-      }
+      })
+    }
     })
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-
   }
 })
-function GetBilling(item) {
-  return new Promise((resolve, reject) => {
-    const VirtualtToSearchWith = new virtual_Invoice({ patient_id: item.patient_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
-    virtual_Invoice.find({ $or: [{ "patient._id": req.body.patient_id }, { "patient._id": VirtualtToSearchWith.patient_id }], "status.value": req.body.status }, function (err, data2) {
-      if (err) {
-        reject(err)
-
-      }
-      else {
-        console.log("data2", data2)
-        if (data2.length > 0) {
-          newcf.push(data2);
-          resolve(newcf)
-        }
-      }
-    })
-  })
-}
 
 
 
@@ -1707,7 +1644,7 @@ function ansfromhouseid(data) {
     let house_id = data[0].house_id
     const VirtualtToSearchWith = new answerspatient({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, ans) {
+    answerspatient.find({ $or: [{ house_id: data[0].house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, ans) {
       if (err) {
         reject(err)
       }
@@ -1721,15 +1658,34 @@ function ansfromhouseid(data) {
 
 function taskfromhouseid(data) {
   return new Promise((resolve, reject) => {
+    let flatArray=[]
     let house_id = data[0].house_id
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, task) {
+    virtual_Task.find({ $or: [{ house_id: data[0].house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, task) {
       if (err) {
         reject(err)
       } else {
-        console.log("task", task)
-        resolve(task)
+        Institute.find({ "institute_groups.houses.house_id": data[0].house_id }).exec(function (err, task2) {
+          if (err) {
+            reject(err)
+          } else {
+            console.log("task2", task2)
+            let infoHouse1={}
+            task2[0].institute_groups.map(function(dataa){
+              dataa.houses.map(function (data1) {
+                if (data1.house_id == data[0].house_id) {
+                  infoHouse1= {house_name:data1.house_name, house_logo:data1.house_logo};
+                }
+              })
+
+            })
+            var finalTasktask = {...task, ...infoHouse1}
+            flatArray.push(finalTasktask);
+            console.log("flatarrayfor task",flatArray)
+            resolve(flatArray)
+          }
+        })
       }
     })
   })
@@ -1737,16 +1693,42 @@ function taskfromhouseid(data) {
 
 function invoicefromhouseid(data) {
   return new Promise((resolve, reject) => {
+    let flatArray=[]
     let house_id = data[0].house_id
+    console.log("house_id",house_id)
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, invoice) {
+    virtual_Invoice.find({ $or: [{ house_id: data[0].house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, invoice) {
       if (err) {
         console.log("err", err)
         reject(err)
       } else {
-        console.log("invoice", invoice)
-        resolve(invoice)
+        Institute.find({"institute_groups.houses.house_id":data[0].house_id}).exec(function (err, invoice2) {
+          if (err) {
+            reject(err)
+          } else {
+            console.log("invoice2",invoice2)
+            let infoHouse={}
+            invoice2[0].institute_groups.map(function(dataa){
+              dataa.houses.map(function (data1) {
+                if (data1.house_id == data[0].house_id) {
+                  infoHouse = {house_name:data1.house_name, house_logo:data1.house_logo};
+                }
+              })
+
+            })
+            console.log("infoHouse1",infoHouse)
+            var finalTasktask = {...invoice, ...infoHouse}
+            
+            flatArray.push(finalTasktask);
+
+
+            console.log("flatArrayfor invoice",flatArray)
+             resolve(flatArray)
+
+            
+          }
+        })
       }
     })
   })
