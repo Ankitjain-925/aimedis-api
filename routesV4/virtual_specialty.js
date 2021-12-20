@@ -1596,26 +1596,6 @@ router.post("/CalenderFilter", function (req, res) {
   }
 });
 
-
-
-
-
-// function common(data) {
-//   return new Promise((resolve, reject) => {
-//     let house_id = data[0].house_id
-//     virtual_Case.find({ house_id: house_id }).exec(function (err, cases) {
-//       if (err) {
-//         reject(err)
-//       }
-//       else {
-//         
-//         resolve(cases)
-//       }
-//     })
-//   })
-
-// }
-
 function ansfromhouseid(data) {
   return new Promise((resolve, reject) => {
     let house_id = data[0].house_id
@@ -1623,7 +1603,7 @@ function ansfromhouseid(data) {
     VirtualtToSearchWith.encryptFieldsSync();
     answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, ans) {
       if (err) {
-        reject(err)
+        reject([])
       }
       else {
         console.log("ans", ans)
@@ -1640,7 +1620,7 @@ function taskfromhouseid(data) {
     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, task) {
       if (err) {
-        reject(err)
+        reject([])
       } else {
         console.log("task", task)
         resolve(task)
@@ -1657,7 +1637,7 @@ function invoicefromhouseid(data) {
     virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, invoice) {
       if (err) {
         console.log("err", err)
-        reject(err)
+        reject([])
       } else {
         console.log("invoice", invoice)
         resolve(invoice)
