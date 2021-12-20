@@ -536,6 +536,186 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
   }
 });
 
+router.put("/AddTrack2", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var ids = { track_id: uuidv1() };
+    req.body.data.created_by = encrypt(req.body.data.created_by);
+    req.body.data._enc_created_by = true;
+    var full_record = { ...ids, ...req.body.data };
+    if(req.body.option=="Specific"){
+    user.updateOne(
+      { _id: req.body.UserId },
+      { $push: { track_record: full_record } },
+      { safe: true, upsert: true },
+      function (err, doc) {
+        if (err && !doc) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+            error: err,
+          });
+        } else {
+          if (doc.nModified == "0") {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "User is not found",
+            });
+          } else {
+            console.log("pharmacy_id", req.body.data.pharmacy_id);
+            if (req.body.data && req.body.data.pharmacy_id) {
+              const messageToSearchWith = new user({
+                profile_id: req.body.data.pharmacy_id,
+              });
+              messageToSearchWith.encryptFieldsSync();
+              var patient_id2 = {
+                patient_id: req.body.data.patient_profile_id,
+              };
+              var full_record1 = { ...patient_id2, ...ids, ...req.body.data };
+              user.updateOne(
+                {
+                  $or: [
+                    { profile_id: req.body.data.pharmacy_id },
+                    { profile_id: messageToSearchWith.profile_id },
+                  ],
+                },
+                { $push: { track_record: full_record1 } },
+                { safe: true, upsert: true },
+                function (err, doc) {
+                  if (err && !doc) {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      msg: "Something went wrong",
+                      error: err,
+                    });
+                  } else {
+                    if (doc.nModified == "0") {
+                      console.log("I am heereee056");
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        msg: "Pharmacy is not found",
+                      });
+                    } else {
+                      console.log("I am heereee to send on Pharmcay too.");
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        msg: "track is updated",
+                      });
+                    }
+                  }
+                }
+              );
+            } else {
+              console.log("terrererer");
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "track is updated",
+              });
+            }
+            // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+          }
+        }
+      }
+    );
+    }else{
+      user.update(
+        {$in:[{ _id: req.body.UserId }]},
+        { $push: { track_record: full_record } },
+        { safe: true, upsert: true },
+        function (err, doc) {
+          if (err && !doc) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+              error: err,
+            });
+          } else {
+            if (doc.nModified == "0") {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                msg: "User is not found",
+              });
+            } else {
+              console.log("pharmacy_id", req.body.data.pharmacy_id);
+              if (req.body.data && req.body.data.pharmacy_id) {
+                const messageToSearchWith = new user({
+                  profile_id: req.body.data.pharmacy_id,
+                });
+                messageToSearchWith.encryptFieldsSync();
+                var patient_id2 = {
+                  patient_id: req.body.data.patient_profile_id,
+                };
+                var full_record1 = { ...patient_id2, ...ids, ...req.body.data };
+                user.updateOne(
+                  {
+                    $or: [
+                      { profile_id: req.body.data.pharmacy_id },
+                      { profile_id: messageToSearchWith.profile_id },
+                    ],
+                  },
+                  { $push: { track_record: full_record1 } },
+                  { safe: true, upsert: true },
+                  function (err, doc) {
+                    if (err && !doc) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        msg: "Something went wrong",
+                        error: err,
+                      });
+                    } else {
+                      if (doc.nModified == "0") {
+                        console.log("I am heereee056");
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          msg: "Pharmacy is not found",
+                        });
+                      } else {
+                        console.log("I am heereee to send on Pharmcay too.");
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          msg: "track is updated",
+                        });
+                      }
+                    }
+                  }
+                );
+              } else {
+                console.log("terrererer");
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  msg: "track is updated",
+                });
+              }
+              // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+            }
+          }
+        }
+      );
+
+    }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
+
+
 //remove track record
 router.delete("/AddTrack/:UserId/:TrackId", function (req, res, next) {
   const token = req.headers.token;

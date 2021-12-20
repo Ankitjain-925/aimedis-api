@@ -188,6 +188,8 @@ var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
 
 
+var market = require("./routesV4/marketing")
+
 app.use("/api/v1/User", UserData);
 app.use("/api/v1/UserProfile", UserProfile);
 app.use("/api/v1/SaveCSV", SaveCSV);
@@ -247,6 +249,7 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
+
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
