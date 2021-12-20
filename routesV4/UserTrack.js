@@ -544,92 +544,56 @@ router.put("/AddTrack2", function (req, res, next) {
     req.body.data.created_by = encrypt(req.body.data.created_by);
     req.body.data._enc_created_by = true;
     var full_record = { ...ids, ...req.body.data };
-    if(req.body.option=="Specific"){
-    user.updateOne(
-      { _id: req.body.UserId },
-      { $push: { track_record: full_record } },
-      { safe: true, upsert: true },
-      function (err, doc) {
-        if (err && !doc) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-            error: err,
-          });
-        } else {
-          if (doc.nModified == "0") {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "User is not found",
-            });
-          } else {
-            console.log("pharmacy_id", req.body.data.pharmacy_id);
-            if (req.body.data && req.body.data.pharmacy_id) {
-              const messageToSearchWith = new user({
-                profile_id: req.body.data.pharmacy_id,
-              });
-              messageToSearchWith.encryptFieldsSync();
-              var patient_id2 = {
-                patient_id: req.body.data.patient_profile_id,
-              };
-              var full_record1 = { ...patient_id2, ...ids, ...req.body.data };
-              user.updateOne(
-                {
-                  $or: [
-                    { profile_id: req.body.data.pharmacy_id },
-                    { profile_id: messageToSearchWith.profile_id },
-                  ],
-                },
-                { $push: { track_record: full_record1 } },
-                { safe: true, upsert: true },
-                function (err, doc) {
-                  if (err && !doc) {
-                    res.json({
-                      status: 200,
-                      hassuccessed: false,
-                      msg: "Something went wrong",
-                      error: err,
-                    });
-                  } else {
-                    if (doc.nModified == "0") {
-                      console.log("I am heereee056");
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        msg: "Pharmacy is not found",
-                      });
-                    } else {
-                      console.log("I am heereee to send on Pharmcay too.");
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        msg: "track is updated",
-                      });
-                    }
-                  }
-                }
-              );
-            } else {
-              console.log("terrererer");
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                msg: "track is updated",
-              });
-            }
-            // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
-          }
-        }
-      }
-    );
-    }else{
-      user.update(
-        {$in:[{ _id: req.body.UserId }]},
+    if (req.body.option == "Specific") {
+      user.updateOne(
+        { _id: req.body.UserId },
         { $push: { track_record: full_record } },
         { safe: true, upsert: true },
         function (err, doc) {
+          if (err && !doc) {
+            console.log("err", err)
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+              error: err,
+            });
+          } else {
+            console.log("doc", doc)
+            if (doc.nModified == "0") {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                msg: "User is not found",
+              });
+            } else {
+              if (doc.nModified == "0") {
+                console.log("I am heereee056");
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Pharmacy is not found",
+                });
+              } else {
+                console.log("I am heereee to send on Pharmcay too.");
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  msg: "track is updated",
+                });
+              }
+            }
+          }
+        })
+    }
+
+    else {
+      user.updateMany(
+        { _id: req.body.UserId },
+        { $push: { track_record: full_record } },
+        { safe: true, upsert: true },
+        function (err, doc) {
+          console.log("err1", err)
           if (err && !doc) {
             res.json({
               status: 200,
@@ -638,6 +602,7 @@ router.put("/AddTrack2", function (req, res, next) {
               error: err,
             });
           } else {
+            console.log("docs", doc)
             if (doc.nModified == "0") {
               res.json({
                 status: 200,
@@ -645,62 +610,13 @@ router.put("/AddTrack2", function (req, res, next) {
                 msg: "User is not found",
               });
             } else {
-              console.log("pharmacy_id", req.body.data.pharmacy_id);
-              if (req.body.data && req.body.data.pharmacy_id) {
-                const messageToSearchWith = new user({
-                  profile_id: req.body.data.pharmacy_id,
-                });
-                messageToSearchWith.encryptFieldsSync();
-                var patient_id2 = {
-                  patient_id: req.body.data.patient_profile_id,
-                };
-                var full_record1 = { ...patient_id2, ...ids, ...req.body.data };
-                user.updateOne(
-                  {
-                    $or: [
-                      { profile_id: req.body.data.pharmacy_id },
-                      { profile_id: messageToSearchWith.profile_id },
-                    ],
-                  },
-                  { $push: { track_record: full_record1 } },
-                  { safe: true, upsert: true },
-                  function (err, doc) {
-                    if (err && !doc) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        msg: "Something went wrong",
-                        error: err,
-                      });
-                    } else {
-                      if (doc.nModified == "0") {
-                        console.log("I am heereee056");
-                        res.json({
-                          status: 200,
-                          hassuccessed: false,
-                          msg: "Pharmacy is not found",
-                        });
-                      } else {
-                        console.log("I am heereee to send on Pharmcay too.");
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          msg: "track is updated",
-                        });
-                      }
-                    }
-                  }
-                );
-              } else {
-                console.log("terrererer");
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  msg: "track is updated",
-                });
-              }
-              // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "track is updated",
+              });
             }
+            // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
           }
         }
       );
@@ -1101,19 +1017,19 @@ router.post("/appointment", function (req, res) {
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
-      "01",
-      "02",
-      "03",
-      "04",
-      "05",
-      "06",
-      "07",
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-    ],
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ],
     month = monthNames[d.getMonth()],
     day = d.getDate(),
     year = d.getFullYear();
