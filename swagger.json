@@ -2278,6 +2278,39 @@
                     }
                 }
             }
+        },
+        "/vh/billfilter": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "Billingfilter",
+                        "in": "body",
+                        "description": "For Billing Filter",
+                        "schema": {
+                            "$ref": "#/definitions/Billingfilter"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Billingfilter",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2780,8 +2813,32 @@
                 }
                
             }
+        },
+        "Billingfilter":{
+            "required": [],
+            "properties": {
+                "Patient_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": true
+                },
+                "speciality": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": true
+                },
+                "status": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": true
+                }
+            }
         }
-
-        
     }
 }
