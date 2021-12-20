@@ -5,15 +5,15 @@ var nodemailer = require("nodemailer");
 
 
 var transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: 25,
-    secure: false,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
-    },
-  });
 
+  host: process.env.MAIL_HOST,
+  port: 25,
+  secure: false,
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+  },
+});
 router.post("/MarketingMail", function (req, res) {
   if(req.body.email !==""){
     let mailOptions = {
@@ -31,9 +31,8 @@ router.post("/MarketingMail", function (req, res) {
         req.body.option+
         "<div>"
     };
-    console.log("mailoption",mailOptions)
+
     let sendmail = transporter.sendMail(mailOptions);
-    console.log("sendmail",sendmail)
     if (sendmail) {
       console.log("emailsend")
       res.json({
@@ -62,13 +61,16 @@ router.post("/MarketingMail2", function (req, res) {
       to: "vaibhav.webnexus@gmail.com",
       subject: "Investor Relation Request",
       html:
-        "<div><b>Name:-</b>&nbsp;" +
+
+        "<div><b>Name:-</b>&nbsp" +
+
         req.body.first_name +
         "&nbsp;"+
         req.body.last_name +
         "</div>"
     };
-    console.log("mailOptions2",mailOptions)
+
+
     let sendmail = transporter.sendMail(mailOptions);
     if (sendmail) {
       res.json({
@@ -100,7 +102,7 @@ router.post("/MarketingMail3", function (req, res) {
         req.body.option+
         "</div>"
     };
-    console.log("mailOptions",mailOptions)
+
     let sendmail = transporter.sendMail(mailOptions);
     if (sendmail) {
       res.json({
