@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aimedis.io/",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -38,7 +38,7 @@
         }
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -2290,18 +2290,18 @@
             "post": {
                 "parameters": [
                     {
-                        "name": "Billingfilter",
+                        "name": "Billfilter",
                         "in": "body",
-                        "description": "For Billing Filter",
+                        "description": "get bill",
                         "schema": {
-                            "$ref": "#/definitions/Billingfilter"
+                            "$ref": "#/definitions/Billfilter"
                         }
                     }
                 ],
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "Billingfilter",
+                "summary": "calenderfilter",
                 "produces": [
                     "application/json"
                 ],
@@ -2312,6 +2312,7 @@
                 }
             }
         }
+      
     },
     "definitions": {
         "AddtheGroup": {
@@ -2814,10 +2815,10 @@
                
             }
         },
-        "Billingfilter":{
+        "Billfilter":{
             "required": [],
             "properties": {
-                "Patient_id": {
+                "patient_id": {
                     "type": "array",
                     "items": {
                         "type": "object"
