@@ -1,6 +1,9 @@
 var express = require("express");
 let router = express.Router();
 var nodemailer = require("nodemailer");
+const mailchimp = require("@mailchimp/mailchimp_marketing")
+const md5 = require("md5")
+
 
 
 
@@ -119,7 +122,35 @@ router.post("/MarketingMail3", function (req, res) {
   }
   });
     
+  
+  
+router.post('/subscribe', (req, res) => {
 
+    mailchimp.setConfig({
+      apiKey: 'cdc28513af7095e5fe5a349065cd58a3-us20',
+      server: 'us20',
+    });
+
+    const { email} = req.body
+
+    const subscriberHash = md5(email.toLowerCase());
+    const listId = '8f2e5a6770';
+
+    const response =  mailchimp.lists.setListMember(
+      listId,
+      subscriberHash,
+      {
+        email_address: email,
+        status_if_new: 'subscribed',
+      }
+    );
+    res.json({
+        status: 200,
+        message: "New Subscription",
+        hassuccessed: true,
+      });
+   
+})
 
 
 module.exports = router;
