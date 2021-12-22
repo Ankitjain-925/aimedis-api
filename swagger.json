@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aimedis.io/",
+    "host": "virtualhospital.aimedis.io",
     "basePath": "/api/v4",
     "tags": [
         {
