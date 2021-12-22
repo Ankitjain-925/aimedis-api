@@ -18,7 +18,7 @@ var transporter = nodemailer.createTransport({
   },
 });
 router.post("/MarketingMail", function (req, res) {
-  if(req.body.email !==""){
+  if (req.body.email !== "") {
     let mailOptions = {
       from: req.body.email,
       to: "vaibhav.webnexus@gmail.com",
@@ -26,12 +26,12 @@ router.post("/MarketingMail", function (req, res) {
       html:
         "<div><b>Name -</b>&nbsp;" +
         req.body.first_name +
-        "&nbsp;"+
+        "&nbsp;" +
         req.body.last_name +
-        "</div><div><b>Company Name-</b>&nbsp;"+
-        req.body.company_name+
-        "</div><div><b>Option:-</b>&nbsp;"+
-        req.body.option+
+        "</div><div><b>Company Name-</b>&nbsp;" +
+        req.body.company_name +
+        "</div><div><b>Option:-</b>&nbsp;" +
+        req.body.option +
         "<div>"
     };
 
@@ -47,17 +47,17 @@ router.post("/MarketingMail", function (req, res) {
       console.log("err")
       res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
-  }else{
+  } else {
     console.log("no email")
     res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
 
   }
-  });
+});
 
 
 
 router.post("/MarketingMail2", function (req, res) {
-  if(req.body.email !==""){
+  if (req.body.email !== "") {
 
     let mailOptions = {
       from: req.body.email,
@@ -68,7 +68,7 @@ router.post("/MarketingMail2", function (req, res) {
         "<div><b>Name:-</b>&nbsp" +
 
         req.body.first_name +
-        "&nbsp;"+
+        "&nbsp;" +
         req.body.last_name +
         "</div>"
     };
@@ -84,14 +84,14 @@ router.post("/MarketingMail2", function (req, res) {
     } else {
       res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
-  }else{
+  } else {
     console.log("no email")
     res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
   }
-  });
+});
 
 router.post("/MarketingMail3", function (req, res) {
-  if(req.body.email!=""){
+  if (req.body.email != "") {
     let mailOptions = {
       from: req.body.email,
       to: "vaibhav.webnexus@gmail.com",
@@ -101,8 +101,8 @@ router.post("/MarketingMail3", function (req, res) {
         req.body.first_name +
         "&nbsp;" +
         req.body.last_name +
-        "</div><div><b>Option:-&nbsp;</b>"+
-        req.body.option+
+        "</div><div><b>Option:-&nbsp;</b>" +
+        req.body.option +
         "</div>"
     };
 
@@ -116,27 +116,27 @@ router.post("/MarketingMail3", function (req, res) {
     } else {
       res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
-  }else{
+  } else {
     console.log("no email")
     res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
   }
-  });
-    
-  
-  
+});
+
+
+
 router.post('/subscribe', (req, res) => {
 
-    mailchimp.setConfig({
-      apiKey: 'cdc28513af7095e5fe5a349065cd58a3-us20',
-      server: 'us20',
-    });
+  mailchimp.setConfig({
+    apiKey: 'cdc28513af7095e5fe5a349065cd58a3-us20',
+    server: 'us20',
+  });
 
-    const { email} = req.body
-
+  const { email } = req.body
+  if (email != "") {
     const subscriberHash = md5(email.toLowerCase());
     const listId = '8f2e5a6770';
 
-    const response =  mailchimp.lists.setListMember(
+    const response = mailchimp.lists.setListMember(
       listId,
       subscriberHash,
       {
@@ -145,11 +145,18 @@ router.post('/subscribe', (req, res) => {
       }
     );
     res.json({
-        status: 200,
-        message: "New Subscription",
-        hassuccessed: true,
-      });
-   
+      status: 200,
+      message: "New Subscription",
+      hassuccessed: true,
+    });
+  }
+  else {
+    res.json({
+      status: 200,
+      message: "Email required",
+      hassuccessed: false,
+    });
+  }
 })
 
 
