@@ -1163,8 +1163,10 @@ router.get("/statisticstopinfo/:House_id", function (req, res, next) {
       virtualCase(req.params.House_id),
       User_Case(req.params.House_id),
       User_Case1(req.params.House_id),
-    ]).then((count, list, list1) => {
-      res.json({ status: 200, hassuccessed: true, data: count, list, list1 });
+    ]).then((list1) => {
+      var flatArray = Array.prototype.concat.apply([], list1);
+
+      res.json({ status: 200, hassuccessed: true, data: flatArray });
     });
   } else {
     res.json({
@@ -1417,10 +1419,12 @@ router.get("/patientjourney/:patient_id", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
+        console.log("data",data)
         if(data && data.length>0){
           Promise.all([ansfromhouseid(data), taskfromhouseid(data), invoicefromhouseid(data)]).then((final_data) => {
             var flatArray = Array.prototype.concat.apply([], final_data);
-            flatArray.sort(mySorter);
+            console.log("flatArray",flatArray)
+            // flatArray.sort(mySorter);
             res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: flatArray })
           })
         }
@@ -1436,11 +1440,12 @@ router.get("/patientjourney/:patient_id", function (req, res) {
   }
 })
 
-function mySorter(a, b) {
-  var x = a.created_at.toLowerCase();
-  var y = b.created_at.toLowerCase();
-  return x > y ? -1 : x < y ? 1 : 0;
-}
+// function mySorter(a, b) {
+
+//   var x = a.created_at.toLowerCase();
+//   var y = b.created_at.toLowerCase();
+//   return x > y ? -1 : x < y ? 1 : 0;
+// }
 
 router.post("/TaskFilter", function (req, res) {
   const token = req.headers.token;
@@ -1637,6 +1642,47 @@ router.post("/billfilter", function (req, res) {
   }
 })
 
+router.delete("/AddTrack", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    user.updateOne(
+      { _id: req.body.UserId },
+      { $pull: { track_record: { track_id: req.body.TrackId } } },
+      { multi: true },
+      function (err, doc) {
+        if (err && !doc) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+            error: err,
+          });
+        } else {
+          if (doc.nModified == "0") {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Track record is not found",
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              msg: "track is deleted",
+            });
+          }
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
 
 
 
@@ -1650,7 +1696,6 @@ function ansfromhouseid(data) {
         reject([])
       }
       else {
-        console.log("ans", ans)
         resolve(ans)
       }
     })
@@ -1683,7 +1728,6 @@ function taskfromhouseid(data) {
             })
             var finalTasktask = {...task, ...infoHouse1}
             flatArray.push(finalTasktask);
-            console.log("flatarrayfor task",flatArray)
             resolve(flatArray)
           }
         })
@@ -1722,9 +1766,6 @@ function invoicefromhouseid(data) {
             var finalTasktask = {...invoice, ...infoHouse}
             
             flatArray.push(finalTasktask);
-
-
-            console.log("flatArrayfor invoice",flatArray)
              resolve(flatArray)
 
             
