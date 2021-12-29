@@ -1234,7 +1234,7 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
   console.log("legit", legit)
   try {
 
-  if (legit) {
+    if (legit) {
       Virtual_Specialty.find({ _id: req.params.specialty_id }, function (err, data) {
         if (err & !data) {
           console.log("err", err)
@@ -1290,11 +1290,11 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
         }
       })
     }
-  else {
-    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    else {
+      res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
+    }
   }
-}
   catch {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
@@ -1715,6 +1715,79 @@ router.delete("/AddTrack", function (req, res, next) {
   }
 });
 
+router.post("/Newentry", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  var leftdataPatient = {}
+  if (legit) {
+    let house_id = req.body.house_id
+    const VirtualtToSearchWith = new User({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    virtual_Case.findOne({ $or: [{ house_id: house_id, house_id: VirtualtToSearchWith.house_id }], patient_id: req.body.patient_id, inhospital: true }, function (err, data) {
+      if (err & !data) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, error: err })
+      } else {
+        console.log("data", data)
+
+        leftdataPatient.data = data;
+        virtual_Task.aggregate([
+          {
+            "$facet": {
+              "total_task": [
+                { "$match": { "case_id": data.case_number, "status": { "$exists": true, } } },
+                { "$count": "total_task" },
+              ],
+              "done_task": [
+                { "$match": { "case_id": data.case_number, "status": "done" } },
+                { "$count": "done_task" }
+              ]
+            }
+          },
+          {
+            "$project": {
+              "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
+              "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
+            }
+          }
+        ], function (err, results) {
+          console.log("result",results)
+          leftdataPatient.complete = results
+
+          User.findOne({ _id: req.body.patient_id }).exec(function (err, data2) {
+            if (err) {
+              res.json({ status: 200, hassuccessed: false, error: err })
+            }
+            else {
+
+              // console.log("data2", data2.track_record.length)
+              let treck_record = data2 && data2.track_record
+              leftdataPatient.entries = treck_record.length
+              let sum = 0
+
+              treck_record.forEach((element) => {
+                console.log("element", element.attachfile)
+                if(element.attachfile && element.attachfile.length>0){
+                let download = element.attachfile.length + sum
+                console.log("down",download)
+                leftdataPatient.document_file = download
+                }
+              })
+              console.log("leftdataPatient",leftdataPatient)
+            res.json({status:200,hassuccessed:true,data:leftdataPatient})
+            }
+          })
+        })
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
 
 
 function ansfromhouseid(data) {
