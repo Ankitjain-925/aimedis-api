@@ -2311,6 +2311,39 @@
                     }
                 }
             }
+        },
+        "/vh/LeftInfoPatient": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "LeftInfoPatient",
+                        "in": "body",
+                        "description": "get details",
+                        "schema": {
+                            "$ref": "#/definitions/PatientInfo"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Info Patient",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
         }
       
     },
@@ -2837,6 +2870,20 @@
                     "items": {
                         "type": "object"
                     },
+                    "uniqueItems": true
+                }
+            }
+        },
+        "PatientInfo":{
+            "required": [],
+            "properties": {
+               
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "patient_id": {
+                    "type": "string",
                     "uniqueItems": true
                 }
             }

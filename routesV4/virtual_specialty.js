@@ -1715,7 +1715,7 @@ router.delete("/AddTrack", function (req, res, next) {
   }
 });
 
-router.post("/Newentry", function (req, res) {
+router.post("/LeftInfoPatient", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var leftdataPatient = {}
@@ -1768,8 +1768,7 @@ router.post("/Newentry", function (req, res) {
               treck_record.forEach((element) => {
                 console.log("element", element.attachfile)
                 if(element.attachfile && element.attachfile.length>0){
-                let sum = element.attachfile.length + sum
-                console.log("down",download)
+                sum = element.attachfile.length + sum
                 leftdataPatient.document_file = sum
                 }
               })
