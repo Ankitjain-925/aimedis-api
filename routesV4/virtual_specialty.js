@@ -1287,13 +1287,10 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
       console.log("value1", value)
       console.log("key", key)
       if (Array.isArray(value)) {
-        console.log("service1243", value)
         Data.push({
           k: key.replace(/_/g, " "),
           v: value.map((element) => {
-            console.log("element", element)
-            // return element
-            return element.price_per_quantity && element.quantity && element.service && element.price
+            return {price_per_quantity: element.price_per_quantity , quantity: element.quantity, service: element.service,price: element.price}
           })
         });
       }
@@ -1498,10 +1495,9 @@ router.post("/TaskFilter", function (req, res) {
               }
               else {
                 res.json({ status: 200, hassuccessed: true, message: "No data found" })
-
               }
             }
-          })
+          })++
         }
         else {
           console.log("data", data)
@@ -1607,36 +1603,36 @@ router.post("/CalenderFilter", function (req, res) {
 router.post("/billfilter", function (req, res) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
-  console.log("legit", legit)
   if (legit) {
-    virtual_Case.find({ patient_id: req.body.patient_id, "speciality._id": req.body.speciality }, function (err, data) {
-      if (err & !data) {
-        console.log("err", err)
-        res.json({ status: 200, hassuccessed: false, error: err })
+      var condition = {house_id: req.body.house_id} 
+      if(req.body.status && req.body.status.length > 0)
+      {
+        condition["status.value"] = { $in: req.body.status }
       }
-      else {
-       console.log("data",data)
-        data.forEach(element=>{
-          console.log("element",element.patient_id )
-          let patient_id= element.patient_id 
-          const VirtualtToSearchWith = new virtual_Invoice({patient_id});
-          VirtualtToSearchWith.encryptFieldsSync();
-          console.log("VirtualtToSearchWith", VirtualtToSearchWith.house_id)
-        
-        virtual_Invoice.find({ $or: [{ "patient._id": patient_id }, { "patient._id": VirtualtToSearchWith.patient_id }], "status.value": req.body.status }, function (err, data2) {
-          if (err & !data2) {
-            console.log("err", err)
-            res.json({ status: 200, hassuccessed: false, error: err })
-          }else {
-            let final_data=[...data,...data2]
-            console.log("final_data",final_data)
-            res.json({ status: 200, hassuccessed: true, data:final_data})
-
+      if(req.body.patient_id && req.body.patient_id.length > 0){
+        condition["patient.patient_id"] = { $in: req.body.patient_id }
+      }
+      virtual_Invoice.find(condition, function (err, data2) {
+        if (err & !data2) {
+          res.json({ status: 200, hassuccessed: false, error: err })
+        }else {
+          if(req.body.speciality && req.body.speciality.length > 0){
+            virtual_Case.find({"speciality._id": {$in : req.body.speciality }, house_id: req.body.house_id}, function (err, data) {
+              if (err & !data) {
+                res.json({ status: 200, hassuccessed: false, error: err })
+              }
+              else {
+                var finalData = data2 && data2.length>0 && data2.filter((item)=>item.case_id === data._id)
+                res.json({ status: 200, hassuccessed: true, data: finalData })
+              }
+            })
           }
-        })
+          else{
+            res.json({ status: 200, hassuccessed: true, data:data2})
+          }
+        }
       })
-    }
-    })
+    
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
   }
@@ -1683,8 +1679,6 @@ router.delete("/AddTrack", function (req, res, next) {
     });
   }
 });
-
-
 
 function ansfromhouseid(data) {
   return new Promise((resolve, reject) => {
@@ -1841,6 +1835,7 @@ function User_Case1(House_id) {
     );
   });
 }
+
 function virtualCase(House_id) {
   return new Promise((resolve, reject) => {
     virtual_Case.countDocuments(
@@ -1874,7 +1869,6 @@ function virtualAppointment(userdata) {
   return new Promise((resolve, reject) => {
     Appoint = [];
     forEachPromise(userdata, getApointsDoctor).then((result) => {
-      console.log("Appoint", Appoint);
       resolve(Appoint);
     });
   });
@@ -1937,4 +1931,5 @@ function forEachPromise(items, fn) {
     });
   }, Promise.resolve());
 }
+
 module.exports = router;

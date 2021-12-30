@@ -536,7 +536,7 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
   }
 });
 
-router.put("/AddTrack2", function (req, res, next) {
+router.put("/AddTrackAdmin", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -544,9 +544,9 @@ router.put("/AddTrack2", function (req, res, next) {
     req.body.data.created_by = encrypt(req.body.data.created_by);
     req.body.data._enc_created_by = true;
     var full_record = { ...ids, ...req.body.data };
-    if (req.body.option == "Specific") {
-      user.updateOne(
-        { _id: req.body.UserId },
+    if (req.body.option == "specific") {
+      user.updateMany(
+        {_id: { $in: req.body.UserId }},
         { $push: { track_record: full_record } },
         { safe: true, upsert: true },
         function (err, doc) {
@@ -586,14 +586,12 @@ router.put("/AddTrack2", function (req, res, next) {
           }
         })
     }
-
     else {
       user.updateMany(
-        { _id: req.body.UserId },
+        { type: 'patient' },
         { $push: { track_record: full_record } },
         { safe: true, upsert: true },
         function (err, doc) {
-          console.log("err1", err)
           if (err && !doc) {
             res.json({
               status: 200,
@@ -616,11 +614,9 @@ router.put("/AddTrack2", function (req, res, next) {
                 msg: "track is updated",
               });
             }
-            // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
           }
         }
       );
-
     }
   } else {
     res.json({
