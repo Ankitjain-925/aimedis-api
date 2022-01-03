@@ -2344,6 +2344,39 @@
                     }
                 }
             }
+        },
+        "/admin/allHospitalusers": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "HospitalUsers",
+                        "in": "body",
+                        "description": "get details",
+                        "schema": {
+                            "$ref": "#/definitions/adminhostipal"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Infomation",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
         }
       
     },
@@ -2883,6 +2916,24 @@
                     "uniqueItems": true
                 },
                 "patient_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+            }
+        },
+        "adminhostipal":{
+            "required": [],
+            "properties": {
+               
+                "institue_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "type": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "search": {
                     "type": "string",
                     "uniqueItems": true
                 }

@@ -19,6 +19,7 @@ var newcf = [];
 var fs = require("fs");
 const { join } = require("path");
 var html = fs.readFileSync(join(`${__dirname}/Invoice.html`), "utf8");
+var html2 = fs.readFileSync(join(`${__dirname}/index.html`), "utf8");
 var html_to_pdf = require("html-pdf-node");
 const { virtual } = require("../schema/topic.js");
 
@@ -1381,6 +1382,184 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
 
 });
 
+router.post("/downloadInvoice2Pdf", function (req, res, next) {
+  // Custom handlebar helper
+  handlebars.registerHelper("ifCond", function (v1, v2, options) {
+    if (v1 === v2) {
+      return options.fn(this);
+    }
+    return options.inverse(this);
+  });
+
+  var Data = [];
+  if (req.body.choice == 1) {
+    {
+      console.log("1")
+      Institute.findOne({ "institute_groups.houses.house_id": req.body.house_id }).exec(function (err, data) {
+        Object.entries(req.body).map(([key, value]) => {
+          console.log("value1", value)
+          console.log("key", key)
+          if (Array.isArray(value)) {
+            console.log("service1243", value)
+            // Data.push({
+            //   k: key.replace(/_/g, " "),
+            //   v: value.map((element) => {
+            //     ({ ...element })
+            //   })
+            // });
+            value.forEach(v=> Data.push(Object.assign({}, v)));
+
+          }
+
+          if (
+            key === "invoice_id" ||
+            key === "Number" ||
+            key === "status" ||
+            key === "patient"
+          ) {
+            Data.push({
+              k: key.replace(/_/g, " "),
+              v: value,
+            });
+          }
+          else if (key === "created_at" ) {
+            Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+
+          }
+        });
+
+        Data.push({
+          k: "institute",
+          v: data
+        })
+        console.log("Data", Data)
+        var template = handlebars.compile(html2);
+        var htmlToSend = template({
+          Invoice: Data,
+          pat_info: req.body,
+        });
+        var filename = "GeneratedReport.pdf"
+        if (htmlToSend) {
+          var options = {
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            path: `${__dirname}/${filename}`,
+          };
+          let file = [{ content: htmlToSend }];
+          html_to_pdf.generatePdfs(file, options).then((output) => {
+            const file = `${__dirname}/${filename}`;
+            console.log("file", file)
+            res.download(file);
+          });
+        } else {
+          console.log("filename")
+          res.json({ status: 200, hassuccessed: true, filename: filename });
+        }
+      });
+    }
+  } if (req.body.choice == 2) {
+    console.log("2")
+    Object.entries(req.body).map(([key, value]) => {
+      console.log("value1", value)
+      console.log("key", key)
+      if (Array.isArray(value)) {
+        console.log("service1243", value)
+        Data.push({
+          k: key.replace(/_/g, " "),
+          v: value.map((element) => {
+            console.log("element", element)
+            // return element
+            return element.price_per_quantity && element.quantity && element.service
+          })
+        });
+      }
+
+      else if (
+        key === "invoice_id" ||
+        key === "case_id" ||
+        key === "total_amount"
+
+      ) {
+        Data.push({
+          k: key.replace(/_/g, " "),
+          v: value,
+        });
+      }
+      else if (key === "created_at") {
+        Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+
+      }
+    });
+  } if (req.body.choice == 3) {
+    console.log("3")
+    Object.entries(req.body).map(([key, value]) => {
+      console.log("value1", value)
+      console.log("key", key)
+      if (Array.isArray(value)) {
+        console.log("service1243", value)
+        Data.push({
+          k: key.replace(/_/g, " "),
+          v: value.map((element) => {
+            console.log("element", element)
+            // return element
+            return element.price_per_quantity && element.quantity
+          })
+        });
+      }
+
+      else if (
+        key === "invoice_id" ||
+        key === "case_id" ||
+        key === "total_amount"
+
+      ) {
+        Data.push({
+          k: key.replace(/_/g, " "),
+          v: value,
+        });
+      }
+      else if (key === "created_at") {
+        Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+
+      }
+    });
+  } if (req.body.choice == 4) {
+    console.log("4")
+    Object.entries(req.body).map(([key, value]) => {
+      console.log("value1", value)
+      console.log("key", key)
+      if (Array.isArray(value)) {
+        console.log("service1243", value)
+        Data.push({
+          k: key.replace(/_/g, " "),
+          v: value.map((element) => {
+            console.log("element", element)
+            // return element
+            return element.price_per_quantity
+          })
+        });
+      }
+
+      else if (
+        key === "invoice_id" ||
+        key === "case_id" ||
+        key === "total_amount"
+
+      ) {
+        Data.push({
+          k: key.replace(/_/g, " "),
+          v: value,
+        });
+      }
+      else if (key === "created_at") {
+        Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+
+      }
+    });
+  }
+
+
+});
+
 router.get("/patientjourneyQue/:patient_id", function (req, res) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
@@ -1760,12 +1939,9 @@ router.post("/LeftInfoPatient", function (req, res) {
                 res.json({ status: 200, hassuccessed: false, error: err })
               }
               else {
-
-                // console.log("data2", data2.track_record.length)
                 let treck_record = data2 && data2.track_record
                 leftdataPatient.entries = treck_record.length
                 let sum = 0
-
                 treck_record.forEach((element) => {
                   console.log("element", element.attachfile)
                   if (element.attachfile && element.attachfile.length > 0) {
@@ -1774,9 +1950,27 @@ router.post("/LeftInfoPatient", function (req, res) {
                   }
                 })
                 console.log("leftdataPatient", leftdataPatient)
-                res.json({ status: 200, hassuccessed: true, data: leftdataPatient })
+                virtual_step.findOne({ "steps.case_numbers.case_id": data.case_number }).exec(function (err, data3) {
+                  console.log("dat2", data3)
+                  data3.steps.map((element) => {
+                    console.log("elele", element)
+                    if (element.length > 0) {
+                      element.case_number.map((element2) => {
+                        console.log("eleemnrt2", element2)
+                        if (element2.length > 0) {
+                          if (element2.case_id == data.case_number) {
+                            console.log("element", element2)
+                            leftdataPatient.step_name = element.step_name
+                            res.json({ status: 200, hassuccessed: true, data: leftdataPatient })
+                          }
+                        }
+                      })
+                    }
+                  })
+                })
               }
             })
+
           })
         } else {
           res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: [] })
