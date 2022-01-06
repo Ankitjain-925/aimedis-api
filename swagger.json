@@ -2377,7 +2377,41 @@
                     }
                 }
             }
+        },
+        "/vh/downloadInvoice2Pdf": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "downloadinvoice",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/download2"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Api for  Download",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Download PDF"
+                    }
+                }
+            }
         }
+
       
     },
     "definitions": {
@@ -2934,6 +2968,49 @@
                     "uniqueItems": true
                 },
                 "search": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+            }
+        },
+        "download2": {
+            "required": [],
+            "properties": {
+                "choice":{
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "invoice_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "patient": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "case_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "status": {
+                    "type": "object",
+                    "uniqueItems": true
+                },
+                "total_amount": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "created_at": {
                     "type": "string",
                     "uniqueItems": true
                 }
