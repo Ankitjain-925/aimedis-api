@@ -16,6 +16,8 @@ var jwtconfig = require("../jwttoken");
 const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
 var newcf = [];
+const { getMsgLang, trans } = require("./GetsetLang");
+const sendSms = require("./sendSms");
 var fs = require("fs");
 const { join } = require("path");
 var html = fs.readFileSync(join(`${__dirname}/Invoice.html`), "utf8");
@@ -183,11 +185,72 @@ router.post("/AddTask", function (req, res, next) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
+
+        User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
+          if (err && !dofc) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "User is not found",
+              error: err,
+            });
+          } else {
+            if (doc == null || doc == "undefined") {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                msg: "User is not exist",
+              });
+            } else {
+              var m = new Date();
+              var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " +
+                m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
+              var lan1 = getMsgLang(doc._id);
+              lan1.then((result) => {
+                result =
+                  result === "ch"
+                    ? "zh"
+                    : result === "sp"
+                      ? "es"
+                      : result === "rs"
+                        ? "ru"
+                        : result;
+                var sms1 = "There was a task added on in your Aimedis profile -" + req.body.task_name + ' (' + req.body.description + ') at ' + dateString;
+                trans(sms1, { source: "en", target: result }).then((res1) => {
+                  sendSms(doc.mobile, res1)
+                    .then((result) => { })
+                    .catch((e) => {
+                      console.log("Message is not sent", e);
+                    });
+                });
+                if (doc.emergency_number && doc.emergency_number !== "") {
+                  var sms2 =
+                    "There was a task added on -" +
+                    doc.first_name +
+                    " " +
+                    doc.last_name +
+                    " Aimedis profile ( " +
+                    doc.profile_id +
+                    " )  " +
+                    " - " +
+                    req.body.task_name + ' (' + req.body.description + ') at ' + dateString;
+                  trans(sms2, { source: "en", target: result }).then((res1) => {
+                    sendSms(doc.emergency_number, res1)
+                      .then((result) => { })
+                      .catch((e) => {
+                        console.log("Message is not sent", e);
+                      });
+                  });
+                }
+              })
+              res.json({
+                status: 200,
+                message: "Added Successfully",
+                hassuccessed: true,
+              });
+            }
+          }
+        })
       }
     });
   } else {
@@ -889,7 +952,7 @@ router.post("/checkPatient", function (req, res, next) {
               if (createCase) {
                 virtual_Case.findOne({ patient_id: userdata._id, inhospital: true }, function (err, data) {
                   if (err & !data) {
-                    res.json({ status: 200, message: "Something went wrong.",  hassuccessed: false, error: err })
+                    res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
                   }
                   else {
                     if (data) {
@@ -1317,7 +1380,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
         Data.push({
           k: key.replace(/_/g, " "),
           v: value.map((element) => {
-            return {price_per_quantity: element.price_per_quantity , quantity: element.quantity, service: element.service,price: element.price}
+            return { price_per_quantity: element.price_per_quantity, quantity: element.quantity, service: element.service, price: element.price }
           })
         });
       }
@@ -1631,35 +1694,34 @@ router.post("/billfilter", function (req, res) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {
-      var condition = {house_id: req.body.house_id} 
-      if(req.body.status && req.body.status.length > 0)
-      {
-        condition["status.value"] = { $in: req.body.status }
-      }
-      if(req.body.patient_id && req.body.patient_id.length > 0){
-        condition["patient.patient_id"] = { $in: req.body.patient_id }
-      }
-      virtual_Invoice.find(condition, function (err, data2) {
-        if (err & !data2) {
-          res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
-        }else {
-          if(req.body.speciality && req.body.speciality.length > 0){
-            virtual_Case.find({"speciality._id": {$in : req.body.speciality }, house_id: req.body.house_id}, function (err, data) {
-              if (err & !data) {
-                res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
-              }
-              else {
-                var finalData = data2 && data2.length>0 && data2.filter((item)=>item.case_id === data._id)
-                res.json({ status: 200, hassuccessed: true, data: finalData })
-              }
-            })
-          }
-          else{
-            res.json({ status: 200, hassuccessed: true, data:data2})
-          }
+    var condition = { house_id: req.body.house_id }
+    if (req.body.status && req.body.status.length > 0) {
+      condition["status.value"] = { $in: req.body.status }
+    }
+    if (req.body.patient_id && req.body.patient_id.length > 0) {
+      condition["patient.patient_id"] = { $in: req.body.patient_id }
+    }
+    virtual_Invoice.find(condition, function (err, data2) {
+      if (err & !data2) {
+        res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+      } else {
+        if (req.body.speciality && req.body.speciality.length > 0) {
+          virtual_Case.find({ "speciality._id": { $in: req.body.speciality }, house_id: req.body.house_id }, function (err, data) {
+            if (err & !data) {
+              res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+            }
+            else {
+              var finalData = data2 && data2.length > 0 && data2.filter((item) => item.case_id === data._id)
+              res.json({ status: 200, hassuccessed: true, data: finalData })
+            }
+          })
         }
-      })
-    
+        else {
+          res.json({ status: 200, hassuccessed: true, data: data2 })
+        }
+      }
+    })
+
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
   }
@@ -1742,7 +1804,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                 }
               }
             ], function (err, results) {
-              if(results && results.length>0){
+              if (results && results.length > 0) {
                 leftdataPatient.done_task = results[0].done_task;
                 leftdataPatient.total_task = results[0].total_task;
               }
@@ -1762,42 +1824,42 @@ router.post("/LeftInfoPatient", function (req, res) {
                   })
                   virtual_step.findOne({ "steps.case_numbers.case_id": data._id.toString() }).exec(function (err, data3) {
                     if (err) {
-                      res.json({ status: 200, hassuccessed: false,  message: "Something went wrong.", error: err })
-                    }else{
-                    if(data3 && data3.steps && data3.steps.length>0){
-                     data3.steps.map((item) => {
-                        if (item.case_numbers && item.case_numbers.length > 0) {
-                          item.case_numbers.map((item2) => {
-                            if (item2.case_id == data._id.toString()) {
-                              leftdataPatient.step = item;
-                            }
-                          })
+                      res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+                    } else {
+                      if (data3 && data3.steps && data3.steps.length > 0) {
+                        data3.steps.map((item) => {
+                          if (item.case_numbers && item.case_numbers.length > 0) {
+                            item.case_numbers.map((item2) => {
+                              if (item2.case_id == data._id.toString()) {
+                                leftdataPatient.step = item;
+                              }
+                            })
+                          }
+                        });
+                      }
+                      virtual_Invoice.find({ case_id: data._id.toString() }).exec(function (err, invoice) {
+                        if (err) {
+                          res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+                        } else {
+                          leftdataPatient.invoice = invoice;
+                          res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: leftdataPatient })
                         }
-                     });
+                      })
                     }
-                    virtual_Invoice.find({case_id : data._id.toString()  }).exec(function (err, invoice) {
-                      if (err) {
-                        res.json({ status: 200, hassuccessed: false,  message: "Something went wrong.", error: err })
-                      }else{
-                        leftdataPatient.invoice = invoice;
-                        res.json({ status: 200, hassuccessed: true,message: 'succefully find', data: leftdataPatient })
-                      } 
-                    })
-                    } 
                   })
                 }
               })
-  
+
             })
           } else {
             res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: [] })
-  
+
           }
         }
         catch (e) {
           res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: e })
         }
-        
+
       }
     })
   } else {

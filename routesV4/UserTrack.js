@@ -544,7 +544,6 @@ router.put("/AddTrackAdmin", function (req, res, next) {
     req.body.data.created_by = encrypt(req.body.data.created_by);
     req.body.data._enc_created_by = true;
     var full_record = { ...ids, ...req.body.data };
-    if (req.body.option == "specific") {
       user.updateMany(
         {_id: { $in: req.body.UserId }},
         { $push: { track_record: full_record } },
@@ -567,57 +566,14 @@ router.put("/AddTrackAdmin", function (req, res, next) {
                 msg: "User is not found",
               });
             } else {
-              if (doc.nModified == "0") {
-                console.log("I am heereee056");
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  msg: "Pharmacy is not found",
-                });
-              } else {
-                console.log("I am heereee to send on Pharmcay too.");
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   msg: "track is updated",
                 });
-              }
             }
           }
         })
-    }
-    else {
-      user.updateMany(
-        { type: 'patient' },
-        { $push: { track_record: full_record } },
-        { safe: true, upsert: true },
-        function (err, doc) {
-          if (err && !doc) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Something went wrong",
-              error: err,
-            });
-          } else {
-            console.log("docs", doc)
-            if (doc.nModified == "0") {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "User is not found",
-              });
-            } else {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                msg: "track is updated",
-              });
-            }
-          }
-        }
-      );
-    }
   } else {
     res.json({
       status: 200,
