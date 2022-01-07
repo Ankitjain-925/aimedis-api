@@ -93,22 +93,25 @@
 
                 <table width="100%" style="border-bottom:1px solid red; padding-bottom:20px; margin-top:30px">
                     <tr>
-                        <td style="font-size:14px; padding-bottom: 10px; width:70%;">
-
-                            <p>From</p>
-                            <strong>{{Service}}</strong>
-                           
-
-                          
-
-                        </td>
-                        <td style="font-size:14px; padding-bottom: 10px; width:30%;" class="txtalign">
-                            <p>For</p>
-                            <strong><p>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
-                            <p>{{pat_info.patient.profile_id}}</p>
-                            <p>{{pat_info.patient.patient_id}}</p></strong>
-                        </td>
+                        <td style="font-size:14px; width:60%;">From</td>
+                        <td style="font-size:14px; width:40%;" class="txtalign">For</td>
                     </tr>
+
+                    <tr>
+                        <td>{{Service}}</td>
+                        <td>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.profile_id}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.patient_id}}</td>
+                    </tr>
+
                 </table>
 
                 <table width="100%" style="padding-top:30px">

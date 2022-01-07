@@ -90,27 +90,31 @@
                         </td>
                     </tr>
                 </table>
-
-                <table width="100%">
+                <table width="100%" style="border-bottom:1px solid red; padding-bottom:20px;">
                     <tr>
-                        <td style="width:33%;">
-                            <p>From</p>
-                            <strong>{{Service}}</strong>
-                        </td>
-
+                        <td style="width:33%;">From</td>
                         <td width="33%">
                             <p>For</p>
-                            <strong>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</strong>
-                            <p>{{pat_info.patient.profile_id}}</p>
-                            <p>{{pat_info.patient.patient_id}}</p>
                         </td>
+                        <td style="width:33%;">Invoice_no:{{pat_info.invoice_id}}</td>
+                    </tr>
 
-                        <td style="width:33%;">
-                            <strong>
-                                <p>Invoice &nbsp;{{pat_info.invoice_id}}</p>
-                            </strong>
-                            <p>Invoice Date: &nbsp;{{pat_info.created_at}}</p>
-                        </td>
+                    <tr>
+                        <td>{{Service}}</td>
+                        <td>{{pat_info.patient.first_name}}&nbsp;{{pat_info.patient.last_name}}</td>
+                        <td>Invoice_date:{{pat_info.created_at}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.profile_id}}</td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.patient_id}}</td>
+                        <td></td>
                     </tr>
                 </table>
 

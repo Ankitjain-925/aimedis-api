@@ -93,45 +93,29 @@
                         </td>
                     </tr>
                 </table>
-
-                <table width="100%">
+                <table width="100%" style="border-bottom:1px solid red; padding-bottom:20px; margin-top:30px">
                     <tr>
-                        <td>
-                            <p>From</p>
-                            <strong>{{Service}}</strong>
-
-                        </td>
-                        <td>
-                            <p>For</p>
-                            <strong>
-                                <p>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
-                                <p>{{pat_info.patient.profile_id}}</p>
-                                <p>{{pat_info.patient.patient_id}}</p></strong>
-                        </td>
-                        <td>
-                            <strong><p>Invoice &nbsp;:{{pat_info.invoice_id}}</p></strong>
-                            
-                                
-                        </td>
+                        <td style="font-size:14px; width:60%;">From</td>
+                        <td style="font-size:14px; width:40%;" class="txtalign">For</td>
                     </tr>
+
+                    <tr>
+                        <td>{{Service}}</td>
+                        <td>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.profile_id}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.patient_id}}</td>
+                    </tr>
+
                 </table>
-
-                <table border="1" cellspacing="0" cellpadding="10" width="100%" style="margin-top:30px;">
-                    <tr>
-                        <th>PATIENT</th>
-                        <th>DATE OF BIRTH</th>
-                        <th>GENDER</th>
-                        <th>WEIGHT</th>
-                        <th>HEIGHT</th>
-                    </tr>
-                    <tr>
-                        <td>{{pat_info.patient.first_name}}</td>
-                        <td>{{pat_info.patient.d.b.o}}</td>
-                        <td>{{pat_info.patient.gender}} </td>
-                        <td>{{patt_info.patient.Weight}}</td>
-                        <td>{{pat_info.patient.height}}</td>
-                    </tr>
-                </table>
+               
 
                 <table width="100%" cellspacing="0" cellpadding="10" bgcolor="black"
                     style="margin-top:30px; color:white">

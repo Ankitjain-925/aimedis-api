@@ -114,10 +114,9 @@
 
                         <table width="100%" bgcolor="black" style="color:white; margin-top: 20px; padding:10px 20px;">
                             <tr>
-                                <th width="20%" align="left">Medicine</th>
-                                <th width="20%" align="right">Amount</th>
-                                <th width="20%" align="right">Payment</th>
-                                <th width="20%" align="right">Balance</th>
+                                <th width="33%" align="left">Medicine</th>
+                                <th width="33%" align="right">Amount</th>
+                                <th width="33%" align="right">Payment</th>
 
                             </tr>
                         </table>
@@ -126,16 +125,25 @@
                             {{#each Invoice}}
 
                             <tr>
-                                <th width="20%" align="left">{{service}</th>
-                                <th width="20%" align="right">{{price}}</th>
-                                <th width="20%" align="right">{{price}}</th>
-                                <th width="20%" align="right">{{price}}</th>
+                                <th width="33%" align="left">{{service}}</th>
+                                <th width="33%" align="right">{{price}}</th>
+                                <th width="33%" align="right">{{price}}</th>
 
-
+                                
                             </tr>
                             {{/each}}
 
                         </table>
+                        <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;">
+                            <tr>
+                                <td  style="display:flex; justify-content:flex-end">
+                                    <p style="width:33%; text-align:right">Total</p>
+                                    <p style="width:33%; text-align:right">{{pat_info.total_amount}}</p>
+                                    <p style="width:33%; text-align:left"></p>
+                                    
+                                </td>
+                            </tr>
+                      </table>
 
 
                         <table style="font-size:14px; margin-top: 10px;">
