@@ -1,83 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-
-    <style type="text/css" media="screen">
-        body {
-            font-family: Arial, Helvetica, sans-serif !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            display: block !important;
-            min-width: 100% !important;
-            width: 100% !important;
-            background: #fff;
-            -webkit-text-size-adjust: none;
-            line-height: 18px;
-        }
-
-        a {
-            color: #ffffff;
-            text-decoration: none
-        }
-
-        p {
-            padding: 0 !important;
-            margin: 0 !important
-        }
-
-        img {
-            -ms-interpolation-mode: bicubic;
-            /* Allow smoother rendering of resized image in Internet Explorer */
-        }
-
-        .mcnPreviewText {
-            display: none !important;
-        }
-
-        body .MsoNormal {
-            line-height: normal !important;
-        }
-
-
-
-        /* -------------------------------aimedis -------------------------------------------- */
-        * {
-            font-family: Arial, Helvetica, sans-serif !important;
-        }
-
-        .maintabPart {
-            padding: 20px 300px 20px 300px;
-        }
-
-        @media (max-width:599px) {
-
-            .firsttabhead,
-            .secsttabhead {
-                padding-left: 10px !important;
-                padding-right: 10px !important;
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    
+        <style type="text/css" media="screen">
+            body {
+                font-family: Arial, Helvetica, sans-serif !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block !important;
+                min-width: 100% !important;
+                width: 100% !important;
+                background: #fff;
+                -webkit-text-size-adjust: none;
+                line-height: 18px;
             }
-        }
-
-        @media only screen and (max-device-width: 768px),
-        only screen and (max-width: 768px) {
+    
+            a {
+                color: #ffffff;
+                text-decoration: none
+            }
+    
+            p {
+                padding: 0 !important;
+                margin: 0 !important
+            }
+    
+            img {
+                -ms-interpolation-mode: bicubic;
+                /* Allow smoother rendering of resized image in Internet Explorer */
+            }
+    
+            .mcnPreviewText {
+                display: none !important;
+            }
+    
+            body .MsoNormal {
+                line-height: normal !important;
+            }
+    
+    
+    
+            /* -------------------------------aimedis -------------------------------------------- */
+            * {
+                font-family: Arial, Helvetica, sans-serif !important;
+            }
+    
             .maintabPart {
-                padding: 20px 20px;
+                padding: 20px 300px 20px 300px;
             }
-        }
-
-        @media(min-width:768px) and (max-width:1150px) {
-            .maintabPart {
-                padding: 20px 100px;
+    
+            @media (max-width:599px) {
+    
+                .firsttabhead,
+                .secsttabhead {
+                    padding-left: 10px !important;
+                    padding-right: 10px !important;
+                }
             }
-    </style>
-
-
-</head>
+    
+            @media only screen and (max-device-width: 1168px),
+            only screen and (max-width: 1168px) {
+                .maintabPart {
+                    padding: 20px 20px;
+                }
+            }
+    
+            
+        </style>
+    
+    
+    </head>
 
 <body>
     <table width="100%" bordre="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" class="maintabPart">
@@ -100,19 +97,16 @@
 
                             <p>From</p>
                             <strong>{{Service}}</strong>
-                            <p>{{Invoice.institute.email}}</p>
-                            <p>{{Invoice.institute.address}}</p>
-                            <p>{{Invoice.institute.phone}}</p>
+                           
 
                           
 
                         </td>
                         <td style="font-size:14px; padding-bottom: 10px; width:30%;" class="txtalign">
                             <p>For</p>
-                            <strong>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</strong>
+                            <strong><p>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
                             <p>{{pat_info.patient.profile_id}}</p>
-                            <p>{{pat_info.patient.patient_id}}</p>
-                            <p>{{pat_info.patient.phone}}</p>
+                            <p>{{pat_info.patient.patient_id}}</p></strong>
                         </td>
                     </tr>
                 </table>
@@ -123,13 +117,11 @@
                             <p>Number</p>
                             <p>Date</p>
                             <p>Terms</p>
-                            <p>Due</p>
                         </td>
                         <td style="font-size:14px; padding-bottom: 10px;">
                             <p>{{pat_info.invoice_id}}</p>
                             <p>{{pat_info.created_at}}</p>
                             <p>{{pat_info.status.label_en}}</p>
-                            <p>{{pat_info.due_date}}</p>
                         </td>
                     </tr>
                 </table>
@@ -162,17 +154,11 @@
                         style="text-align:right; border-bottom: 2px solid red; padding:10px 20px 20px 20px">
                         <tr>
                             <td style="font-size:14px; padding-bottom: 10px; width:10%; width:80%">
-                                <p>Subtotal</p>
-                                <p>Tax(7%)</p>
                                 <p>Total</p>
-                                <strong>Balance Due</strong>
                             </td>
 
                             <td style="font-size:14px; padding-bottom: 10px; width:20%">
-                                <p>Subtotal</p>
-                                <p>Tax(7%)</p>
                                 <p>{{pat_info.total_amount}}</p>
-                                <strong>Balance Due</strong>
                             </td>
                         </tr>
                     </table>
@@ -181,7 +167,11 @@
                     <table style="font-size:14px; margin-top: 10px;">
                         <tr>
                             <td>
-                                <p>Notes any relevant info, terms, paymant instruction, e.t.c.</p>
+                                <h3>Your Aimedis team</h3>
+                                <p>https://aimedis.io</p>
+                                <p>https://sys.aimedis.com</p>
+                                <p style="margin-top: 30px!important">If you have any questions do not hesitate to
+                                    contact us via the support chat or via contact@aimedis.com</p>
                             </td>
                         </tr>
                     </table>

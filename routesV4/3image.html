@@ -63,17 +63,14 @@
             }
         }
 
-        @media only screen and (max-device-width: 768px),
-        only screen and (max-width: 768px) {
+        @media only screen and (max-device-width: 1168px),
+        only screen and (max-width: 1168px) {
             .maintabPart {
                 padding: 20px 20px;
             }
         }
 
-        @media(min-width:768px) and (max-width:1150px) {
-            .maintabPart {
-                padding: 20px 100px;
-            }
+        
     </style>
 
 
@@ -81,103 +78,79 @@
 
 <body>
 
-
-
-
-    <table width="100%" >
-        <tr>{{Service}}</tr>
+    <table width="100%" bordre="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" class="maintabPart">
         <tr>
-            <th width="25%" align="left">Street Address</th>
-            <th width="20%">Address</th>
-            <th width="15%">City</th>
-        </tr>
-    </table>
-    <table>
+            <td valign="top">
 
-        <table width="100%">
-            <tr>
-                <th width="25%" align="left">Phone:</th>
-                <th width="20%">Fax</th>
-                <th width="15%">E-mail</th>
-            </tr>
-        </table>
-        <table width="100%" >
-            <tr>
-                <th width="25%" align="left"></th>
-                <th width="20%"></th>
-                <th width="15%"></th>
-            </tr>
-        </table>
+                <table width="100%" border="1" cellspacing="0">
+                    <tr>
+                        <th colspan="3" bgcolor="black" style="color:white; padding:10px" align="left">{{Service}}</th>
+                    </tr>
+                </table>
 
-        <table width="100%" style="border-bottom:1px solid red; padding-bottom:20px; margin-top:30px">
-            <tr>
-                <td style="font-size:14px; padding-bottom: 10px; width:70%;">
-                    <p>Service Charges</p>
-                    <strong>
-                        <p>Invoice: &nbsp;{{pat_info.invoice_id}}</p>
-                        <p>Date: &nbsp;</p>
-                        <p>CustomerID:{{pat_info.patient.patient_id}}</p>
-                        <p>Bed Number</p>
-                        <p>AdmissionDate</p>
-                    </strong>
-                </td>
-                <td style="font-size:14px; padding-bottom: 10px; width:30%;" class="txtalign">
+                <table>
 
-                    <strong>
-                        <p>Bill to:{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
-                        <p>Company Name:</p>
-                        <p>Street Addresses:</p>
-                        <p>Address:</p>
-                        <p>Ciy,ST,Zip code:</p>
-                    </strong>
-                </td>
-            </tr>
-        </table>
+                    <table width="100%" style="border-bottom:1px solid red; padding-bottom:20px; margin-top:30px">
+                        <tr>
+                            <th align="left">SERVICE CHANGES</th>
+                        </tr>
+                            <td style="font-size:14px; padding-bottom: 10px; width:65%;">
+                                
+                                    <p><strong>Invoice:</strong> &nbsp;{{pat_info.invoice_id}}</p>
+                                    <p><strong>Date:</strong> &nbsp;{{pat_info.created_at}}</p>
+                                    <p><strong>CustomerID:</strong>{{pat_info.patient.patient_id}}</p>
+                                
+                            </td>
+                            
+                            <td style="font-size:14px; padding-bottom: 10px; width:35%;" class="txtalign">
+
+                                    <p><strong>Bill to:</strong>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
+                            </td>
+                        </tr>
+                    </table>
 
 
-        <table>
+                    <table>
 
-            <table width="100%" bgcolor="black" style="color:white; margin-top: 20px; padding:10px 20px;">
-                <tr>
-                    <th width="20%" align="left">Medicine</th>
-                    <th width="20%">Equipment</th>
-                    <th width="20%" align="right">Amount</th>
-                    <th width="20%" align="right">Payment</th>
-                    <th width="20%" align="right">Balance</th>
+                        <table width="100%" bgcolor="black" style="color:white; margin-top: 20px; padding:10px 20px;">
+                            <tr>
+                                <th width="20%" align="left">Medicine</th>
+                                <th width="20%" align="right">Amount</th>
+                                <th width="20%" align="right">Payment</th>
+                                <th width="20%" align="right">Balance</th>
 
-                </tr>
-            </table>
-            <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;" class="secsttabhead">
-                {{#each Invoice}}
+                            </tr>
+                        </table>
+                        <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;"
+                            class="secsttabhead">
+                            {{#each Invoice}}
 
-                <tr>
-                    <th width="20%" align="left">{{price_per_quantity}}</th>
-                    <th width="20%">{{service}}</th>
-                    <th width="20%" align="right">{{price}}</th>
-                    <th width="20%" align="right">{{price}}</th>
-                    <th width="20%" align="right">{{price}}</th>
-
-
-                </tr>
-                {{/each}}
-
-            </table>
+                            <tr>
+                                <th width="20%" align="left">{{service}</th>
+                                <th width="20%" align="right">{{price}}</th>
+                                <th width="20%" align="right">{{price}}</th>
+                                <th width="20%" align="right">{{price}}</th>
 
 
+                            </tr>
+                            {{/each}}
+
+                        </table>
 
 
-            <table style="font-size:14px; margin-top: 10px;">
-                <tr>
-                    <td>
-                        <h1>Terms and Condition</h1>
-                        <p>Thank you for business send paymentwithin_____ days of receiving this invoice. There will be
-                            a ____% per______on late invoices.</p>
-                    </td>
-                </tr>
-            </table>
+                        <table style="font-size:14px; margin-top: 10px;">
+                            <tr>
+                                <td>
+                                    <h3>Your Aimedis team</h3>
+                                    <p>https://aimedis.io</p>
+                                    <p>https://sys.aimedis.com</p>
+                                    <p style="margin-top: 30px!important">If you have any questions do not hesitate to contact us via the support chat or via contact@aimedis.com</p>
+                                </td>
+                            </tr>
+                        </table>
 
-        </table>
-        </td>
+                    </table>
+            </td>
         </tr>
     </table>
 </body>

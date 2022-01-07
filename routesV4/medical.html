@@ -63,17 +63,14 @@
             }
         }
 
-        @media only screen and (max-device-width: 768px),
-        only screen and (max-width: 768px) {
+        @media only screen and (max-device-width: 1168px),
+        only screen and (max-width: 1168px) {
             .maintabPart {
                 padding: 20px 20px;
             }
         }
 
-        @media(min-width:768px) and (max-width:1150px) {
-            .maintabPart {
-                padding: 20px 100px;
-            }
+      
     </style>
 
 
@@ -96,32 +93,31 @@
 
                 <table width="100%">
                     <tr>
-                        <td >
+                        <td style="width:33%;">
                             <p>From</p>
                             <strong>{{Service}}</strong>
-                            <p>{{Invoice.institute.email}}</p>
-                            <p>{{Invoice.institute.address}}</p>
-                            <p>{{Invoice.institute.phone}}</p>
                         </td>
-                        <td >
+
+                        <td width="33%">
                             <p>For</p>
                             <strong>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</strong>
                             <p>{{pat_info.patient.profile_id}}</p>
                             <p>{{pat_info.patient.patient_id}}</p>
-                            <p>{{Invoice.institute.phone}}</p>
                         </td>
-                        
-                        <td>
-                            <strong><p>Invoice &nbsp;{{pat_info.invoice_id}}</p></strong>
-                            <p>Due Date &nbsp;{{pat_info.created_at}}</p>
+
+                        <td style="width:33%;">
+                            <strong>
+                                <p>Invoice &nbsp;{{pat_info.invoice_id}}</p>
+                            </strong>
+                            <p>Invoice Date: &nbsp;{{pat_info.created_at}}</p>
                         </td>
                     </tr>
                 </table>
 
+
                 <table>
 
-                    <table width="100%" bgcolor="black"
-                        style="color:white; margin-top: 20px; padding:10px 20px;">
+                    <table width="100%" bgcolor="black" style="color:white; margin-top: 20px; padding:10px 20px;">
                         <tr>
                             <th width="25%" align="left">Medical Services Performed</th>
                             <th width="25%">Medication</th>
@@ -142,18 +138,35 @@
 
                         </tr>
                         {{/each}}
-                       
+
 
                     </table>
 
-                    
+                    <table width="100%">
+                        <tr>
+                            <td style="width:85%; text-align:right; padding-top: 10px;">
+                               
+                                <p>Total</p>
+                            </td>
+
+                            <td style="width:15%; text-align:right; padding-top: 10px;">
+                                
+                                <p>{{pat_info.total_amount}}</p>
+                            </td>
+                        </tr>
+                    </table>
+
+
 
 
                     <table style="font-size:14px; margin-top: 10px;">
                         <tr>
                             <td>
-                                <h1>Terms and Condition</h1>
-                                <p>Thank you for business send paymentwithin_____ days of receiving this invoice. There will be a ____% per______on late invoices.</p>
+                                <h3>Your Aimedis team</h3>
+                                <p>https://aimedis.io</p>
+                                <p>https://sys.aimedis.com</p>
+                                <p style="margin-top: 30px!important">If you have any questions do not hesitate to
+                                    contact us via the support chat or via contact@aimedis.com</p>
                             </td>
                         </tr>
                     </table>

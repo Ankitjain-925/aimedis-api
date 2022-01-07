@@ -63,17 +63,17 @@
             }
         }
 
-        @media only screen and (max-device-width: 768px),
-        only screen and (max-width: 768px) {
+        @media only screen and (max-device-width: 1168px),
+        only screen and (max-width: 1168px) {
             .maintabPart {
                 padding: 20px 20px;
             }
         }
 
-        @media(min-width:768px) and (max-width:1150px) {
+        /* @media(min-width:768px) and (max-width:1150px) {
             .maintabPart {
                 padding: 20px 100px;
-            }
+            } */
     </style>
 
 
@@ -99,90 +99,90 @@
                         <td>
                             <p>From</p>
                             <strong>{{Service}}</strong>
-                            <p>{{Invoice.institute.email}}</p>
-                            <p>{{Invoice.institute.address}}</p>
-                            <p>{{Invoice.institute.phone}}</p>
+
                         </td>
-                        <td style="font-size:14px; padding-bottom: 10px; width:30%;" class="txtalign">
+                        <td>
                             <p>For</p>
-                            <strong>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</strong>
-                            <p>{{pat_info.patient.profile_id}}</p>
-                            <p>{{pat_info.patient.patient_id}}</p>
-                            <p>{{pat_info.patient.phone}}</p>
+                            <strong>
+                                <p>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
+                                <p>{{pat_info.patient.profile_id}}</p>
+                                <p>{{pat_info.patient.patient_id}}</p></strong>
+                        </td>
+                        <td>
+                            <strong><p>Invoice &nbsp;:{{pat_info.invoice_id}}</p></strong>
+                            
+                                
                         </td>
                     </tr>
                 </table>
 
-                <table>
+                <table border="1" cellspacing="0" cellpadding="10" width="100%" style="margin-top:30px;">
+                    <tr>
+                        <th>PATIENT</th>
+                        <th>DATE OF BIRTH</th>
+                        <th>GENDER</th>
+                        <th>WEIGHT</th>
+                        <th>HEIGHT</th>
+                    </tr>
+                    <tr>
+                        <td>{{pat_info.patient.first_name}}</td>
+                        <td>{{pat_info.patient.d.b.o}}</td>
+                        <td>{{pat_info.patient.gender}} </td>
+                        <td>{{patt_info.patient.Weight}}</td>
+                        <td>{{pat_info.patient.height}}</td>
+                    </tr>
+                </table>
 
-                    <table width="100%" bgcolor="black" style="color:white; margin-top: 20px; padding:10px 20px;">
+                <table width="100%" cellspacing="0" cellpadding="10" bgcolor="black"
+                    style="margin-top:30px; color:white">
+                    <tr>
+                        <th width="20%">MEDICATION</th>
+                        <th width="40%">MEDICAL SERVICES PERFORMED</th>
+                        <th width="20%">RATE</th>
+                        <th width="20%">TOTAL</th>
+                    </tr>
+
+
+
+                </table>
+
+                <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;" class="secsttabhead">
+                    {{#each Invoice}}
+
+                    <tr>
+
+                        <th width="20%" align="left">{{price_per_quantity}}</th>
+                        <th width="40%">{{service}}</th>
+                        <th width="20%" align="right">{{price}}</th>
+                        <th width="20%" align="right">{{price}}</th>
+
+                    </tr>
+                    {{/each}}
+
+
+                    <table width="100%"
+                        style="text-align:right; border-bottom: 2px solid red; padding:10px 20px 20px 20px">
                         <tr>
-                            <th width="25%" align="left">Patient</th>
-                            <th width="20%">D.B.O</th>
-                            <th width="15%">Gender</th>
-                            <th width="15%" align="right">Weight</th>
-                            <th width="10%" align="right">Height</th>
-                            <th width="15%" align="right">Date</th>
+                            <td style="font-size:14px; padding-bottom: 10px; width:10%; width:80%">
+                                <p>Total</p>
+                            </td>
 
+                            <td style="font-size:14px; padding-bottom: 10px; width:20%">
+                                <p>{{pat_info.total_amount}}</p>
+                            </td>
                         </tr>
                     </table>
-                    <table>
-
-                        <table width="100%" >
-                            <tr>
-                                <th width="25%" align="left">{{pat_info.patient.first_name}}</th>
-                                <th width="20%">{{pat_info.patient.first_name}}</th>
-                                <th width="15%">{{pat_info.patient.first_name}}</th>
-                                <th width="15%" align="right">{{pat_info.patient.first_name}}</th>
-                                <th width="10%" align="right">{{pat_info.patient.first_name}}</th>
-                                <th width="15%" align="right">{{pat_info.patient.first_name}}</th>
-
-
-                            </tr>
-                        </table>
-
-                        <table>
-
-                            <table width="100%" bgcolor="black"
-                                style="color:white; margin-top: 20px; padding:10px 20px;">
-                                <tr>
-                                    <th width="20%" align="left">Medication</th>
-                                    <th width="40%">Medical Services Performed</th>
-
-                                    <th width="20%" align="right">Rate($)</th>
-                                    <th width="20%" align="right">Total($)</th>
-
-                                </tr>
-                            </table>
-                            <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;"
-                                class="secsttabhead">
-                                {{#each Invoice}}
-
-                                <tr>
-                                    <th width="20%" align="left">{{price_per_quantity}}</th>
-                                    <th width="40%">{{service}}</th>
-                                    <th width="20%" align="right">{{price}}</th>
-                                    <th width="20%" align="right">{{price}}</th>
-
-                                </tr>
-                                {{/each}}
-
-                            </table>
-
-
-
-
-                            <table style="font-size:14px; margin-top: 10px;">
-                                <tr>
-                                    <td>
-                                        <h1>Terms and Condition</h1>
-                                        <p>Thank you for business send paymentwithin_____ days of receiving this
-                                            invoice. There will be a ____% per______on late invoices.</p>
-                                    </td>
-                                </tr>
-                            </table>
-
-                        </table>
+                    <table style="font-size:14px; margin-top: 10px;">
+                        <tr>
+                            <td>
+                                <h3>Your Aimedis team</h3>
+                                <p>https://aimedis.io</p>
+                                <p>https://sys.aimedis.com</p>
+                                <p style="margin-top: 30px!important">If you have any questions do not hesitate to
+                                    contact us via the support chat or via contact@aimedis.com</p>
+                            </td>
+                        </tr>
+                    </table>
             </td>
         </tr>
     </table>
