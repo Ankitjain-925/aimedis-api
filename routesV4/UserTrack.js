@@ -10,6 +10,7 @@ var jwtconfig = require("../jwttoken");
 const uuidv1 = require("uuid/v1");
 const { join } = require("path");
 const sendSms = require("./sendSms");
+var virtual_Case = require("../schema/virtual_cases.js");
 const moment = require("moment");
 const { getMsgLang, trans } = require("./GetsetLang");
 const {
@@ -545,7 +546,7 @@ router.put("/AddTrackAdmin", function (req, res, next) {
     req.body.data._enc_created_by = true;
     var full_record = { ...ids, ...req.body.data };
       user.updateMany(
-        {_id: { $in: req.body.UserId }},
+        {_id: { $in: req.body.data.UserId }},
         { $push: { track_record: full_record } },
         { safe: true, upsert: true },
         function (err, doc) {
@@ -1797,6 +1798,46 @@ router.get("/getAllUserProfileId", (req, res, next) => {
     });
   }
 });
+
+router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_Case.find(
+      { $and: [{ house_id: req.params.house_id }, { inhospital: true }] },
+      function (err, user_data) {
+        if (err && !user_data) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          user.find({ institute_id: req.params.institute_id, type:'patient' })
+          .exec()
+          .then((data) => {
+            console.log('user_daya', data, user_data)
+            var LisiUser= [...user_data, ...data];
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "User is found",
+                data: LisiUser,
+              });
+          });
+          
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 
 function mySorter(a, b) {
   var x = a.datetime_on.toLowerCase();
