@@ -28,7 +28,7 @@ var billinvoice3 = fs.readFileSync(join(`${__dirname}/3image.html`), "utf8");
 var html_to_pdf = require("html-pdf-node");
 const { virtual } = require("../schema/topic.js");
 var flatArraya = [];
-
+var Inhospital = [];
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
@@ -1867,6 +1867,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
   let legit = jwtconfig.verify(token)
   if (legit) {
     flatArraya = [];
+    Inhospital = [];
     virtual_Case.find({ patient_id: req.params.patient_id }, function (err, data) {
       if (err & !data) {
         res.json({ status: 200, hassuccessed: true, error: err })
@@ -1875,8 +1876,8 @@ router.get("/patientjourney/:patient_id", function (req, res) {
         if (data && data.length > 0) {
           forEachPromise(data, taskfromhouseid)
           .then((result) => {
-            
-            res.json({ status: 200, hassuccessed: true, msg: 'User is found', data: flatArraya })
+            res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: flatArraya })
+  
           })
         }
         else {
@@ -2344,15 +2345,14 @@ router.post("/LeftInfoPatient", function (req, res) {
 
 function ansfromhouseid(data) {
   return new Promise((resolve, reject) => {
-    let house_id = data[0].house_id
+    let house_id = data.house_id
     const VirtualtToSearchWith = new answerspatient({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    answerspatient.find({ $or: [{ house_id: data[0].house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, ans) {
+    answerspatient.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, ans) {
       if (err) {
         reject([])
       }
       else {
-        console.log("ans", ans)
         resolve(ans)
       }
     })
@@ -2369,10 +2369,22 @@ function taskfromhouseid(item) {
         if (err) {
           resolve(flatArraya)
         } else {
+          if(!Inhospital.includes(item.house_id)){
           flatArraya.push(...task);
-          flatArraya = flatArraya.filter((c, index) => {
-            return flatArraya.indexOf(c) === index;
-        });
+            var ansfromhousessid = ansfromhouseid(item)
+            ansfromhousessid.then((result)=> {
+              flatArraya.push(...result);
+            })
+          }
+          if(item.inhospital == false){
+            console.log('I am hereeee')
+            var invoices = invoicefromhouseid(item)
+            console.log('invoices', invoices)
+            invoices.then((result)=> {
+              flatArraya.push(...result);
+            })
+            Inhospital.push(item.house_id);
+          }
           resolve(flatArraya)
         }
       })
@@ -2418,11 +2430,10 @@ function taskfromhouseid(item) {
 function invoicefromhouseid(data) {
   return new Promise((resolve, reject) => {
     let flatArray = []
-    let house_id = data[0].house_id
-    console.log("house_id", house_id)
+    let house_id = data.house_id;
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Invoice.find({ $or: [{ house_id: data[0].house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, invoice) {
+    virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, invoice) {
       if (err) {
         console.log("err", err)
         resolve(flatArray)
