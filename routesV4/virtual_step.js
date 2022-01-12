@@ -484,7 +484,7 @@ function getfullInfo(data) {
           .exec()
           .then(function (doc5) {
             if(doc5){
-                if(doc3.inhospital===true){
+                if(doc3.inhospital==true){
                   var data5= {}
                   data5 = doc3;
                   var Tasks = new Promise((resolve, reject)=>{
@@ -497,12 +497,20 @@ function getfullInfo(data) {
                         "done_task": [
                           { "$match" : {"case_id": data.case_id,  "status": "done"}},
                           { "$count": "done_task" }
-                        ]
+                        ],
+                        "total_comments": [  
+                          { "$match" : {"case_id": data.case_id,}},
+                          { "$group": { 
+                          "_id": null, 
+                          "total_count": { $sum: { $size: "$comments" } }
+                      }},]
                       }},
                       { "$project": {
                         "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
-                        "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
+                        "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] },
+                        "total_comments": { "$arrayElemAt": ["$total_comments.total_count", 0] }
                       }}
+                      
                     ], function (err, results) {
                       resolve(results)
                   })
@@ -510,11 +518,19 @@ function getfullInfo(data) {
                    if(data3 && data3.length>0){
                     data5.done_task = data3[0].done_task;
                     data5.total_task = data3[0].total_task;
+                    data5.total_comments = data3[0].total_comments;
+                    fullinfo.push(data5);
+                    resolve(fullinfo);
+                   }
+                   else{
                     fullinfo.push(data5);
                     resolve(fullinfo);
                    }
                   })
                 
+              }
+              else{
+                resolve(fullinfo);
               }
             }
             else{
