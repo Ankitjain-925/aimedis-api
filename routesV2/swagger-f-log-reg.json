@@ -1,0 +1,156 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.4.0",
+        "title": "Aimedis API",
+        "description": "Manage the Api",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "host": "aidoc.io",
+    "basePath": "/api/v3",
+    "tags": [
+        {
+            "name": "Registration",
+            "description": "API for user registration"
+        },
+        {
+            "name": "User",
+            "description": "API for user login"
+        }
+        
+      
+    ],
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/UserProfile/AddUser": {
+            "post": {
+                "tags": [
+                    "Registration"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration",
+                        "in": "body",
+                        "description": "Add new User",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User added succefully",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/UserProfile/UserLogin": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "Login the User",
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                ],
+                "summary": "For Login",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                }
+            }
+        }
+      
+      
+    },
+    "definitions": {
+        "User": {
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "first_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "last_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "country_code": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "mobile": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+               
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "password": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+               
+                
+               
+            }
+        },
+       
+        "Login": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "password": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        }
+
+    }
+}

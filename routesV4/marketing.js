@@ -17,6 +17,7 @@ var transporter = nodemailer.createTransport({
     pass: process.env.MAIL_PASS,
   },
 });
+
 router.post("/MarketingMail", function (req, res) {
   if (req.body.email !== "") {
     let mailOptions = {

@@ -411,7 +411,7 @@ router.post("/UserLogin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://sys.aimedis.io/change-password";
+                      let link = "https://aidoc.io/change-password";
                       var sendData =
                         "<div>Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -694,7 +694,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://sys.aimedis.io/admin/change-password";
+                      let link = "https://aidoc.io/admin/change-password";
                       var sendData =
                         "<div>Admin Aimedis Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -868,8 +868,8 @@ router.post("/UserntfCheck", function (req, res, next) {
 //   // Making POST request to verify captcha
 
 //       let token= "abchere"
-//       let link = "https://sys.aimedis.io/";
-//       var verifylink = `https://sys.aimedis.io/?token=${token}`
+//       let link = "https://aidoc.io/";
+//       var verifylink = `https://aidoc.io/?token=${token}`
 //       let datacomposer = (lang, {verifylink}) => {
 //         return {};
 //       };
@@ -934,14 +934,14 @@ router.post("/UserntfCheck", function (req, res, next) {
 router.post("/AddUser", function (req, res, next) {
   const response_key = req.body.token;
   // Making POST request to verify captcha
-var config = {
-  method: "post",
-  url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
-};
-axios(config)
-  .then(function (google_response) {
+// var config = {
+//   method: "post",
+//   url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
+// };
+// axios(config)
+//   .then(function (google_response) {
     
-    if (google_response.data.success == true) {
+    // if (google_response.data.success == true) {
       if (
         req.body.email == "" ||
         req.body.email == undefined ||
@@ -1069,8 +1069,8 @@ axios(config)
                           user_id = user_data._id;
                           let token = user_data.usertoken;
                           //let link = 'http://localhost:3000/';
-                          let link = "https://sys.aimedis.io/";
-                          var verifylink = `https://sys.aimedis.io/?token=${token}`
+                          let link = "https://aidoc.io/";
+                          var verifylink = `https://aidoc.io/?token=${token}`
                           let datacomposer = (lang, {verifylink}) => {
                             return {};
                           };
@@ -1156,21 +1156,21 @@ axios(config)
             }
           });
       }
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Authentication required.",
-      });
-    }
-  })
-  .catch(function (error) {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  });
+  //   } else {
+  //     res.json({
+  //       status: 200,
+  //       hassuccessed: false,
+  //       msg: "Authentication required.",
+  //     });
+  //   }
+  // })
+  // .catch(function (error) {
+  //   res.json({
+  //     status: 200,
+  //     hassuccessed: false,
+  //     msg: "Authentication required.",
+  //   });
+  // });
 });
 
 router.put("/Bookservice", (req, res) => {
@@ -7231,11 +7231,11 @@ router.post("/forgotPassword", function (req, res, next) {
             console.log("userdata1", user_data1);
             if (token !== "") {
               var link =
-                "https://sys.aimedis.io/change-password?token=" + token;
+                "https://aidoc.io/change-password?token=" + token;
               if (req.body.passFrom === "landing") {
                 // link = '/change-password';
                 // link = 'https://aidoc.io/change-password'
-                link = "https://sys.aimedis.io/change-password?token=" + token;
+                link = "https://aidoc.io/change-password?token=" + token;
               }
               // link = 'http://localhost:3000/change-password';
               var lan1 = getMsgLang(user_data1._id);
@@ -7297,7 +7297,7 @@ router.post("/AskPatient1/:id", function (req, res, next) {
         req.body.message +
         "</b><br/><br/><br/>" +
         "<b>Ihr Aimedis Team</b><br/>" +
-        '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+        '<b>Webadresse: </b> <a href="https://aidoc.io">https://aidoc.io</a><br/>' +
         '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
     } else {
       var dhtml =
@@ -7310,7 +7310,7 @@ router.post("/AskPatient1/:id", function (req, res, next) {
         req.body.message +
         "</b><br/><br/><br/>" +
         "<b>Ihr Aimedis Team</b><br/>" +
-        '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+        '<b>Website Url:</b><a href="https://aidoc.io">https://aidoc.io</a><br/>' +
         '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
     }
     var mailOptions = {
@@ -7410,7 +7410,7 @@ router.post("/AskPatient/:id", function (req, res, next) {
       .then((user_data1) => {
         if (user_data1) {
           // var Link1 = 'https://aidoc.io/patient'
-          var Link1 = "https://sys.aimedis.io/patient";
+          var Link1 = "https://aidoc.io/patient";
 
           var lan1 = getMsgLang(user_data1._id);
           lan1.then((result) => {
@@ -7422,7 +7422,7 @@ router.post("/AskPatient/:id", function (req, res, next) {
               ")" +
               " to your trusted private doctor list. To accept / decline / postpone this request please follow the link given below.<br/><br/><br/> " +
               "<b>Your Aimedis team</b><br/>" +
-              '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+              '<b>Website Url:</b><a href="https://aidoc.io">https://aidoc.io</a><br/>' +
               '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
 
             result =
@@ -7466,14 +7466,14 @@ router.post("/AskPatient/:id", function (req, res, next) {
           //     var dhtml = 'Sie haben die Anfrage erhalten, einen neuen DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ')' +
           //         ' zu Ihrer Liste vertrauenswürdiger privater Ärzte hinzuzufügen. Um diese Anfrage anzunehmen / abzulehnen / zu verschieben, folgen Sie bitte dem <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
           //         '<b>Ihr Aimedis Team</b><br/>' +
-          //         '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+          //         '<b>Webadresse: </b> <a href="https://aidoc.io">https://aidoc.io</a><br/>' +
           //         '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
           // }
           // else {
           //     var dhtml = 'You got a request to add a new DOCTOR (' + req.body.first_name + ' ' + req.body.last_name + ')'+
           //         ' to your trusted private doctor list. To accept / decline / postpone this request please follow the <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +
           //         '<b>Your Aimedis team</b><br/>' +
-          //         '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+          //         '<b>Website Url:</b><a href="https://aidoc.io">https://aidoc.io</a><br/>' +
           //         '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
           // }
 
