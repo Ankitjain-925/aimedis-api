@@ -89,6 +89,11 @@ var CaseSchema = new Schema({
         required: false,
         unique: false
     },
+    total_comments:{
+        type: String,
+        required: false,
+        unique: false
+    },
     done_task: { 
         type: String,
         required: false,

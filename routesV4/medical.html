@@ -131,14 +131,14 @@
 
                         </tr>
                     </table>
-                    <table width="100%">
+                    <table width="100%" style="border-bottom: 1px solid red;">
                         {{#each Invoice}}
                         <tr>
-                            <th width="25%" align="left">{{service}}</th>
+                            <th width="25%" align="center">{{service}}</th>
                             <th width="25%">{{price_per_quantity}}</th>
                             <th width="20%">{{quantity}}</th>
-                            <th width="15%" align="right">{{price}}</th>
-                            <th width="15%" align="right">{{price}}</th>
+                            <th width="15%" align="center">{{price}}</th>
+                            <th width="15%" align="center">{{price}}</th>
 
                         </tr>
                         {{/each}}
@@ -146,14 +146,14 @@
 
                     </table>
 
-                    <table width="100%">
+                    <table width="100%" style="border-bottom: 1px solid red;">
                         <tr>
-                            <td style="width:85%; text-align:right; padding-top: 10px;">
+                            <td style="width:85%; text-align:right; padding-top: 10px; padding-right: 20px;">
                                
                                 <p>Total</p>
                             </td>
 
-                            <td style="width:15%; text-align:right; padding-top: 10px;">
+                            <td style="width:15%; text-align:center; padding-top: 10px;">
                                 
                                 <p>{{pat_info.total_amount}}</p>
                             </td>
