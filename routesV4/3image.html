@@ -98,13 +98,13 @@
                                 
                                     <p><strong>Invoice:</strong> &nbsp;{{pat_info.invoice_id}}</p>
                                     <p><strong>Date:</strong> &nbsp;{{pat_info.created_at}}</p>
-                                    <p><strong>CustomerID:</strong>{{pat_info.patient.patient_id}}</p>
+                                    <p><strong>ProfileID:</strong> &nbsp;{{pat_info.patient.profile_id}}</p>
                                 
                             </td>
                             
                             <td style="font-size:14px; padding-bottom: 10px; width:35%;" class="txtalign">
 
-                                    <p><strong>Bill to:</strong>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
+                                    <p><strong>Bill to:</strong>&nbsp;{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</p>
                             </td>
                         </tr>
                     </table>
@@ -112,12 +112,12 @@
 
                     <table>
 
-                        <table width="100%" bgcolor="black" style="color:white; margin-top: 20px; padding:10px 20px;">
+                        <table width="100%" bgcolor="black" style="color:rgb(243, 241, 241); margin-top: 20px; padding:10px 20px;">
                             <tr>
-                                <th width="33%" align="left">Medicine</th>
-                                <th width="33%" align="right">Amount</th>
-                                <th width="33%" align="right">Payment</th>
-
+                                <th width="25%" align="left">Service</th>
+                                <th width="25%" align="right">Quantity</th>
+                                <th width="25%" align="right">Price Per Quantity</th>
+                                <th width="25%" align="right">Amount</th>
                             </tr>
                         </table>
                         <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;"
@@ -125,9 +125,10 @@
                             {{#each Invoice}}
 
                             <tr>
-                                <th width="33%" align="left">{{service}}</th>
-                                <th width="33%" align="right">{{price}}</th>
-                                <th width="33%" align="right">{{price}}</th>
+                                <th width="25%" align="left">{{service}}</th>
+                                <th width="25%" align="right">{{quantity}}</th>
+                                <th width="25%" align="right">{{price_per_quantity}}</th>
+                                <th width="25%" align="right">{{price}}</th>
 
                                 
                             </tr>
@@ -137,9 +138,10 @@
                         <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;">
                             <tr>
                                 <td  style="display:flex; justify-content:flex-end">
-                                    <p style="width:33%; text-align:right">Total</p>
-                                    <p style="width:33%; text-align:right">{{pat_info.total_amount}}</p>
-                                    <p style="width:33%; text-align:left"></p>
+                                    <p style="width:25%; text-align:right"></p>
+                                    <p style="width:25%; text-align:right"></p>
+                                    <p style="width:25%; text-align:right">Total</p>
+                                    <p style="width:25%; text-align:right">{{pat_info.total_amount}}</p>
                                     
                                 </td>
                             </tr>
@@ -152,7 +154,7 @@
                                     <h3>Your Aimedis team</h3>
                                     <p>https://aimedis.io</p>
                                     <p>https://sys.aimedis.com</p>
-                                    <p style="margin-top: 30px!important">If you have any questions do not hesitate to contact us via the support chat or via contact@aimedis.com</p>
+                                    <p>If you have any questions do not hesitate to contact us via the support chat or via contact@aimedis.com</p>
                                 </td>
                             </tr>
                         </table>
