@@ -921,8 +921,7 @@ router.post("/checkPatient", function (req, res, next) {
             { profile_id: messageToSearchWith.profile_id },
             { alies_id: messageToSearchWith1.alies_id },
             { profile_id: req.body.patient_id },
-            { alies_id: req.body.patient_id },
-            {type: "patient"},
+            { alies_id: req.body.patient_id }
           ],
         },
         function (err, userdata) {

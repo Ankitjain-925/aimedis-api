@@ -1,12 +1,9 @@
 require("dotenv").config();
 var express = require("express");
 let router = express.Router();
-const multer = require("multer");
 var User = require("../schema/user.js");
-var Membership = require("../schema/membership.js");
 var Metadata = require("../schema/metadata");
 var Appointment = require("../schema/appointments");
-var DoctrorAppointment = require("../schema/doctor_appointment");
 var Prescription = require("../schema/prescription");
 var Second_opinion = require("../schema/second_option");
 var Sick_certificate = require("../schema/sick_certificate");
@@ -19,7 +16,6 @@ var dateTime = require("node-datetime");
 var nodemailer = require("nodemailer");
 var uuidv1 = require("uuid/v1");
 var moment = require("moment");
-var message = require("../schema/message");
 const { join } = require("path");
 var shortid = require("shortid");
 var aws = require("aws-sdk");
@@ -27,21 +23,25 @@ const axios = require("axios");
 const { getMsgLang, trans } = require("./GetsetLang");
 var fs = require("fs");
 var converter = require("json-2-csv");
-var pdf = require("dynamic-html-pdf");
-const {
-  FieldValueContext,
-} = require("twilio/lib/rest/preview/understand/assistant/fieldType/fieldValue");
 var html = fs.readFileSync(join(`${__dirname}/Userdata.html`), "utf8");
 var html1 = fs.readFileSync(join(`${__dirname}/UserFullData.html`), "utf8");
 var html_to_pdf = require("html-pdf-node");
 var handlebars = require("handlebars");
-const puppeteer = require("puppeteer");
 const {
   getSubject,
   SUBJECT_KEY,
   EMAIL,
   generateTemplate,
 } = require("../emailTemplate/index.js");
+var phoneReg = require("../lib/phone_verification")(API_KEY);
+const Client = require("authy-client").Client;
+const appleReceiptVerify = require("node-apple-receipt-verify");
+var Verifier = require("google-play-billing-validator");
+var options = {
+  email:
+    "app-in-purchase-validator@pc-api-4692645912538711177-40.iam.gserviceaccount.com",
+  key: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCegeoN0LbVry0F\nauvahnfFY9/wMSMA6/UlsCK8mxMlLqWjMl6jNCshNfxaifOzE+CswhnX/P8D6Ylj\nK7j8mlCok7Quqm9oa5KVZiJ6dpdQSudkcOeiiiPMhlo/i/96EXXLO69mxQirf50L\n0rFRx6u/zHZr9PVavFyw2sgNL+bJts9HrkLgIrpeT69CKgpJMQzAadDNzMbnA0Vv\ne5m6iTHseipXvsG6/EZaMlLHENcd9HpH+f0evVGYnth21CtXfP5fym4eRXdfxJby\nAo6UuD0ypPhcjG2RKzz5oeDUSCsavnM2XIEzWneO1XfL2SC0cjXMkB+2azSobapK\nUASk3SFNAgMBAAECggEAD4SIdXHJdIIB1lXxYSNo9logwlMNKjnvdhEYVX6ZETrP\n3HpB6Zhh4I54diSrRwzbIg6emRaboLZsTNkq8w/odZiAO1FUNtTRNO8a0QJrLeEn\nZh3nj3IWrx84FqCOElVDQvJE6brAbom/xjiKQ4dYuR47ObZxjsCCEo5Yp3HZFkY3\n82C8b+1oB7lONEiEXNq8ucfcVKcFJ7Tk7IPJ1LJsW1kYZmfYOm1fUB1DCEoU8pG4\nl8mB9yLUmczppHmZ1A6IYAl9lZZ759eGnLaZ5PZDeoH1F4rDkbOQUAxGL/6Pe/b2\ng5k/fjt17Wj6MHa9RbOt/nm97o5DMWnJ2q+g1dxbwQKBgQDKtOBoX0bZfIJ0GGg0\nvBxPAWje3mXuHbH7CDoJx201OYIvXA3e5NbTmRy6/Z5aoGj3gWek6SQvsvY9YP1w\nVVoqCSD9CkxmWH6nki8edcF8gkf21HVDzX8Px+zE30cncfoLE3ZuEyxQjkUuxd2j\n/ymfij6a9ABN2guHSF+NrEfI+wKBgQDILjpju9Z0Jg7ADB9Vp+4OATb3LnhUsATR\nDOS9k3+JPKV6C6QsKY3CBEDg+1udLsFUbmNaGVEpsT/FKiNoG/odLHPpIn5u8MrI\n5qPus7SpCYXhO3zdTAGkbn31Kc1TCi+PS8Qdrht5AJt5KlWXqcEZC77UOpbhtj6T\nMCoZi4c8VwKBgGZhtxpgTPuaLJWQoklIXY/16U7vy1HaQ8PD4vR/eoQweLWM7CCR\nOoQDSISVhn7FmF6ySHP9oV5KKJ7Vtwwev/yNQdEse2wR9F6UsiHTXheSAeEEa/oD\n99Izqz3AfELLCXzApsdv/ajuQrkeDRVA0ngXLgm7hc/MepgokMKQqm0zAoGAJ2AI\ndjOtdD1EK3x28WdNyQ1uHWLTonzZBbHOkIehz4HRXtdJXLJzwtUJWfe3Roy61Hu+\nKSvPri7CR2sJeeH+6Zwj1JjHW9UbXjcXyc0pXRKVdf84iWL487oUJpQpYgsf3cTe\nd6QWnU+ERWoRWfq3E9EeoSpBIXayikswDMRIPpMCgYEAvZDsm6TB846hL8uZ0osa\n2SYa6a7ZPTRgYBZZx7XaBHp5Sb3Ehjo+jRp/KcoPNKPD6VshOlCgOtORQi5vVU2a\nR+jXPCKI07x6BYzuCjTPSAFqijH7g52O3Y+eWL16U5RXPQESJ6icxTWt/BD4OaZI\n/jKKFyF+mKT1UUS8fX/Hwu4=\n-----END PRIVATE KEY-----\n",
+};
 const UserType = {
   patient: "patient",
   doctor: "doctor",
@@ -55,16 +55,6 @@ const UserType = {
 // https://github.com/seegno/authy-client
 var API_KEY = process.env.ADMIN_API_KEY;
 var SECRET = process.env.ADMIN_API_SECRET;
-var phoneReg = require("../lib/phone_verification")(API_KEY);
-const Client = require("authy-client").Client;
-const TrustedComms = require("twilio/lib/rest/preview/TrustedComms");
-const appleReceiptVerify = require("node-apple-receipt-verify");
-var Verifier = require("google-play-billing-validator");
-var options = {
-  email:
-    "app-in-purchase-validator@pc-api-4692645912538711177-40.iam.gserviceaccount.com",
-  key: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCegeoN0LbVry0F\nauvahnfFY9/wMSMA6/UlsCK8mxMlLqWjMl6jNCshNfxaifOzE+CswhnX/P8D6Ylj\nK7j8mlCok7Quqm9oa5KVZiJ6dpdQSudkcOeiiiPMhlo/i/96EXXLO69mxQirf50L\n0rFRx6u/zHZr9PVavFyw2sgNL+bJts9HrkLgIrpeT69CKgpJMQzAadDNzMbnA0Vv\ne5m6iTHseipXvsG6/EZaMlLHENcd9HpH+f0evVGYnth21CtXfP5fym4eRXdfxJby\nAo6UuD0ypPhcjG2RKzz5oeDUSCsavnM2XIEzWneO1XfL2SC0cjXMkB+2azSobapK\nUASk3SFNAgMBAAECggEAD4SIdXHJdIIB1lXxYSNo9logwlMNKjnvdhEYVX6ZETrP\n3HpB6Zhh4I54diSrRwzbIg6emRaboLZsTNkq8w/odZiAO1FUNtTRNO8a0QJrLeEn\nZh3nj3IWrx84FqCOElVDQvJE6brAbom/xjiKQ4dYuR47ObZxjsCCEo5Yp3HZFkY3\n82C8b+1oB7lONEiEXNq8ucfcVKcFJ7Tk7IPJ1LJsW1kYZmfYOm1fUB1DCEoU8pG4\nl8mB9yLUmczppHmZ1A6IYAl9lZZ759eGnLaZ5PZDeoH1F4rDkbOQUAxGL/6Pe/b2\ng5k/fjt17Wj6MHa9RbOt/nm97o5DMWnJ2q+g1dxbwQKBgQDKtOBoX0bZfIJ0GGg0\nvBxPAWje3mXuHbH7CDoJx201OYIvXA3e5NbTmRy6/Z5aoGj3gWek6SQvsvY9YP1w\nVVoqCSD9CkxmWH6nki8edcF8gkf21HVDzX8Px+zE30cncfoLE3ZuEyxQjkUuxd2j\n/ymfij6a9ABN2guHSF+NrEfI+wKBgQDILjpju9Z0Jg7ADB9Vp+4OATb3LnhUsATR\nDOS9k3+JPKV6C6QsKY3CBEDg+1udLsFUbmNaGVEpsT/FKiNoG/odLHPpIn5u8MrI\n5qPus7SpCYXhO3zdTAGkbn31Kc1TCi+PS8Qdrht5AJt5KlWXqcEZC77UOpbhtj6T\nMCoZi4c8VwKBgGZhtxpgTPuaLJWQoklIXY/16U7vy1HaQ8PD4vR/eoQweLWM7CCR\nOoQDSISVhn7FmF6ySHP9oV5KKJ7Vtwwev/yNQdEse2wR9F6UsiHTXheSAeEEa/oD\n99Izqz3AfELLCXzApsdv/ajuQrkeDRVA0ngXLgm7hc/MepgokMKQqm0zAoGAJ2AI\ndjOtdD1EK3x28WdNyQ1uHWLTonzZBbHOkIehz4HRXtdJXLJzwtUJWfe3Roy61Hu+\nKSvPri7CR2sJeeH+6Zwj1JjHW9UbXjcXyc0pXRKVdf84iWL487oUJpQpYgsf3cTe\nd6QWnU+ERWoRWfq3E9EeoSpBIXayikswDMRIPpMCgYEAvZDsm6TB846hL8uZ0osa\n2SYa6a7ZPTRgYBZZx7XaBHp5Sb3Ehjo+jRp/KcoPNKPD6VshOlCgOtORQi5vVU2a\nR+jXPCKI07x6BYzuCjTPSAFqijH7g52O3Y+eWL16U5RXPQESJ6icxTWt/BD4OaZI\n/jKKFyF+mKT1UUS8fX/Hwu4=\n-----END PRIVATE KEY-----\n",
-};
 var verifier = new Verifier(options);
 const authy = new Client({ key: API_KEY });
 
@@ -86,29 +76,6 @@ var transporter = nodemailer.createTransport({
   },
 });
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-var Certificatestorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads/certificates");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-var upload = multer({ storage: storage }).single("uploadImage");
-var upload1 = multer({ storage: storage }).array("UploadDocument", 5);
-var upload2 = multer({ storage: Certificatestorage }).single(
-  "uploadCertificate"
-);
 
 // router.post('/uploadImage', function (req, res, next) {
 //     const token = (req.headers.token)
@@ -411,7 +378,7 @@ router.post("/UserLogin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://aidoc.io/change-password";
+                      let link = "https://aimedix.com/change-password";
                       var sendData =
                         "<div>Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -694,7 +661,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://aidoc.io/admin/change-password";
+                      let link = "https://aimedix.com/admin/change-password";
                       var sendData =
                         "<div>Admin Aimedis Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -868,8 +835,8 @@ router.post("/UserntfCheck", function (req, res, next) {
 //   // Making POST request to verify captcha
 
 //       let token= "abchere"
-//       let link = "https://aidoc.io/";
-//       var verifylink = `https://aidoc.io/?token=${token}`
+//       let link = "https://aimedix.com/";
+//       var verifylink = `https://aimedix.com/?token=${token}`
 //       let datacomposer = (lang, {verifylink}) => {
 //         return {};
 //       };
@@ -932,16 +899,16 @@ router.post("/UserntfCheck", function (req, res, next) {
 // });
 
 router.post("/AddUser", function (req, res, next) {
-  const response_key = req.body.token;
+  // const response_key = req.body.token;
   // Making POST request to verify captcha
-// var config = {
-//   method: "post",
-//   url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
-// };
-// axios(config)
-//   .then(function (google_response) {
+var config = {
+  method: "post",
+  url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
+};
+axios(config)
+  .then(function (google_response) {
     
-    // if (google_response.data.success == true) {
+    if (google_response.data.success == true) {
       if (
         req.body.email == "" ||
         req.body.email == undefined ||
@@ -1069,8 +1036,8 @@ router.post("/AddUser", function (req, res, next) {
                           user_id = user_data._id;
                           let token = user_data.usertoken;
                           //let link = 'http://localhost:3000/';
-                          let link = "https://aidoc.io/";
-                          var verifylink = `https://aidoc.io/?token=${token}`
+                          let link = "https://aimedix.com/";
+                          var verifylink = `https://aimedix.com/?token=${token}`
                           let datacomposer = (lang, {verifylink}) => {
                             return {};
                           };
@@ -1156,21 +1123,21 @@ router.post("/AddUser", function (req, res, next) {
             }
           });
       }
-  //   } else {
-  //     res.json({
-  //       status: 200,
-  //       hassuccessed: false,
-  //       msg: "Authentication required.",
-  //     });
-  //   }
-  // })
-  // .catch(function (error) {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     msg: "Authentication required.",
-  //   });
-  // });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+  .catch(function (error) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  });
 });
 
 router.put("/Bookservice", (req, res) => {
@@ -7231,11 +7198,11 @@ router.post("/forgotPassword", function (req, res, next) {
             console.log("userdata1", user_data1);
             if (token !== "") {
               var link =
-                "https://aidoc.io/change-password?token=" + token;
+                "https://aimedix.com/change-password?token=" + token;
               if (req.body.passFrom === "landing") {
                 // link = '/change-password';
-                // link = 'https://aidoc.io/change-password'
-                link = "https://aidoc.io/change-password?token=" + token;
+                // link = 'https://aimedix.com/change-password'
+                link = "https://aimedix.com/change-password?token=" + token;
               }
               // link = 'http://localhost:3000/change-password';
               var lan1 = getMsgLang(user_data1._id);
@@ -7409,8 +7376,8 @@ router.post("/AskPatient/:id", function (req, res, next) {
       .exec()
       .then((user_data1) => {
         if (user_data1) {
-          // var Link1 = 'https://aidoc.io/patient'
-          var Link1 = "https://aidoc.io/patient";
+          // var Link1 = 'https://aimedix.com/patient'
+          var Link1 = "https://aimedix.com/patient";
 
           var lan1 = getMsgLang(user_data1._id);
           lan1.then((result) => {

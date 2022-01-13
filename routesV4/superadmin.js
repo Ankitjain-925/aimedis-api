@@ -3,7 +3,6 @@ var express = require("express");
 var router = express.Router();
 const multer = require("multer");
 var User = require("../schema/user");
-var message = require("../schema/message");
 var Topic = require("../schema/topic");
 var Institute = require("../schema/institute");
 const { encrypt, decrypt } = require("./Cryptofile.js");
@@ -22,7 +21,6 @@ var base64 = require("base-64");
 var shortid = require("shortid");
 var API_KEY = process.env.ADMIN_API_KEY;
 var SECRET = process.env.ADMIN_API_SECRET;
-var phoneReg = require("../lib/phone_verification")(API_KEY);
 const Client = require("authy-client").Client;
 const authy = new Client({ key: API_KEY });
 
