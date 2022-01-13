@@ -921,8 +921,7 @@ router.post("/checkPatient", function (req, res, next) {
             { profile_id: messageToSearchWith.profile_id },
             { alies_id: messageToSearchWith1.alies_id },
             { profile_id: req.body.patient_id },
-            { alies_id: req.body.patient_id },
-            {type: "patient"},
+            { alies_id: req.body.patient_id }
           ],
         },
         function (err, userdata) {
@@ -1778,7 +1777,6 @@ router.get("/patientjourney/:patient_id", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
-        console.log("d", data)
         if (data && data.length > 0) {
           forEachPromise(data, taskfromhouseid)
           .then((result) => {
