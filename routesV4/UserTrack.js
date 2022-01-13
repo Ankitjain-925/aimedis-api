@@ -10,6 +10,7 @@ var jwtconfig = require("../jwttoken");
 const uuidv1 = require("uuid/v1");
 const { join } = require("path");
 const sendSms = require("./sendSms");
+var virtual_Case = require("../schema/virtual_cases.js");
 const moment = require("moment");
 const { getMsgLang, trans } = require("./GetsetLang");
 const {
@@ -536,7 +537,7 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
   }
 });
 
-router.put("/AddTrack2", function (req, res, next) {
+router.put("/AddTrackAdmin", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -544,9 +545,8 @@ router.put("/AddTrack2", function (req, res, next) {
     req.body.data.created_by = encrypt(req.body.data.created_by);
     req.body.data._enc_created_by = true;
     var full_record = { ...ids, ...req.body.data };
-    if (req.body.option == "Specific") {
-      user.updateOne(
-        { _id: req.body.UserId },
+      user.updateMany(
+        {_id: { $in: req.body.data.UserId }},
         { $push: { track_record: full_record } },
         { safe: true, upsert: true },
         function (err, doc) {
@@ -567,61 +567,14 @@ router.put("/AddTrack2", function (req, res, next) {
                 msg: "User is not found",
               });
             } else {
-              if (doc.nModified == "0") {
-                console.log("I am heereee056");
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  msg: "Pharmacy is not found",
-                });
-              } else {
-                console.log("I am heereee to send on Pharmcay too.");
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   msg: "track is updated",
                 });
-              }
             }
           }
         })
-    }
-
-    else {
-      user.updateMany(
-        { _id: req.body.UserId },
-        { $push: { track_record: full_record } },
-        { safe: true, upsert: true },
-        function (err, doc) {
-          console.log("err1", err)
-          if (err && !doc) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Something went wrong",
-              error: err,
-            });
-          } else {
-            console.log("docs", doc)
-            if (doc.nModified == "0") {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "User is not found",
-              });
-            } else {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                msg: "track is updated",
-              });
-            }
-            // res.json({ status: 200, hassuccessed: true, msg: 'track is updated' })
-          }
-        }
-      );
-
-    }
   } else {
     res.json({
       status: 200,
@@ -1845,6 +1798,46 @@ router.get("/getAllUserProfileId", (req, res, next) => {
     });
   }
 });
+
+router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_Case.find(
+      { $and: [{ house_id: req.params.house_id }, { inhospital: true }] },
+      function (err, user_data) {
+        if (err && !user_data) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          user.find({ institute_id: req.params.institute_id, type:'patient' })
+          .exec()
+          .then((data) => {
+            console.log('user_daya', data, user_data)
+            var LisiUser= [...user_data, ...data];
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "User is found",
+                data: LisiUser,
+              });
+          });
+          
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 
 function mySorter(a, b) {
   var x = a.datetime_on.toLowerCase();
