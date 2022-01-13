@@ -899,7 +899,7 @@ router.post("/UserntfCheck", function (req, res, next) {
 // });
 
 router.post("/AddUser", function (req, res, next) {
-  // const response_key = req.body.token;
+  const response_key = req.body.token;
   // Making POST request to verify captcha
 var config = {
   method: "post",
@@ -1036,8 +1036,8 @@ axios(config)
                           user_id = user_data._id;
                           let token = user_data.usertoken;
                           //let link = 'http://localhost:3000/';
-                          let link = "https://aimedix.com/";
-                          var verifylink = `https://aimedix.com/?token=${token}`
+                          let link = "https://sys.aimedis.io/";
+                          var verifylink = `https://sys.aimedis.io/?token=${token}`
                           let datacomposer = (lang, {verifylink}) => {
                             return {};
                           };
@@ -1084,7 +1084,7 @@ axios(config)
                               }
                             }
                           );
-     
+    
                           User.findOne({ _id: user_id }, function (err, doc) {
                             if (err && !doc) {
                               res.json({
