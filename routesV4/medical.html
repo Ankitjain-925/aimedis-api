@@ -121,46 +121,40 @@
 
                 <table>
 
-                    <table width="100%" bgcolor="black" style="color:white; margin-top: 20px; padding:10px 20px;">
+                    <table width="100%" bgcolor="black" style="color:rgb(243, 241, 241); margin-top: 20px; padding:10px 20px;">
                         <tr>
-                            <th width="25%" align="left">Medical Services Performed</th>
-                            <th width="25%">Medication</th>
-                            <th width="20%">Patient</th>
-                            <th width="15%" align="right">Rate($)</th>
-                            <th width="15%" align="right">Total($)</th>
-
+                            <th width="25%" align="left">Service</th>
+                            <th width="25%" align="right">Quantity</th>
+                            <th width="25%" align="right">Price Per Quantity</th>
+                            <th width="25%" align="right">Amount</th>
                         </tr>
                     </table>
-                    <table width="100%" style="border-bottom: 1px solid red;">
+                    <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;"
+                        class="secsttabhead">
                         {{#each Invoice}}
-                        <tr>
-                            <th width="25%" align="center">{{service}}</th>
-                            <th width="25%">{{price_per_quantity}}</th>
-                            <th width="20%">{{quantity}}</th>
-                            <th width="15%" align="center">{{price}}</th>
-                            <th width="15%" align="center">{{price}}</th>
 
+                        <tr>
+                            <th width="25%" align="left">{{service}}</th>
+                            <th width="25%" align="right">{{quantity}}</th>
+                            <th width="25%" align="right">{{price_per_quantity}}</th>
+                            <th width="25%" align="right">{{price}}</th>
+
+                            
                         </tr>
                         {{/each}}
 
-
                     </table>
-
-                    <table width="100%" style="border-bottom: 1px solid red;">
+                    <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;">
                         <tr>
-                            <td style="width:85%; text-align:right; padding-top: 10px; padding-right: 20px;">
-                               
-                                <p>Total</p>
-                            </td>
-
-                            <td style="width:15%; text-align:center; padding-top: 10px;">
+                            <td  style="display:flex; justify-content:flex-end">
+                                <p style="width:25%; text-align:right"></p>
+                                <p style="width:25%; text-align:right"></p>
+                                <p style="width:25%; text-align:right">Total</p>
+                                <p style="width:25%; text-align:right">{{pat_info.total_amount}}</p>
                                 
-                                <p>{{pat_info.total_amount}}</p>
                             </td>
                         </tr>
-                    </table>
-
-
+                  </table>
 
 
                     <table style="font-size:14px; margin-top: 10px;">
@@ -169,8 +163,7 @@
                                 <h3>Your Aimedis team</h3>
                                 <p>https://aimedis.io</p>
                                 <p>https://sys.aimedis.com</p>
-                                <p style="margin-top: 30px!important">If you have any questions do not hesitate to
-                                    contact us via the support chat or via contact@aimedis.com</p>
+                                <p>If you have any questions do not hesitate to contact us via the support chat or via contact@aimedis.com</p>
                             </td>
                         </tr>
                     </table>
