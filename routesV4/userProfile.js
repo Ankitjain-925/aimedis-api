@@ -1036,8 +1036,8 @@ axios(config)
                           user_id = user_data._id;
                           let token = user_data.usertoken;
                           //let link = 'http://localhost:3000/';
-                          let link = "https://sys.aimedis.io/";
-                          var verifylink = `https://sys.aimedis.io/?token=${token}`
+                          let link = "https://aimedix.com/";
+                          var verifylink = `https://aimedix.com/?token=${token}`
                           let datacomposer = (lang, {verifylink}) => {
                             return {};
                           };
@@ -3897,12 +3897,13 @@ function GetUpcomingAppoint(item) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       var new_data = item;
-      if (new_data.appointment_type === "appointments") {
+      // if (new_data.appointment_type === "appointments") {
         console.log("I am here34", item.appointment_type);
         User.findOne({ type: "doctor", _id: item.doctor_id })
-          .exec()
-          .then(function (doc3) {
-            if (doc3) {
+        .exec()
+        .then(function (doc3) {
+          if (doc3) {
+            if (item.appointment_type === "appointments") {
               if (
                 doc3.private_appointments &&
                 doc3.private_appointments.length > 0
@@ -3911,14 +3912,44 @@ function GetUpcomingAppoint(item) {
                 new_data.custom_text = custom_text;
               }
             }
-            GetUpcomingAppoint1.push(new_data);
-            resolve(GetUpcomingAppoint1);
-          });
-      } else {
-        console.log("I am here36", item.appointment_type);
-        GetUpcomingAppoint1.push(item);
-        resolve(GetUpcomingAppoint1);
-      }
+            console.log('sdfsdfsf', new_data)
+            new_data.docProfile= {
+              patient_id:
+                doc3 &&
+                doc3.profile_id,
+              first_name:
+                doc3 &&
+                doc3.first_name,
+              last_name:
+                doc3 &&
+                doc3.last_name,
+              email:
+                doc3 && doc3.email,
+              birthday:
+                doc3 && doc3.birthday,
+              profile_image:
+                doc3 && doc3.image,
+              speciality:
+                doc3 &&
+                doc3.speciality,
+              subspeciality:
+                doc3 &&
+                doc3.subspeciality,
+              phone:
+                doc3 && doc3.phone,
+            }
+          }
+          return new_data;
+        })
+        .then(function (new_data) {
+          GetUpcomingAppoint1.push(new_data);
+          resolve(GetUpcomingAppoint1);
+        });
+      // } else {
+      //   console.log("I am here36", item.appointment_type);
+      //   GetUpcomingAppoint1.push(item);
+      //   resolve(GetUpcomingAppoint1);
+      // }
     });
   });
 }
@@ -3927,17 +3958,44 @@ function GetPastAppoint(item) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       var new_data = item;
-      if (item.appointment_type === "appointments") {
         User.findOne({ type: "doctor", _id: item.doctor_id })
           .exec()
           .then(function (doc3) {
             if (doc3) {
-              if (
-                doc3.private_appointments &&
-                doc3.private_appointments.length > 0
-              ) {
-                var custom_text = doc3.private_appointments[0].custom_text;
-                new_data.custom_text = custom_text;
+              if (item.appointment_type === "appointments") {
+                if (
+                  doc3.private_appointments &&
+                  doc3.private_appointments.length > 0
+                ) {
+                  var custom_text = doc3.private_appointments[0].custom_text;
+                  new_data.custom_text = custom_text;
+                }
+              }
+              console.log('sdfsdfsf', new_data)
+              new_data.docProfile= {
+                patient_id:
+                  doc3 &&
+                  doc3.profile_id,
+                first_name:
+                  doc3 &&
+                  doc3.first_name,
+                last_name:
+                  doc3 &&
+                  doc3.last_name,
+                email:
+                  doc3 && doc3.email,
+                birthday:
+                  doc3 && doc3.birthday,
+                profile_image:
+                  doc3 && doc3.image,
+                speciality:
+                  doc3 &&
+                  doc3.speciality,
+                subspeciality:
+                  doc3 &&
+                  doc3.subspeciality,
+                phone:
+                  doc3 && doc3.phone,
               }
             }
             return new_data;
@@ -3946,10 +4004,10 @@ function GetPastAppoint(item) {
             GetPastAppoint1.push(new_data);
             resolve(GetPastAppoint1);
           });
-      } else {
-        GetPastAppoint1.push(new_data);
-        resolve(GetPastAppoint1);
-      }
+      // } else {
+      //   GetPastAppoint1.push(new_data);
+      //   resolve(GetPastAppoint1);
+      // }
     });
   });
 }

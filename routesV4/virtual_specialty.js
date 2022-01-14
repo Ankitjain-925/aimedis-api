@@ -473,6 +473,35 @@ router.get("/ProfessionalTask/:patient_profile_id", function (req, res, next) {
   }
 });
 
+router.get("/ProfessionalTask/:patient_profile_id/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    console.log('req.params.house_id',req.params.house_id)
+    virtual_Task.find(
+      { "assinged_to.profile_id": req.params.patient_profile_id, house_id: req.params.house_id },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 router.post("/ProfessionalTaskComment/:task_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -957,10 +986,11 @@ router.post("/checkPatient", function (req, res, next) {
                   }
                   else {
                     if (data) {
-                      Institute.findOne({ _id: req.body.institute_id })
-                        .exec()
-                        .then(function (doc3) {
-                          var infoHouse = {}
+                      Institute.findOne({ "institute_groups.houses.house_id": data.house_id }).exec(function (err, doc3) {
+                        var infoHouse = {}
+                        console.log('doc3-1', doc3)
+                        if(doc3){
+                          console.log('doC3', doc3)
                           doc3.institute_groups.map(function (dataa) {
                             dataa.houses.map(function (data) {
                               if (data.house_id == req.body.house_id) {
@@ -969,13 +999,15 @@ router.post("/checkPatient", function (req, res, next) {
                               }
                             })
                           })
-                          res.json({
-                            status: 200,
-                            hassuccessed: false,
-                            message: "Already in other hospital",
-                            data: infoHouse,
-                          });
-                        })
+                          console.log('infoHouse', infoHouse)
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "Already in other hospital",
+                          data: infoHouse,
+                        });
+                        } 
+                      })
                     }
                     else {
                       res.json({
