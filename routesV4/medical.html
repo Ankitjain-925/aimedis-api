@@ -102,7 +102,7 @@
                     <tr>
                         <td>{{Service}}</td>
                         <td>{{pat_info.patient.first_name}}&nbsp;{{pat_info.patient.last_name}}</td>
-                        <td>Invoice_date:{{pat_info.created_at}}</td>
+                        <td>Invoice_date:{{date}}</td>
                     </tr>
 
                     <tr>
@@ -124,8 +124,8 @@
                     <table width="100%" bgcolor="black" style="color:rgb(243, 241, 241); margin-top: 20px; padding:10px 20px;">
                         <tr>
                             <th width="25%" align="left">Service</th>
-                            <th width="25%" align="right">Quantity</th>
                             <th width="25%" align="right">Price Per Quantity</th>
+                            <th width="25%" align="right">Quantity</th>
                             <th width="25%" align="right">Amount</th>
                         </tr>
                     </table>
@@ -135,8 +135,8 @@
 
                         <tr>
                             <th width="25%" align="left">{{service}}</th>
-                            <th width="25%" align="right">{{quantity}}</th>
                             <th width="25%" align="right">{{price_per_quantity}}</th>
+                            <th width="25%" align="right">{{quantity}}</th>
                             <th width="25%" align="right">{{price}}</th>
 
                             

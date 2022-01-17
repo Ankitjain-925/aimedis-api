@@ -1361,6 +1361,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
   });
 
   var Data = [];
+  var date1=[];
   if (req.body.choice == 1) {
     {
       Institute.findOne({ "institute_groups.houses.house_id": req.body.house_id }).exec(function (err, data) {
@@ -1397,7 +1398,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
 
           }
           else if (key === "created_at") {
-            Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+            date1.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
 
           }
         });
@@ -1406,6 +1407,11 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
           k: "institute",
           v: data
         })
+        console.log("data",date1)
+        console.log("1",Data[0].created_at)
+        console.log("2",Data.created_at)
+        let data1=date1.map((element)=>{return element.v})
+
         var template = handlebars.compile(html2);
         let house_name = ""
         data.institute_groups.map((item) => {
@@ -1418,7 +1424,8 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
         var htmlToSend = template({
           Invoice: Data,
           pat_info: req.body,
-          Service: house_name
+          Service: house_name,
+          date:data1
         });
         var filename = "GeneratedReport.pdf"
         logo1 =
@@ -1466,7 +1473,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
         }
 
         else if (key === "created_at") {
-          Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+          date1.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
 
         }
       });
@@ -1479,10 +1486,13 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
           }
         })
       })
+      let data1=date1.map((element)=>{return element.v})
+
       var htmlToSend = template({
         Invoice: Data,
         pat_info: req.body,
-        Service: house_name
+        Service: house_name,
+        date:data1
       });
       var filename = "GeneratedReport.pdf"
       logo1 =
@@ -1591,11 +1601,13 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
         }
 
         else if (key === "created_at") {
-          Data.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+          date1.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
 
         }
       });
       var template = handlebars.compile(billinvoice3);
+      let data1=date1.map((element)=>{return element.v})
+
       let house_name = ""
       data.institute_groups.map((item) => {
         item.houses.map((item2) => {
@@ -1607,7 +1619,8 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
       var htmlToSend = template({
         Invoice: Data,
         pat_info: req.body,
-        Service: house_name
+        Service: house_name,
+        date:data1
       });
       var filename = "GeneratedReport.pdf"
       logo1 =
