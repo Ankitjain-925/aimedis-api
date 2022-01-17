@@ -962,6 +962,7 @@ router.post("/checkPatient", function (req, res, next) {
               error: err,
             });
           } else {
+            console.log("userdata",userdata)
             if (userdata) {
               var createCase = false;
               if (req.body.pin) {
@@ -985,15 +986,16 @@ router.post("/checkPatient", function (req, res, next) {
                     res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
                   }
                   else {
+                    console.log("data",data)
                     if (data) {
                       Institute.findOne({ "institute_groups.houses.house_id": data.house_id }).exec(function (err, doc3) {
                         var infoHouse = {}
-                        console.log('doc3-1', doc3)
                         if(doc3){
                           console.log('doC3', doc3)
                           doc3.institute_groups.map(function (dataa) {
-                            dataa.houses.map(function (data) {
-                              if (data.house_id == req.body.house_id) {
+                            dataa.houses.map(function (data1) {
+                              console.log("req.body.house_id",data1.house_id)
+                              if (data1.house_id == data.house_id) {
                                 infoHouse.house = data;
                                 infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
                               }
