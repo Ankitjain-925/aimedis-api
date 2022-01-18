@@ -477,7 +477,7 @@ router.get("/ProfessionalTask/:patient_profile_id/:house_id", function (req, res
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    console.log('req.params.house_id',req.params.house_id)
+    console.log('req.params.house_id', req.params.house_id)
     virtual_Task.find(
       { "assinged_to.profile_id": req.params.patient_profile_id, house_id: req.params.house_id },
       function (err, userdata) {
@@ -962,7 +962,7 @@ router.post("/checkPatient", function (req, res, next) {
               error: err,
             });
           } else {
-            console.log("userdata",userdata)
+            console.log("userdata", userdata)
             if (userdata) {
               var createCase = false;
               if (req.body.pin) {
@@ -986,27 +986,29 @@ router.post("/checkPatient", function (req, res, next) {
                     res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
                   }
                   else {
-                    console.log("data",data)
+                    console.log("data", data)
                     if (data) {
                       Institute.findOne({ "institute_groups.houses.house_id": data.house_id }).exec(function (err, doc3) {
                         var infoHouse = {}
-                        if(doc3){
+                        if (doc3) {
+                          console.log('doC3', doc3)
                           doc3.institute_groups.map(function (dataa) {
                             dataa.houses.map(function (data1) {
-                              if (data1.house_id === data.house_id) {
+                              console.log("req.body.house_id", data1.house_id)
+                              if (data1.house_id == data.house_id) {
                                 infoHouse.house = data1;
                                 infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
                               }
                             })
                           })
                           console.log('infoHouse', infoHouse)
-                        res.json({
-                          status: 200,
-                          hassuccessed: false,
-                          message: "Already in other hospital",
-                          data: infoHouse,
-                        });
-                        } 
+                          res.json({
+                            status: 200,
+                            hassuccessed: false,
+                            message: "Already in other hospital",
+                            data: infoHouse,
+                          });
+                        }
                       })
                     }
                     else {
@@ -1393,12 +1395,12 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
   });
 
   var Data = [];
-  var date1=[];
+  var date1 = [];
   if (req.body.choice == 1) {
     {
       Institute.findOne({ "institute_groups.houses.house_id": req.body.house_id }).exec(function (err, data) {
         Object.entries(req.body).map(([key, value]) => {
-     
+
           if (Array.isArray(value)) {
             // Data.push({
             //   k: key.replace(/_/g, " "),
@@ -1439,10 +1441,10 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
           k: "institute",
           v: data
         })
-        console.log("data",date1)
-        console.log("1",Data[0].created_at)
-        console.log("2",Data.created_at)
-        let data1=date1.map((element)=>{return element.v})
+        console.log("data", date1)
+        console.log("1", Data[0].created_at)
+        console.log("2", Data.created_at)
+        let data1 = date1.map((element) => { return element.v })
 
         var template = handlebars.compile(html2);
         let house_name = ""
@@ -1457,7 +1459,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
           Invoice: Data,
           pat_info: req.body,
           Service: house_name,
-          date:data1
+          date: data1
         });
         var filename = "GeneratedReport.pdf"
         logo1 =
@@ -1518,13 +1520,13 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
           }
         })
       })
-      let data1=date1.map((element)=>{return element.v})
+      let data1 = date1.map((element) => { return element.v })
 
       var htmlToSend = template({
         Invoice: Data,
         pat_info: req.body,
         Service: house_name,
-        date:data1
+        date: data1
       });
       var filename = "GeneratedReport.pdf"
       logo1 =
@@ -1638,7 +1640,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
         }
       });
       var template = handlebars.compile(billinvoice3);
-      let data1=date1.map((element)=>{return element.v})
+      let data1 = date1.map((element) => { return element.v })
 
       let house_name = ""
       data.institute_groups.map((item) => {
@@ -1652,7 +1654,7 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
         Invoice: Data,
         pat_info: req.body,
         Service: house_name,
-        date:data1
+        date: data1
       });
       var filename = "GeneratedReport.pdf"
       logo1 =
@@ -1824,15 +1826,15 @@ router.get("/patientjourney/:patient_id", function (req, res) {
       else {
         if (data && data.length > 0) {
           forEachPromise(data, taskfromhouseid)
-          .then((result) => {
-            //  var ansfromhousessid = ansfromhouseid(req.params.patient_id)
-            // ansfromhousessid.then((result)=> {
-            //   console.log("result", result)
-            //   flatArraya.push(...result);
+            .then((result) => {
+              //  var ansfromhousessid = ansfromhouseid(req.params.patient_id)
+              // ansfromhousessid.then((result)=> {
+              //   console.log("result", result)
+              //   flatArraya.push(...result);
               flatArraya.sort(mySorter);
               res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: flatArraya })
-            // })
-          })
+              // })
+            })
         }
         else {
           res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: [] })
@@ -1878,7 +1880,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
 // })
 
 function mySorter(a, b) {
-  if(a.created_at && b.created_at){
+  if (a.created_at && b.created_at) {
     var x = a.created_at.toLowerCase();
     var y = b.created_at.toLowerCase();
     return x > y ? -1 : x < y ? 1 : 0;
@@ -1886,7 +1888,7 @@ function mySorter(a, b) {
   else{
     return -1;
   }
- 
+
 }
 
 router.post("/TaskFilter", function (req, res) {
@@ -2220,6 +2222,51 @@ router.post("/LeftInfoPatient", function (req, res) {
   }
 });
 
+
+router.post("/deletehouse", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    let house_id = req.body.house_id
+      User.updateOne({ "houses.value": house_id }, { $pull: { "houses":{"value": house_id} } }).exec(function (err, data) {
+      if (err && !data) {
+        console.log("err",err)
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Something went wrong",
+          error: err,
+        })
+      } else {
+        console.log("data", data)
+        virtual_Case.updateOne({ house_id: { $in: house_id } }, { $set: { inhospital: false } }).exec(function (err, data1) {
+          if (err) {
+            console.log("err",err)
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+              error: err,
+            })
+          }
+          else {
+            console.log("data1",data1)
+            res.json({ status: 200, hassuccessed: true, message: "Update in houses" })
+          }
+
+        })
+      }
+    })
+
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
+
 // router.post("/LeftInfoPatient", function (req, res) {
 //   const token = req.headers.token;
 //   let legit = jwtconfig.verify(token);
@@ -2323,12 +2370,12 @@ function taskfromhouseid(item) {
         if (err) {
           resolve(flatArraya)
         } else {
-          if(!Inhospital.includes(item.house_id)){
-          flatArraya.push(...task);
+          if (!Inhospital.includes(item.house_id)) {
+            flatArraya.push(...task);
           }
-          if(item.inhospital == false){
+          if (item.inhospital == false) {
             var invoices = invoicefromhouseid(item)
-            invoices.then((result)=> {
+            invoices.then((result) => {
               flatArraya.push(...result);
             })
             Inhospital.push(item.house_id);
