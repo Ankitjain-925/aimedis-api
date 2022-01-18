@@ -991,12 +991,10 @@ router.post("/checkPatient", function (req, res, next) {
                       Institute.findOne({ "institute_groups.houses.house_id": data.house_id }).exec(function (err, doc3) {
                         var infoHouse = {}
                         if(doc3){
-                          console.log('doC3', doc3)
                           doc3.institute_groups.map(function (dataa) {
                             dataa.houses.map(function (data1) {
-                              console.log("req.body.house_id",data1.house_id)
-                              if (data1.house_id == data.house_id) {
-                                infoHouse.house = data;
+                              if (data1.house_id === data.house_id) {
+                                infoHouse.house = data1;
                                 infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
                               }
                             })
@@ -1886,7 +1884,7 @@ function mySorter(a, b) {
     return x > y ? -1 : x < y ? 1 : 0;
   }
   else{
-    return 1;
+    return -1;
   }
  
 }
@@ -2308,7 +2306,6 @@ function ansfromhouseid(patient_id) {
         reject([])
       }
       else {
-        console.log('anss', ans)
         resolve(ans)
       }
     })
@@ -2429,7 +2426,6 @@ function User_Case(House_id) {
         if (err) {
           reject(err);
         } else {
-          console.log("2", userdata)
           resolve(userdata);
         }
       }
