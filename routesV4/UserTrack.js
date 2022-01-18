@@ -822,7 +822,8 @@ router.post("/appointment", function (req, res) {
             time: req.body.start_time,
             doctor_phone: req.body.patient_info.phone,
           }),
-          (error, html) => {
+          (error, html2) => {
+            console.log("html", html2);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -831,7 +832,7 @@ router.post("/appointment", function (req, res) {
                   result,
                   SUBJECT_KEY.aimedis_appointment_system
                 ),
-                html: html,
+                html: html2,
               };
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
@@ -875,7 +876,8 @@ router.post("/appointment", function (req, res) {
             patient_email: req.body.patient_info.email,
             patient_phone: req.body.patient_info.phone,
           }),
-          (error, html) => {
+          (error, html3) => {
+            console.log("html2", html3);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -884,7 +886,7 @@ router.post("/appointment", function (req, res) {
                   result,
                   SUBJECT_KEY.aimedis_appointment_system
                 ),
-                html: html,
+                html: html3,
               };
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
