@@ -2228,36 +2228,30 @@ router.post("/deletehouse", function (req, res) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     let house_id = req.body.house_id
-      User.updateOne({ "houses.value": house_id }, { $pull: { "houses":{"value": house_id} } }).exec(function (err, data) {
-      if (err && !data) {
-        console.log("err",err)
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "Something went wrong",
-          error: err,
-        })
-      } else {
-        console.log("data", data)
-        virtual_Case.updateOne({ house_id: { $in: house_id } }, { $set: { inhospital: false } }).exec(function (err, data1) {
-          if (err) {
-            console.log("err",err)
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Something went wrong",
-              error: err,
-            })
-          }
-          else {
-            console.log("data1",data1)
-            res.json({ status: 200, hassuccessed: true, message: "Update in houses" })
-          }
-
-        })
-      }
+    house_id.forEach((element, index) => {
+      User.updateMany({ "houses.value" : element }, { $pull: { "houses":{"value": element} } }).exec(function (err, data) {
+        if (err && !data) {
+            console.log('eeee', err)
+        } else {
+          console.log("data1111",index ,data)
+        }
+      }) 
     })
+      virtual_Case.updateMany({ house_id: { $in: house_id } }, { $set: { inhospital: false } }).exec(function (err, data1) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+            error: err,
+          })
+        }
+        else {
+          console.log("data1",data1)
+          res.json({ status: 200, hassuccessed: true, message: "Update in houses" })
+        }
 
+      })      
   } else {
     res.json({
       status: 200,
