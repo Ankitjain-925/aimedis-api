@@ -545,36 +545,36 @@ router.put("/AddTrackAdmin", function (req, res, next) {
     req.body.data.created_by = encrypt(req.body.data.created_by);
     req.body.data._enc_created_by = true;
     var full_record = { ...ids, ...req.body.data };
-      user.updateMany(
-        {_id: { $in: req.body.data.UserId }},
-        { $push: { track_record: full_record } },
-        { safe: true, upsert: true },
-        function (err, doc) {
-          if (err && !doc) {
-            console.log("err", err)
+    user.updateMany(
+      { _id: { $in: req.body.data.UserId } },
+      { $push: { track_record: full_record } },
+      { safe: true, upsert: true },
+      function (err, doc) {
+        if (err && !doc) {
+          console.log("err", err)
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+            error: err,
+          });
+        } else {
+          console.log("doc", doc)
+          if (doc.nModified == "0") {
             res.json({
               status: 200,
               hassuccessed: false,
-              msg: "Something went wrong",
-              error: err,
+              msg: "User is not found",
             });
           } else {
-            console.log("doc", doc)
-            if (doc.nModified == "0") {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "User is not found",
-              });
-            } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  msg: "track is updated",
-                });
-            }
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              msg: "track is updated",
+            });
           }
-        })
+        }
+      })
   } else {
     res.json({
       status: 200,
@@ -795,8 +795,10 @@ router.get("/AppointmentByDate", function (req, res, next) {
 
 router.post("/appointment", function (req, res) {
   var Appointments = new Appointment(req.body);
+  console.log("Appointments",Appointments)
   Appointments.save(function (err, user_data) {
     if (err && !user_data) {
+      console.log("err",err)
       res.json({ status: 200, message: "Something went wrong.", error: err });
     } else {
       var date = getDate(
@@ -834,6 +836,8 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html2,
               };
+              console.log("html1",html)
+              console.log("mailOptions1",mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
                 console.log("Mail is sent ");
@@ -888,6 +892,8 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html3,
               };
+              console.log("html2", html)
+              console.log("mail", mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
                 console.log("Mail is sent ");
@@ -1815,19 +1821,19 @@ router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, 
             error: err,
           });
         } else {
-          user.find({ institute_id: req.params.institute_id, type:'patient' })
-          .exec()
-          .then((data) => {
-            console.log('user_daya', data, user_data)
-            var LisiUser= [...user_data, ...data];
+          user.find({ institute_id: req.params.institute_id, type: 'patient' })
+            .exec()
+            .then((data) => {
+              console.log('user_daya', data, user_data)
+              var LisiUser = [...user_data, ...data];
               res.json({
                 status: 200,
                 hassuccessed: true,
                 msg: "User is found",
                 data: LisiUser,
               });
-          });
-          
+            });
+
         }
       }
     );
