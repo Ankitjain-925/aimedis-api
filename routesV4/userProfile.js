@@ -3900,7 +3900,6 @@ function GetUpcomingAppoint(item) {
     process.nextTick(() => {
       var new_data = item;
       // if (new_data.appointment_type === "appointments") {
-        console.log("I am here34", item.appointment_type);
         User.findOne({ type: "doctor", _id: item.doctor_id })
         .exec()
         .then(function (doc3) {
@@ -3948,6 +3947,9 @@ function GetUpcomingAppoint(item) {
           return new_data;
         })
         .then(function (new_data) {
+          GetUpcomingAppoint1.push(new_data);
+          resolve(GetUpcomingAppoint1);
+        }).catch(function (err) {
           GetUpcomingAppoint1.push(new_data);
           resolve(GetUpcomingAppoint1);
         });
@@ -4010,9 +4012,11 @@ function GetPastAppoint(item) {
             return new_data;
           })
           .then(function (new_data) {
-            let final_data = { new_data, docProfile }
-            console.log("final_data", final_data)
-            GetPastAppoint1.push(final_data);
+            console.log("final_data", new_data)
+            GetPastAppoint1.push(new_data);
+            resolve(GetPastAppoint1);
+          }).catch(function (err) {
+            GetPastAppoint1.push(new_data);
             resolve(GetPastAppoint1);
           });
       // } else {

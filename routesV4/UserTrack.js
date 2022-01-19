@@ -836,7 +836,7 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html2,
               };
-              console.log("html1",html)
+              console.log("html1",html2)
               console.log("mailOptions1",mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
@@ -892,7 +892,7 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html3,
               };
-              console.log("html2", html)
+              console.log("html2", html3)
               console.log("mail", mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
