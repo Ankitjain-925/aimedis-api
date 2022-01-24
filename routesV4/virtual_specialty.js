@@ -962,6 +962,7 @@ router.post("/checkPatient", function (req, res, next) {
               error: err,
             });
           } else {
+            try{
             console.log("userdata", userdata)
             if (userdata) {
               var createCase = false;
@@ -1043,6 +1044,10 @@ router.post("/checkPatient", function (req, res, next) {
                 message: "patient is not exist",
               });
             }
+          }catch(err){
+          res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+
+          }
           }
         }
       );
@@ -1387,13 +1392,14 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
 
 router.post("/downloadInvoicePdf", function (req, res, next) {
   // Custom handlebar helper
+try{
+  
   handlebars.registerHelper("ifCond", function (v1, v2, options) {
     if (v1 === v2) {
       return options.fn(this);
     }
     return options.inverse(this);
   });
-
   var Data = [];
   var date1 = [];
   if (req.body.choice == 1) {
@@ -1755,7 +1761,9 @@ router.post("/downloadInvoicePdf", function (req, res, next) {
     }
 
   }
-
+}catch(e){
+  res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: e })
+}
 
 });
 
@@ -1794,6 +1802,7 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
 
 function GetAllQuestion(item) {
   return new Promise((resolve, reject) => {
+    try{
     const VirtualtToSearchWith = new questionaire({ house_id: item.house_id });
     VirtualtToSearchWith.encryptFieldsSync();
     questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
@@ -1809,6 +1818,9 @@ function GetAllQuestion(item) {
         }
       }
     })
+  }catch(err){
+    resolve(item)
+  }
   })
 }
 
@@ -1885,7 +1897,7 @@ function mySorter(a, b) {
     var y = b.created_at.toLowerCase();
     return x > y ? -1 : x < y ? 1 : 0;
   }
-  else{
+  else {
     return -1;
   }
 
@@ -2229,29 +2241,29 @@ router.post("/deletehouse", function (req, res) {
   if (legit) {
     let house_id = req.body.house_id
     house_id.forEach((element, index) => {
-      User.updateMany({ "houses.value" : element }, { $pull: { "houses":{"value": element} } }).exec(function (err, data) {
+      User.updateMany({ "houses.value": element }, { $pull: { "houses": { "value": element } } }).exec(function (err, data) {
         if (err && !data) {
-            console.log('eeee', err)
+          console.log('eeee', err)
         } else {
-          console.log("data1111",index ,data)
+          console.log("data1111", index, data)
         }
-      }) 
+      })
     })
-      virtual_Case.updateMany({ house_id: { $in: house_id } }, { $set: { inhospital: false } }).exec(function (err, data1) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-            error: err,
-          })
-        }
-        else {
-          console.log("data1",data1)
-          res.json({ status: 200, hassuccessed: true, message: "Update in houses" })
-        }
+    virtual_Case.updateMany({ house_id: { $in: house_id } }, { $set: { inhospital: false } }).exec(function (err, data1) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Something went wrong",
+          error: err,
+        })
+      }
+      else {
+        console.log("data1", data1)
+        res.json({ status: 200, hassuccessed: true, message: "Update in houses" })
+      }
 
-      })      
+    })
   } else {
     res.json({
       status: 200,
@@ -2356,27 +2368,31 @@ function ansfromhouseid(patient_id) {
 function taskfromhouseid(item) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
-      let infoHouse1 = {}
-      let house_id = item.house_id;
-      const VirtualtToSearchWith = new virtual_Task({ house_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-      virtual_Task.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, task) {
-        if (err) {
-          resolve(flatArraya)
-        } else {
-          if (!Inhospital.includes(item.house_id)) {
-            flatArraya.push(...task);
+      try {
+        let infoHouse1 = {}
+        let house_id = item.house_id;
+        const VirtualtToSearchWith = new virtual_Task({ house_id });
+        VirtualtToSearchWith.encryptFieldsSync();
+        virtual_Task.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, task) {
+          if (err) {
+            resolve(flatArraya)
+          } else {
+            if (!Inhospital.includes(item.house_id)) {
+              flatArraya.push(...task);
+            }
+            if (item.inhospital == false) {
+              var invoices = invoicefromhouseid(item)
+              invoices.then((result) => {
+                flatArraya.push(...result);
+              })
+              Inhospital.push(item.house_id);
+            }
+            resolve(flatArraya)
           }
-          if (item.inhospital == false) {
-            var invoices = invoicefromhouseid(item)
-            invoices.then((result) => {
-              flatArraya.push(...result);
-            })
-            Inhospital.push(item.house_id);
-          }
-          resolve(flatArraya)
-        }
-      })
+        })
+      } catch (error) {
+        resolve(item)
+      }
     })
   })
 
@@ -2419,6 +2435,7 @@ function taskfromhouseid(item) {
 
 function invoicefromhouseid(data) {
   return new Promise((resolve, reject) => {
+    try{
     let flatArray = []
     let house_id = data.house_id;
     const VirtualtToSearchWith = new virtual_Task({ house_id });
@@ -2430,23 +2447,31 @@ function invoicefromhouseid(data) {
         resolve(invoice)
       }
     })
+  }catch(e){
+    resolve(data)
+  }
   })
 }
 
 function virtualInvoiceforPatient(patient_id) {
   return new Promise((resolve, reject) => {
-    virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(data)
-      }
-    })
+    try {
+      virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
+    } catch (err) {
+      reject(err)
+    }
   })
 }
 
 function virtualTasksforPatient(patient_id) {
   return new Promise((resolve, reject) => {
+    try{
     const VirtualtToSearchWith = new virtual_Task({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find({ $or: [{ "patient_id": patient_id }, { "patient_id": VirtualtToSearchWith.patient_id }] }).sort({ created_at: 'desc' }).exec(function (err, data1) {
@@ -2456,11 +2481,15 @@ function virtualTasksforPatient(patient_id) {
         resolve(data1)
       }
     })
+  }catch (err) {
+    reject(err)
+  }
   })
 }
 
 function User_Case(House_id) {
   return new Promise((resolve, reject) => {
+    try{
     User.countDocuments(
       { "houses.value": House_id, type: "doctor" },
       function (err, userdata) {
@@ -2471,11 +2500,15 @@ function User_Case(House_id) {
         }
       }
     );
+    }catch (err) {
+      reject(err)
+    }
   });
 }
 
 function User_Case1(House_id) {
   return new Promise((resolve, reject) => {
+    try{
     User.countDocuments(
       { "houses.value": House_id, type: "nurse" },
       function (err, userdata) {
@@ -2487,11 +2520,15 @@ function User_Case1(House_id) {
         }
       }
     );
+    }catch (err) {
+      reject(err)
+    }
   });
 }
 
 function virtualCase(House_id) {
   return new Promise((resolve, reject) => {
+    try{
     virtual_Case.countDocuments(
       { house_id: House_id, inhospital: true },
       function (err, count) {
@@ -2502,11 +2539,15 @@ function virtualCase(House_id) {
         }
       }
     );
+    }catch (err) {
+      reject(err)
+    }
   });
 }
 
 function virtualTask(house_id) {
   return new Promise((resolve, reject) => {
+    try{
     virtual_Task.find({ house_id: house_id }, function (err, list) {
       if (err) {
         reject(err);
@@ -2515,6 +2556,9 @@ function virtualTask(house_id) {
         resolve(finaldata);
       }
     });
+  }catch (err) {
+    reject(err)
+  }
   });
 }
 
@@ -2529,6 +2573,7 @@ function virtualAppointment(userdata) {
 
 function getApointsDoctor(user) {
   return new Promise((resolve, reject) => {
+    try{
     process.nextTick(() => {
       if (user) {
         const AppointToSearchWith = new Appointments({ doctor_id: user._id });
@@ -2555,12 +2600,16 @@ function getApointsDoctor(user) {
         resolve(Appoint);
       }
     });
+  }catch (err) {
+    resolve(user)
+  }
   });
 }
 
 function getfullInfo(data) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
+      try{
       Institute.findOne({ "institute_groups.houses.house_id": data.value })
         .exec()
         .then(function (doc3) {
@@ -2570,6 +2619,9 @@ function getfullInfo(data) {
           }
           resolve(fullInfo);
         });
+      }catch(error){
+        resolve(data)
+      }
     });
   });
 }
