@@ -1777,22 +1777,18 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
         res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
       }
       else {
-        console.log("data", data)
         if (data && data.length > 0) {
           const result1 = data.filter((thing, index, self) =>
             index === self.findIndex((t) => (
               t.house_id === thing.house_id
             ))
           )
-          console.log("result1",result1)
           forEachPromise(result1, GetAllQuestion).then((result) => {
-            console.log("2",result)
             res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: newcf })
 
           })
         }
         else {
-          console.log("3")
           res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: [] })
         }
       }
@@ -1811,15 +1807,12 @@ function GetAllQuestion(item) {
     VirtualtToSearchWith.encryptFieldsSync();
     questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
       if (err) {
-        console.log("err", err)
         resolve(newcf)
 
       }
       else {
-        console.log("data2", data2)
         if (data2.length > 0) {
           newcf.push(data2);
-          console.log("newcf",newcf)
           resolve(newcf)
         }
          else{
