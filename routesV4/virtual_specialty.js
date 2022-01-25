@@ -981,34 +981,40 @@ router.post("/checkPatient", function (req, res, next) {
                       : false;
               }
               if (createCase) {
-                virtual_Case.findOne({ patient_id: userdata._id, inhospital: true }, function (err, data) {
+                virtual_Case.findOne({ patient_id: userdata._id.toString(), inhospital: true }, function (err, data) {
                   if (err & !data) {
                     res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
                   }
                   else {
                     console.log("data", data)
                     if (data) {
-                      Institute.findOne({ "institute_groups.houses.house_id": data.house_id }).exec(function (err, doc3) {
-                        var infoHouse = {}
-                        if (doc3) {
-                          console.log('doC3', doc3)
-                          doc3.institute_groups.map(function (dataa) {
-                            dataa.houses.map(function (data1) {
-                              console.log("req.body.house_id", data1.house_id)
-                              if (data1.house_id == data.house_id) {
-                                infoHouse.house = data1;
-                                infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
-                              }
-                            })
-                          })
-                          console.log('infoHouse', infoHouse)
-                          res.json({
-                            status: 200,
-                            hassuccessed: false,
-                            message: "Already in other hospital",
-                            data: infoHouse,
-                          });
+                      Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() },function (err, doc3) {
+                        if (err & !doc3) {
+                          res.json({ status: 200, message: "Something went wrongq.", hassuccessed: false, error: err })
                         }
+                        else{
+                          var infoHouse = {}
+                          if (doc3) {
+                            console.log('doC3', doc3)
+                            doc3.institute_groups.map(function (dataa) {
+                              dataa.houses.map(function (data1) {
+                                console.log("req.body.house_id", data1.house_id)
+                                if (data1.house_id == data.house_id) {
+                                  infoHouse.house = data1;
+                                  infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
+                                }
+                              })
+                            })
+                            console.log('infoHouse', infoHouse)
+                            res.json({
+                              status: 200,
+                              hassuccessed: false,
+                              message: "Already in other hospital",
+                              data: infoHouse,
+                            });
+                          }
+                        }
+                       
                       })
                     }
                     else {
@@ -1333,44 +1339,63 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
           res.json({ status: 200, hassuccessed: true, error: err })
         }
         else {
-          data[0].wards.forEach((element) => {
-            if (element._id == req.params.ward_id) {
-              wards.rooms = element.rooms
-            }
-          })
-          virtual_Case.find(({ "wards._id": req.params.ward_id }), function (err, room) {
-            if (err & !room) {
-              res.json({ status: 200, hassuccessed: true, error: err })
-
-            }
-            else {
-              // console.log("rooms", room[0].rooms)
-              // wards.rooms.forEach((element) => {
-              //   if (room[0].rooms._id == element._id) {
-              //     console.log("element.room",element.room)
-              //     wards.cases = element.room
-              //     console.log("wards",wards)
-              //     res.json({ status: 200, hassuccessed: true, data: wards })
-              //   }
-
-              // });
-              wards.rooms.forEach((element) => {
-                room.forEach((element2) => {
-                  if (element2.rooms._id == element._id) {
-                    ward1.rooms = element2.rooms
-                    ward1.cases = room
-                    allData.push(ward1)
-                    ward1 = {}
+          console.log('data', data)
+          if(data && data.length>0){
+            data[0].wards.forEach((element) => {
+              if (element._id == req.params.ward_id) {
+                wards.rooms = element.rooms
+              }
+            })
+            virtual_Case.find(({ "wards._id": req.params.ward_id }), function (err, room) {
+              if (err & !room) {
+                res.json({ status: 200, hassuccessed: true, error: err })
+  
+              }
+              else {
+                // console.log("rooms", room[0].rooms)
+                // wards.rooms.forEach((element) => {
+                //   if (room[0].rooms._id == element._id) {
+                //     console.log("element.room",element.room)
+                //     wards.cases = element.room
+                //     console.log("wards",wards)
+                //     res.json({ status: 200, hassuccessed: true, data: wards })
+                //   }
+  
+                // });
+                var bedData = [];
+                wards && wards.rooms && wards.rooms.length>0 && wards.rooms.forEach((element) => {
+                  
+                  for (var i = 1; i <= element.no_of_bed; i++) {
+                    var data = room && room.length>0 && room.filter((item)=>{
+                      return (item.rooms._id == element._id && item.bed == i)
+                    })
+                    bedData.push({bed: i,
+                    cases :  (data && data.length>0) ? data[0] : {}})
                   }
-                })
-              });
-              res.json({ status: 200, hassuccessed: true, data: allData })
-
-            }
-
-          })
-
-
+                  ward1.bedData = bedData;
+                  ward1.room_id = element._id;
+                  ward1.rooms = element;
+                  allData.push(ward1)
+                  ward1 = {}
+                  bedData = []
+                  // room.forEach((element2) => {
+                  //   if (element2.rooms._id == element._id) {
+                  //     ward1.room_id = element2.rooms._id
+                  //     ward1.cases = room
+                  //     allData.push(ward1)
+                  //     ward1 = {}
+                  //   }
+                  // })
+                });
+                res.json({ status: 200, hassuccessed: true, data: allData })
+  
+              }
+  
+            })
+          }
+          else{
+            res.json({ status: 200, hassuccessed: false, message: 'speciality not found' }) 
+          }
         }
       })
     }

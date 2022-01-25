@@ -1036,8 +1036,8 @@ router.post("/AddUser", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-                            let link = "https://sys.aimedis.io/";
-                            var verifylink = `https://sys.aimedis.io/?token=${token}`
+                            let link = "https://aimedix.com/";
+                            var verifylink = `https://aimedix.com/?token=${token}`
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
