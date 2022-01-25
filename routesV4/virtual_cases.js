@@ -119,7 +119,10 @@ router.post("/AddCase", function (req, res, next) {
     virtual_cases.findOne(
       { patient_id: req.body.patient_id, inhospital: { $eq: true }, house_id: req.body.house_id },
       function (err, userdata) {
+        try{
+
         if (err) {
+          console.log("err",err)
           res.json({
             status: 200,
             hassuccessed: false,
@@ -127,6 +130,7 @@ router.post("/AddCase", function (req, res, next) {
             error: err,
           });
         } else {
+            console.log("userdata",userdata)
           if (userdata) {
             res.json({
               status: 200,
@@ -152,7 +156,15 @@ router.post("/AddCase", function (req, res, next) {
               }
             });
           }
+        
         }
+      }catch(err){
+        res.json({
+          status: 200,
+          message: "Something went wrong.",
+          error: err,
+        });
+      }
       }
     );
   } else {
@@ -169,6 +181,7 @@ router.post("/checkbedAvailabilityByWard", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   var beds = [];
   newArray = [];
+
   //  if (legit) {
   virtual_cases.find(
     {
@@ -247,6 +260,7 @@ router.post("/checkbedAvailability", function (req, res, next) {
       if (err && !userdata) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
+        try{
         Virtual_Specialty.findOne(
           { _id: req.body.specialty_id },
           function (err, userdata1) {
@@ -269,7 +283,10 @@ router.post("/checkbedAvailability", function (req, res, next) {
             }
           }
         );
+      }catch(e){
+        res.json({ status: 200, message: "Something went wrong.", error: err });
       }
+    }
     }
   );
 });

@@ -2120,13 +2120,13 @@
             }
         },
         "/allHospitalusers": {
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
             "get": {
                 "parameters": [
                     {
@@ -2138,7 +2138,6 @@
                         }
                     }
                 ],
-
                 "tags": [
                     "virtual_cases"
                 ],
@@ -2410,9 +2409,40 @@
                     }
                 }
             }
+        },
+        "/vh/deletehouse": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "deletehouse",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/deletehouse"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Api for  Deleting houses",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deletehouse"
+                    }
+                }
+            }
         }
-
-      
     },
     "definitions": {
         "AddtheGroup": {
@@ -2778,6 +2808,10 @@
         "download": {
             "required": [],
             "properties": {
+                "choice": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
                 "services": {
                     "type": "array",
                     "items": {
@@ -2814,7 +2848,7 @@
                 }
             }
         },
-        "search":{
+        "search": {
             "required": [],
             "properties": {
                 "institute_id": {
@@ -2829,10 +2863,9 @@
                     "type": "string",
                     "uniqueItems": true
                 }
-               
             }
         },
-        "filtertask":{
+        "filtertask": {
             "required": [],
             "properties": {
                 "house_id": {
@@ -2861,21 +2894,20 @@
                     },
                     "uniqueItems": true
                 },
-                "speciality_id":{
+                "speciality_id": {
                     "type": "string",
                     "uniqueItems": true
                 },
-                "patient_id":{
+                "patient_id": {
                     "type": "array",
                     "items": {
                         "type": "object"
                     },
                     "uniqueItems": true
                 }
-               
             }
         },
-        "Calenderfilter":{
+        "Calenderfilter": {
             "required": [],
             "properties": {
                 "filter": {
@@ -2901,21 +2933,20 @@
                     },
                     "uniqueItems": true
                 },
-                "speciality_id":{
+                "speciality_id": {
                     "type": "string",
                     "uniqueItems": true
                 },
-                "patient_id":{
+                "patient_id": {
                     "type": "array",
                     "items": {
                         "type": "object"
                     },
                     "uniqueItems": true
                 }
-               
             }
         },
-        "Billfilter":{
+        "Billfilter": {
             "required": [],
             "properties": {
                 "patient_id": {
@@ -2941,10 +2972,9 @@
                 }
             }
         },
-        "PatientInfo":{
+        "PatientInfo": {
             "required": [],
             "properties": {
-               
                 "house_id": {
                     "type": "string",
                     "uniqueItems": true
@@ -2955,10 +2985,9 @@
                 }
             }
         },
-        "adminhostipal":{
+        "adminhostipal": {
             "required": [],
             "properties": {
-               
                 "institue_id": {
                     "type": "string",
                     "uniqueItems": true
@@ -2976,7 +3005,7 @@
         "download2": {
             "required": [],
             "properties": {
-                "choice":{
+                "choice": {
                     "type": "string",
                     "uniqueItems": true
                 },
@@ -3013,6 +3042,17 @@
                 "created_at": {
                     "type": "string",
                     "uniqueItems": true
+                }
+            }
+        },
+        "deletehouse": {
+            "required": [],
+            "properties": {
+                "house_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
                 }
             }
         }

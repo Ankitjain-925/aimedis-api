@@ -6,7 +6,7 @@ var virtual_cases = require("../schema/virtual_cases.js");
 var virtual_tasks = require("../schema/virtual_tasks");
 var User = require("../schema/user.js");
 var jwtconfig = require("../jwttoken");
-var fullinfo = [], newDatafull=[];
+var fullinfo = [], newDatafull = [];
 
 router.put("/AddStep/:house_id", function (req, res, next) {
   const token = req.headers.token;
@@ -47,49 +47,57 @@ router.post("/AddStep", function (req, res, next) {
   let legit = jwtconfig.verify(token);
 
   if (legit) {
-      virtual_step.findOne({house_id: req.body.house_id}, function (err, userdata) {
-        if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
-        }
-      else{
-          if(userdata){
-            virtual_step.updateOne(
-              { house_id: req.body.house_id },
-              req.body,
-              function (err, userdata) {
-                if (err) {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    message: "Something went wrong",
-                    error: err,
-                  });
-                } else {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "Specialty is updated",
-                    data: userdata,
-                  });
-                }
-              }
-            );
-          }
-          else{
-            var Virtual_Steps = new virtual_step(req.body);
-            Virtual_Steps.save(function (err, user_data) {
-              if (err && !user_data) {
-                res.json({ status: 200, message: "Something went wrong.", error: err });
+    virtual_step.findOne({ house_id: req.body.house_id }, function (err, userdata) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      }
+      else {
+      try{
+        if (userdata) {
+          virtual_step.updateOne(
+            { house_id: req.body.house_id },
+            req.body,
+            function (err, userdata) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
               } else {
                 res.json({
                   status: 200,
-                  message: "Added Successfully",
                   hassuccessed: true,
+                  message: "Specialty is updated",
+                  data: userdata,
                 });
               }
-            });
-          }
-      }
+            }
+          );
+        }
+        else {
+          var Virtual_Steps = new virtual_step(req.body);
+          Virtual_Steps.save(function (err, user_data) {
+            if (err && !user_data) {
+              res.json({ status: 200, message: "Something went wrong.", error: err });
+            } else {
+              res.json({
+                status: 200,
+                message: "Added Successfully",
+                hassuccessed: true,
+              });
+            }
+          });
+        }
+      }catch(err){
+      res.json({
+        status: 200,
+        message: "Something went wrong.",
+        error: err,
+      });
+    }
+    }
     })
   } else {
     res.json({
@@ -134,43 +142,43 @@ router.get('/GetStep/:house_id', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   if (legit) {
     newDatafull = [];
-    virtual_step.findOne({house_id: req.params.house_id}, function (err, userdata) {
-          if (err && !userdata) {
-              res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
-               } else {
-            if(userdata){
-              if(userdata.steps && userdata.steps.length>0){
-                forEachPromise(userdata.steps, getCaes).then((data)=>{
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "Steps is found",
-                    data: newDatafull,
-                  });
-                })
-              }
-              else
-              {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Steps is found",
-                  data: []
-                });
-              }
-            }
-            else{
+    virtual_step.findOne({ house_id: req.params.house_id }, function (err, userdata) {
+      if (err && !userdata) {
+        res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
+      } else {
+        if (userdata) {
+          console.log("userdata", userdata)
+          if (userdata.steps && userdata.steps.length > 0) {
+            forEachPromise(userdata.steps, getCaes).then((data) => {
               res.json({
                 status: 200,
                 hassuccessed: true,
                 message: "Steps is found",
-                data: []
+                data: newDatafull,
               });
-            }  
+            })
           }
-      })
+          else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Steps is found",
+              data: []
+            });
+          }
+        }
+        else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Steps is found",
+            data: []
+          });
+        }
+      }
+    })
   } else {
-      res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
   }
 })
 
@@ -407,7 +415,7 @@ router.get('/GetStep/:house_id', function (req, res, next) {
 //     //     message: "Authentication required.",
 //     //   });
 // });
-  
+
 
 // router.delete("/Patient/:step_id", function (req, res, next) {
 //   const token = req.headers.token;
@@ -451,105 +459,118 @@ router.get('/GetStep/:house_id', function (req, res, next) {
 //     }
 // })
 
-function getCaes(data1){
+function getCaes(data1) {
   console.log('dataaaaa', data1)
-    return new Promise((resolve, reject) => {
-      process.nextTick(() => {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
       fullinfo = [];
-      if(data1.case_numbers && data1.case_numbers.length>0){
-        forEachPromise(data1.case_numbers, getfullInfo).then((data)=>{
+      if (data1.case_numbers && data1.case_numbers.length > 0) {
+        console.log("case1", data1.case_numbers)
+        forEachPromise(data1.case_numbers, getfullInfo).then((data) => {
+          console.log("data", data)
           var finald = data1;
           finald.case_numbers = data;
-            newDatafull.push(finald);
-            resolve(newDatafull);
+          newDatafull.push(finald);
+          resolve(newDatafull);
         })
       }
-      else{
+      else {
         newDatafull.push(data1);
         resolve(newDatafull);
       }
-  })
+    })
   })
 }
 
 function getfullInfo(data) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
-      if(data.case_id){
-        virtual_cases.findOne({ _id: data.case_id })
-        .exec()
-        .then(function (doc3) {
-          if(doc3){
-          User.findOne({ _id: doc3.patient_id })
+      if (data.case_id) {
+        console.log("data1", data)
+        virtual_cases.findOne({ _id: data.case_id.toString() })
           .exec()
-          .then(function (doc5) {
-            if(doc5){
-                if(doc3.inhospital==true){
-                  var data5= {}
-                  data5 = doc3;
-                  var Tasks = new Promise((resolve, reject)=>{
-                    virtual_tasks.aggregate([
-                      { "$facet": {
-                        "total_task": [
-                          { "$match" : {"case_id": data.case_id,  "status": { "$exists": true,  }}},
-                          { "$count": "total_task" },
-                        ],
-                        "done_task": [
-                          { "$match" : {"case_id": data.case_id,  "status": "done"}},
-                          { "$count": "done_task" }
-                        ],
-                        "total_comments": [  
-                          { "$match" : {"case_id": data.case_id,}},
-                          { "$group": { 
-                          "_id": null, 
-                          "total_count": { $sum: { $size: "$comments" } }
-                      }},]
-                      }},
-                      { "$project": {
-                        "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
-                        "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] },
-                        "total_comments": { "$arrayElemAt": ["$total_comments.total_count", 0] }
-                      }}
-                      
-                    ], function (err, results) {
-                      resolve(results)
-                  })
-                  }).then((data3)=>{
-                   if(data3 && data3.length>0){
-                    data5.done_task = data3[0].done_task;
-                    data5.total_task = data3[0].total_task;
-                    data5.total_comments = data3[0].total_comments;
-                    fullinfo.push(data5);
+          .then(function (doc3) {
+            console.log("doc3", doc3)
+            if (doc3) {
+              User.findOne({ _id: doc3.patient_id })
+                .exec()
+                .then(function (doc5) {
+                  if (doc5) {
+                    if (doc3.inhospital == true) {
+                      var data5 = {}
+                      data5 = doc3;
+                      var Tasks = new Promise((resolve, reject) => {
+                        virtual_tasks.aggregate([
+                          {
+                            "$facet": {
+                              "total_task": [
+                                { "$match": { "case_id": data.case_id, "status": { "$exists": true, } } },
+                                { "$count": "total_task" },
+                              ],
+                              "done_task": [
+                                { "$match": { "case_id": data.case_id, "status": "done" } },
+                                { "$count": "done_task" }
+                              ],
+                              "total_comments": [
+                                { "$match": { "case_id": data.case_id, } },
+                                {
+                                  "$group": {
+                                    "_id": null,
+                                    "total_count": { $sum: { $size: "$comments" } }
+                                  }
+                                },]
+                            }
+                          },
+                          {
+                            "$project": {
+                              "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
+                              "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] },
+                              "total_comments": { "$arrayElemAt": ["$total_comments.total_count", 0] }
+                            }
+                          }
+
+                        ], function (err, results) {
+                          resolve(results)
+                        })
+                      }).then((data3) => {
+                        if (data3 && data3.length > 0) {
+                          data5.done_task = data3[0].done_task;
+                          data5.total_task = data3[0].total_task;
+                          data5.total_comments = data3[0].total_comments;
+                          fullinfo.push(data5);
+                          resolve(fullinfo);
+                        }
+                        else {
+                          fullinfo.push(data5);
+                          resolve(fullinfo);
+                        }
+                      })
+
+                    }
+                    else {
+                      resolve(fullinfo);
+                    }
+                  }
+                  else {
                     resolve(fullinfo);
-                   }
-                   else{
-                    fullinfo.push(data5);
-                    resolve(fullinfo);
-                   }
-                  })
-                
-              }
-              else{
-                resolve(fullinfo);
-              }
+                  }
+                })
             }
-            else{
+            else {
               resolve(fullinfo);
             }
-          })
-        }
-        else{
-          resolve(fullinfo);
-        }
-        });
+          }).catch((error) => {
+            resolve(data)
+          });
       }
-      else{
+      else {
+        console.log("fullinfo", fullinfo)
         resolve(fullinfo);
       }
     });
   });
 }
-  
+
 function forEachPromise(items, fn) {
   return items.reduce(function (promise, item) {
     return promise.then(function () {
@@ -557,5 +578,5 @@ function forEachPromise(items, fn) {
     });
   }, Promise.resolve());
 }
-  
-  module.exports = router;
+
+module.exports = router;
