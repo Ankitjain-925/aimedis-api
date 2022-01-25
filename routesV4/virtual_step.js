@@ -52,6 +52,7 @@ router.post("/AddStep", function (req, res, next) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       }
       else {
+      try{
         if (userdata) {
           virtual_step.updateOne(
             { house_id: req.body.house_id },
@@ -89,7 +90,14 @@ router.post("/AddStep", function (req, res, next) {
             }
           });
         }
-      }
+      }catch(err){
+      res.json({
+        status: 200,
+        message: "Something went wrong.",
+        error: err,
+      });
+    }
+    }
     })
   } else {
     res.json({
