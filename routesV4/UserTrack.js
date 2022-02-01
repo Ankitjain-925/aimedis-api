@@ -267,7 +267,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    console.log("req.body.data.created_by", req.body.data.created_by);
     var created_by = req.body.data.created_by;
     req.body.data.created_by = encrypt(req.body.data.created_by);
     req.body.data._enc_created_by = true;
@@ -310,7 +309,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
                   //     'If you have any questions for the pharmacist, please write him an email at ' + data.pharma.email + '. <br/>' +
                   //     'Alternatively, you can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/><br/></br>' +
                   //     'Your Aimedis team';
-                  console.log("I am here");
                   generateTemplate(
                     EMAIL.doctorEmail.handledPrescriptionnSystem(result, {
                       doctor_name: docUser.first_name + " " + docUser.last_name,
@@ -331,7 +329,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
                     }),
                     (error, html) => {
                       if (!error) {
-                        console.log("I am ghtf");
                         let mailOptions = {
                           from: "contact@aimedis.com",
                           to: docUser.email,
@@ -469,7 +466,6 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
               msg: "User is not found",
             });
           } else {
-            console.log("pharmacy_id", req.body.data.pharmacy_id);
             if (req.body.data && req.body.data.pharmacy_id) {
               const messageToSearchWith = new user({
                 profile_id: req.body.data.pharmacy_id,
@@ -498,14 +494,12 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
                     });
                   } else {
                     if (doc.nModified == "0") {
-                      console.log("I am heereee056");
                       res.json({
                         status: 200,
                         hassuccessed: false,
                         msg: "Pharmacy is not found",
                       });
                     } else {
-                      console.log("I am heereee to send on Pharmcay too.");
                       res.json({
                         status: 200,
                         hassuccessed: true,
@@ -516,7 +510,6 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
                 }
               );
             } else {
-              console.log("terrererer");
               res.json({
                 status: 200,
                 hassuccessed: true,
@@ -551,7 +544,6 @@ router.put("/AddTrackAdmin", function (req, res, next) {
       { safe: true, upsert: true },
       function (err, doc) {
         if (err && !doc) {
-          console.log("err", err)
           res.json({
             status: 200,
             hassuccessed: false,
@@ -559,7 +551,6 @@ router.put("/AddTrackAdmin", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("doc", doc)
           if (doc.nModified == "0") {
             res.json({
               status: 200,
@@ -795,7 +786,6 @@ router.get("/AppointmentByDate", function (req, res, next) {
 
 router.post("/appointment", function (req, res) {
   var Appointments = new Appointment(req.body);
-  console.log("Appointments",Appointments)
   Appointments.save(function (err, user_data) {
     if (err && !user_data) {
       console.log("err",err)
@@ -805,7 +795,6 @@ router.post("/appointment", function (req, res) {
         moment(req.body.date).format("YYYY/MM/DD"),
         "YYYY/MM/DD"
       );
-      console.log("dates", date);
       var lan1 = getMsgLang(req.body.patient);
       var lan2 = getMsgLang(req.body.doctor_id);
 
@@ -1573,7 +1562,6 @@ function getAlltrack1(data, right_management) {
                   var d2 = new Date(end_date).setHours(0, 0, 0, 0);
                   console.log("rrrr");
                   if (d1 >= d2) {
-                    console.log("rrr333r");
                     trackrecord1.push(new_data);
                   }
                 }
@@ -1824,7 +1812,6 @@ router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, 
           user.find({ institute_id: req.params.institute_id, type: 'patient' })
             .exec()
             .then((data) => {
-              console.log('user_daya', data, user_data)
               var LisiUser = [...user_data, ...data];
               res.json({
                 status: 200,
