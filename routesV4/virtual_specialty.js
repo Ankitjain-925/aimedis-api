@@ -29,7 +29,7 @@ var html_to_pdf = require("html-pdf-node");
 const { virtual } = require("../schema/topic.js");
 var flatArraya = [];
 var Inhospital = [];
-var ObjectId = require('mongodb').ObjectID;
+var InhopspitalInvoice = [];
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
@@ -978,19 +978,21 @@ router.post("/checkPatient", function (req, res, next) {
                   createCase =
                     userdata.parent_id === req.body.institute_id
                       ? true
-                      : pos && pos.length > 0
-                        ? true
-                        : false;
-                }
-                if (createCase) {
-                  virtual_Case.findOne({ patient_id: userdata._id, inhospital: true }, function (err, data) {
-                    if (err & !data) {
-                      res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
-                    }
-                    else {
-                      console.log("data", data)
-                      if (data) {
-                        Institute.findOne({ "institute_groups.houses.house_id": data.house_id }).exec(function (err, doc3) {
+                      : false;
+              }
+              if (createCase) {
+                virtual_Case.findOne({ patient_id: userdata._id.toString(), inhospital: true }, function (err, data) {
+                  if (err & !data) {
+                    res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
+                  }
+                  else {
+                    console.log("data", data)
+                    if (data) {
+                      Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() },function (err, doc3) {
+                        if (err & !doc3) {
+                          res.json({ status: 200, message: "Something went wrongq.", hassuccessed: false, error: err })
+                        }
+                        else{
                           var infoHouse = {}
                           if (doc3) {
                             console.log('doC3', doc3)
@@ -1011,7 +1013,10 @@ router.post("/checkPatient", function (req, res, next) {
                               data: infoHouse,
                             });
                           }
-                        })
+                        }
+                       
+                      })
+
                       }
                       else {
                         res.json({
@@ -1397,44 +1402,63 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
           res.json({ status: 200, hassuccessed: true, error: err })
         }
         else {
-          data[0].wards.forEach((element) => {
-            if (element._id == req.params.ward_id) {
-              wards.rooms = element.rooms
-            }
-          })
-          virtual_Case.find(({ "wards._id": req.params.ward_id }), function (err, room) {
-            if (err & !room) {
-              res.json({ status: 200, hassuccessed: true, error: err })
-
-            }
-            else {
-              // console.log("rooms", room[0].rooms)
-              // wards.rooms.forEach((element) => {
-              //   if (room[0].rooms._id == element._id) {
-              //     console.log("element.room",element.room)
-              //     wards.cases = element.room
-              //     console.log("wards",wards)
-              //     res.json({ status: 200, hassuccessed: true, data: wards })
-              //   }
-
-              // });
-              wards.rooms.forEach((element) => {
-                room.forEach((element2) => {
-                  if (element2.rooms._id == element._id) {
-                    ward1.rooms = element2.rooms
-                    ward1.cases = room
-                    allData.push(ward1)
-                    ward1 = {}
+          console.log('data', data)
+          if(data && data.length>0){
+            data[0].wards.forEach((element) => {
+              if (element._id == req.params.ward_id) {
+                wards.rooms = element.rooms
+              }
+            })
+            virtual_Case.find(({ "wards._id": req.params.ward_id }), function (err, room) {
+              if (err & !room) {
+                res.json({ status: 200, hassuccessed: true, error: err })
+  
+              }
+              else {
+                // console.log("rooms", room[0].rooms)
+                // wards.rooms.forEach((element) => {
+                //   if (room[0].rooms._id == element._id) {
+                //     console.log("element.room",element.room)
+                //     wards.cases = element.room
+                //     console.log("wards",wards)
+                //     res.json({ status: 200, hassuccessed: true, data: wards })
+                //   }
+  
+                // });
+                var bedData = [];
+                wards && wards.rooms && wards.rooms.length>0 && wards.rooms.forEach((element) => {
+                  
+                  for (var i = 1; i <= element.no_of_bed; i++) {
+                    var data = room && room.length>0 && room.filter((item)=>{
+                      return (item.rooms._id == element._id && item.bed == i)
+                    })
+                    bedData.push({bed: i,
+                    cases :  (data && data.length>0) ? data[0] : {}})
                   }
-                })
-              });
-              res.json({ status: 200, hassuccessed: true, data: allData })
-
-            }
-
-          })
-
-
+                  ward1.bedData = bedData;
+                  ward1.room_id = element._id;
+                  ward1.rooms = element;
+                  allData.push(ward1)
+                  ward1 = {}
+                  bedData = []
+                  // room.forEach((element2) => {
+                  //   if (element2.rooms._id == element._id) {
+                  //     ward1.room_id = element2.rooms._id
+                  //     ward1.cases = room
+                  //     allData.push(ward1)
+                  //     ward1 = {}
+                  //   }
+                  // })
+                });
+                res.json({ status: 200, hassuccessed: true, data: allData })
+  
+              }
+  
+            })
+          }
+          else{
+            res.json({ status: 200, hassuccessed: false, message: 'speciality not found' }) 
+          }
         }
       })
     }
@@ -1892,6 +1916,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
   if (legit) {
     flatArraya = [];
     Inhospital = [];
+    InhopspitalInvoice = [];
     virtual_Case.find({ patient_id: req.params.patient_id }, function (err, data) {
       if (err & !data) {
         res.json({ status: 200, hassuccessed: true, error: err })
@@ -2442,12 +2467,15 @@ function taskfromhouseid(item) {
               flatArraya.push(...task);
             }
             if (item.inhospital == false) {
+              if (!InhopspitalInvoice.includes(item.house_id)) {
               var invoices = invoicefromhouseid(item)
               invoices.then((result) => {
                 flatArraya.push(...result);
               })
-              Inhospital.push(item.house_id);
+              } 
+              InhopspitalInvoice.push(item.house_id);
             }
+            Inhospital.push(item.house_id);
             resolve(flatArraya)
           }
         })
@@ -2497,11 +2525,7 @@ function taskfromhouseid(item) {
 function invoicefromhouseid(data) {
   return new Promise((resolve, reject) => {
     try {
-      let flatArray = []
-      let house_id = data.house_id;
-      const VirtualtToSearchWith = new virtual_Task({ house_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-      virtual_Invoice.find({ $or: [{ house_id: data.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, invoice) {
+      virtual_Invoice.find({ $or: [{ house_id: data.house_id }] }).exec(function (err, invoice) {
         if (err) {
           resolve([])
         } else {
