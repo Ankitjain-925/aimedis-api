@@ -1758,6 +1758,41 @@
                 }
             }
         },
+        "/cases/checkbedAvailabilityByWard": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "parameters": [
+                    {
+                        "name": "checkbedAvailabilityByWard",
+                        "in": "body",
+                        "description": "checkbedAvailabilityByWard",
+                        "schema": {
+                            "$ref": "#/definitions/Checkward"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "added successfully"
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
         "/cases/GetInfo/{house_id}": {
             "parameters": [
                 {
@@ -1812,7 +1847,7 @@
                         "in": "body",
                         "description": "Answers",
                         "schema": {
-                            "$ref": "#/definitions/AddRoom"
+                            "$ref": "#/definitions/Ward"
                         }
                     }
                 ],
@@ -2834,6 +2869,24 @@
                 },
                 "inhospital": {
                     "type": "boolean",
+                    "uniqueItems": true
+                }
+            }
+        },
+        "Checkward": {
+            "required": [
+            ],
+            "properties": {
+                "ward_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "specialty_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
                     "uniqueItems": true
                 }
             }
