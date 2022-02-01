@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aimedis.io",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -38,7 +38,7 @@
         }
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -2278,6 +2278,39 @@
                 }
             }
         },
+        "/vh/AddTrack": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "delete": {
+                "parameters": [
+                    {
+                        "name": "Addtrack",
+                        "in": "body",
+                        "description": "Update",
+                        "schema": {
+                            "$ref": "#/definitions/AddTrack"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "AddTrack",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Update in data"
+                    }
+                }
+            }
+        },
         "/vh/billfilter": {
             "parameters": [
                 {
@@ -2944,6 +2977,20 @@
                     },
                     "uniqueItems": true
                 }
+            }
+        },
+        "AddTrack": {
+            "required": [],
+            "properties": {
+                "UserId": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "TrackId": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+                
             }
         },
         "Billfilter": {

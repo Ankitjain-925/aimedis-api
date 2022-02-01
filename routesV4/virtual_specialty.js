@@ -2180,7 +2180,7 @@ router.delete("/AddTrack", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    user.updateOne(
+    User.updateOne(
       { _id: req.body.UserId },
       { $pull: { track_record: { track_id: req.body.TrackId } } },
       { multi: true },
