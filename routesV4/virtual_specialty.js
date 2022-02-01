@@ -29,6 +29,7 @@ var html_to_pdf = require("html-pdf-node");
 const { virtual } = require("../schema/topic.js");
 var flatArraya = [];
 var Inhospital = [];
+var ObjectId = require('mongodb').ObjectID;
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
@@ -1313,6 +1314,7 @@ router.get("/sortinfo/:patient_id", function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {
+    
     Promise.all([virtualInvoiceforPatient(req.params.patient_id), virtualTasksforPatient(req.params.patient_id)]).then((data, data1) => {
       res.json({ status: 200, hassuccessed: true, data: data, data1 })
     })
@@ -1323,6 +1325,63 @@ router.get("/sortinfo/:patient_id", function (req, res, next) {
 
   }
 })
+
+router.get("/sortinfo1/:patient_id", function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+
+    virtual_Invoice.aggregate([{
+      $match: {
+        "patient._id": ObjectId(req.params.patient_id),
+        // "patient.patient_id": req.params.patient_id,
+
+
+      }
+    },
+    {
+      $lookup: {
+        from: "virtual_tasks",
+        localField: "patient_id",
+        foreignField: "patient_id",
+        as: "complete_info"
+      }
+    },
+    {
+      $project: {
+        services: 1,
+        invoice_id: 1,
+        patient: 1,
+        case_id: 1,
+        status: 1,
+        total_amount: 1,
+        house_id: 1,
+        created_at: 1,
+        virtualtask: "$complete_info"
+
+      }
+    }
+      //  { $unwind: "$complete_info"}
+    ]).exec(function (err, data) {
+      if (err) {
+        console.log("err", error)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      } else {
+        console.log("data", data)
+        res.json({ status: 200, hassuccessed: true, result: data })
+
+      }
+    })
+
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+
+})
+
+
 
 router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
   const token = (req.headers.token)
@@ -1802,25 +1861,25 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
 
 function GetAllQuestion(item) {
   return new Promise((resolve, reject) => {
-    try{
-    const VirtualtToSearchWith = new questionaire({ house_id: item.house_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
-      if (err) {
-        resolve(newcf)
+    try {
+      const VirtualtToSearchWith = new questionaire({ house_id: item.house_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      questionaire.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, data2) {
+        if (err) {
+          resolve(newcf)
 
-      }
-      else {
-        if (data2.length > 0) {
-          newcf.push(data2);
-          resolve(newcf)
         }
-         else{
-          resolve(newcf)
-         } 
-      }
-    })
-    }catch(err){
+        else {
+          if (data2.length > 0) {
+            newcf.push(data2);
+            resolve(newcf)
+          }
+          else {
+            resolve(newcf)
+          }
+        }
+      })
+    } catch (err) {
       resolve(newcf)
     }
   })
@@ -2458,7 +2517,7 @@ function invoicefromhouseid(data) {
 function virtualInvoiceforPatient(patient_id) {
   return new Promise((resolve, reject) => {
     try {
-      virtual_Invoice.find({ "patient._id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
+      virtual_Invoice.find({ "patient.patient_id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
         if (err) {
           reject(err)
         } else {
