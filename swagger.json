@@ -2510,57 +2510,9 @@
                     }
                 }
             }
-        },
-        "/vh/setCasenotInhospital": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
-                "parameters": [
-                    {
-                        "name": "set case",
-                        "in": "body",
-                        "description": "set case",
-                        "schema": {
-                            "$ref": "#/definitions/setcase"
-                        }
-                    }
-                ],
-                "tags": [
-                    "virtual_cases"
-                ],
-                "summary": "Api for editing inhospital",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Update"
-                    }
-                }
-            }
         }
     },
     "definitions": {
-        "setcase": {
-            "required": [
-                "case_id"
-            ],
-            "properties": {
-               
-                "case_id": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    },
-                    "uniqueItems": false
-                }
-            }
-        },
         "AddtheGroup": {
             "required": [
                 "group_name"
