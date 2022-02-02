@@ -979,43 +979,43 @@ router.post("/checkPatient", function (req, res, next) {
                     userdata.parent_id === req.body.institute_id
                       ? true
                       : false;
-              }
-              if (createCase) {
-                virtual_Case.findOne({ patient_id: userdata._id.toString(), inhospital: true }, function (err, data) {
-                  if (err & !data) {
-                    res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
-                  }
-                  else {
-                    console.log("data", data)
-                    if (data) {
-                      Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() },function (err, doc3) {
-                        if (err & !doc3) {
-                          res.json({ status: 200, message: "Something went wrongq.", hassuccessed: false, error: err })
-                        }
-                        else{
-                          var infoHouse = {}
-                          if (doc3) {
-                            console.log('doC3', doc3)
-                            doc3.institute_groups.map(function (dataa) {
-                              dataa.houses.map(function (data1) {
-                                console.log("req.body.house_id", data1.house_id)
-                                if (data1.house_id == data.house_id) {
-                                  infoHouse.house = data1;
-                                  infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
-                                }
-                              })
-                            })
-                            console.log('infoHouse', infoHouse)
-                            res.json({
-                              status: 200,
-                              hassuccessed: false,
-                              message: "Already in other hospital",
-                              data: infoHouse,
-                            });
+                }
+                if (createCase) {
+                  virtual_Case.findOne({ patient_id: userdata._id.toString(), inhospital: true }, function (err, data) {
+                    if (err & !data) {
+                      res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
+                    }
+                    else {
+                      console.log("data", data)
+                      if (data) {
+                        Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() }, function (err, doc3) {
+                          if (err & !doc3) {
+                            res.json({ status: 200, message: "Something went wrongq.", hassuccessed: false, error: err })
                           }
-                        }
-                       
-                      })
+                          else {
+                            var infoHouse = {}
+                            if (doc3) {
+                              console.log('doC3', doc3)
+                              doc3.institute_groups.map(function (dataa) {
+                                dataa.houses.map(function (data1) {
+                                  console.log("req.body.house_id", data1.house_id)
+                                  if (data1.house_id == data.house_id) {
+                                    infoHouse.house = data1;
+                                    infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
+                                  }
+                                })
+                              })
+                              console.log('infoHouse', infoHouse)
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Already in other hospital",
+                                data: infoHouse,
+                              });
+                            }
+                          }
+
+                        })
 
                       }
                       else {
@@ -1319,7 +1319,7 @@ router.get("/sortinfo/:patient_id", function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {
-    
+
     Promise.all([virtualInvoiceforPatient(req.params.patient_id), virtualTasksforPatient(req.params.patient_id)]).then((data, data1) => {
       res.json({ status: 200, hassuccessed: true, data: data, data1 })
     })
@@ -1403,7 +1403,7 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
         }
         else {
           console.log('data', data)
-          if(data && data.length>0){
+          if (data && data.length > 0) {
             data[0].wards.forEach((element) => {
               if (element._id == req.params.ward_id) {
                 wards.rooms = element.rooms
@@ -1412,7 +1412,7 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
             virtual_Case.find(({ "wards._id": req.params.ward_id }), function (err, room) {
               if (err & !room) {
                 res.json({ status: 200, hassuccessed: true, error: err })
-  
+
               }
               else {
                 // console.log("rooms", room[0].rooms)
@@ -1423,17 +1423,19 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
                 //     console.log("wards",wards)
                 //     res.json({ status: 200, hassuccessed: true, data: wards })
                 //   }
-  
+
                 // });
                 var bedData = [];
-                wards && wards.rooms && wards.rooms.length>0 && wards.rooms.forEach((element) => {
-                  
+                wards && wards.rooms && wards.rooms.length > 0 && wards.rooms.forEach((element) => {
+
                   for (var i = 1; i <= element.no_of_bed; i++) {
-                    var data = room && room.length>0 && room.filter((item)=>{
+                    var data = room && room.length > 0 && room.filter((item) => {
                       return (item.rooms._id == element._id && item.bed == i)
                     })
-                    bedData.push({bed: i,
-                    cases :  (data && data.length>0) ? data[0] : {}})
+                    bedData.push({
+                      bed: i,
+                      cases: (data && data.length > 0) ? data[0] : {}
+                    })
                   }
                   ward1.bedData = bedData;
                   ward1.room_id = element._id;
@@ -1451,13 +1453,13 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
                   // })
                 });
                 res.json({ status: 200, hassuccessed: true, data: allData })
-  
+
               }
-  
+
             })
           }
-          else{
-            res.json({ status: 200, hassuccessed: false, message: 'speciality not found' }) 
+          else {
+            res.json({ status: 200, hassuccessed: false, message: 'speciality not found' })
           }
         }
       })
@@ -1922,6 +1924,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
+        console.log("data", data)
         if (data && data.length > 0) {
           forEachPromise(data, taskfromhouseid)
             .then((result) => {
@@ -2359,6 +2362,41 @@ router.post("/deletehouse", function (req, res) {
   }
 });
 
+router.post("/setCasenotInhospital",function(req,res){
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    
+    var case_id = req.body.case_id;
+    virtual_Case.updateMany({_id: {$in:case_id}},{ $set: [{ inhospital: false, status:"5"}] }).exec(function (err, data) {
+      if(err){
+        console.log("err",err)
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Something went wrong",
+          error: err,
+        })
+      }
+      else{
+        console.log("update",data)
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          msg: "update",
+        })
+      }
+    })
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+})
+
 // router.post("/LeftInfoPatient", function (req, res) {
 //   const token = req.headers.token;
 //   let legit = jwtconfig.verify(token);
@@ -2455,7 +2493,7 @@ function taskfromhouseid(item) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       try {
-        let infoHouse1 = {}
+        let infoHouse = {}
         let house_id = item.house_id;
         const VirtualtToSearchWith = new virtual_Task({ house_id });
         VirtualtToSearchWith.encryptFieldsSync();
@@ -2463,20 +2501,55 @@ function taskfromhouseid(item) {
           if (err) {
             resolve(flatArraya)
           } else {
-            if (!Inhospital.includes(item.house_id)) {
-              flatArraya.push(...task);
-            }
-            if (item.inhospital == false) {
-              if (!InhopspitalInvoice.includes(item.house_id)) {
-              var invoices = invoicefromhouseid(item)
-              invoices.then((result) => {
-                flatArraya.push(...result);
-              })
-              } 
-              InhopspitalInvoice.push(item.house_id);
-            }
-            Inhospital.push(item.house_id);
-            resolve(flatArraya)
+            Institute.find({ $or: [{ "institute_groups.houses.house_id": house_id }, { "institute_groups.houses.house_id": VirtualtToSearchWith.house_id }] }).exec(function (err, houseinfo) {
+              if (err) {
+                resolve(flatArraya)
+              } else {
+                console.log("houseinfo",houseinfo)
+                if(houseinfo.length>0){
+                houseinfo[0].institute_groups.map(function (dataa) {
+                  dataa.houses.map(function (data1) {
+                    if (data1.house_id == house_id) {
+                      infoHouse = { house_name: data1.house_name, house_logo: data1.house_logo };
+                      console.log("infoho",infoHouse)
+                    }
+                  })
+                })
+                }
+                if (!Inhospital.includes(item.house_id)) {
+                  //condition 1
+                //  data= Array.prototype.concat.apply(...task,infoHouse);
+                //  flatArraya.push(data)
+                
+                  // console.log("tassk",task)
+                  //condition2 
+                  // task1={}
+                  // task1.task= task
+                  // task1.house_name=infoHouse.house_name
+                  // task1.house_logo=infoHouse.house_logo
+                  // console.log("2",task[0].house_name)
+                  // console.log("task",task)
+                  // flatArraya=[task1]
+                  // task.concat(infoHouse)
+                  // flatArraya.push(task)
+                  // flatArraya=[...task,infoHouse]
+                
+                  task.includes(house_name=infoHouse.house_name,house_logo=infoHouse.house_logo)
+                  flatArraya=[...task]
+                }
+                if (item.inhospital == false) {
+                  if (!InhopspitalInvoice.includes(item.house_id)) {
+                    var invoices = invoicefromhouseid(item)
+                    invoices.then((result) => {
+                      flatArraya.push({...result,infoHouse});
+                    })
+                  }
+                  InhopspitalInvoice.push(item.house_id);
+                }
+                Inhospital.push(item.house_id);
+                resolve(flatArraya)
+              }
+            })
           }
         })
       } catch (error) {
