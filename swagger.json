@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aimedis.io",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -38,7 +38,7 @@
         }
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -1758,6 +1758,41 @@
                 }
             }
         },
+        "/cases/checkbedAvailabilityByWard": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "virtual_cases"
+                ],
+                "parameters": [
+                    {
+                        "name": "checkbedAvailabilityByWard",
+                        "in": "body",
+                        "description": "checkbedAvailabilityByWard",
+                        "schema": {
+                            "$ref": "#/definitions/Checkward"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "added successfully"
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
         "/cases/GetInfo/{house_id}": {
             "parameters": [
                 {
@@ -1812,7 +1847,7 @@
                         "in": "body",
                         "description": "Answers",
                         "schema": {
-                            "$ref": "#/definitions/AddRoom"
+                            "$ref": "#/definitions/Ward"
                         }
                     }
                 ],
@@ -2274,6 +2309,39 @@
                 "responses": {
                     "200": {
                         "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vh/AddTrack": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "delete": {
+                "parameters": [
+                    {
+                        "name": "Addtrack",
+                        "in": "body",
+                        "description": "Update",
+                        "schema": {
+                            "$ref": "#/definitions/AddTrack"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "AddTrack",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Update in data"
                     }
                 }
             }
@@ -2805,6 +2873,24 @@
                 }
             }
         },
+        "Checkward": {
+            "required": [
+            ],
+            "properties": {
+                "ward_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "specialty_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+            }
+        },
         "download": {
             "required": [],
             "properties": {
@@ -2944,6 +3030,20 @@
                     },
                     "uniqueItems": true
                 }
+            }
+        },
+        "AddTrack": {
+            "required": [],
+            "properties": {
+                "UserId": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "TrackId": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+                
             }
         },
         "Billfilter": {
