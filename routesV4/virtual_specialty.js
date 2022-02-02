@@ -2055,6 +2055,40 @@ router.post("/TaskFilter", function (req, res) {
   }
 });
 
+router.post("/setCasenotInhospital",function(req,res){
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+
+    var case_id = req.body.case_id;
+    virtual_Case.updateMany({_id: {$in:case_id}},{ $set: [{ inhospital: false, status:"5"}] }).exec(function (err, data) {
+      if(err){
+        console.log("err",err)
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Something went wrong",
+          error: err,
+        })
+      }
+      else{
+        console.log("update",data)
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          msg: "update",
+        })
+      }
+    })
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+})
 
 router.post("/CalenderFilter", function (req, res) {
   const token = req.headers.token;
