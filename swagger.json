@@ -2543,7 +2543,41 @@
                     }
                 }
             }
+        },
+        "/vh/getSubmitQuestionnaire": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "get": {
+                "parameters": [
+                    {
+                        "name": "Get Submit",
+                        "in": "body",
+                        "description": "Get Submit",
+                        "schema": {
+                            "$ref": "#/definitions/info1"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "Api for get answer and user info",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Update"
+                    }
+                }
+            }
         }
+
     },
     "definitions": {
         "setcase": {
@@ -3202,6 +3236,20 @@
                         "type": "object"
                     }
                 }
+            }
+        },
+        "info1": {
+            "required": [],
+            "properties": {
+                "patient_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+               
             }
         }
     }
