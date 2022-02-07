@@ -2552,12 +2552,12 @@
                     "description": "JWT token User"
                 }
             ],
-            "get": {
+            "post": {
                 "parameters": [
                     {
-                        "name": "Get Submit",
+                        "name": "getSubmitQuestionnaire",
                         "in": "body",
-                        "description": "Get Submit",
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/info1"
                         }
@@ -2566,13 +2566,13 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "Api for get answer and user info",
+                "summary": "get allhospitaluser by institute_id",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Update"
+                        "description": "Get Data"
                     }
                 }
             }

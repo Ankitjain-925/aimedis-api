@@ -2459,7 +2459,7 @@ router.get("/pa", function (req, res, next) {
 })
 
 
-router.get("/getSubmitQuestionnaire",function(req,res){
+router.post("/getSubmitQuestionnaire",function(req,res){
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   let result={}
