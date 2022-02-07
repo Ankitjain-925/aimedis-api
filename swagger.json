@@ -2557,7 +2557,7 @@
                     {
                         "name": "getSubmitQuestionnaire",
                         "in": "body",
-                        "description": "",
+                        "description": "Get submit questionaire",
                         "schema": {
                             "$ref": "#/definitions/info1"
                         }
@@ -2566,7 +2566,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "get allhospitaluser by institute_id",
+                "summary": "get submit questionaire with house id and patient id",
                 "produces": [
                     "application/json"
                 ],
