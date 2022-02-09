@@ -982,6 +982,7 @@ router.post("/checkPatient", function (req, res, next) {
                       : false;
                 }
                 if (createCase) {
+                  console.log("createCase",createCase)
                   virtual_Case.findOne({ patient_id: userdata._id.toString(), inhospital: true }, function (err, data) {
                     if (err & !data) {
                       res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
@@ -995,6 +996,147 @@ router.post("/checkPatient", function (req, res, next) {
                           }
                           else {
                             var infoHouse = {}
+                            if (doc3) {
+                              console.log('doC3', doc3)
+                              doc3.institute_groups.map(function (dataa) {
+                                dataa.houses.map(function (data1) {
+                                  console.log("req.body.house_id", data1.house_id)
+                                  if (data1.house_id == data.house_id) {
+                                    infoHouse.house = data1;
+                                    infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
+                                  }
+                                })
+                              })
+                              console.log('infoHouse', infoHouse)
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Already in other hospital",
+                                data: infoHouse,
+                              });
+                            }
+                          }
+
+                        })
+
+                      }
+                      else {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "information get successfully",
+                          data: userdata,
+                        });
+                      }
+                    }
+                  })
+                } else {
+                  if (req.body.pin) {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "pin is not correct",
+                    });
+                  } else {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "user is not associated need pin to add",
+                    });
+                  }
+                }
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "patient is not exist",
+                });
+              }
+            } catch (err) {
+              res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+
+            }
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Please enter patient id",
+      });
+    }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+router.post("/checkPatientNew", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    if (req.body.patient_id) {
+      const profile_id = req.body.patient_id;
+      const messageToSearchWith = new User({ profile_id });
+      messageToSearchWith.encryptFieldsSync();
+      const alies_id = req.body.patient_id;
+      const messageToSearchWith1 = new User({ alies_id });
+      messageToSearchWith1.encryptFieldsSync();
+      User.findOne(
+        {
+          $or: [
+            { profile_id: messageToSearchWith.profile_id },
+            { alies_id: messageToSearchWith1.alies_id },
+            { profile_id: req.body.patient_id },
+            { alies_id: req.body.patient_id }
+          ],
+        },
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            try {
+              console.log("userdata", userdata)
+              if (userdata) {
+                var createCase = false;
+                if (req.body.email) {
+                  createCase = req.body.email == userdata.email ? true : false;
+                } else {
+                  var pos =
+                    userdata &&
+                    userdata.assosiated_by.filter(
+                      (data) => data.institute_id === req.body.institute_id
+                    );
+                  createCase =
+                    userdata.parent_id === req.body.institute_id
+                      ? true
+                      : false;
+                }
+                if (createCase) {
+                  console.log("createCase",createCase)
+                  virtual_Case.findOne({ patient_id: userdata.email, inhospital: true }, function (err, data) {
+                    if (err & !data) {
+                      res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
+                    }
+                    else {
+                      console.log("data", data)
+                      if (data) {
+                        Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() }, function (err, doc3) {
+                          if (err & !doc3) {
+                            res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
+                          }
+                          else {
+                            var infoHouse = {}
+                            console.log("doc3",doc3)
                             if (doc3) {
                               console.log('doC3', doc3)
                               doc3.institute_groups.map(function (dataa) {

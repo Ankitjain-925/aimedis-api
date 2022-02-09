@@ -864,6 +864,44 @@
                 }
             }
         },
+        "/vh/checkPatientNew": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Virtual_Specialty"
+                ],
+                "parameters": [
+                    {
+                        "name": "checkPatient",
+                        "in": "body",
+                        "description": "Virtual_Specialty",
+                        "schema": {
+                            "$ref": "#/definitions/checkPatient"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": " information get successfully",
+                        "schema": {
+                            "$ref": "#/definitions/checkPatient"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
         "/vh/addPatientToVH": {
             "parameters": [
                 {
@@ -2416,7 +2454,7 @@
             "parameters": [
                 {
                     "name": "token",
-                    "in": "header",
+                  "in": "header",
                     "description": "JWT token User"
                 }
             ],
@@ -2576,6 +2614,39 @@
                     }
                 }
             }
+        },
+        "/UserProfile/AddNewUser": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "getSubmitQuestionnaire",
+                        "in": "body",
+                        "description": "Get submit questionaire",
+                        "schema": {
+                            "$ref": "#/definitions/user"
+                        }
+                    }
+                ],
+                "tags": [
+                    "virtual_cases"
+                ],
+                "summary": "get submit questionaire with house id and patient id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
         }
 
     },
@@ -2595,6 +2666,30 @@
                 }
             }
         },
+        "user": {
+            "required": [
+             
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "first_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "last_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "phone": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        
         "AddtheGroup": {
             "required": [
                 "group_name"
@@ -2889,6 +2984,10 @@
                     "uniqueItems": false
                 },
                 "institute_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "email":{
                     "type": "string",
                     "uniqueItems": false
                 }
