@@ -2061,7 +2061,7 @@ router.post("/setCasenotInhospital",function(req,res){
   if (legit) {
 
     var case_id = req.body.case_id;
-    virtual_Case.updateMany({_id: {$in:case_id}},{ $set: [{ inhospital: false, status:"5"}] }).exec(function (err, data) {
+    virtual_Case.updateMany({_id: {$in : case_id}},{ $set: { inhospital: false, status:"5"} }).exec(function (err, data) {
       if(err){
         console.log("err",err)
         res.json({
