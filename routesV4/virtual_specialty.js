@@ -30,6 +30,7 @@ const { virtual } = require("../schema/topic.js");
 var flatArraya = [];
 var Inhospital = [];
 var InhopspitalInvoice = [];
+var mongoose = require('mongoose');
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
@@ -1073,6 +1074,147 @@ router.post("/checkPatient", function (req, res, next) {
   }
 });
 
+router.post("/checkPatientNew", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    if (req.body.patient_id) {
+      const profile_id = req.body.patient_id;
+      const messageToSearchWith = new User({ profile_id });
+      messageToSearchWith.encryptFieldsSync();
+      const alies_id = req.body.patient_id;
+      const messageToSearchWith1 = new User({ alies_id });
+      messageToSearchWith1.encryptFieldsSync();
+      User.findOne(
+        {
+          $or: [
+            { profile_id: messageToSearchWith.profile_id },
+            { alies_id: messageToSearchWith1.alies_id },
+            { profile_id: req.body.patient_id },
+            { alies_id: req.body.patient_id }
+          ],
+        },
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            try {
+              console.log("userdata", userdata)
+              if (userdata) {
+                var createCase = false;
+                if (req.body.email) {
+                  createCase = req.body.email == userdata.email ? true : false;
+                } else {
+                  var pos =
+                    userdata &&
+                    userdata.assosiated_by.filter(
+                      (data) => data.institute_id === req.body.institute_id
+                    );
+                  createCase =
+                    userdata.parent_id === req.body.institute_id
+                      ? true
+                      : false;
+                }
+                if (createCase) {
+                  console.log("createCase",createCase)
+                  virtual_Case.findOne({ patient_id: userdata.email, inhospital: true }, function (err, data) {
+                    if (err & !data) {
+                      res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
+                    }
+                    else {
+                      console.log("data", data)
+                      if (data) {
+                        Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() }, function (err, doc3) {
+                          if (err & !doc3) {
+                            res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
+                          }
+                          else {
+                            var infoHouse = {}
+                            console.log("doc3",doc3)
+                            if (doc3) {
+                              console.log('doC3', doc3)
+                              doc3.institute_groups.map(function (dataa) {
+                                dataa.houses.map(function (data1) {
+                                  console.log("req.body.house_id", data1.house_id)
+                                  if (data1.house_id == data.house_id) {
+                                    infoHouse.house = data1;
+                                    infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
+                                  }
+                                })
+                              })
+                              console.log('infoHouse', infoHouse)
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Already in other hospital",
+                                data: infoHouse,
+                              });
+                            }
+                          }
+
+                        })
+
+                      }
+                      else {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "information get successfully",
+                          data: userdata,
+                        });
+                      }
+                    }
+                  })
+                } else {
+                  if (req.body.pin) {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "pin is not correct",
+                    });
+                  } else {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "user is not associated need pin to add",
+                    });
+                  }
+                }
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "patient is not exist",
+                });
+              }
+            } catch (err) {
+              res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+
+            }
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Please enter patient id",
+      });
+    }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 router.post("/addPatientToVH", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1999,7 +2141,7 @@ router.post("/TaskFilter", function (req, res) {
 
     var condition = { house_id: req.body.house_id };
     if (req.body.assigned_to) {
-      condition["assigned_to.user_id"] = { $in: req.body.assigned_to }
+      condition["assinged_to.user_id"] = { $in: req.body.assigned_to }
     }
     if (req.body.status) {
       condition.status = { $in: req.body.status }
@@ -2039,7 +2181,7 @@ router.post("/TaskFilter", function (req, res) {
                 res.json({ status: 200, hassuccessed: true, message: "No data found" })
               }
             }
-          })++
+          })
         }
         else {
           res.json({ status: 200, hassuccessed: true, data: data })
@@ -2105,9 +2247,9 @@ router.post("/CalenderFilter", function (req, res) {
     if (req.body.speciality_id) {
       condition["speciality._id"] = req.body.speciality_id
     }
-    if (req.body.patient_id) {
-      condition.patient_id = { $in: req.body.patient_id }
-    }
+    // if (req.body.patient_id) {
+    //   condition.patient_id = { $in: req.body.patient_id }
+    // }
 
     virtual_Task.find(condition, function (err, data) {
 
@@ -2115,6 +2257,7 @@ router.post("/CalenderFilter", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
+        console.log("data",data)
         let condition3 = { house_id: req.body.house_id }
         if (req.body.ward_id || req.body.room_id) {
           if (req.body.room_id) {
@@ -2129,7 +2272,11 @@ router.post("/CalenderFilter", function (req, res) {
               res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
             }
             else {
-              Appointments.find({ patient: req.body.patient_id }, function (err, appointments) {
+              console.log("data1",data1)
+            let patient_id= data1.map((element)=>{ return element.patient_id})
+            
+            
+              Appointments.find({ patient:{$in:patient_id} }, function (err, appointments) {
                 if (err) {
                   res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
 
@@ -2143,6 +2290,7 @@ router.post("/CalenderFilter", function (req, res) {
 
                   }
                   else {
+                    console.log("1")
                     res.json({ status: 200, hassuccessed: true, data: appointments })
                   }
 
@@ -2160,6 +2308,7 @@ router.post("/CalenderFilter", function (req, res) {
           })
         }
         else {
+          console.log("d")
           res.json({ status: 200, hassuccessed: true, data: data })
         }
       }
@@ -2259,7 +2408,7 @@ router.post("/LeftInfoPatient", function (req, res) {
   if (legit) {
     let house_id = req.body.house_id
     const VirtualtToSearchWith = new User({ house_id });
-    VirtualtToSearchWith.encryptFieldsSync();
+    VirtualtToSearchWith.encryptFieldsSync();       
     virtual_Case.findOne({ $or: [{ house_id: house_id, house_id: VirtualtToSearchWith.house_id }], patient_id: req.body.patient_id, inhospital: true }, function (err, data) {
       if (err & !data) {
         res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
@@ -2392,6 +2541,158 @@ router.post("/deletehouse", function (req, res) {
     });
   }
 });
+
+router.post("/setCasenotInhospital",function(req,res){
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    
+    var case_id = req.body.case_id;
+    virtual_Case.updateMany({_id: {$in:case_id}},{ $set: { inhospital: false, status:"5"} }).exec(function (err, data) {
+      if(err){
+        console.log("err",err)
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Something went wrong",
+          error: err,
+        })
+      }
+      else{
+        console.log("update",data)
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          msg: "update",
+        })
+      }
+    })
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+})
+
+router.get("/pa", function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    let patient_id = new  mongoose.Types.ObjectId(req.body.patient_id)
+    // let patient_id = req.body.patient_id
+
+    const VirtualtToSearchWith = new User({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    console.log("patient",patient_id)
+    answerspatient.aggregate([{
+      $match: {$or:[{
+        patient_id:patient_id,patient_id:VirtualtToSearchWith.patient_id}
+      ]
+
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "patient_id",
+        foreignField: "_id",
+        as: "complete_info"
+      }
+    },
+    {
+      $project: {
+        questionaire_id:1,
+        answers:1,
+        patient:1,
+        house_name:1,
+        house_id:1,
+        house_logo:1,
+        patient_id:1,
+        profile_id: "$complete_info.profile_id",
+        email: "$complete_info.email",
+        first_name:"$complete_info.first_name",
+        last_name:"$complete_info.last_name",
+        mobile:"$complete_info.mobile"
+      }
+    }
+      //  { $unwind: "$complete_info"}
+    ]).exec(function (err, data) {
+      if (err) {
+        console.log("err", error)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      } else {
+        console.log("data", data)
+        res.json({ status: 200, hassuccessed: true, result: data })
+      }
+    })
+
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+
+})
+
+
+router.post("/getSubmitQuestionnaire",function(req,res){
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  let result={}
+  if (legit) {
+    let patient_id = req.body.patient_id
+    const VirtualtToSearchWith = new answerspatient({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    let house_id = req.body.house_id
+    const VirtualtToSearchWithhouseid = new answerspatient({ house_id });
+    VirtualtToSearchWithhouseid.encryptFieldsSync();
+
+    answerspatient.find({$or:[{patient_id:patient_id},{patient_id:VirtualtToSearchWith.patient_id },{house_id:house_id},{house_id:VirtualtToSearchWithhouseid.house_id}]},function(err,data){
+      if(err){
+        console.log("err",err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      }
+      else{
+        console.log("data",data)
+        result.data=data
+        if(data && data.length>0){
+          let pat=data.map(element=>{
+            return element.patient_id
+          })
+          
+          User.find({_id:{$in:pat}},function(err,data2){
+            if(err){
+              res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+            }else{
+              console.log("1",data2)
+              result.profile_id=data2[0].profile_id
+              result.first_name=data2[0].first_name
+              result.last_name=data2[0].last_name
+              result.email=data2[0].email
+              result.mobile=data2[0].mobile
+
+              res.json({status: 200, hassuccessed: true, data:result})
+            }
+          })
+        
+        }else{
+          res.json({status: 200, hassuccessed: false,message:"Not found" })
+
+        }
+      }
+
+    })
+  }else{
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
 
 // router.post("/LeftInfoPatient", function (req, res) {
 //   const token = req.headers.token;
