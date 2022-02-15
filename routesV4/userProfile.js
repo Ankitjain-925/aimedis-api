@@ -1536,33 +1536,36 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                   { email: req.body.email && req.body.email.toUpperCase() },
                 ]
               },
-              {
-                $or: [
-                  { first_name: req.body.first_name },
-                  { first_name: first_name && first_name.toLowerCase() },
-                  { first_name: first_name && first_name.toUpperCase() },
-                  { first_name: messageToSearchWithFirst.first_name },
-                  { first_name: messageToSearchWithFirst1.first_name },
-                  { first_name: messageToSearchWithFirst2.first_name },
-                ]
-              }, 
-              {
-                $or: [
-                  { last_name: req.body.last_name },
-                  { last_name: last_name && last_name.toLowerCase() },
-                  { last_name: last_name && last_name.toUpperCase() },
-                  { last_name: messageToSearchWithLast.last_name },
-                  { last_name: messageToSearchWithLast1.last_name },
-                  { last_name: messageToSearchWithLast2.last_name },
-                ]
-              },
+              
               {
                 $or: [
                   { mobile: req.body.phone },
                   { mobile: messageToSearchWithPhone.mobile }
                 ]
               }
-            ]
+            ],
+            $and:[
+              {
+              $or: [
+                { first_name: req.body.first_name },
+                { first_name: first_name && first_name.toLowerCase() },
+                { first_name: first_name && first_name.toUpperCase() },
+                { first_name: messageToSearchWithFirst.first_name },
+                { first_name: messageToSearchWithFirst1.first_name },
+                { first_name: messageToSearchWithFirst2.first_name },
+              ]
+            }, 
+            {
+              $or: [
+                { last_name: req.body.last_name },
+                { last_name: last_name && last_name.toLowerCase() },
+                { last_name: last_name && last_name.toUpperCase() },
+                { last_name: messageToSearchWithLast.last_name },
+                { last_name: messageToSearchWithLast1.last_name },
+                { last_name: messageToSearchWithLast2.last_name },
+              ]
+            },
+          ]
           })
             .exec()
             .then((data1) => {
