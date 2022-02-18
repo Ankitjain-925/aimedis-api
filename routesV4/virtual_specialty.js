@@ -2257,7 +2257,6 @@ router.post("/CalenderFilter", function (req, res) {
         res.json({ status: 200, hassuccessed: true, error: err })
       }
       else {
-        console.log("data",data)
         let condition3 = { house_id: req.body.house_id }
         if (req.body.ward_id || req.body.room_id) {
           if (req.body.room_id) {
@@ -2274,8 +2273,6 @@ router.post("/CalenderFilter", function (req, res) {
             else {
               console.log("data1",data1)
             let patient_id= data1.map((element)=>{ return element.patient_id})
-            
-            
               Appointments.find({ patient:{$in:patient_id} }, function (err, appointments) {
                 if (err) {
                   res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
@@ -2287,7 +2284,6 @@ router.post("/CalenderFilter", function (req, res) {
                   }
                   else if (req.body.filter == "task") {
                     res.json({ status: 200, hassuccessed: true, data: data1 })
-
                   }
                   else {
                     console.log("1")

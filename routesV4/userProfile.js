@@ -3860,7 +3860,7 @@ router.put("/GetSecondOpinion/:Prescription_id", function (req, res, next) {
           var lan1 = getMsgLang(userdata.patient_id);
           var dt = dateTime.create();
           if (userdata && typeof userdata == "object")
-            userdata = userdata.toObject();
+            userdata = userdata.toObject() ;
           if (req.body.status === "decline") {
           }
           if (req.body.status === "accept" && userdata.attachfile.length == 0) {
