@@ -864,44 +864,6 @@
                 }
             }
         },
-        "/vh/checkPatientNew": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
-                "tags": [
-                    "Virtual_Specialty"
-                ],
-                "parameters": [
-                    {
-                        "name": "checkPatient",
-                        "in": "body",
-                        "description": "Virtual_Specialty",
-                        "schema": {
-                            "$ref": "#/definitions/checkPatient"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": " information get successfully",
-                        "schema": {
-                            "$ref": "#/definitions/checkPatient"
-                        }
-                    },
-                    "500": {
-                        "description": "Something happened wrong"
-                    }
-                }
-            }
-        },
         "/vh/checkPatient1": {
             "parameters": [
                 {
