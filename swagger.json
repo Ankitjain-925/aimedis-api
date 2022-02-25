@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5000",
+    "host": "https://virtualhospital.aimedis.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -38,7 +38,7 @@
         }
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -827,44 +827,6 @@
             }
         },
         "/vh/checkPatient": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
-                "tags": [
-                    "Virtual_Specialty"
-                ],
-                "parameters": [
-                    {
-                        "name": "checkPatient",
-                        "in": "body",
-                        "description": "Virtual_Specialty",
-                        "schema": {
-                            "$ref": "#/definitions/checkPatient"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": " information get successfully",
-                        "schema": {
-                            "$ref": "#/definitions/checkPatient"
-                        }
-                    },
-                    "500": {
-                        "description": "Something happened wrong"
-                    }
-                }
-            }
-        },
-        "/vh/checkPatientNew": {
             "parameters": [
                 {
                     "name": "token",
@@ -2694,7 +2656,7 @@
                 "case_id"
             ],
             "properties": {
-               
+
                 "case_id": {
                     "type": "array",
                     "items": {

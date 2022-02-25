@@ -112,6 +112,88 @@ router.put("/AddCase/:speciality_id", function (req, res, next) {
 }
 });
 
+router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
+ if(req.body.verifiedbyPatient){
+  virtual_cases.updateOne(
+    { _id: req.params.case_id },
+    req.body,
+    function (err, userdata) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+          error: err,
+        });
+      } else {
+        if (userdata.nModified == "0") {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Case is not found",
+          });
+        } 
+        else{
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "case is updated",
+            data: userdata,
+          });
+        }
+      }
+    }
+  );
+ }
+ else{
+  virtual_cases.findOne(
+    {_id: req.params.case_id},
+    function (err, userdata) {
+      if (err) {
+        console.log("err",err)
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+          error: err,
+        });
+      } else {
+        if (userdata) {
+  virtual_cases.findByIdAndRemove(
+    { _id: req.params.case_id },
+    function (err, doc) {
+      if (err && !doc) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Something went wrong",
+          error: err,
+        });
+      } else {
+        
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            msg: "case is deleted",
+          });
+        
+      }
+    })
+
+  }
+  else{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Case is not found",
+    });
+  }
+ }
+
+});
+ }
+})
+
 router.post("/AddCase", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);

@@ -114,6 +114,17 @@ var CaseSchema = new Schema({
         required: false,
         unique: false
     },
+    verifiedbyPatient:{
+        type: Boolean,
+        required: false,
+        unique: false
+    },
+    added_at: {
+        type: Date,
+    },
+    discharged_at: {
+        type: Date,
+    },
     assinged_to: [ProfessionalInfo],
 },{ strict: false });
 
