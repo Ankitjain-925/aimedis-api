@@ -114,6 +114,7 @@ router.put("/AddCase/:speciality_id", function (req, res, next) {
 
 router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
  if(req.body.verifiedbyPatient){
+  console.log('sdsdfsdfsd111')
   virtual_cases.updateOne(
     { _id: req.params.case_id },
     req.body,
@@ -126,7 +127,9 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
           error: err,
         });
       } else {
+        console.log('case', userdata)
         if (userdata.nModified == "0") {
+          console.log('sdsdfsdfsd')
           res.json({
             status: 200,
             hassuccessed: false,
@@ -134,6 +137,7 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
           });
         } 
         else{
+          console.log('sdsdfsdfs2222')
           res.json({
             status: 200,
             hassuccessed: true,
@@ -162,6 +166,7 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
   virtual_cases.findByIdAndRemove(
     { _id: req.params.case_id },
     function (err, doc) {
+      console.log('doc', doc)
       if (err && !doc) {
         res.json({
           status: 200,
