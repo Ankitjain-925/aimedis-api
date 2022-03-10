@@ -72,7 +72,7 @@ function getAllrating(data){
         process.nextTick(() => { 
             Rating.aggregate([
                 { $match : { courseID : `${data._id}` } },
-                {$group: {_id: "$courseID", average: {$avg: '$rating'}, count: { $sum: 1 }}}   
+                {$group : {_id: "$courseID", average: {$avg: '$rating'}, count: { $sum: 1 }}}   
             ]).exec()
             .then(function(doc3){
                 

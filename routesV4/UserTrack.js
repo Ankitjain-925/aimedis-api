@@ -788,7 +788,6 @@ router.post("/appointment", function (req, res) {
   var Appointments = new Appointment(req.body);
   Appointments.save(function (err, user_data) {
     if (err && !user_data) {
-      console.log("err",err)
       res.json({ status: 200, message: "Something went wrong.", error: err });
     } else {
       var date = getDate(
@@ -814,7 +813,7 @@ router.post("/appointment", function (req, res) {
             doctor_phone: req.body.patient_info.phone,
           }),
           (error, html2) => {
-            console.log("html", html2);
+            console.log("html2", html2);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -825,7 +824,6 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html2,
               };
-              console.log("html1",html2)
               console.log("mailOptions1",mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
@@ -852,6 +850,24 @@ router.post("/appointment", function (req, res) {
         //     var sendmail = transporter.sendMail(mailOptions)
         // });
       });
+
+      // var new1 = EMAIL.doctorEmail.appointmentSystem('en', {
+      //   doctor_name:
+      //     req.body.docProfile.first_name +
+      //     " " +
+      //     req.body.docProfile.last_name,
+      //   patient_id: req.body.patient_info.patient_id,
+      //   patient_name:
+      //     req.body.patient_info.first_name +
+      //     " " +
+      //     req.body.patient_info.last_name,
+      //   date: date,
+      //   time: req.body.start_time,
+      //   patient_email: req.body.patient_info.email,
+      //   patient_phone: req.body.patient_info.phone,
+      // });
+      // console.log('Doctor known', new1)
+
       lan2.then((result) => {
         generateTemplate(
           EMAIL.doctorEmail.appointmentSystem(result, {
@@ -870,7 +886,7 @@ router.post("/appointment", function (req, res) {
             patient_phone: req.body.patient_info.phone,
           }),
           (error, html3) => {
-            console.log("html2", html3);
+            console.log("html3", html3);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -881,8 +897,6 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html3,
               };
-              console.log("html2", html3)
-              console.log("mail", mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
                 console.log("Mail is sent ");
@@ -1149,6 +1163,7 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
                 forEachPromises(
                   doc[0].track_record,
                   doc[0].Rigt_management[0],
+                  doc[0].fav_doctor,
                   getAlltrack1
                 ).then((result) => {
                   res.json({
@@ -1413,14 +1428,13 @@ function getAlltrack2(data) {
           if (data.archive) {
             track2.push(new_data);
           }
-
           resolve(track2);
         });
     });
   });
 }
 
-function getAlltrack1(data, right_management) {
+function getAlltrack1(data, right_management, trusted_doctor) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       var created_by =

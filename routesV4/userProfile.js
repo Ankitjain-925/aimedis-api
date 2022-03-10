@@ -1142,16 +1142,15 @@ router.post("/AddUser", function (req, res, next) {
 });
 
 router.post("/AddNewUseradiitional", function (req, res, next) {
-  const response_key = req.body.token;
-console.log("resp", response_key)
+  // const response_key = req.body.token;
 // Making POST request to verify captcha
-var config = {
-  method: "post",
-  url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
-};
-axios(config)
-  .then(function (google_response) {
-    if (google_response.data.success==false) {
+// var config = {
+//   method: "post",
+//   url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
+// };
+// axios(config)
+  // .then(function (google_response) {
+    // if (google_response.data.success) {
       if (
         req.body.email == "" ||
         req.body.email == undefined ||
@@ -1207,10 +1206,12 @@ axios(config)
         messageToSearchWithLast2.encryptFieldsSync();
 
 
-        const mobile = req.body.mobile;
-        const messageToSearchWithPhone = new User({ mobile });
-        messageToSearchWithPhone.encryptFieldsSync();
-
+        var mobile = false;
+        if(req.body.mobile){
+          mobile = req.body.country_code.toUpperCase() + "-" + req.body.mobile;
+          var messageToSearchWithPhone = new User({ mobile });
+          messageToSearchWithPhone.encryptFieldsSync();
+        }
           User.findOne({
 
             $or: [
@@ -1223,7 +1224,6 @@ axios(config)
             ]
           }).exec()
             .then((data1) => {
-              console.log("data1", data1)
               if (data1) {
                 res.json({
                   status: 200,
@@ -1244,14 +1244,13 @@ axios(config)
                       messageToSearchWithLast1.last_name, messageToSearchWithLast2.last_name]
                   }
                 }
-                if (mobile) {
+                if (mobile) { 
                   condition.mobile = { $in: [mobile, messageToSearchWithPhone.mobile] }
                 }
 
                 User.findOne(
                   condition
                 ).exec().then((data2) => {
-                  console.log("data2", data2)
                   if (data2 && new Date(req.body.birthday).setHours(0,0,0,0) ===  new Date(data2 && data2.birthday).setHours(0,0,0,0)) {
                       console.log("for birthday")
                       res.json({
@@ -1261,7 +1260,6 @@ axios(config)
                       });
                   } 
                   else {
-                    console.log("for null")
                     var ids = shortid.generate();
                     let _language = req.body.lan || "en";
                     let _usertype = req.body.type;
@@ -1300,6 +1298,7 @@ axios(config)
                     req.body.password = enpassword;
 
                     var user_id;
+                    console.log('I am heereee')
 
                     if (req.body.country_code && req.body.mobile) {
                       authy
@@ -1520,24 +1519,24 @@ axios(config)
               }
             });
         }
-      } else {
-        console.log("1")
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "Authentication required.",
-        });
-      }
-    })
-    .catch(function (error) {
-      console.log("err", error)
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Authentication required.",
-      });
+      // } else {
+      //   console.log("1")
+      //   res.json({
+      //     status: 200,
+      //     hassuccessed: false,
+      //     msg: "Authentication required.",
+      //   });
+      // }
+    // })
+  //   .catch(function (error) {
+  //     console.log("err", error)
+  //     res.json({
+  //       status: 200,
+  //       hassuccessed: false,
+  //       msg: "Authentication required.",
+  //     });
     
-  })
+  // })
 
 });
 
@@ -5643,8 +5642,7 @@ router.put("/GetAppointment/:GetAppointment_id", function (req, res, next) {
                       req.body.docProfile.first_name +
                       " " +
                       req.body.docProfile.last_name +
-                      ".<br/>" +
-                      "<b>Your Aimedis team </b>";
+                      ".<br/>";
 
                     generateTemplate(
                       EMAIL.generalEmail.createTemplate(result, {
@@ -8891,8 +8889,7 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
         lan1.then((result) => {
           var sendData =
             `<div>The appoinment with Dr. ${doctorProfile.first_name + " " + doctorProfile.last_name
-            } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>` +
-            "Your Aimedis team";
+            } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
 
           generateTemplate(
             EMAIL.generalEmail.createTemplate(result, {

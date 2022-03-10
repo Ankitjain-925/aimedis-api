@@ -127,9 +127,7 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
           error: err,
         });
       } else {
-        console.log('case', userdata)
         if (userdata.nModified == "0") {
-          console.log('sdsdfsdfsd')
           res.json({
             status: 200,
             hassuccessed: false,
@@ -137,7 +135,6 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
           });
         } 
         else{
-          console.log('sdsdfsdfs2222')
           res.json({
             status: 200,
             hassuccessed: true,

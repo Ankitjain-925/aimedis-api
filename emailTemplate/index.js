@@ -6,15 +6,12 @@ handlebars.registerHelper("editmode", function(floorplan, options) {
   return floorplan ? options.fn(this) : options.inverse(this);
 });
 const generateTemplate = (data = {}, cb = () => null) => {
-  readHTMLFile(__dirname + "/index.html", async function(err, html) {
-    if (!err) {
-      let template = handlebars.compile(html);
-      let htmlToSend = template(data);
-      cb(null, htmlToSend);
-    } else {
-      cb(err);
-    }
-  });
+  const fileRead = fs.readFileSync(__dirname + "/index.html",
+            {encoding:'utf8', flag:'r'});
+  let template = null;
+  template = require("handlebars").compile(fileRead);
+  let htmlToSend = template(data);
+    cb(null, htmlToSend);
 };
 const getSubject = (lang, key) => {
   return getLanguage(lang, key);
