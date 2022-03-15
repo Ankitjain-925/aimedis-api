@@ -222,6 +222,7 @@ var UserSchema = new Schema({
     fav_doctor : [FavDocList],
     family_doc : {type : Array},
     aimedis_doc: {type : Array},
+    roles:{type:Array},
     marital_status:{
        type: Object,
        required: false,

@@ -37,6 +37,7 @@ var transporter = nodemailer.createTransport({
 
 var trackrecord1 = [];
 var track2 = [];
+var CheckRole=require("./../middleware/middleware")
 
 //var paths= "http:/localhost:5000/uploads/Trackrecord"
 var paths = "https://aimedis1.com/public/uploads/Trackrecord";
@@ -153,7 +154,7 @@ router.get("/getAllKyc", function (req, res, next) {
   }
 });
 
-router.post("/Addkyc", function (req, res, next) {
+router.post("/Addkyc",CheckRole("kyc_license"), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -657,7 +658,7 @@ router.get("/AppointOfDate/:date", function (req, res, next) {
 });
 
 //Added by Ankita
-router.get("/AppointOfDate1/:date", function (req, res, next) {
+router.get("/AppointOfDate1/:date",CheckRole("show_appointment"), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -691,7 +692,7 @@ router.get("/AppointOfDate1/:date", function (req, res, next) {
   }
 });
 
-router.get("/AppointmentByDate1", function (req, res, next) {
+router.get("/AppointmentByDate1",CheckRole("show_appointment"), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -737,7 +738,7 @@ router.get("/AppointmentByDate1", function (req, res, next) {
   }
 });
 
-router.get("/AppointmentByDate", function (req, res, next) {
+router.get("/AppointmentByDate",CheckRole("show_appointment"), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -784,7 +785,7 @@ router.get("/AppointmentByDate", function (req, res, next) {
   }
 });
 
-router.post("/appointment", function (req, res) {
+router.post("/appointment",CheckRole("Add_appointment"), function (req, res) {
   var Appointments = new Appointment(req.body);
   Appointments.save(function (err, user_data) {
     if (err && !user_data) {
