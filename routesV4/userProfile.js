@@ -58,7 +58,6 @@ var API_KEY = process.env.ADMIN_API_KEY;
 var SECRET = process.env.ADMIN_API_SECRET;
 var verifier = new Verifier(options);
 const authy = new Client({ key: API_KEY });
-var CheckRole=require("./../middleware/middleware")
 
 var Mypat = [];
 var GetUpcomingAppoint1 = [],
@@ -1142,7 +1141,7 @@ router.post("/AddUser", function (req, res, next) {
     });
 });
 
-router.post("/AddNewUseradiitional",CheckRole("add_user"),function (req, res, next) {
+router.post("/AddNewUseradiitional",function (req, res, next) {
   const response_key = req.body.token;
 console.log("resp", response_key)
 // Making POST request to verify captcha

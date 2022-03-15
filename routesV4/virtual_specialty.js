@@ -47,7 +47,6 @@ var transporter = nodemailer.createTransport({
   },
 })
 var mongoose = require('mongoose');
-var CheckRole=require("./../middleware/middleware")
 
 function getDate(date, dateFormat) {
   var d = new Date(date);
@@ -78,7 +77,7 @@ function getDate(date, dateFormat) {
   }
 }
 
-router.delete("/AddSpecialty/:specialty_id/:house_id", CheckRole('delete_speciality'), function (req, res, next) {
+router.delete("/AddSpecialty/:specialty_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -110,7 +109,7 @@ router.delete("/AddSpecialty/:specialty_id/:house_id", CheckRole('delete_special
   }
 });
 
-router.put("/AddSpecialty/:specialty_id/:house_id",CheckRole('edit_speciality'), function (req, res, next) {
+router.put("/AddSpecialty/:specialty_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -144,7 +143,7 @@ router.put("/AddSpecialty/:specialty_id/:house_id",CheckRole('edit_speciality'),
   }
 });
 
-router.post("/AddSpecialty",CheckRole('add_speciality'), function (req, res, next) {
+router.post("/AddSpecialty", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -197,7 +196,7 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
   }
 });
 
-router.post("/AddTask",CheckRole('add_task'), function (req, res, next) {
+router.post("/AddTask", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -283,7 +282,7 @@ router.post("/AddTask",CheckRole('add_task'), function (req, res, next) {
   }
 });
 
-router.delete("/AddTask/:task_id/:house_id",CheckRole('delete_task'), function (req, res, next) {
+router.delete("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -312,7 +311,7 @@ router.delete("/AddTask/:task_id/:house_id",CheckRole('delete_task'), function (
   }
 });
 
-router.put("/AddTask/:task_id/:house_id",CheckRole('edit_task'), function (req, res, next) {
+router.put("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -346,7 +345,7 @@ router.put("/AddTask/:task_id/:house_id",CheckRole('edit_task'), function (req, 
   }
 });
 
-router.get("/GetAllTask/:house_id",CheckRole('show_task'), function (req, res, next) {
+router.get("/GetAllTask/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -374,7 +373,7 @@ router.get("/GetAllTask/:house_id",CheckRole('show_task'), function (req, res, n
   }
 });
 
-router.get("/GetAllArchivedTask/:house_id",CheckRole('archive_task'), function (req, res, next) {
+router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -402,7 +401,7 @@ router.get("/GetAllArchivedTask/:house_id",CheckRole('archive_task'), function (
   }
 });
 
-router.get("/AddTask/:task_ids/:house_id",CheckRole('show_task'), function (req, res, next) {
+router.get("/AddTask/:task_ids", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -659,7 +658,7 @@ router.delete(
   }
 );
 
-router.delete("/AddService/:service_id/:house_id",CheckRole('delete_service'), function (req, res, next) {
+router.delete("/AddService/:service_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -691,7 +690,7 @@ router.delete("/AddService/:service_id/:house_id",CheckRole('delete_service'), f
   }
 });
 
-router.put("/AddService/:service_id",CheckRole('edit_service'), function (req, res, next) {
+router.put("/AddService/:service_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -725,7 +724,7 @@ router.put("/AddService/:service_id",CheckRole('edit_service'), function (req, r
   }
 });
 
-router.post("/AddService",CheckRole('add_service'), function (req, res, next) {
+router.post("/AddService", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -778,7 +777,7 @@ router.get("/GetService/:house_id", function (req, res, next) {
   }
 });
 
-router.delete("/AddInvoice/:bill_id/:house_id",CheckRole('delete_invoice'), function (req, res, next) {
+router.delete("/AddInvoice/:bill_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -841,7 +840,7 @@ router.put("/AddInvoice/:bill_id", function (req, res, next) {
   }
 });
 
-router.post("/AddInvoice",CheckRole('add_service'), function (req, res, next) {
+router.post("/AddInvoice", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -1516,7 +1515,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
   }
 });
 
-router.post("/addPatientToVH",CheckRole("add_patient"), function (req, res, next) {
+router.post("/addPatientToVH", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -1916,7 +1915,7 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
   }
 })
 
-router.post("/downloadInvoicePdf",CheckRole("download_invoice"), function (req, res, next) {
+router.post("/downloadInvoicePdf", function (req, res, next) {
   // Custom handlebar helper
   try {
 
@@ -3026,32 +3025,6 @@ router.post("/virtualstep1", function (req, res, next) {
   }
 })
 
-
-router.post("/virtualstep1addition", function (req, res, next) {
-  const token = (req.headers.token)
-  let legit = jwtconfig.verify(token)
-  if (legit) {
-    virtual_step.find({ house_id: req.body.house_id }, function (err, data) {
-      // if (err) {
-      //   console.log("err", err)
-      //   res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
-
-      // }
-      console.log("1")
-      next();
-    }, (req, res) => {
-      console.log("2")
-      virtual_step.findByIdAndRemove(req.body.house_id, function (err, data2) {
-        res.json({ status: 200, hassuccessed: false, message: "delete" })
-      })
-    }
-    )
-  }
-  else {
-    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-
-  }
-})
 
 router.post("/virtualstep2", function (req, res, next) {
   const token = (req.headers.token)

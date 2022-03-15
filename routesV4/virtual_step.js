@@ -7,9 +7,8 @@ var virtual_tasks = require("../schema/virtual_tasks");
 var User = require("../schema/user.js");
 var jwtconfig = require("../jwttoken");
 var fullinfo = [], newDatafull = [];
-var CheckRole=require("./../middleware/middleware")
 
-router.put("/AddStep/:house_id",CheckRole('edit_step'), function (req, res, next) {
+router.put("/AddStep/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -43,7 +42,7 @@ router.put("/AddStep/:house_id",CheckRole('edit_step'), function (req, res, next
   }
 });
 
-router.post("/AddStep",CheckRole('add_step'), function (req, res, next) {
+router.post("/AddStep", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
 
@@ -109,7 +108,7 @@ router.post("/AddStep",CheckRole('add_step'), function (req, res, next) {
   }
 });
 
-// router.delete("/AddStep/:step_id",CheckRole('delete_step'), function (req, res, next) {
+// router.delete("/AddStep/:step_id",function (req, res, next) {
 //   const token = req.headers.token;
 //   let legit = jwtconfig.verify(token);
 //   if (legit) {
@@ -138,7 +137,7 @@ router.post("/AddStep",CheckRole('add_step'), function (req, res, next) {
 //   }
 // });
 
-router.get('/GetStep/:house_id',CheckRole("show_step_patient"), function (req, res, next) {
+router.get('/GetStep/:house_id',function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {
