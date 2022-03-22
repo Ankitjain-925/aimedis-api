@@ -3106,6 +3106,37 @@ router.get("/trackrecords", function (req, res) {
   }
 })
 
+
+
+router.post("/trackrecordsforpatient", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    let patient_id = req.body.patient_id
+    const VirtualtToSearchWith = new virtual_Task({ patient_id :req.body.patient_id});
+    VirtualtToSearchWith.encryptFieldsSync();
+    virtual_Task.find({ patient_id:{$in:[ patient_id,VirtualtToSearchWith.patient_id]},task_type:"picture_evaluation"}).exec(function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+      }
+      else {
+        if(data.length>0){
+        res.json({ status: 200, hassuccessed: true, data: data ,message:"Successfully fetch"})
+        }else{
+        res.json({ status: 200, hassuccessed: false, message: 'No Task Found' })
+
+        }
+      }
+        
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
 // router.post("/LeftInfoPatient", function (req, res) {
 //   const token = req.headers.token;
 //   let legit = jwtconfig.verify(token);

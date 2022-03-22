@@ -212,7 +212,13 @@ var TaskSchema = new Schema({
         required: false,
         unique: false
     },
-    Task_type:{
+    is_payment:{
+        type:Boolean,
+        required: false,
+        unique: false
+
+    },
+    task_type:{
         type: String,
         required: false,
         unique: false
