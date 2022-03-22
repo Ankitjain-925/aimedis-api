@@ -1490,20 +1490,21 @@ router.post("/checkPatient1", function (req, res, next) {
                           if (doc3) {
                             doc3.institute_groups.map(function (dataa) {
                               dataa.houses.map(function (data1) {
-                                console.log("req.body.house_id", data1.house_id)
                                 if (data1.house_id == data.house_id) {
                                   infoHouse.house = data1;
                                   infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
                                 }
                               })
                             })
-                            console.log('infoHouse', infoHouse)
                             res.json({
                               status: 200,
                               hassuccessed: false,
                               message: "Already in other hospital",
                               data: infoHouse,
                             });
+                          }
+                          else{
+                            console.log('fsdfsdfsdfsfsdf')
                           }
                         }
 
@@ -1725,26 +1726,18 @@ router.post("/checkPatient1", function (req, res, next) {
                                   infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
                                 }
                               })
-                              res.json({
-                                status: 200,
-                                hassuccessed: false,
-                                message: "Already in other hospital",
-                                data: infoHouse,
-                              });
-                            }
+                            })
+                            res.json({
+                              status: 200,
+                              hassuccessed: false,
+                              message: "Already in other hospital",
+                              data: infoHouse,
+                            });
                           }
+                        }
 
-                        })
+                      })
 
-                      }
-                      else {
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          message: "information get successfully",
-                          data: userdata,
-                        });
-                      }
                     }
                     else {
                       res.json({
@@ -1798,7 +1791,6 @@ router.post("/checkPatient1", function (req, res, next) {
   }
 });
 
-
 router.post("/linkforAccepthospital", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1809,34 +1801,34 @@ router.post("/linkforAccepthospital", function (req, res, next) {
         var sendData = "Dear,<br/><b>"+ req.body.patient_name+"</b><br/> "+
         "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='"+"https://aimedix.com/approveHospital/"+req.body.case_id+"'>LINK</a></b>"
         ".<br/>" +
-          "<b>Your Aimedis team </b>";
+        "<b>Your Aimedis team </b>";
 
-        generateTemplate(
-          EMAIL.generalEmail.createTemplate(result, {
-            title: "",
-            content: sendData,
-          }),
-          (error, html) => {
-            if (!error) {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.email,
-                subject: "Request to access you information from Hospital",
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Mail is sent",
-                });
-              }
+      generateTemplate(
+        EMAIL.generalEmail.createTemplate(result, {
+          title: "",
+          content: sendData,
+        }),
+        (error, html) => {
+          if (!error) {
+            let mailOptions = {
+              from: "contact@aimedis.com",
+              to: req.body.email,
+              subject: "Request to access you information from Hospital",
+              html: html,
+            };
+            let sendmail = transporter.sendMail(mailOptions);
+            if (sendmail) {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Mail is sent",
+              });
             }
           }
-        );
+        }
+      );
       }
-      if (req.body.mobile) {
+    if(req.body.mobile){
         result =
         result === "ch"
           ? "zh"
@@ -1863,9 +1855,10 @@ router.post("/linkforAccepthospital", function (req, res, next) {
               hassuccessed: false,
               message: "Message is not sent",
             });
+          });
         })
-      }
-    });
+    }
+    });     
   } else {
     res.json({
       status: 200,
@@ -1874,6 +1867,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
     });
   }
 });
+
 
 router.post("/addPatientToVH", function (req, res, next) {
   const token = req.headers.token;
