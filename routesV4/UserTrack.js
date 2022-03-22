@@ -1113,6 +1113,7 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
   trackrecord1 = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  console.log('legit45', legit)
   if (legit) {
     if (req.params.UserId === legit.id) {
       user.find({ _id: req.params.UserId }, function (err, doc) {
@@ -1146,8 +1147,8 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
         }
       });
     } else {
-      user.find({ _id: req.params.UserId }, function (err, doc) {
-        if (err && !doc) {
+      user.findOne({ _id: legit.id }, function (err, doc34) {
+        if (err && !doc34) {
           res.json({
             status: 200,
             hassuccessed: false,
@@ -1155,33 +1156,56 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
             error: err,
           });
         } else {
-          if (doc && doc.length > 0) {
-            var finaloutput = [];
-            doc[0].track_record.sort(mySorter);
-            if (doc[0].track_record.length > 0) {
-              if (doc[0].track_record.length > 0) {
-                forEachPromises(
-                  doc[0].track_record,
-                  doc[0].Rigt_management[0],
-                  doc[0].fav_doctor,
-                  getAlltrack1
-                ).then((result) => {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    msg: "User is found",
-                    data: trackrecord1,
-                  });
+          if (doc34){
+            user.find({ _id: req.params.UserId }, function (err, doc) {
+              if (err && !doc) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "User is not found",
+                  error: err,
                 });
+              } else {
+                if (doc && doc.length > 0) {
+                  var finaloutput = [];
+                  doc[0].track_record.sort(mySorter);
+                  if (doc[0].track_record.length > 0) {
+                    if (doc[0].track_record.length > 0) {
+                      console.log('doc34', doc34.profile_id)
+                      forEachPromises(
+                        doc[0].track_record,
+                        doc[0].Rigt_management[0],
+                        doc[0].fav_doctor,
+                        doc34.profile_id,
+                        getAlltrack1
+                      ).then((result) => {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          msg: "User is found",
+                          data: trackrecord1,
+                        });
+                      });
+                    }
+                  } else {
+                    res.json({ status: 200, hassuccessed: false, msg: "No data" });
+                  }
+                } else {
+                  res.json({ status: 200, hassuccessed: false, msg: "No data" });
+                }
               }
-            } else {
-              res.json({ status: 200, hassuccessed: false, msg: "No data" });
-            }
-          } else {
-            res.json({ status: 200, hassuccessed: false, msg: "No data" });
+            });
+          }
+          else{
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
           }
         }
-      });
+      
+      })
     }
   } else {
     res.json({
@@ -1241,10 +1265,10 @@ function forEachPromise(items, fn) {
   }, Promise.resolve());
 }
 
-function forEachPromises(items, right_management, fn) {
+function forEachPromises(items, right_management, fav_doc, current_user, fn) {
   return items.reduce(function (promise, item) {
     return promise.then(function () {
-      return fn(item, right_management);
+      return fn(item, right_management, fav_doc, current_user);
     });
   }, Promise.resolve());
 }
@@ -1434,7 +1458,7 @@ function getAlltrack2(data) {
   });
 }
 
-function getAlltrack1(data, right_management, trusted_doctor) {
+function getAlltrack1(data, right_management, trusted_doctor, current_user) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       var created_by =
@@ -1517,6 +1541,10 @@ function getAlltrack1(data, right_management, trusted_doctor) {
                 return new_data;
               });
           }
+          if(trusted_doctor.find(obj => obj.profile_id === current_user))
+          {
+            if (!data.archive) { trackrecord1.push(new_data); }
+          } else { 
           if (!new_data.public || new_data.public == "") {
             if (!data.archive) {
               if (
@@ -1605,7 +1633,7 @@ function getAlltrack1(data, right_management, trusted_doctor) {
             new_data.visible == "show" &&
             new_data.public == "always"
           ) {
-            trackrecord1.push(new_data);
+            if (!data.archive) { trackrecord1.push(new_data); }
           } else {
             var d1 = new Date();
             let end_date = new Date(new_data.public);
@@ -1628,6 +1656,7 @@ function getAlltrack1(data, right_management, trusted_doctor) {
               }
             }
           }
+        }
           resolve(trackrecord1);
         });
     });

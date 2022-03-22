@@ -41,6 +41,18 @@ router.post("/", (req, res) => {
   stripe.charges.create(req.body, postStripeCharge(res, token));
 });
 
+router.post("/intent", async (req, res) => {
+try{
+  var PaymentIntent = await stripe.paymentIntents.create(req.body);
+  res
+  .status(200)
+  .json({ message: "Payment Success", data: PaymentIntent.client_secret });
+}
+catch(stripeErr){
+  res.status(400).json({ message: "Payment Failed", error: stripeErr });
+}
+});
+
 router.post("/saveData", (req, res) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
