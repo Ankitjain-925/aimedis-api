@@ -108,7 +108,7 @@ router.post("/AddStep", function (req, res, next) {
   }
 });
 
-// router.delete("/AddStep/:step_id", function (req, res, next) {
+// router.delete("/AddStep/:step_id",function (req, res, next) {
 //   const token = req.headers.token;
 //   let legit = jwtconfig.verify(token);
 //   if (legit) {
@@ -137,7 +137,7 @@ router.post("/AddStep", function (req, res, next) {
 //   }
 // });
 
-router.get('/GetStep/:house_id', function (req, res, next) {
+router.get('/GetStep/:house_id',function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {

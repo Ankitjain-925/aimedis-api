@@ -326,7 +326,7 @@ function returnNumberofBedOnWard(array, ward_id) {
 }
 
 //check the availablity of the bed in particular specialty, ward, and room, and house
-router.post("/checkbedAvailability", function (req, res, next) {
+router.post("/checkbedAvailability",function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var bed = 0;

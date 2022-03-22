@@ -48,6 +48,7 @@ var transporter = nodemailer.createTransport({
   },
 })
 var mongoose = require('mongoose');
+
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
@@ -994,43 +995,43 @@ router.post("/checkPatient", function (req, res, next) {
                     userdata.parent_id === req.body.institute_id
                       ? true
                       : false;
-              }
-              if (createCase) {
-                virtual_Case.findOne({ patient_id: userdata._id.toString(), inhospital: true }, function (err, data) {
-                  if (err & !data) {
-                    res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
-                  }
-                  else {
-                    console.log("data", data)
-                    if (data) {
-                      Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() },function (err, doc3) {
-                        if (err & !doc3) {
-                          res.json({ status: 200, message: "Something went wrongq.", hassuccessed: false, error: err })
-                        }
-                        else{
-                          var infoHouse = {}
-                          if (doc3) {
-                            console.log('doC3', doc3)
-                            doc3.institute_groups.map(function (dataa) {
-                              dataa.houses.map(function (data1) {
-                                console.log("req.body.house_id", data1.house_id)
-                                if (data1.house_id == data.house_id) {
-                                  infoHouse.house = data1;
-                                  infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
-                                }
-                              })
-                            })
-                            console.log('infoHouse', infoHouse)
-                            res.json({
-                              status: 200,
-                              hassuccessed: false,
-                              message: "Already in other hospital",
-                              data: infoHouse,
-                            });
+                }
+                if (createCase) {
+                  virtual_Case.findOne({ patient_id: userdata._id.toString(), inhospital: true }, function (err, data) {
+                    if (err & !data) {
+                      res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err })
+                    }
+                    else {
+                      console.log("data", data)
+                      if (data) {
+                        Institute.findOne({ "institute_groups.houses.house_id": data.house_id.toString() }, function (err, doc3) {
+                          if (err & !doc3) {
+                            res.json({ status: 200, message: "Something went wrongq.", hassuccessed: false, error: err })
                           }
-                        }
-                       
-                      })
+                          else {
+                            var infoHouse = {}
+                            if (doc3) {
+                              console.log('doC3', doc3)
+                              doc3.institute_groups.map(function (dataa) {
+                                dataa.houses.map(function (data1) {
+                                  console.log("req.body.house_id", data1.house_id)
+                                  if (data1.house_id == data.house_id) {
+                                    infoHouse.house = data1;
+                                    infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
+                                  }
+                                })
+                              })
+                              console.log('infoHouse', infoHouse)
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Already in other hospital",
+                                data: infoHouse,
+                              });
+                            }
+                          }
+
+                        })
 
                       }
                       else {
@@ -1489,21 +1490,20 @@ router.post("/checkPatient1", function (req, res, next) {
                           if (doc3) {
                             doc3.institute_groups.map(function (dataa) {
                               dataa.houses.map(function (data1) {
+                                console.log("req.body.house_id", data1.house_id)
                                 if (data1.house_id == data.house_id) {
                                   infoHouse.house = data1;
                                   infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
                                 }
                               })
                             })
+                            console.log('infoHouse', infoHouse)
                             res.json({
                               status: 200,
                               hassuccessed: false,
                               message: "Already in other hospital",
                               data: infoHouse,
                             });
-                          }
-                          else{
-                            console.log('fsdfsdfsdfsfsdf')
                           }
                         }
 
@@ -1725,18 +1725,26 @@ router.post("/checkPatient1", function (req, res, next) {
                                   infoHouse.institute_groups = { group_name: dataa.group_name, _id: dataa._id };
                                 }
                               })
-                            })
-                            res.json({
-                              status: 200,
-                              hassuccessed: false,
-                              message: "Already in other hospital",
-                              data: infoHouse,
-                            });
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Already in other hospital",
+                                data: infoHouse,
+                              });
+                            }
                           }
-                        }
 
-                      })
+                        })
 
+                      }
+                      else {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "information get successfully",
+                          data: userdata,
+                        });
+                      }
                     }
                     else {
                       res.json({
@@ -1801,34 +1809,34 @@ router.post("/linkforAccepthospital", function (req, res, next) {
         var sendData = "Dear,<br/><b>"+ req.body.patient_name+"</b><br/> "+
         "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='"+"https://aimedix.com/approveHospital/"+req.body.case_id+"'>LINK</a></b>"
         ".<br/>" +
-        "<b>Your Aimedis team </b>";
+          "<b>Your Aimedis team </b>";
 
-      generateTemplate(
-        EMAIL.generalEmail.createTemplate(result, {
-          title: "",
-          content: sendData,
-        }),
-        (error, html) => {
-          if (!error) {
-            let mailOptions = {
-              from: "contact@aimedis.com",
-              to: req.body.email,
-              subject: "Request to access you information from Hospital",
-              html: html,
-            };
-            let sendmail = transporter.sendMail(mailOptions);
-            if (sendmail) {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "Mail is sent",
-              });
+        generateTemplate(
+          EMAIL.generalEmail.createTemplate(result, {
+            title: "",
+            content: sendData,
+          }),
+          (error, html) => {
+            if (!error) {
+              let mailOptions = {
+                from: "contact@aimedis.com",
+                to: req.body.email,
+                subject: "Request to access you information from Hospital",
+                html: html,
+              };
+              let sendmail = transporter.sendMail(mailOptions);
+              if (sendmail) {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "Mail is sent",
+                });
+              }
             }
           }
-        }
-      );
+        );
       }
-    if(req.body.mobile){
+      if (req.body.mobile) {
         result =
         result === "ch"
           ? "zh"
@@ -1855,10 +1863,9 @@ router.post("/linkforAccepthospital", function (req, res, next) {
               hassuccessed: false,
               message: "Message is not sent",
             });
-          });
         })
-    }
-    });     
+      }
+    });
   } else {
     res.json({
       status: 200,
@@ -2111,7 +2118,7 @@ router.get("/sortinfo/:patient_id", function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   if (legit) {
-    
+
     Promise.all([virtualInvoiceforPatient(req.params.patient_id), virtualTasksforPatient(req.params.patient_id)]).then((data, data1) => {
       res.json({ status: 200, hassuccessed: true, data: data, data1 })
     })
@@ -2195,7 +2202,7 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
         }
         else {
           console.log('data', data)
-          if(data && data.length>0){
+          if (data && data.length > 0) {
             data[0].wards.forEach((element) => {
               if (element._id == req.params.ward_id) {
                 wards.rooms = element.rooms
@@ -2204,7 +2211,7 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
             virtual_Case.find(({ "wards._id": req.params.ward_id }), function (err, room) {
               if (err & !room) {
                 res.json({ status: 200, hassuccessed: true, error: err })
-  
+
               }
               else {
                 // console.log("rooms", room[0].rooms)
@@ -2215,17 +2222,19 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
                 //     console.log("wards",wards)
                 //     res.json({ status: 200, hassuccessed: true, data: wards })
                 //   }
-  
+
                 // });
                 var bedData = [];
-                wards && wards.rooms && wards.rooms.length>0 && wards.rooms.forEach((element) => {
-                  
+                wards && wards.rooms && wards.rooms.length > 0 && wards.rooms.forEach((element) => {
+
                   for (var i = 1; i <= element.no_of_bed; i++) {
-                    var data = room && room.length>0 && room.filter((item)=>{
+                    var data = room && room.length > 0 && room.filter((item) => {
                       return (item.rooms._id == element._id && item.bed == i)
                     })
-                    bedData.push({bed: i,
-                    cases :  (data && data.length>0) ? data[0] : {}})
+                    bedData.push({
+                      bed: i,
+                      cases: (data && data.length > 0) ? data[0] : {}
+                    })
                   }
                   ward1.bedData = bedData;
                   ward1.room_id = element._id;
@@ -2243,13 +2252,13 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
                   // })
                 });
                 res.json({ status: 200, hassuccessed: true, data: allData })
-  
+
               }
-  
+
             })
           }
-          else{
-            res.json({ status: 200, hassuccessed: false, message: 'speciality not found' }) 
+          else {
+            res.json({ status: 200, hassuccessed: false, message: 'speciality not found' })
           }
         }
       })
@@ -2847,15 +2856,15 @@ router.post("/TaskFilter", function (req, res) {
   }
 });
 
-router.post("/setCasenotInhospital",function(req,res){
+router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
 
     var case_id = req.body.case_id;
-    virtual_Case.updateMany({_id: {$in : case_id}},{ $set: { inhospital: false, status:"5"} }).exec(function (err, data) {
-      if(err){
-        console.log("err",err)
+    virtual_Case.updateMany({ _id: { $in: case_id } }, { $set: { inhospital: false, status: "5" } }).exec(function (err, data) {
+      if (err) {
+        console.log("err", err)
         res.json({
           status: 200,
           hassuccessed: false,
@@ -2863,8 +2872,8 @@ router.post("/setCasenotInhospital",function(req,res){
           error: err,
         })
       }
-      else{
-        console.log("update",data)
+      else {
+        console.log("update", data)
         res.json({
           status: 200,
           hassuccessed: true,
@@ -2921,9 +2930,9 @@ router.post("/CalenderFilter", function (req, res) {
               res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
             }
             else {
-              console.log("data1",data1)
-            let patient_id= data1.map((element)=>{ return element.patient_id})
-              Appointments.find({ patient:{$in:patient_id} }, function (err, appointments) {
+              console.log("data1", data1)
+              let patient_id = data1.map((element) => { return element.patient_id })
+              Appointments.find({ patient: { $in: patient_id } }, function (err, appointments) {
                 if (err) {
                   res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
 
@@ -3341,6 +3350,151 @@ router.post("/getSubmitQuestionnaire", function (req, res) {
   }
 })
 
+router.post("/virtualstep1", function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    virtual_step.find({ house_id: req.body.house_id }, function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      }
+      else {
+        if (data) {
+          console.log("123")
+          virtual_step.updateMany({ house_id: req.body.house_id }).exec(function (err, data) {
+            res.json({ status: 200, hassuccessed: false, message: "delete" })
+
+          })
+          // virtual_step.findByIdAndRemove(req.body.house_id , function (err, data2) {
+          //   res.json({ status: 200, hassuccessed: false, message: "delete" })
+
+          // })
+        }
+        else {
+          res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+        }
+      }
+
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
+router.post("/virtualstep2", function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    virtual_Task.find({ house_id: req.body.house_id }, function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      }
+      else {
+        console.log("data", data)
+        if (data) {
+          console.log("12345")
+          virtual_Task.updateMany({ house_id: req.body.house_id }).exec(function (err, data) {
+            res.json({ status: 200, hassuccessed: false, message: "delete" })
+          })
+          // virtual_Task.findByIdAndRemove(req.body.house_id, function (err, data2) {
+          //   res.json({ status: 200, hassuccessed: false, message:"delete" })
+          // })
+        }
+        else {
+          res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+        }
+      }
+
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
+
+router.get("/trackrecords", function (req, res) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  console.log("legit",legit)
+  finaldata = []
+  if (legit) {
+    User.find().exec(function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      }
+      else {
+        trackrecords = data.map((element) => {
+          return element.track_record
+        })
+        // console.log("track", trackrecords)
+        if (trackrecords.length > 0) {
+
+          trackrecords.forEach((element2) => {
+            lastdata = element2.slice(-1)
+            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+            let d2 = new Date(lastdata[0] && lastdata[0].datetime_on).setHours(0, 0, 0, 0);
+            if (d1 <= d2) {
+              finaldata.push(lastdata[0].datetime_on)
+
+            }
+          })
+          console.log("finaldata", finaldata)
+          let finaldata1 = finaldata.length
+          console.log("finaldata123", finaldata1)
+          res.json({ status: 200, hassuccessed: true, data: finaldata1 })
+        }
+        else {
+          res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+        }
+      }
+
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
+
+router.post("/trackrecordsforpatient", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    let patient_id = req.body.patient_id
+    const VirtualtToSearchWith = new virtual_Task({ patient_id :req.body.patient_id});
+    VirtualtToSearchWith.encryptFieldsSync();
+    virtual_Task.find({ patient_id:{$in:[ patient_id,VirtualtToSearchWith.patient_id]},task_type:"picture_evaluation"}).exec(function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+      }
+      else {
+        if(data.length>0){
+        res.json({ status: 200, hassuccessed: true, data: data ,message:"Successfully fetch"})
+        }else{
+        res.json({ status: 200, hassuccessed: false, message: 'No Task Found' })
+
+        }
+      }
+        
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
 
 // router.post("/LeftInfoPatient", function (req, res) {
 //   const token = req.headers.token;
@@ -3451,11 +3605,11 @@ function taskfromhouseid(item) {
             }
             if (item.inhospital == false) {
               if (!InhopspitalInvoice.includes(item.house_id)) {
-              var invoices = invoicefromhouseid(item)
-              invoices.then((result) => {
-                flatArraya.push(...result);
-              })
-              } 
+                var invoices = invoicefromhouseid(item)
+                invoices.then((result) => {
+                  flatArraya.push(...result);
+                })
+              }
               InhopspitalInvoice.push(item.house_id);
             }
             Inhospital.push(item.house_id);

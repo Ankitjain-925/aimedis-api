@@ -3,99 +3,29 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 
-const ProfessionalInfo = new mongoose.Schema({
-    image: {
+var pictureevaluation = new Schema({
+    patient_id:{
+        type: Object,
+        required: false,
+        unique: false
+    },
+    assingned_to :{
         type: String,
         required: false,
         unique: false
     },
-    name: {
+    hospitaladmin_id:{
         type: String,
         required: false,
         unique: false
     },
-    profile_id: {
+    Age: {
+        type: Date,
+        required: false
+    },
+    gender: {
         type: String,
         required: false,
-        unique: false
-    },
-    alies_id: {
-        type: String,
-        required: false,
-        unique: false
-    }
-}, { strict: false });
-
-ProfessionalInfo.plugin(mongooseFieldEncryption, {
-    fields: ["name", "image", "alies_id"],
-    secret: process.env.SOME_32BYTE_BASE64_STRING,
-    saltGenerator: function (secret) {
-        return "1234567890123456"; // should ideally use the secret to return a string of length 16
-    }
-});
-
-var TaskSchema = new Schema({
-    assinged_to: [ProfessionalInfo],
-    task_name: {
-        type: String,
-        required: true,
-        unique: false
-    },
-    description: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    attachments: {
-        type: Array,
-        required: false,
-        unique: false
-    },
-    house_id: {
-        type: String,
-        required: true,
-        unique: false
-    },
-    archived: {
-        type: Boolean,
-        required: false,
-        unique: false
-    },
-    comments: {
-        type: Array,
-        required: false,
-        unique: false
-    },
-    created_at: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    status: {
-        type: String,
-        required: true,
-        unique: false
-    },
-    patient: ProfessionalInfo,
-    priority: {
-        type: Number,
-        required: false,
-        unique: false
-    },
-    patient_id: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    case_id: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    done_on: {
-        type: String,
-        required: false,
-        unique: false
     },
     bloodpressure: {
         type: Object,
@@ -103,12 +33,12 @@ var TaskSchema = new Schema({
         unique: false
     },
     diabetes: {
-        type: Object,
+        type: Boolean,
         required: false,
         unique: false
     },
     smoking_status: {
-        type: Object,
+        type: Boolean,
         required: false,
         unique: false
     },
@@ -128,6 +58,11 @@ var TaskSchema = new Schema({
         unique: false
     },
     place_of_birth: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    place_of_residence: {
         type: String,
         required: false,
         unique: false
@@ -202,35 +137,24 @@ var TaskSchema = new Schema({
         required: false,
         unique: false
     },
-    sexual_activities: {
+    sexual_activities:{
         type: String,
         required: false,
         unique: false
     },
-    payment_data: {
-        type: Object,
-        required: false,
-        unique: false
-    },
-    is_payment:{
-        type:Boolean,
-        required: false,
-        unique: false
-
-    },
-    task_type:{
-        type: String,
+    payment_data:{
+        type:Object,
         required: false,
         unique: false
     }
 
-}, { strict: false });
+})
 
-TaskSchema.plugin(mongooseFieldEncryption, {
-    fields: ["task_name", "description"], secret: process.env.SOME_32BYTE_BASE64_STRING,
+
+pictureevaluation.plugin(mongooseFieldEncryption, {
+    fields: [""], secret: process.env.SOME_32BYTE_BASE64_STRING,
     saltGenerator: function (secret) {
         return "1234567890123456"; // should ideally use the secret to return a string of length 16
     }
 });
-var virtual_Task = mongoose.model('virtual_task', TaskSchema);
-module.exports = virtual_Task;
+module.exports = mongoose.model('pictureevaluation', pictureevaluation);

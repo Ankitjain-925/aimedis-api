@@ -22,12 +22,15 @@ var CryptoJS = require("crypto-js");
 var moment = require("moment");
 mongoose.connect(config.database, { useNewUrlParser: true });
 mongoose.set("debug", true);
+var CheckRole=require("./middleware/middleware")
 
 var app = express();
 app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+////middleware///////
+// router.use(CheckRole)
 
 ////////////admin+main/////////////
 const appAdmin = express();
@@ -249,7 +252,7 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
-
+// app.use("/api/v4/vh",CheckRole,vspecialty4);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

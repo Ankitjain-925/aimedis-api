@@ -1240,7 +1240,7 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                 }
                 if (last_name) {
                   condition.last_name = {
-                    $in: [last_name, last_name.toLowerCase(), first_name.toUpperCase(), messageToSearchWithLast.last_name,
+                    $in: [last_name, last_name.toLowerCase(), last_name.toUpperCase(), messageToSearchWithLast.last_name,
                       messageToSearchWithLast1.last_name, messageToSearchWithLast2.last_name]
                   }
                 }
