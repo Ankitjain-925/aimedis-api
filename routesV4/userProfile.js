@@ -8875,6 +8875,34 @@ function getDate(date, dateFormat) {
 
 //API to get the
 //Added by Ankita for Upcoming Appointment
+router.post("/MailSendToDr", function (req, res) {
+  let email=req.body.email
+  var patient_infos =req.body.patient_infos
+  console.log("req.body.doc",patient_infos)
+
+  var sendData=`<div> Dear Doctor,
+  </div><br/><div>Here is new Picture evaluation for patient -  ${patient_infos.first_name+" "+patient_infos.last_name+"-"+patient_infos.patient_id}  added please check and give your explanation on that.</div><br/><br/><br/>` +
+  "Your Aimedis team";
+  
+  let mailOptions = {
+    from: "contact@aimedis.com" ,
+    to:email,
+    subject: "Picture Evaluation for Patient",
+    html:sendData,
+  };
+  console.log("mailoption",mailOptions)
+  let sendmail = transporter.sendMail(mailOptions);
+  if (sendmail) {
+    res.json({
+      status: 200,
+      message: "Mail sent Successfully",
+      hassuccessed: true,
+    });
+  } else {
+    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+  }
+});
+
 router.put("/SuggestTimeSlot", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
