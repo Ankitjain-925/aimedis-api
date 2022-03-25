@@ -268,6 +268,7 @@ router.post("/AddTask", function (req, res, next) {
                 status: 200,
                 message: "Added Successfully",
                 hassuccessed: true,
+                data: user_data
               });
             }
           }
@@ -3470,7 +3471,6 @@ router.post("/trackrecordsforpatient", function (req, res) {
     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find({ patient_id:{$in:[ patient_id,VirtualtToSearchWith.patient_id]},task_type:"picture_evaluation"}).exec(function (err, data) {
       if (err) {
-        console.log("err", err)
         res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
       }
       else {
