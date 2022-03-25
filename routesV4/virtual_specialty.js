@@ -5,6 +5,7 @@ var virtual_Case = require("../schema/virtual_cases.js");
 var virtual_Task = require("../schema/virtual_tasks.js");
 var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
+var picture_Evaluation = require("../schema/pictureevaluation_feedback");
 var User = require("../schema/user.js");
 var questionaire = require("../schema/questionaire")
 var Institute = require("../schema/institute.js");
@@ -3489,6 +3490,119 @@ router.post("/trackrecordsforpatient", function (req, res) {
   }
 })
 
+
+
+router.post("/pictureevaluationfeedback", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    var picture_evaluation = new picture_Evaluation(req.body);
+    picture_evaluation.save(function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "Feedback Submit",
+          hassuccessed: true,
+        });
+      }
+    });
+   
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+router.get("/getfeedbackforpatient/:patient_id", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    picture_Evaluation.findOne({"patient_infos.patient_id":req.params.patient_id}).exec(function(err,data){
+      if (err && !data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "data fetch",
+          hassuccessed: true,
+          data:data
+        });
+      }
+    });
+   
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    picture_Evaluation.findOne({doctor_id:req.params.doctor_id}).exec(function(err,data){
+      if (err && !data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "data fetch",
+          hassuccessed: true,
+          data:data
+        });
+      }
+    });
+   
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+router.delete("/pictureevaluationfeedback/:_id", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    picture_Evaluation.deleteOne({_id:req.params._id},function (err,data) {
+      if (err) {
+        console.log("err",err)
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "Delete Feedback",
+          hassuccessed: true,
+        });
+      }
+    });
+   
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+  }
+})
+
+router.put("/pictureevaluationfeedback/:_id", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    picture_Evaluation.updateOne({_id:req.params._id},req.body,function (err,data) {
+      if (err) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "Update Feedback",
+          hassuccessed: true,
+        });
+      }
+    });
+   
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+  }
+})
 
 // router.post("/LeftInfoPatient", function (req, res) {
 //   const token = req.headers.token;

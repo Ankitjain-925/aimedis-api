@@ -163,22 +163,22 @@ var TaskSchema = new Schema({
         unique: false
     },
     warm: {
-        type: Boolean,
+        type: String,
         required: false,
         unique: false
     },
     size_progress: {
-        type: Boolean,
+        type: String,
         required: false,
         unique: false
     },
     itch: {
-        type: Boolean,
+        type: String,
         required: false,
         unique: false
     },
     pain: {
-        type: Boolean,
+        type: String,
         required: false,
         unique: false
     },
