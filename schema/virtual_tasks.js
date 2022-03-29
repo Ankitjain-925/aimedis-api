@@ -218,8 +218,18 @@ var TaskSchema = new Schema({
         unique: false
 
     },
+    is_decline:{
+        type:Boolean,
+        required: false,
+        unique: false 
+    },
     task_type:{
         type: String,
+        required: false,
+        unique: false
+    },
+    isviewed:{
+        type: Boolean,
         required: false,
         unique: false
     }

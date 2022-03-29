@@ -224,47 +224,50 @@ router.post("/AddTask", function (req, res, next) {
                 msg: "User is not exist",
               });
             } else {
-              var m = new Date();
-              var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " +
-                m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
-              var lan1 = getMsgLang(doc._id);
-              lan1.then((result) => {
-                result =
-                  result === "ch"
-                    ? "zh"
-                    : result === "sp"
-                      ? "es"
-                      : result === "rs"
-                        ? "ru"
-                        : result;
-                var sms1 = "There was a task added on in your Aimedis profile -" + req.body.task_name + ' (' + req.body.description + ') at ' + dateString;
-                trans(sms1, { source: "en", target: result }).then((res1) => {
-                  sendSms(doc.mobile, res1)
-                    .then((result) => { })
-                    .catch((e) => {
-                      console.log("Message is not sent", e);
-                    });
-                });
-                if (doc.emergency_number && doc.emergency_number !== "") {
-                  var sms2 =
-                    "There was a task added on -" +
-                    doc.first_name +
-                    " " +
-                    doc.last_name +
-                    " Aimedis profile ( " +
-                    doc.profile_id +
-                    " )  " +
-                    " - " +
-                    req.body.task_name + ' (' + req.body.description + ') at ' + dateString;
-                  trans(sms2, { source: "en", target: result }).then((res1) => {
-                    sendSms(doc.emergency_number, res1)
+              if(req.body.task_type !== 'picture_evaluation'){
+                var m = new Date();
+                var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " +
+                  m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
+                var lan1 = getMsgLang(doc._id);
+                lan1.then((result) => {
+                  result =
+                    result === "ch"
+                      ? "zh"
+                      : result === "sp"
+                        ? "es"
+                        : result === "rs"
+                          ? "ru"
+                          : result;
+                  var sms1 = "There was a task added on in your Aimedis profile -" + req.body.task_name + ' (' + req.body.description + ') at ' + dateString;
+                  trans(sms1, { source: "en", target: result }).then((res1) => {
+                    sendSms(doc.mobile, res1)
                       .then((result) => { })
                       .catch((e) => {
                         console.log("Message is not sent", e);
                       });
                   });
-                }
-              })
+                  if (doc.emergency_number && doc.emergency_number !== "") {
+                    var sms2 =
+                      "There was a task added on -" +
+                      doc.first_name +
+                      " " +
+                      doc.last_name +
+                      " Aimedis profile ( " +
+                      doc.profile_id +
+                      " )  " +
+                      " - " +
+                      req.body.task_name + ' (' + req.body.description + ') at ' + dateString;
+                    trans(sms2, { source: "en", target: result }).then((res1) => {
+                      sendSms(doc.emergency_number, res1)
+                        .then((result) => { })
+                        .catch((e) => {
+                          console.log("Message is not sent", e);
+                        });
+                    });
+                  }
+                })
+              }
+            
               res.json({
                 status: 200,
                 message: "Added Successfully",
@@ -330,12 +333,51 @@ router.put("/AddTask/:task_id", function (req, res, next) {
             error: err,
           });
         } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Task is updated",
-            data: userdata,
-          });
+          if(req.body.is_decline){
+            User.findOne({_id:req.body.patient_id},function(err,data){
+              if(err){
+                res.json({ status: 200, message: "Something went wrong.", error: err})
+              }
+              else{
+                var sendData=`<div> Dear ${data.first_name+" "+data.last_name},
+                </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
+          
+                generateTemplate(
+                  EMAIL.generalEmail.createTemplate('en', {
+                    title: "",
+                    content: sendData,
+                  }),
+                  (error, html) => {
+                    if (!error) {
+                      let mailOptions = {
+                        from: "contact@aimedis.com" ,
+                        to:data.email,
+                        subject: "Decline picture evaluation",
+                        html:html,
+                      };
+                     
+                      let sendmail = transporter.sendMail(mailOptions);
+                      if (sendmail) {
+                        res.json({
+                          status: 200,
+                          message: "Mail sent Successfully",
+                          hassuccessed: true,
+                        });
+                      }
+                    }
+                  })
+              }
+            })
+          }
+          else{
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Task is updated",
+              data: userdata,
+            });
+          }
+      
         }
       }
     );
@@ -353,7 +395,10 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_Task.find(
-      { house_id: req.params.house_id, archived: { $ne: true } },
+      { house_id: req.params.house_id, archived: { $ne: true }, $or: [
+        { is_payment: { $exists:false } },
+        { is_payment:true }
+      ],  $or : [{is_decline: {$exists:false}, is_decline: {$ne : true} }] },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -363,6 +408,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
+         
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -3499,7 +3545,7 @@ router.post("/pictureevaluationfeedback", function (req, res) {
     var picture_evaluation = new picture_Evaluation(req.body);
     picture_evaluation.save(function (err, user_data) {
       if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
+        res.json({ status: 200, message: "Something went wrong.", error: err,  hassuccessed: false });
       } else {
         res.json({
           status: 200,
@@ -3521,7 +3567,7 @@ router.get("/getfeedbackforpatient/:patient_id", function (req, res) {
   if (legit) {
     picture_Evaluation.findOne({"patient_infos.patient_id":req.params.patient_id}).exec(function(err,data){
       if (err && !data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
+        res.json({ status: 200, message: "Something went wrong.", error: err,  hassuccessed: false });
       } else {
         res.json({
           status: 200,
@@ -3544,7 +3590,7 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   if (legit) {
     picture_Evaluation.findOne({doctor_id:req.params.doctor_id}).exec(function(err,data){
       if (err && !data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
+        res.json({ status: 200, message: "Something went wrong.", error: err, hassuccessed: false });
       } else {
         res.json({
           status: 200,
@@ -3568,7 +3614,7 @@ router.delete("/pictureevaluationfeedback/:_id", function (req, res) {
     picture_Evaluation.deleteOne({_id:req.params._id},function (err,data) {
       if (err) {
         console.log("err",err)
-        res.json({ status: 200, message: "Something went wrong.", error: err });
+        res.json({ status: 200, message: "Something went wrong.", error: err ,   hassuccessed: false });
       } else {
         res.json({
           status: 200,
@@ -3589,7 +3635,7 @@ router.put("/pictureevaluationfeedback/:_id", function (req, res) {
   if (legit) {
     picture_Evaluation.updateOne({_id:req.params._id},req.body,function (err,data) {
       if (err) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
+        res.json({ status: 200, message: "Something went wrong.", error: err ,   hassuccessed: false });
       } else {
         res.json({
           status: 200,
@@ -3704,7 +3750,7 @@ function taskfromhouseid(item) {
         let house_id = item.house_id;
         const VirtualtToSearchWith = new virtual_Task({ house_id });
         VirtualtToSearchWith.encryptFieldsSync();
-        virtual_Task.find({ $or: [{ house_id: item.house_id }, { house_id: VirtualtToSearchWith.house_id }] }).exec(function (err, task) {
+        virtual_Task.find({ $or: [{ house_id: item.house_id, }, { house_id: VirtualtToSearchWith.house_id }] , task_type: { $ne: "picture_evaluation" } }).exec(function (err, task) {
           if (err) {
             resolve(flatArraya)
           } else {
