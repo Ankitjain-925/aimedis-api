@@ -8881,26 +8881,70 @@ router.post("/MailSendToDr", function (req, res) {
   console.log("req.body.doc",patient_infos)
 
   var sendData=`<div> Dear Doctor,
-  </div><br/><div>Here is new Picture evaluation for patient -  ${patient_infos.first_name+" "+patient_infos.last_name+"-"+patient_infos.patient_id}  added please check and give your explanation on that.</div><br/><br/><br/>` +
-  "Your Aimedis team";
+  </div><br/><div>Here is new Picture evaluation for patient -  ${patient_infos.first_name+" "+patient_infos.last_name+"-"+patient_infos.patient_id}  added please check and give your explanation on that.</div>`;
   
-  let mailOptions = {
-    from: "contact@aimedis.com" ,
-    to:email,
-    subject: "Picture Evaluation for Patient",
-    html:sendData,
-  };
-  console.log("mailoption",mailOptions)
-  let sendmail = transporter.sendMail(mailOptions);
-  if (sendmail) {
-    res.json({
-      status: 200,
-      message: "Mail sent Successfully",
-      hassuccessed: true,
-    });
-  } else {
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-  }
+  generateTemplate(
+    EMAIL.generalEmail.createTemplate('en', {
+      title: "",
+      content: sendData,
+    }),
+    (error, html) => {
+      if (!error) {
+        let mailOptions = {
+          from: "contact@aimedis.com" ,
+          to:email,
+          subject: "Picture Evaluation for Patient",
+          html:html,
+        };
+       
+        let sendmail = transporter.sendMail(mailOptions);
+        if (sendmail) {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }
+      }
+    })
+});
+
+router.post("/MailSendToPatient", function (req, res) {
+
+  User.findOne({_id:req.body.user_id},function(err,data){
+    if(err){
+      res.json({ status: 200, message: "Something went wrong.", error: err})
+    }
+    else{
+      var sendData=`<div> Dear ${data.first_name+" "+data.last_name},
+      </div><br/><div>Here is a new update on your request for the picture evaluation by the doctor please go to detail age and check it.</div>`;
+
+      generateTemplate(
+        EMAIL.generalEmail.createTemplate('en', {
+          title: "",
+          content: sendData,
+        }),
+        (error, html) => {
+          if (!error) {
+            let mailOptions = {
+              from: "contact@aimedis.com" ,
+              to:data.email,
+              subject: "Latest update on your picture evaluation",
+              html:html,
+            };
+           
+            let sendmail = transporter.sendMail(mailOptions);
+            if (sendmail) {
+              res.json({
+                status: 200,
+                message: "Mail sent Successfully",
+                hassuccessed: true,
+              });
+            }
+          }
+        })
+    }
+  })
 });
 
 router.put("/SuggestTimeSlot", function (req, res, next) {

@@ -37,6 +37,14 @@ const appAdmin = express();
 
 appAdmin.use(express.static(path.join(__dirname, "./build/admin")));
 app.use(express.static(path.join(__dirname, "./build/main")));
+
+const server =require("http").createServer(app)
+const io =require("socket.io")(server,{transports:['polling'],
+        cors: {
+          origin: "*"
+        }
+      
+})
 ////////////admin+main+end/////////////
 
 // cron.schedule("*/1 * * * *", () => {
@@ -283,7 +291,23 @@ app.use(function (err, req, res, next) {
   return err;
 });
 
-app.listen(5000, () => {
+
+io.on('connection', (socket) => {
+  console.log('A user is connected');
+  
+  socket.on("update", (data) => {
+    console.log("data",data)
+      socket.broadcast.emit("data_shown",data)
+    });
+  socket.on("addpatient",(data)=>{
+    console.log("addpatient",data)
+    socket.broadcast.emit("email_accept",data)
+    // socket.emit("email_accept",data)
+  })
+})
+
+
+server.listen(5000, () => {
   console.log("Server started on port 5000");
 });
 
