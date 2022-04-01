@@ -398,7 +398,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
       { house_id: req.params.house_id, archived: { $ne: true }, $or: [
         { is_payment: { $exists:false } },
         { is_payment:true }
-      ],  $or : [{is_decline: {$exists:false}, is_decline: {$ne : true} }] },
+      ]},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -542,9 +542,11 @@ router.get("/ProfessionalTask/:patient_profile_id/:house_id", function (req, res
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    console.log('req.params.house_id', req.params.house_id)
     virtual_Task.find(
-      { "assinged_to.profile_id": req.params.patient_profile_id, house_id: req.params.house_id },
+      { "assinged_to.profile_id": req.params.patient_profile_id, house_id: req.params.house_id , $or: [
+        { is_decline : { $exists:false } },
+        { is_decline : false }
+      ]},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -554,6 +556,7 @@ router.get("/ProfessionalTask/:patient_profile_id/:house_id", function (req, res
             error: err,
           });
         } else {
+          userdata.sort(mySorter);
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -3487,7 +3490,6 @@ router.get("/trackrecords", function (req, res) {
             let d2 = new Date(lastdata[0] && lastdata[0].datetime_on).setHours(0, 0, 0, 0);
             if (d1 <= d2) {
               finaldata.push(lastdata[0].datetime_on)
-
             }
           })
           console.log("finaldata", finaldata)
@@ -3561,6 +3563,29 @@ router.post("/pictureevaluationfeedback", function (req, res) {
   }
 })
 
+router.get("/checkFeedBack/:task_id", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    picture_Evaluation.findOne({task_id: req.params.task_id}, function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err,  hassuccessed: false });
+      } else {
+       if(user_data){
+        res.json({ status: 200, message: "Already exists",  hassuccessed: true, data: user_data });
+       }
+       else{
+        res.json({ status: 200, message: "Not exists",  hassuccessed: false });
+       }
+      }
+    });
+   
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
 router.get("/getfeedbackforpatient/:patient_id", function (req, res) {
   const token = req.headers.token
   let legit = jwtconfig.verify(token)
@@ -3600,10 +3625,8 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
         });
       }
     });
-   
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-
   }
 })
 
