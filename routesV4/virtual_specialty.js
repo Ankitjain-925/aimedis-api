@@ -3466,11 +3466,10 @@ router.post("/virtualstep2", function (req, res, next) {
 })
 
 
-
 // router.get("/trackrecords", function (req, res) {
 //   const token = (req.headers.token)
 //   let legit = jwtconfig.verify(token)
-//   console.log("legit",legit)
+//   console.log("legit", legit)
 //   finaldata = []
 //   if (legit) {
 //     User.find().exec(function (err, data) {
@@ -3486,18 +3485,141 @@ router.post("/virtualstep2", function (req, res, next) {
 //         // console.log("track", trackrecords)
 //         if (trackrecords.length > 0) {
 
-//           trackrecords.forEach((element2) => {
-//             lastdata = element2.slice(-1)
+// //       }
+// //       else {
+// //         trackrecords = data.map((element) => {
+// //           return element.track_record
+// //         })
+// //         // console.log("track", trackrecords)
+// //         if (trackrecords.length > 0) {
+
+// //           trackrecords.forEach((element2) => {
+// //             lastdata = element2.slice(-1)
+// //             var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+// //             let d2 = new Date(lastdata[0] && lastdata[0].datetime_on).setHours(0, 0, 0, 0);
+// //             if (d1 <= d2) {
+// //               finaldata.push(lastdata[0].datetime_on)
+// //             }
+// //           })
+// //           console.log("finaldata", finaldata)
+// //           let finaldata1 = finaldata.length
+// //           console.log("finaldata123", finaldata1)
+// //           res.json({ status: 200, hassuccessed: true, data: finaldata1 })
+// //         }
+// //         else {
+// //           res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+// //         }
+// //       }
+
+// //     })
+// //   } else {
+// //     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+// //   }
+// // })
+
+router.get("/trackrecordsbytype", function (req, res) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  console.log("legit", legit)
+  finaldata = []
+  if (legit) {
+    User.find({ type: req.body.type }).exec(function (err, data) {
+      if (err) {
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      }
+      else {
+        if (data.length > 0) {
+          let finalcount = data.length
+          res.json({ status: 200, hassuccessed: false, data: finalcount })
+
+        }
+        else {
+          res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+        }
+      }
+
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+router.get("/trackrecordsbytype2", function (req, res) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  console.log("legit", legit)
+  finaldata = []
+  if (legit) {
+    User.aggregate([
+      {
+        $match: { "type": req.body.type }
+      },
+      {
+       $count:"Totalnumber"
+      }
+
+
+    ],function (err, data) {
+      console.log("data",data)
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      }
+      else {
+        if (data.length > 0) {
+          
+          res.json({ status: 200, hassuccessed: false, data:data })
+
+        }
+        else {
+          res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+        }
+      }
+
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+// router.get("/trackrecordsforappointment", function (req, res) {
+//   const token = (req.headers.token)
+//   let legit = jwtconfig.verify(token)
+//   console.log("legit", legit)
+//   finaldata = []
+//   finaldata1 = []
+//   if (legit) {
+//     Appointments.find().exec(function (err, data) {
+//       if (err) {
+//         console.log("err", err)
+//         res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+//       }
+//       else {
+
+//         if (data.length > 0) {
+
+//           data.forEach((element2) => {
+//             console.log("elements", element2.date)
+
 //             var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
-//             let d2 = new Date(lastdata[0] && lastdata[0].datetime_on).setHours(0, 0, 0, 0);
+//             let d2 = new Date(element2.date).setHours(0, 0, 0, 0);
 //             if (d1 <= d2) {
-//               finaldata.push(lastdata[0].datetime_on)
+//               finaldata.push(element2.date)
+//               console.log("finaldata", finaldata)
+//               finaldata1 = finaldata.length
+
 //             }
+
 //           })
-//           console.log("finaldata", finaldata)
-//           let finaldata1 = finaldata.length
-//           console.log("finaldata123", finaldata1)
 //           res.json({ status: 200, hassuccessed: true, data: finaldata1 })
+
+
 //         }
 //         else {
 //           res.json({ status: 200, hassuccessed: false, message: 'No user found' })
@@ -3511,28 +3633,27 @@ router.post("/virtualstep2", function (req, res, next) {
 //   }
 // })
 
-
-
 router.post("/trackrecordsforpatient", function (req, res) {
   const token = req.headers.token
   let legit = jwtconfig.verify(token)
   if (legit) {
     let patient_id = req.body.patient_id
-    const VirtualtToSearchWith = new virtual_Task({ patient_id :req.body.patient_id});
+    const VirtualtToSearchWith = new virtual_Task({ patient_id: req.body.patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Task.find({ patient_id:{$in:[ patient_id,VirtualtToSearchWith.patient_id]},task_type:"picture_evaluation"}).exec(function (err, data) {
+    virtual_Task.find({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] }, task_type: "picture_evaluation" }).exec(function (err, data) {
       if (err) {
+        console.log("err", err)
         res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
       }
       else {
-        if(data.length>0){
-        res.json({ status: 200, hassuccessed: true, data: data ,message:"Successfully fetch"})
-        }else{
-        res.json({ status: 200, hassuccessed: false, message: 'No Task Found' })
+        if (data.length > 0) {
+          res.json({ status: 200, hassuccessed: true, data: data, message: "Successfully fetch" })
+        } else {
+          res.json({ status: 200, hassuccessed: false, message: 'No Task Found' })
 
         }
       }
-        
+
     })
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
@@ -3540,6 +3661,168 @@ router.post("/trackrecordsforpatient", function (req, res) {
   }
 })
 
+router.get("/trackrecordsforappointment", function (req, res) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  console.log("legit", legit)
+  var date = new Date(req.body.date)
+  if (legit) {
+    Appointments.aggregate([
+      {
+        $match: { "date": { $gte: date } }
+      },
+      {
+        $group: {
+          _id: "$patient",
+          count: { $sum: 1 },
+        }
+      }
+
+
+    ], function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+
+      }
+      else {
+
+        console.log(data)
+        res.json({ status: 200, hassuccessed: true, data: data })
+      }
+
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+router.post("/trackrecordsfordr", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  var date = new Date(req.body.date)
+  if (legit) {
+
+    Appointments.aggregate([
+      {
+        $match: { "date": { $gte: date } }
+      },
+      {
+        $group: {
+          _id: "$doctor_id",
+          count: { $sum: 1 },
+        }
+      }
+
+    ], function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+      }
+      else {
+        console.log(data)
+
+        // if(data.length>0){
+        //   User.find()
+        // }
+        res.json({ status: 200, hassuccessed: true, data: data })
+      }
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
+router.post("/trackrecordsforprescription", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  let finaldata = []
+  finaldata1 = []
+  if (legit) {
+
+    Prescription.find().exec(function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+      }
+      else {
+        console.log("data", data.send_on)
+        if (data.length > 0) {
+
+          data.forEach((element2) => {
+            console.log("elements", element2.send_on)
+
+            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+            let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
+            if (d1 <= d2) {
+              finaldata.push(element2.send_on)
+              console.log("finaldata", finaldata)
+              finaldata1 = finaldata.length
+
+            }
+
+          })
+          res.json({ status: 200, hassuccessed: true, data: finaldata1 })
+
+
+        }
+        else {
+          res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+        }
+      }
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
+
+
+router.post("/trackrecordsforsickcertificate", function (req, res) {
+  const token = req.headers.token
+  let legit = jwtconfig.verify(token)
+  let finaldata = []
+  finaldata1 = []
+  if (legit) {
+
+    Cretificate.find({}, function (err, data) {
+      if (err) {
+        console.log("err", err)
+        res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
+      }
+      else {
+        console.log(data)
+        if (data.length > 0) {
+
+          data.forEach((element2) => {
+            console.log("elements", element2.send_on)
+
+            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+            let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
+            if (d1 <= d2) {
+              finaldata.push(element2.send_on)
+              console.log("finaldata", finaldata)
+              finaldata1 = finaldata.length
+
+            }
+
+          })
+          res.json({ status: 200, hassuccessed: true, data: finaldata1 })
+
+
+        }
+        else {
+          res.json({ status: 200, hassuccessed: false, message: 'No user found' })
+        }
+      }
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+
+  }
+})
 
 
 router.post("/pictureevaluationfeedback", function (req, res) {
@@ -3558,7 +3841,7 @@ router.post("/pictureevaluationfeedback", function (req, res) {
         });
       }
     });
-   
+
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
@@ -3592,7 +3875,7 @@ router.get("/getfeedbackforpatient/:patient_id", function (req, res) {
   const token = req.headers.token
   let legit = jwtconfig.verify(token)
   if (legit) {
-    picture_Evaluation.findOne({"patient_infos.patient_id":req.params.patient_id}).exec(function(err,data){
+    picture_Evaluation.findOne({ "patient_infos.patient_id": req.params.patient_id }).exec(function (err, data) {
       if (err && !data) {
         res.json({ status: 200, message: "Something went wrong.", error: err,  hassuccessed: false });
       } else {
@@ -3600,11 +3883,11 @@ router.get("/getfeedbackforpatient/:patient_id", function (req, res) {
           status: 200,
           message: "data fetch",
           hassuccessed: true,
-          data:data
+          data: data
         });
       }
     });
-   
+
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
 
@@ -3615,7 +3898,7 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   const token = req.headers.token
   let legit = jwtconfig.verify(token)
   if (legit) {
-    picture_Evaluation.findOne({doctor_id:req.params.doctor_id}).exec(function(err,data){
+    picture_Evaluation.findOne({ doctor_id: req.params.doctor_id }).exec(function (err, data) {
       if (err && !data) {
         res.json({ status: 200, message: "Something went wrong.", error: err, hassuccessed: false });
       } else {
@@ -3623,7 +3906,7 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
           status: 200,
           message: "data fetch",
           hassuccessed: true,
-          data:data
+          data: data
         });
       }
     });
@@ -3636,7 +3919,7 @@ router.delete("/pictureevaluationfeedback/:_id", function (req, res) {
   const token = req.headers.token
   let legit = jwtconfig.verify(token)
   if (legit) {
-    picture_Evaluation.deleteOne({_id:req.params._id},function (err,data) {
+    picture_Evaluation.deleteOne({ _id: req.params._id }, function (err, data) {
       if (err) {
         console.log("err",err)
         res.json({ status: 200, message: "Something went wrong.", error: err ,   hassuccessed: false });
@@ -3648,7 +3931,7 @@ router.delete("/pictureevaluationfeedback/:_id", function (req, res) {
         });
       }
     });
-   
+
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
   }
@@ -3658,7 +3941,7 @@ router.put("/pictureevaluationfeedback/:_id", function (req, res) {
   const token = req.headers.token
   let legit = jwtconfig.verify(token)
   if (legit) {
-    picture_Evaluation.updateOne({_id:req.params._id},req.body,function (err,data) {
+    picture_Evaluation.updateOne({ _id: req.params._id }, req.body, function (err, data) {
       if (err) {
         res.json({ status: 200, message: "Something went wrong.", error: err ,   hassuccessed: false });
       } else {
@@ -3669,7 +3952,7 @@ router.put("/pictureevaluationfeedback/:_id", function (req, res) {
         });
       }
     });
-   
+
   } else {
     res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
   }
