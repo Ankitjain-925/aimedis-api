@@ -22,7 +22,7 @@ var CryptoJS = require("crypto-js");
 var moment = require("moment");
 mongoose.connect(config.database, { useNewUrlParser: true });
 mongoose.set("debug", true);
-var CheckRole=require("./middleware/middleware")
+var CheckRole = require("./middleware/middleware")
 
 var app = express();
 app.use(cors());
@@ -38,12 +38,13 @@ const appAdmin = express();
 appAdmin.use(express.static(path.join(__dirname, "./build/admin")));
 app.use(express.static(path.join(__dirname, "./build/main")));
 
-const server =require("http").createServer(app)
-const io =require("socket.io")(server,{transports:['polling'],
-        cors: {
-          origin: "*"
-        }
-      
+const server = require("http").createServer(app)
+const io = require("socket.io")(server, {
+  transports: ['polling'],
+  cors: {
+    origin: "*"
+  }
+
 })
 ////////////admin+main+end/////////////
 
@@ -110,8 +111,8 @@ const io =require("socket.io")(server,{transports:['polling'],
 
 // var AuthCheck = function (req, res, next) {
 //   if(req.headers.authorization){
-  
- 
+
+
 //     if(req.headers.authorization==="Aimedis23")
 //     {
 //       console.log('Hew1')
@@ -176,6 +177,7 @@ var adminse3 = require("./routesV4/superadmin");
 var Uploadcerts3 = require("./routesV4/uploadcerts");
 var bloackchain3 = require("./routesV4/blockchain");
 var cronPrecess3 = require("./routesV4/cron");
+var bk = require("./routesV4/bk");
 
 var UserData4 = require("./routesV4/UserTrack");
 var UserProfile4 = require("./routesV4/userProfile");
@@ -260,6 +262,7 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
+app.use("/api/v4/bk", bk)
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -294,16 +297,20 @@ app.use(function (err, req, res, next) {
 
 io.on('connection', (socket) => {
   console.log('A user is connected');
-  
+
   socket.on("update", (data) => {
-    console.log("data",data)
-      socket.broadcast.emit("data_shown",data)
-    });
-  socket.on("addpatient",(data)=>{
-    console.log("addpatient",data)
-    socket.broadcast.emit("email_accept",data)
-    // socket.emit("email_accept",data)
+    console.log("data", data)
+    socket.broadcast.emit("data_shown", data)
+  });
+  socket.on("addpatient", (data) => {
+    console.log("addpatient", data)
+    socket.broadcast.emit("email_accept", data)
+  });
+  socket.on("decline", (data) => {
+    console.log("decline", data)
+    socket.broadcast.emit("email_decline", data)
   })
+
 })
 
 
