@@ -48,6 +48,21 @@ const io = require("socket.io")(server, {
 })
 ////////////admin+main+end/////////////
 
+
+io.on('connection', (socket) => {
+  console.log('A user is connected');
+
+  socket.on("update", (data) => {
+    console.log("data",data)
+      socket.broadcast.emit("data_shown",data)
+    });
+  socket.on("addpatient",(data)=>{
+    console.log("addpatient",data)
+    socket.broadcast.emit("email_accept",data)
+    // socket.emit("email_accept",data)
+  })
+})
+
 // cron.schedule("*/1 * * * *", () => {
 //   mongoTools
 //     .list({
@@ -293,26 +308,6 @@ app.use(function (err, req, res, next) {
   console.log("err", err);
   return err;
 });
-
-
-io.on('connection', (socket) => {
-  console.log('A user is connected');
-
-  socket.on("update", (data) => {
-    console.log("data", data)
-    socket.broadcast.emit("data_shown", data)
-  });
-  socket.on("addpatient", (data) => {
-    console.log("addpatient", data)
-    socket.broadcast.emit("email_accept", data)
-  });
-  socket.on("decline", (data) => {
-    console.log("decline", data)
-    socket.broadcast.emit("email_decline", data)
-  })
-
-})
-
 
 server.listen(5000, () => {
   console.log("Server started on port 5000");

@@ -20,17 +20,17 @@ const patient_infos = new mongoose.Schema({
         required: false,
         unique: false
      },
-     email: {
-        type: String,
-        required: false,
-        unique: false
-     },
      profile_image: {
         type: String,
         required: false,
         unique: false
      },
      birthday :{  
+        type: String,
+        required: false,
+        unique: false
+     },
+     profile_id : { 
         type: String,
         required: false,
         unique: false
@@ -62,9 +62,14 @@ var feedback = new Schema({
         default: ''
     },
     doctor_id:{
-        type: String,
+        type: Array,
         required: false,
         unique: false
+    },
+    task_id:{
+        type: String,
+        required: false,
+        unique: true
     },
     patient_infos:[patient_infos]
  

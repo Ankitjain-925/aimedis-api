@@ -1141,17 +1141,16 @@ router.post("/AddUser", function (req, res, next) {
     });
 });
 
-router.post("/AddNewUseradiitional",function (req, res, next) {
-  const response_key = req.body.token;
-console.log("resp", response_key)
+router.post("/AddNewUseradiitional", function (req, res, next) {
+  // const response_key = req.body.token;
 // Making POST request to verify captcha
-var config = {
-  method: "post",
-  url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
-};
-axios(config)
-  .then(function (google_response) {
-    if (google_response.data.success==false) {
+// var config = {
+//   method: "post",
+//   url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
+// };
+// axios(config)
+  // .then(function (google_response) {
+    // if (google_response.data.success) {
       if (
         req.body.email == "" ||
         req.body.email == undefined ||
@@ -1207,10 +1206,12 @@ axios(config)
         messageToSearchWithLast2.encryptFieldsSync();
 
 
-        const mobile = req.body.mobile;
-        const messageToSearchWithPhone = new User({ mobile });
-        messageToSearchWithPhone.encryptFieldsSync();
-
+        var mobile = false;
+        if(req.body.mobile){
+          mobile = req.body.country_code.toUpperCase() + "-" + req.body.mobile;
+          var messageToSearchWithPhone = new User({ mobile });
+          messageToSearchWithPhone.encryptFieldsSync();
+        }
           User.findOne({
 
             $or: [
@@ -1223,7 +1224,6 @@ axios(config)
             ]
           }).exec()
             .then((data1) => {
-              console.log("data1", data1)
               if (data1) {
                 res.json({
                   status: 200,
@@ -1244,14 +1244,13 @@ axios(config)
                       messageToSearchWithLast1.last_name, messageToSearchWithLast2.last_name]
                   }
                 }
-                if (mobile) {
+                if (mobile) { 
                   condition.mobile = { $in: [mobile, messageToSearchWithPhone.mobile] }
                 }
 
                 User.findOne(
                   condition
                 ).exec().then((data2) => {
-                  console.log("data2", data2)
                   if (data2 && new Date(req.body.birthday).setHours(0,0,0,0) ===  new Date(data2 && data2.birthday).setHours(0,0,0,0)) {
                       console.log("for birthday")
                       res.json({
@@ -1261,7 +1260,6 @@ axios(config)
                       });
                   } 
                   else {
-                    console.log("for null")
                     var ids = shortid.generate();
                     let _language = req.body.lan || "en";
                     let _usertype = req.body.type;
@@ -1300,6 +1298,7 @@ axios(config)
                     req.body.password = enpassword;
 
                     var user_id;
+                    console.log('I am heereee')
 
                     if (req.body.country_code && req.body.mobile) {
                       authy
@@ -1520,24 +1519,24 @@ axios(config)
               }
             });
         }
-      } else {
-        console.log("1")
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "Authentication required.",
-        });
-      }
-    })
-    .catch(function (error) {
-      console.log("err", error)
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Authentication required.",
-      });
+      // } else {
+      //   console.log("1")
+      //   res.json({
+      //     status: 200,
+      //     hassuccessed: false,
+      //     msg: "Authentication required.",
+      //   });
+      // }
+    // })
+  //   .catch(function (error) {
+  //     console.log("err", error)
+  //     res.json({
+  //       status: 200,
+  //       hassuccessed: false,
+  //       msg: "Authentication required.",
+  //     });
     
-  })
+  // })
 
 });
 
@@ -5643,8 +5642,7 @@ router.put("/GetAppointment/:GetAppointment_id", function (req, res, next) {
                       req.body.docProfile.first_name +
                       " " +
                       req.body.docProfile.last_name +
-                      ".<br/>" +
-                      "<b>Your Aimedis team </b>";
+                      ".<br/>";
 
                     generateTemplate(
                       EMAIL.generalEmail.createTemplate(result, {
@@ -8878,10 +8876,52 @@ function getDate(date, dateFormat) {
 router.post("/MailSendToDr", function (req, res) {
   let email=req.body.email
   var patient_infos =req.body.patient_infos
-  console.log("req.body.doc",patient_infos)
-
-  var sendData=`<div> Dear Doctor,
+  var sendData =`<div> Dear Doctor,
   </div><br/><div>Here is new Picture evaluation for patient -  ${patient_infos.first_name+" "+patient_infos.last_name+"-"+patient_infos.patient_id}  added please check and give your explanation on that.</div>`;
+  
+  const profile_id = patient_infos.patient_id;
+      const messageToSearchWith = new User({ profile_id });
+      messageToSearchWith.encryptFieldsSync();
+      const alies_id = patient_infos.patient_id;
+      const messageToSearchWith1 = new User({ alies_id });
+      messageToSearchWith1.encryptFieldsSync();
+      User.findOne(
+        {
+          $or: [
+            { profile_id: messageToSearchWith.profile_id },
+            { alies_id: messageToSearchWith1.alies_id },
+            { profile_id: patient_infos.patient_id },
+            { alies_id: patient_infos.patient_id }
+          ],
+        },function(err,data){
+    if(err){
+      res.json({ status: 200, message: "Something went wrong.", error: err, hassuccessed: false})
+    }
+    else{
+  var sendData1 =`<div> Dear ${patient_infos.first_name+" "+patient_infos.last_name},
+  </div><br/><div>Your Picture evaluation is assigned to the doctor by hospital, And it is in under process please wait for the reply from the doctor.</div>`;
+if(data){
+  generateTemplate(
+    EMAIL.generalEmail.createTemplate('en', {
+      title: "",
+      content: sendData1,
+    }),
+    (error, html) => {
+      if (!error) {
+        let mailOptions1 = {
+          from: "contact@aimedis.com" ,
+          to: data.email,
+          subject: "Picture Evaluation for Patient",
+          html:html,
+        };
+       
+        let sendmail1 = transporter.sendMail(mailOptions1);
+        if (sendmail1) {
+          console.log('Mail sents')
+        }
+      }
+    })
+}
   
   generateTemplate(
     EMAIL.generalEmail.createTemplate('en', {
@@ -8907,6 +8947,8 @@ router.post("/MailSendToDr", function (req, res) {
         }
       }
     })
+  }
+  })
 });
 
 router.post("/MailSendToPatient", function (req, res) {
@@ -8917,7 +8959,7 @@ router.post("/MailSendToPatient", function (req, res) {
     }
     else{
       var sendData=`<div> Dear ${data.first_name+" "+data.last_name},
-      </div><br/><div>Here is a new update on your request for the picture evaluation by the doctor please go to detail age and check it.</div>`;
+      </div><br/><div>Here is a new update on your request for the picture evaluation by the doctor as comments/document uploads. Please go to detail page and check it.</div>`;
 
       generateTemplate(
         EMAIL.generalEmail.createTemplate('en', {
@@ -8963,8 +9005,7 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
         lan1.then((result) => {
           var sendData =
             `<div>The appoinment with Dr. ${doctorProfile.first_name + " " + doctorProfile.last_name
-            } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>` +
-            "Your Aimedis team";
+            } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
 
           generateTemplate(
             EMAIL.generalEmail.createTemplate(result, {

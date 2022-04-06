@@ -788,7 +788,6 @@ router.post("/appointment", function (req, res) {
   var Appointments = new Appointment(req.body);
   Appointments.save(function (err, user_data) {
     if (err && !user_data) {
-      console.log("err",err)
       res.json({ status: 200, message: "Something went wrong.", error: err });
     } else {
       var date = getDate(
@@ -814,7 +813,7 @@ router.post("/appointment", function (req, res) {
             doctor_phone: req.body.patient_info.phone,
           }),
           (error, html2) => {
-            console.log("html", html2);
+            console.log("html2", html2);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -825,7 +824,6 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html2,
               };
-              console.log("html1",html2)
               console.log("mailOptions1",mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
@@ -852,6 +850,24 @@ router.post("/appointment", function (req, res) {
         //     var sendmail = transporter.sendMail(mailOptions)
         // });
       });
+
+      // var new1 = EMAIL.doctorEmail.appointmentSystem('en', {
+      //   doctor_name:
+      //     req.body.docProfile.first_name +
+      //     " " +
+      //     req.body.docProfile.last_name,
+      //   patient_id: req.body.patient_info.patient_id,
+      //   patient_name:
+      //     req.body.patient_info.first_name +
+      //     " " +
+      //     req.body.patient_info.last_name,
+      //   date: date,
+      //   time: req.body.start_time,
+      //   patient_email: req.body.patient_info.email,
+      //   patient_phone: req.body.patient_info.phone,
+      // });
+      // console.log('Doctor known', new1)
+
       lan2.then((result) => {
         generateTemplate(
           EMAIL.doctorEmail.appointmentSystem(result, {
@@ -870,7 +886,7 @@ router.post("/appointment", function (req, res) {
             patient_phone: req.body.patient_info.phone,
           }),
           (error, html3) => {
-            console.log("html2", html3);
+            console.log("html3", html3);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -881,8 +897,6 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html3,
               };
-              console.log("html2", html3)
-              console.log("mail", mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
                 console.log("Mail is sent ");
@@ -1099,6 +1113,7 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
   trackrecord1 = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  console.log('legit45', legit)
   if (legit) {
     if (req.params.UserId === legit.id) {
       user.find({ _id: req.params.UserId }, function (err, doc) {
@@ -1132,8 +1147,8 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
         }
       });
     } else {
-      user.find({ _id: req.params.UserId }, function (err, doc) {
-        if (err && !doc) {
+      user.findOne({ _id: legit.id }, function (err, doc34) {
+        if (err && !doc34) {
           res.json({
             status: 200,
             hassuccessed: false,
@@ -1141,32 +1156,56 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
             error: err,
           });
         } else {
-          if (doc && doc.length > 0) {
-            var finaloutput = [];
-            doc[0].track_record.sort(mySorter);
-            if (doc[0].track_record.length > 0) {
-              if (doc[0].track_record.length > 0) {
-                forEachPromises(
-                  doc[0].track_record,
-                  doc[0].Rigt_management[0],
-                  getAlltrack1
-                ).then((result) => {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    msg: "User is found",
-                    data: trackrecord1,
-                  });
+          if (doc34){
+            user.find({ _id: req.params.UserId }, function (err, doc) {
+              if (err && !doc) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "User is not found",
+                  error: err,
                 });
+              } else {
+                if (doc && doc.length > 0) {
+                  var finaloutput = [];
+                  doc[0].track_record.sort(mySorter);
+                  if (doc[0].track_record.length > 0) {
+                    if (doc[0].track_record.length > 0) {
+                      console.log('doc34', doc34.profile_id)
+                      forEachPromises(
+                        doc[0].track_record,
+                        doc[0].Rigt_management[0],
+                        doc[0].fav_doctor,
+                        doc34.profile_id,
+                        getAlltrack1
+                      ).then((result) => {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          msg: "User is found",
+                          data: trackrecord1,
+                        });
+                      });
+                    }
+                  } else {
+                    res.json({ status: 200, hassuccessed: false, msg: "No data" });
+                  }
+                } else {
+                  res.json({ status: 200, hassuccessed: false, msg: "No data" });
+                }
               }
-            } else {
-              res.json({ status: 200, hassuccessed: false, msg: "No data" });
-            }
-          } else {
-            res.json({ status: 200, hassuccessed: false, msg: "No data" });
+            });
+          }
+          else{
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
           }
         }
-      });
+      
+      })
     }
   } else {
     res.json({
@@ -1226,10 +1265,10 @@ function forEachPromise(items, fn) {
   }, Promise.resolve());
 }
 
-function forEachPromises(items, right_management, fn) {
+function forEachPromises(items, right_management, fav_doc, current_user, fn) {
   return items.reduce(function (promise, item) {
     return promise.then(function () {
-      return fn(item, right_management);
+      return fn(item, right_management, fav_doc, current_user);
     });
   }, Promise.resolve());
 }
@@ -1413,14 +1452,13 @@ function getAlltrack2(data) {
           if (data.archive) {
             track2.push(new_data);
           }
-
           resolve(track2);
         });
     });
   });
 }
 
-function getAlltrack1(data, right_management) {
+function getAlltrack1(data, right_management, trusted_doctor, current_user) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       var created_by =
@@ -1503,6 +1541,10 @@ function getAlltrack1(data, right_management) {
                 return new_data;
               });
           }
+          if(trusted_doctor.find(obj => obj.profile_id === current_user))
+          {
+            if (!data.archive) { trackrecord1.push(new_data); }
+          } else { 
           if (!new_data.public || new_data.public == "") {
             if (!data.archive) {
               if (
@@ -1591,7 +1633,7 @@ function getAlltrack1(data, right_management) {
             new_data.visible == "show" &&
             new_data.public == "always"
           ) {
-            trackrecord1.push(new_data);
+            if (!data.archive) { trackrecord1.push(new_data); }
           } else {
             var d1 = new Date();
             let end_date = new Date(new_data.public);
@@ -1614,6 +1656,7 @@ function getAlltrack1(data, right_management) {
               }
             }
           }
+        }
           resolve(trackrecord1);
         });
     });
