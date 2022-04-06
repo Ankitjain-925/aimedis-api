@@ -103,20 +103,43 @@ io.on('connection', (socket) => {
 //     })
 //     .catch((err) => console.error("error", err));
 // });
-
 // cron.schedule('*/1 * * * *', () => {
-// //  mongoTools.mongodump({ uri: config.database,
-// //  path: 'BackupDB',
-// //  dropboxToken: process.env.DBT,
-// // })
-// // .then((success) =>{ console.info("success", success)
-// // })
-// // .catch((err) => console.error("error", err) );
-//  mongoTools.list({ uri: config.database,
+// mongoTools
+//     .mongorestore({
+//       uri: config.database,
+//       dumpFile: '/BackupDB/aimedis__2022-04-05_000000.gz',
+//       dropBeforeRestore: true,
+//       dropboxToken: process.env.DBT,
+//     })
+//     .then((success) => {
+//       console.info("success", success);
+//       // if (success) {
+//       //   //  console.info("stderr:\n", success.stderr);// mongorestore binary write details on stderr
+//       //   // res.json({
+//       //   //   status: 200,
+//       //   //   message: "Successfully restored",
+//       //   //   data: success.stderr,
+//       //   //   hassuccessed: true,
+//       //   // });
+//       //   console.log('success', success)
+//       //        }
+//     }).catch((e)=>{
+//         console.log("e",e)
+//     });
+// })
+// cron.schedule('*/1 * * * *', () => {
+//  mongoTools.mongodump({ uri: config.database,
 //  path: 'BackupDB',
-//  dropboxToken: process.env.DBT, })
-// .then((success) => console.info("success", success) )
+//  dropboxToken: process.env.DBT,
+// })
+// .then((success) =>{ console.info("success", success)
+// })
 // .catch((err) => console.error("error", err) );
+// //  mongoTools.list({ uri: config.database,
+// //  path: 'BackupDB',
+// //  dropboxToken: process.env.DBT, })
+// // .then((success) => console.info("success", success) )
+// // .catch((err) => console.error("error", err) );
 // });
 
 //app.use(express.static(path.join(__dirname, 'public')));

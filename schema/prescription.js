@@ -265,6 +265,11 @@ var PrescriptionSchema = new Schema({
         required:false,
         unique:false
     },
+    send_on:{
+        type:String,
+        required:false,
+        unique:false
+    },
     patient_info :patient_infos,
     docProfile :docProfiles
 }, { strict: false })
