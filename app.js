@@ -22,7 +22,6 @@ var CryptoJS = require("crypto-js");
 var moment = require("moment");
 mongoose.connect(config.database, { useNewUrlParser: true });
 mongoose.set("debug", true);
-var CheckRole = require("./middleware/middleware")
 
 var app = express();
 app.use(cors());
@@ -53,14 +52,18 @@ io.on('connection', (socket) => {
   console.log('A user is connected');
 
   socket.on("update", (data) => {
-    console.log("data",data)
-      socket.broadcast.emit("data_shown",data)
-    });
-  socket.on("addpatient",(data)=>{
-    console.log("addpatient",data)
-    socket.broadcast.emit("email_accept",data)
-    // socket.emit("email_accept",data)
+    console.log("data", data)
+    socket.broadcast.emit("data_shown", data)
+  });
+  socket.on("addpatient", (data) => {
+    console.log("addpatient", data)
+    socket.broadcast.emit("email_accept", data)
+  });
+  socket.on("decline", (data) => {
+    console.log("decline", data)
+    socket.broadcast.emit("email_decline", data)
   })
+
 })
 
 // cron.schedule("*/1 * * * *", () => {
@@ -215,7 +218,7 @@ var adminse3 = require("./routesV4/superadmin");
 var Uploadcerts3 = require("./routesV4/uploadcerts");
 var bloackchain3 = require("./routesV4/blockchain");
 var cronPrecess3 = require("./routesV4/cron");
-var bk = require("./routesV4/bk");
+// var bk = require("./routesV4/bk");
 
 var UserData4 = require("./routesV4/UserTrack");
 var UserProfile4 = require("./routesV4/userProfile");
@@ -300,7 +303,7 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
-app.use("/api/v4/bk", bk)
+// app.use("/api/v4/bk", bk)
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
