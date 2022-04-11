@@ -110,7 +110,7 @@
             margin-bottom: 5px!important;
         }
         .tempmidsecall p{
-            margin-top: 15px!important;
+            margin-top: 12px!important;
         }
         /* aimedis  */
 		@media only screen and (max-device-width: 480px), only screen and (max-width: 480px) {
@@ -164,7 +164,7 @@
             <table width="100%" class="makecenter" cellspacing="0" cellpadding="0">
                 <tr>
                     <td align="center">
-                        <img src="https://sys.aimedis.io/static/media/LogoPNG.03ac2d92.png" width="70"/>
+                        <img src="https://aimedis.io/static/media/AimedisLogo.5547e4a3.png" width="150"/>
                     </td>
                 </tr>
             </table>
@@ -186,7 +186,7 @@
                     </tr>
 
                     <tr>
-                        <table width="100%" class="comontable" style="margin-top:30px;">
+                        <table width="100%" class="comontable" style="margin-top:15px;">
                             
                             <tr>
                                 <td style="font-size: 15px;">
@@ -203,14 +203,16 @@
                     </tr>
 
                     <tr>
-                        <table width="100%" class="comontable" style="margin-top:20px;">
+                        <table width="100%" class="comontable" style="margin-top:10px;">
                             <tr>
                                 <td style="font-size: 15px;">
                                     <p style="font-weight: bold;">Rechnung</p>
                                     <p>Rechnungsnummer:&nbsp;{{pat_info.invoice_id}}</p>
                                     <p>(Bitte bei Zahlungen angeben)</p>
                                     <p>Patient(in):{{pat_info.data.first_name}} &nbsp;{{pat_info.data.last_name}} </p>
-                                    <p>Geburtsdatum:{{pat_info.data.birthday}}</p>
+                                    {{#each birthday}}
+                                    <p>Geburtsdatum:{{key1}}</p>
+                                    {{/each}}
                                 
                                 </td>
                             </tr>
@@ -282,7 +284,7 @@
                     </tr>
 
                     <tr>
-                        <table width="100%" class="comontable" style="margin-top: 25px;">
+                        <table width="100%" class="comontable" style="margin-top: 20px;">
                             <tr>
                                 <td >
                                     <p style="font-size: 15px;">Die Zahlung wurde vor der Diagnoseanfrage via PayPal / Kreditkarte bezahlt.</p> 
@@ -294,7 +296,7 @@
 
 
                     <tr>
-                        <table width="100%" class="comontable" style="margin-top:60px; margin-bottom: 30px;">
+                        <table width="100%" class="comontable" style="margin-top:40px; margin-bottom: 30px;">
                             <tr>
                                 <td style="font-size: 15px;">
                                     <p>mit freundlichen Grüßen</p>
@@ -306,7 +308,7 @@
 
 
                     <tr>
-                        <table width="100%" class="comontable" style="margin-top:180px; margin-bottom: 30px;">
+                        <table width="100%" class="comontable" style="margin-top:80px; margin-bottom: 30px;">
                             <tr>
                                 <td style="font-size: 13px; text-align: center;">
                                     <p>Aimedis B.V. – Sint Michaelstraat 4 – 5935 BL Steyl – Netherlands – VAT ID NL858194478B01</p>
