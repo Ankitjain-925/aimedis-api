@@ -8914,8 +8914,8 @@ if(data){
           subject: "Picture Evaluation for Patient",
           html:html,
         };
-       
         let sendmail1 = transporter.sendMail(mailOptions1);
+        console.log('sendmail1', sendmail1)
         if (sendmail1) {
           console.log('Mail sents')
         }
@@ -8938,6 +8938,7 @@ if(data){
         };
        
         let sendmail = transporter.sendMail(mailOptions);
+        console.log('sendmail', sendmail)
         if (sendmail) {
           res.json({
             status: 200,
