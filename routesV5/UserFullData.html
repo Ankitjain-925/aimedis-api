@@ -1,0 +1,46 @@
+<html>
+    <body style="letter-spacing: 2px;  line-height: 1.5; font-family:Arial, Helvetica, sans-serif !important;">
+        <div style="text-align: center;  margin-top: 40px;">
+            <h3><b>Aimedis Timeline Report</b></h3>
+        </div>
+        <!-- <div style="text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: 900; text-transform: uppercase;">Aimedis Timeline Record</div> -->
+        <b>{{pat_info.name}}</b>
+        <div>{{pat_info.email}}</div>
+        <div>{{pat_info.Mobile}}</div>
+        <div style= "margin-top: 30px; margin-bottom: 10px;  font-size: 15px;">
+            <b>Emergency Contact -</b>
+        </div>
+        <div>{{pat_info.emergency_contact_name}}</div>
+        <div>{{pat_info.emergency_email}}</div>
+        <div>{{pat_info.emergency_relation}}</div>
+
+        <div style= "margin-top: 30px; margin-bottom: 10px;  font-size: 15px;">
+            <b>Family Doctor -</b>
+        </div>
+        <div>{{pat_info.family_doctor}}</div>
+        
+        <div style="margin-top: 10px; line-height: 2;">
+            {{#each Dieseases}}
+                <div><b style="padding-top: 20px; text-transform: capitalize; line-height: 2">{{k}}:</b><br/></div>
+                <div style="line-height: 2">{{{v}}}</div>
+            </div>
+            {{/each}}
+        </div>
+
+
+        <div>
+              <div style="margin-top:70px; font-size: 15px; line-height: 2;"><b>Your Aimedis team<br/>
+                https://aimedis.io<br/>
+                https://sys.aimedis.com</b><br/>
+              </div>
+              <div style="margin-top:40px; font-size: 15px; line-height: 2;">
+                If you have any questions do not hesitate to contact us via the support chat or via
+                contact@aimedis.com
+             </div>
+        </div>
+    </body>
+</html>
+
+
+
+
