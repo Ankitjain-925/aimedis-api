@@ -45,7 +45,7 @@ router.put("/AddRoom/:Case_Id",CheckRole("add_room"), function (req, res, next) 
     }
   });
 
-  router.post("/checkbedAvailabilityByWard",CheckRole("add_ward") ,function (req, res, next) {
+router.post("/checkbedAvailabilityByWard",CheckRole("add_ward") ,function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     var beds = [];
@@ -97,7 +97,8 @@ router.put("/AddRoom/:Case_Id",CheckRole("add_room"), function (req, res, next) 
       }
     );
   });
-  router.post("/checkbedAvailability",CheckRole("add_bed"),function (req, res, next) {
+
+router.post("/checkbedAvailability",CheckRole("add_bed"),function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     var bed = 0;
@@ -146,7 +147,7 @@ router.put("/AddRoom/:Case_Id",CheckRole("add_room"), function (req, res, next) 
     );
   });  
 
-  function returnNumberofBedOnWard(array, ward_id) {
+function returnNumberofBedOnWard(array, ward_id) {
     let ward = array.wards && array.wards.find(e => e._id == ward_id);
     var beds = [];
     if(ward && ward.rooms && ward.rooms.length>0){
@@ -157,7 +158,8 @@ router.put("/AddRoom/:Case_Id",CheckRole("add_room"), function (req, res, next) 
     }
     return beds;
   }
-  function returnNumberofBed(array, ward_id, room_id) {
+
+function returnNumberofBed(array, ward_id, room_id) {
     if(array){
       let ward = array.wards && array.wards.find(e => e._id == ward_id);
       let room = ward && ward.rooms && ward.rooms.find(e => e._id == room_id)
@@ -169,4 +171,4 @@ router.put("/AddRoom/:Case_Id",CheckRole("add_room"), function (req, res, next) 
     }
   }
 
-  module.exports = router;
+module.exports = router;

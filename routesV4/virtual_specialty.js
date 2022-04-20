@@ -3253,7 +3253,6 @@ router.post("/LeftInfoPatient", function (req, res) {
   }
 });
 
-
 router.post("/deletehouse", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);

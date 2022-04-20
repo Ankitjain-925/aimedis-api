@@ -146,6 +146,7 @@ router.put("/AddSpecialty/:specialty_id/:house_id", CheckRole('edit_speciality')
         });
     }
 });
+
 router.post("/AddSpecialty", CheckRole('add_speciality'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -1037,6 +1038,7 @@ function taskfromhouseid(item) {
     })
   
   }
+
 function invoicefromhouseid(data) {
     return new Promise((resolve, reject) => {
       try {
@@ -1064,7 +1066,8 @@ function mySorter(a, b) {
     }
   
   }
-  function virtualInvoiceforPatient(patient_id) {
+
+function virtualInvoiceforPatient(patient_id) {
     return new Promise((resolve, reject) => {
       try {
         virtual_Invoice.find({ "patient.patient_id": patient_id }).sort({ created_at: 'desc' }).exec(function (err, data) {
@@ -1080,7 +1083,7 @@ function mySorter(a, b) {
     })
   }
   
-  function virtualTasksforPatient(patient_id) {
+function virtualTasksforPatient(patient_id) {
     return new Promise((resolve, reject) => {
       try {
         const VirtualtToSearchWith = new virtual_Task({ patient_id });
@@ -1098,7 +1101,7 @@ function mySorter(a, b) {
     })
   }
   
-  function User_Case(House_id) {
+function User_Case(House_id) {
     return new Promise((resolve, reject) => {
       try {
         User.countDocuments(
@@ -1117,7 +1120,7 @@ function mySorter(a, b) {
     });
   }
   
-  function User_Case1(House_id) {
+function User_Case1(House_id) {
     return new Promise((resolve, reject) => {
       try {
         User.countDocuments(
@@ -1137,7 +1140,7 @@ function mySorter(a, b) {
     });
   }
   
-  function virtualCase(House_id) {
+function virtualCase(House_id) {
     return new Promise((resolve, reject) => {
       try {
         virtual_Case.countDocuments(
@@ -1156,7 +1159,7 @@ function mySorter(a, b) {
     });
   }
   
-  function virtualTask(house_id) {
+function virtualTask(house_id) {
     return new Promise((resolve, reject) => {
       try {
         virtual_Task.find({ house_id: house_id }, function (err, list) {
@@ -1173,7 +1176,7 @@ function mySorter(a, b) {
     });
   }
   
-  function virtualAppointment(userdata) {
+function virtualAppointment(userdata) {
     return new Promise((resolve, reject) => {
       Appoint = [];
       forEachPromise(userdata, getApointsDoctor).then((result) => {
@@ -1182,7 +1185,7 @@ function mySorter(a, b) {
     });
   }
   
-  function getApointsDoctor(user) {
+function getApointsDoctor(user) {
     return new Promise((resolve, reject) => {
       try {
         process.nextTick(() => {
@@ -1217,7 +1220,7 @@ function mySorter(a, b) {
     });
   }
   
-  function getfullInfo(data) {
+function getfullInfo(data) {
     return new Promise((resolve, reject) => {
       process.nextTick(() => {
         try {
@@ -1237,11 +1240,12 @@ function mySorter(a, b) {
     });
   }
   
-  function forEachPromise(items, fn) {
+function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
       return promise.then(function () {
         return fn(item);
       });
     }, Promise.resolve());
   }
+  
 module.exports = router;
