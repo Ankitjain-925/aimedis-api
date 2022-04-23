@@ -62,27 +62,14 @@ SickSchema.index({ area: "2dsphere" });
 
 SickSchema.plugin(mongooseFieldEncryption, {
   fields: [
-    "institute_name",
-    "email",
-    "first_name",
-    "last_name",
-    "weoffer_text",
-    "latest_info",
-    "emergency_number",
-    "emergency_email",
-    "emergency_contact_name",
-    "fax",
-    "website",
-    "phone",
-    "city",
-    "address",
-    "sex",
-    "birthday",
-    "mobile",
-    "profile_id",
-    "alies_id",
-    "latest_info",
-    "createdate",
+        "patient_profile_id"
+      "profile_id"
+      "doctor_profile_id"
+      "doctor_id"
+      "start_time"
+      "end_time"
+      "date"
+      "sesion_id"
   ],
   secret: process.env.SOME_32BYTE_BASE64_STRING,
   saltGenerator: function (secret) {
