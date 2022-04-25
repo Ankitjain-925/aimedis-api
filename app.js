@@ -37,34 +37,31 @@ const appAdmin = express();
 appAdmin.use(express.static(path.join(__dirname, "./build/admin")));
 app.use(express.static(path.join(__dirname, "./build/main")));
 
-const server = require("http").createServer(app)
+const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
-  transports: ['polling'],
+  transports: ["polling"],
   cors: {
-    origin: "*"
-  }
-
-})
+    origin: "*",
+  },
+});
 ////////////admin+main+end/////////////
 
-
-io.on('connection', (socket) => {
-  console.log('A user is connected');
+io.on("connection", (socket) => {
+  console.log("A user is connected");
 
   socket.on("update", (data) => {
-    console.log("data", data)
-    socket.broadcast.emit("data_shown", data)
+    console.log("data", data);
+    socket.broadcast.emit("data_shown", data);
   });
   socket.on("addpatient", (data) => {
-    console.log("addpatient", data)
-    socket.broadcast.emit("email_accept", data)
+    console.log("addpatient", data);
+    socket.broadcast.emit("email_accept", data);
   });
   socket.on("decline", (data) => {
-    console.log("decline", data)
-    socket.broadcast.emit("email_decline", data)
-  })
-
-})
+    console.log("decline", data);
+    socket.broadcast.emit("email_decline", data);
+  });
+});
 
 // cron.schedule("*/1 * * * *", () => {
 //   mongoTools
@@ -153,7 +150,6 @@ io.on('connection', (socket) => {
 // var AuthCheck = function (req, res, next) {
 //   if(req.headers.authorization){
 
-
 //     if(req.headers.authorization==="Aimedis23")
 //     {
 //       console.log('Hew1')
@@ -234,6 +230,7 @@ var Uploadcerts4 = require("./routesV4/uploadcerts");
 var bloackchain4 = require("./routesV4/blockchain");
 var cronPrecess4 = require("./routesV4/cron");
 var vspecialty4 = require("./routesV4/virtual_specialty");
+var vspecialty44 = require("./routesV4/sick_meeting");
 var vstep4 = require("./routesV4/virtual_step");
 var questionaire4 = require("./routesV4/questionaire");
 var vcases4 = require("./routesV4/virtual_cases");
@@ -241,8 +238,7 @@ var hadmin4 = require("./routesV4/h_admin");
 var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
 
-
-var market = require("./routesV4/marketing")
+var market = require("./routesV4/marketing");
 
 app.use("/api/v1/User", UserData);
 app.use("/api/v1/UserProfile", UserProfile);
@@ -297,6 +293,7 @@ app.use("/api/v4/aws", Uploadcerts4);
 app.use("/api/v4/blockchain", bloackchain4);
 app.use("/api/v4/cron", cronPrecess4);
 app.use("/api/v4/vh", vspecialty4);
+app.use("/api/v4/vh1", vspecialty44);
 app.use("/api/v4/step", vstep4);
 app.use("/api/v4/questionaire", questionaire4);
 app.use("/api/v4/cases", vcases4);
