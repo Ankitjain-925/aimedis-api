@@ -242,6 +242,27 @@ var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
 
 
+var UserData5 = require("./routesV5/UserTrack");
+var UserProfile5 = require("./routesV5/userProfile");
+var SaveCSV5 = require("./routesV5/saveCsv");
+var emergency_record5 = require("./routesV5/emergencyrecord");
+var rightinfo5 = require("./routesV5/rightsideinfo");
+var stripeCheckout5 = require("./routesV5/stripeCheckout");
+var lms_stripeCheckout5 = require("./routesV5/lms_stripeCheckout");
+var lms5 = require("./routesV5/lms");
+var certificate5 = require("./routesV5/certificate");
+var adminse5 = require("./routesV5/superadmin");
+var Uploadcerts5 = require("./routesV5/uploadcerts");
+var bloackchain5 = require("./routesV5/blockchain");
+var cronPrecess5 = require("./routesV5/cron");
+var vspecialty5 = require("./routesV5/virtual_specialty");
+var vstep5 = require("./routesV5/virtual_step");
+var questionaire5 = require("./routesV5/questionaire");
+var vcases5 = require("./routesV5/virtual_cases");
+var hadmin5= require("./routesV5/h_admin");
+var comet5 = require("./routesV5/cometUserList");
+var merketing5 = require("./routesV5/marketing");
+
 var market = require("./routesV4/marketing")
 
 app.use("/api/v1/User", UserData);
@@ -303,6 +324,27 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
+
+app.use("/api/v5/User", UserData5);
+app.use("/api/v5/UserProfile", UserProfile5);
+app.use("/api/v5/SaveCSV", SaveCSV5);
+app.use("/api/v5/stripeCheckout", stripeCheckout5);
+app.use("/api/v5/lms_stripeCheckout", lms_stripeCheckout5);
+app.use("/api/v5/emergency_record", emergency_record5);
+app.use("/api/v5/rightinfo", rightinfo5);
+app.use("/api/v5/lms", lms5);
+app.use("/api/v5/certificate", certificate5);
+app.use("/api/v5/admin", adminse5);
+app.use("/api/v5/aws", Uploadcerts5);
+app.use("/api/v5/blockchain", bloackchain5);
+app.use("/api/v5/cron", cronPrecess5);
+app.use("/api/v5/vh", vspecialty5);
+app.use("/api/v5/step", vstep5);
+app.use("/api/v5/questionaire", questionaire5);
+app.use("/api/v5/cases", vcases5);
+app.use("/api/v5/hospitaladmin", hadmin5);
+app.use("/api/v5/cometUserList", comet5);
+app.use("/api/v5/marketing", merketing5);
 // app.use("/api/v4/bk", bk)
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
 
