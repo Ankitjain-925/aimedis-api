@@ -814,7 +814,7 @@ router.delete("/AddInvoice/:bill_id/:house_id", CheckRole('delete_invoice'), fun
     }
 });
 
-router.put("/AddInvoice/:bill_id", function (req, res, next) {
+router.put("/AddInvoice/:bill_id/:house_id",CheckRole('set_invoice_status') ,function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
