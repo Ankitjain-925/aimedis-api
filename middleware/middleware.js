@@ -9,14 +9,12 @@ module.exports = function CheckRole(current_api) {
         let legit = jwtconfig.verify(token)
         if (legit.id) {
             User.findOne({ _id: legit.id }, function (err, data) {
-                console.log("data", data)
                 data.houses.map((element) => {
                     if (element.value == house_id) {
-                     
                      if (element.roles.includes(current_api)) {
                         next();
                     } else {
-                        res.send({ status: 200, hassuccessed: false, message: "User Have not right to add" })
+                        res.send({ status: 200, hassuccessed: false, data: "no_right", message: "No right to run this task" })
                     }
                     }
                 })
@@ -24,7 +22,7 @@ module.exports = function CheckRole(current_api) {
             })
         }
         else {
-            res.send({ status: 200, hassuccessed: false, message: "not authorized" })
+            res.send({ status: 200, hassuccessed: false, data: "no_right", message: "No right to run this task" })
         }
     }
 }
