@@ -240,6 +240,7 @@ var vcases4 = require("./routesV4/virtual_cases");
 var hadmin4 = require("./routesV4/h_admin");
 var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
+var vactive= require("./routesV4/virtual_active")
 
 
 var UserData5 = require("./routesV5/UserTrack");
@@ -324,6 +325,7 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
+app.use("/api/v4/vactive",vactive)
 
 app.use("/api/v5/User", UserData5);
 app.use("/api/v5/UserProfile", UserProfile5);
@@ -346,6 +348,7 @@ app.use("/api/v5/hospitaladmin", hadmin5);
 app.use("/api/v5/cometUserList", comet5);
 app.use("/api/v5/marketing", merketing5);
 // app.use("/api/v4/bk", bk)
+
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
