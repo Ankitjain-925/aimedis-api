@@ -365,7 +365,17 @@ var UserSchema = new Schema({
       type: Array,
       required: false,
       unique: false
-   }
+   },
+   current_available: {
+      type: Boolean,
+      required: false,
+      unique: false
+   },
+   sickleave_appointment: {
+      type: Array,
+      required: false,
+      unique: false
+   },
    
 },
    { strict: false },

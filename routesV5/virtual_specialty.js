@@ -146,6 +146,7 @@ router.put("/AddSpecialty/:specialty_id/:house_id", CheckRole('edit_speciality')
         });
     }
 });
+
 router.post("/AddSpecialty", CheckRole('add_speciality'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -823,6 +824,7 @@ router.put("/AddInvoice/:bill_id/:house_id",CheckRole('set_invoice_status') ,fun
             req.body,
             function (err, userdata) {
                 if (err) {
+                    console.log('dsfdsfsdfds222221111111')
                     res.json({
                         status: 200,
                         hassuccessed: false,
@@ -830,6 +832,7 @@ router.put("/AddInvoice/:bill_id/:house_id",CheckRole('set_invoice_status') ,fun
                         error: err,
                     });
                 } else {
+                    console.log('dsfdsfsdfds22222')
                     res.json({
                         status: 200,
                         hassuccessed: true,
@@ -2694,7 +2697,7 @@ router.post("/downloadPEBill", function (req, res, next) {
 
 });
 
-router.get("/AddInvoice/:house_id/:status", CheckRole('set_invoice_status'), function (req, res, next) {
+router.get("/AddInvoice/:house_id/:status", CheckRole('show_invoice'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
