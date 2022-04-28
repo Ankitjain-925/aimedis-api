@@ -241,32 +241,6 @@ var hadmin4 = require("./routesV4/h_admin");
 var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
 var vactive= require("./routesV4/virtual_active")
-<<<<<<< HEAD
-=======
-
-
-var UserData5 = require("./routesV5/UserTrack");
-var UserProfile5 = require("./routesV5/userProfile");
-var SaveCSV5 = require("./routesV5/saveCsv");
-var emergency_record5 = require("./routesV5/emergencyrecord");
-var rightinfo5 = require("./routesV5/rightsideinfo");
-var stripeCheckout5 = require("./routesV5/stripeCheckout");
-var lms_stripeCheckout5 = require("./routesV5/lms_stripeCheckout");
-var lms5 = require("./routesV5/lms");
-var certificate5 = require("./routesV5/certificate");
-var adminse5 = require("./routesV5/superadmin");
-var Uploadcerts5 = require("./routesV5/uploadcerts");
-var bloackchain5 = require("./routesV5/blockchain");
-var cronPrecess5 = require("./routesV5/cron");
-var vspecialty5 = require("./routesV5/virtual_specialty");
-var vstep5 = require("./routesV5/virtual_step");
-var questionaire5 = require("./routesV5/questionaire");
-var vcases5 = require("./routesV5/virtual_cases");
-var hadmin5= require("./routesV5/h_admin");
-var comet5 = require("./routesV5/cometUserList");
-var merketing5 = require("./routesV5/marketing");
-
->>>>>>> babef2801b5d4961f1ce423da7c88266b1ffab43
 var market = require("./routesV4/marketing")
 
 var UserData5 = require("./routesV5/UserTrack");

@@ -626,7 +626,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
 });
 
-router.post("/DoctorMail", function (req, res) {
+router.post("/SickleaveCretificateToPatient", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
   Here is the new Sick leave certificate request from the 
     ${req.body.first_name + "" +
