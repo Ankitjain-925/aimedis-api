@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5000",
+    "host": "https://virtualhospital.aimedis.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -42,7 +42,7 @@
         }
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
