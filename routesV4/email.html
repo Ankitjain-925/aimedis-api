@@ -33,7 +33,7 @@
                                 style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                 Insurance company</label>
                             <div><input type="text"
-                                    style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                    style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.insurance_company}}" />
                             </div>
                         </div>
                         <table role="presentation" border="0" width="100%" cellspacing="0" style="margin-bottom: 8px;">
@@ -46,15 +46,17 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Name First Name</label>
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.info.first_name}}&nbsp;{{pat_info.info.last_name}}" />
                                     </div>
                                 </td>
                                 <td width="40%" style="padding-left: 2px; vertical-align: bottom;">
                                     <label
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         DOB</label>
-                                    <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                    <div>{{#each birthday}}
+                                        <input type="text"
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{key1}}" />
+                                            {{/each}}
                                     </div>
                                 </td>
                             </tr>
@@ -69,7 +71,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Number Insurance Company</label>
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Number_Insurance_Company}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="padding-right: 2px; vertical-align: bottom;">
@@ -80,7 +82,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Insurance number of Person</label>
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Insurance_number_of_Person}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="vertical-align: bottom;">
@@ -91,7 +93,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Status</label>
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"  value="{{pat_info.Status}}" />
                                     </div>
                                 </td>
                             </tr>
@@ -106,7 +108,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Hospital Number</label>
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Hospital_Number}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="padding-right: 2px; vertical-align: bottom;">
@@ -117,7 +119,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Doctor Number</label>
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Doctor_Number}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="vertical-align: bottom;">
@@ -128,7 +130,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Status</label>
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{date}}" />
                                     </div>
                                 </td>
                             </tr>
@@ -144,7 +146,7 @@
                                          <tr><label style="display: block;font-style: normal;font-weight: 500;font-size: 15px;line-height: 18px;color: #404646;margin-bottom: 2px;">
                                             First Time Certification</label></tr>  
                                          <tr>  
-                                            <td><input type="checkbox" /></td>
+                                            <td><input type="checkbox" value={{pat_info.Workincident}} checked={{pat_info.Workincident}}==true?true?false /></td>
                                             <td>
                                                 <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                     Erstbescheinigung</label>
@@ -153,7 +155,7 @@
                                             </td>
                                          </tr>
                                          <tr>  
-                                            <td><input type="checkbox" /></td>
+                                            <td><input type="checkbox" value={{pat_info.Occupational}}  checked={{pat_info.Occupational}}==true?true?false/></td>
                                             <td>
                                                 <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                 Arbeitsunfall, Arbeitsunfallfolgen, Berufskrankheit</label>
@@ -170,7 +172,7 @@
                                                 Continuation of certification</label>
                                             </tr>    
                                             <tr>  
-                                               <td><input type="checkbox" /></td>
+                                               <td><input type="checkbox" value={{pat_info.Special_Doctor}} checked={{pat_info.Special_Doctor}}==true?true?false > </input></td>
                                                <td>
                                                    <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                     Folgebescheinigung</label>
@@ -179,7 +181,7 @@
                                                </td>
                                             </tr>
                                             <tr>  
-                                               <td><input type="checkbox" /></td>
+                                               <td><input type="checkbox" value={{pat_info.zugewiesen}} checked={{pat_info.zugewiesen}}==true?true?false ></input></td>
                                                <td>
                                                    <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                     Dem Durchgangsarzt zugewiesen</label>
@@ -203,17 +205,20 @@
                                     Imposible to work since</label>
                             </td>
                             <td style="display: flex;justify-content: right;align-items: center;padding-left: 12px;">
+                                {{#each work_since}}
+                                <!-- <input
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-radius: 4px 0px 0px 4px;" >{{v}}</input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-radius: 4px 0px 0px 4px;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" >{{v}}</input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
-                                <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " />
-                            </td>
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input> -->
+                                    <input value="{{v}}" />
+                                {{/each}}
+                                </td>
                         </tr>
                         <tr>
                             <td>
@@ -223,18 +228,21 @@
                                 <label style="margin-bottom: 10px;display: block; font-style: normal;font-weight: 600;font-size: 15px;color: #404646;">most
                                     likely imposible to work until</label>
                             </td>
-                            <td style="display: flex;justify-content: right;align-items: center;padding-left: 12px;">
+                            <!-- <td style="display: flex;justify-content: right;align-items: center;padding-left: 12px;">
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-radius: 4px 0px 0px 4px;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-radius: 4px 0px 0px 4px;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" /></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " />
-                            </td>
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input>
+                            </td> -->
+                            {{#each work_until}}
+                            <input value= "{{v}}" />
+                            {{/each}}
                         </tr>
                         <tr>
                             <td>
@@ -246,17 +254,20 @@
                                     at</label>
                             </td>
                             <td style="display: flex;justify-content: right;align-items: center;padding-left: 12px;">
+                                <!-- <input
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-radius: 4px 0px 0px 4px;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-radius: 4px 0px 0px 4px;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" />
-                                <input
-                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " />
-                            </td>
+                                    style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input> -->
+                                    {{#each detected_at}}
+                                    <input value="{{v}}" />
+                                    {{/each}}
+                                </td>
                         </tr>
                     </table>
 
