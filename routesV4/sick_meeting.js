@@ -36,6 +36,7 @@ var html2 = fs.readFileSync(join(`${__dirname}/index.html`), "utf8");
 var billinvoice1 = fs.readFileSync(join(`${__dirname}/medical.html`), "utf8");
 var billinvoice2 = fs.readFileSync(join(`${__dirname}/2image.html`), "utf8");
 var billinvoice3 = fs.readFileSync(join(`${__dirname}/3image.html`), "utf8");
+var sickleave = fs.readFileSync(join(`${__dirname}/email.html`), "utf8");
 var bill = fs.readFileSync(join(`${__dirname}/bill.html`), "utf8");
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
@@ -164,7 +165,7 @@ router.post("/DoctorMail", function (req, res) {
 router.post("/approvedrequest/:task_id", function (req, res) {
   if (req.body.for_manage === "approved") {
     virtual_Task.updateOne(
-      { task_id: req.params.task_id },
+      { _id: req.params.task_id },
       { approved: true },
       function (err, data) {
         if (err && !data) {
@@ -230,11 +231,11 @@ router.post("/approvedrequest/:task_id", function (req, res) {
   }
 });
 
-router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
+router.delete("/AddMeeting/:session_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    sick_meeting.findByIdAndRemove(req.params.meeting_id, function (err, data) {
+    sick_meeting.findByIdAndRemove(req.params.session_id, function (err, data) {
       if (err) {
         res.json({
           status: 200,
@@ -311,5 +312,57 @@ router.get("/PatientTask/:profile_id", function (req, res, next) {
     });
   }
 });
+
+router.post("/downloadEmail", function (req, res, next) {
+  Object.entries(req.body).map(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((v) => Data.push(Object.assign({}, v)));
+    } else if (
+      key === "invoice_id" ||
+      key === "case_id" ||
+      key === "total_amount"
+    ) {
+      Data.push({
+        k: key.replace(/_/g, " "),
+        v: value,
+      });
+    } else if (key === "created_at") {
+      date1.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
+    }
+  });
+  var template = handlebars.compile(sickleave);
+  let data1 = date1.map((element) => {
+    return element.v;
+  });
+
+  let house_name = req.body.house_name;
+
+  var htmlToSend = template({
+    Invoice: Data,
+    pat_info: req.body,
+    Service: house_name,
+    date: data1,
+  });
+  var filename = "GeneratedReport.pdf";
+  if (htmlToSend) {
+    var options = {
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      format: "A4",
+      path: `${__dirname}/${filename}`,
+      displayHeaderFooter: true,
+      margin: { top: 80, bottom: 80, left: 60, right: 60 },
+      headerTemplate: `<div style="text-align: center; width: 100%; font-size: 30px;"><img src="${logo1}" alt="Girl in a jacket" height="40"></div>`,
+      footerTemplate: `<div style="text-align: center;  width: 100%; font-size: 30px;"><img src="${logo2}" alt="Girl in a jacket" height="30"></div>`,
+    };
+
+    let file = [{ content: htmlToSend }];
+    html_to_pdf.generatePdfs(file, options).then((output) => {
+      const file = `${__dirname}/${filename}`;
+      res.download(file);
+    });
+  } else {
+    res.json({ status: 200, hassuccessed: true, filename: filename });
+  }
+}
 
 module.exports = router;

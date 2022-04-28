@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    
+        <style type="text/css" media="screen">
+            body {
+                font-family: Arial, Helvetica, sans-serif !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block !important;
+                min-width: 100% !important;
+                width: 100% !important;
+                background: #fff;
+                -webkit-text-size-adjust: none;
+                line-height: 18px;
+            }
+    
+            a {
+                color: #ffffff;
+                text-decoration: none
+            }
+    
+            p {
+                padding: 0 !important;
+                margin: 0 !important
+            }
+    
+            img {
+                -ms-interpolation-mode: bicubic;
+                /* Allow smoother rendering of resized image in Internet Explorer */
+            }
+    
+            .mcnPreviewText {
+                display: none !important;
+            }
+    
+            body .MsoNormal {
+                line-height: normal !important;
+            }
+    
+    
+    
+            /* -------------------------------aimedis -------------------------------------------- */
+            * {
+                font-family: Arial, Helvetica, sans-serif !important;
+            }
+    
+            .maintabPart {
+                padding: 20px 300px 20px 300px;
+            }
+    
+            @media (max-width:599px) {
+    
+                .firsttabhead,
+                .secsttabhead {
+                    padding-left: 10px !important;
+                    padding-right: 10px !important;
+                }
+            }
+    
+            @media only screen and (max-device-width: 1168px),
+            only screen and (max-width: 1168px) {
+                .maintabPart {
+                    padding: 20px 20px;
+                }
+            }
+    
+            
+        </style>
+    
+    
+    </head>
+
+<body>
+    <table width="100%" bordre="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff" class="maintabPart">
+        <tr>
+            <td valign="top">
+                <table width="100%" class="makecenter" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="left">
+                            <strong>Welcome to Aimedis</strong>
+                        </td>
+                        <td align="right">
+                            <img src="images/logo_new.png">
+                        </td>
+                    </tr>
+                </table>
+
+                <table width="100%" style="border-bottom:1px solid red; padding-bottom:20px; margin-top:30px">
+                    <tr>
+                        <td style="font-size:14px; width:60%;">From</td>
+                        <td style="font-size:14px; width:40%;" class="txtalign">For</td>
+                    </tr>
+
+                    <tr>
+                        <td>{{Service}}</td>
+                        <td>{{pat_info.patient.first_name}} &nbsp; {{pat_info.patient.last_name}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.alies_id}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>{{pat_info.patient.patient_id}}</td>
+                    </tr>
+
+                </table>
+
+                <table width="100%" style="padding-top:30px;border-bottom: 2px solid red;">
+                    <tr>
+                        <td style="font-size:14px; padding-bottom: 10px; width:5%;">
+                            <p>InvoiceID:</p>
+                            <p>Date:</p>
+                            <p>Status:</p>
+                        </td>
+                        <td style="font-size:14px; padding-bottom: 10px;">
+                            <p>{{pat_info.invoice_id}}</p>
+                            <p>{{date}}</p>
+                            <p>{{pat_info.status.label_en}}</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+
+                    <table width="100%" bgcolor="black" style="color:rgb(243, 241, 241); margin-top: 20px; padding:10px 20px;">
+                        <tr>
+                            <th width="25%" align="left">Service</th>
+                            <th width="25%" align="right">Quantity</th>
+                            <th width="25%" align="right">Price Per Quantity</th>
+                            <th width="25%" align="right">Amount</th>
+                        </tr>
+                    </table>
+                    <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;"
+                        class="secsttabhead">
+                        {{#each Invoice}}
+
+                        <tr>
+                            <th width="25%" align="left">{{service}}</th>
+                            <th width="25%" align="right">{{quantity}}</th>
+                            <th width="25%" align="right">{{price_per_quantity}}</th>
+                            <th width="25%" align="right">{{price}}</th>
+
+                            
+                        </tr>
+                        {{/each}}
+
+                    </table>
+                    <table width="100%" style="padding:10px 20px; border-bottom: 2px solid red;">
+                        <tr>
+                            <td  style="display:flex; justify-content:flex-end">
+                                <p style="width:25%; text-align:right"></p>
+                                <p style="width:25%; text-align:right"></p>
+                                <p style="width:25%; text-align:right">Total</p>
+                                <p style="width:25%; text-align:right">{{pat_info.total_amount}}</p>
+                                
+                            </td>
+                        </tr>
+                  </table>
+
+
+                    <table style="font-size:14px; margin-top: 10px;">
+                        <tr>
+                            <td>
+                                <h3>Your Aimedis team</h3>
+                                <p>https://aimedis.io</p>
+                                <p>https://sys.aimedis.com</p>
+                                <p>If you have any questions do not hesitate to contact us via the support chat or via contact@aimedis.com</p>
+                            </td>
+                        </tr>
+                    </table>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

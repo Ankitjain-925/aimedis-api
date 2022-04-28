@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "https://virtualhospital.aimedis.io",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -35,10 +35,14 @@
         {
             "name": "virtual_cases",
             "description": "API for cases"
+        },
+        {
+            "name": "sick",
+            "description": "API for cases"
         }
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -2647,6 +2651,231 @@
                     }
                 }
             }
+        },
+        "/vactive/SelectDocforSickleave": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "sick"
+                ],
+                "summary": "get slot",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vactive/PatientTask/{profile_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "profile_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "get patienttask",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        
+        "/vactive/AddMeeting/{meeting_id}": {
+            "delete": {
+                    "parameters": [
+                        {
+                            "name": "meeting_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "Delete meeting",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vactive/GetAllPatientData/{patient_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "Get all patient",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vactive/AddMeeting": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User",
+                    "schema": {
+                           
+                    }
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "ADD",
+                        "in": "body",
+                        "description": "Add meeting",
+                        "schema": {
+                            "$ref": "#/definitions/Addmeeting"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "Add meeting",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    }
+                }
+            }
+        },
+        "/vactive/approvedrequest": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "ADD",
+                        "in": "body",
+                        "description": "Approval Request",
+                        "schema": {
+                            "$ref": "#/definitions/approvedrequest"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "Approval Request",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    }
+                }
+            }
+        },
+        "/vactive/DoctorMail": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "ADD",
+                        "in": "body",
+                        "description": "Mail to Doctor",
+                        "schema": {
+                            "$ref": "#/definitions/DoctorMail"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "Mail to doctor",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    }
+                }
+            }
         }
 
     },
@@ -2688,6 +2917,75 @@
                     "uniqueItems": false
                 }
             }
+        },
+        "DoctorMail":{
+            "required": [
+             "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "first_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "last_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "profile_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "start": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "end": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+            
+
+        },
+        "approvedrequest":{
+            "required": [
+             
+            ],
+            "properties": {
+                "for_manage": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "task_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "start": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "end": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+
         },
         
         "AddtheGroup": {
@@ -2752,6 +3050,47 @@
                     }
                 },
                 "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Addmeeting": {
+           
+            "properties": {
+                "patient_profile_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "doctor_profile_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "doctor_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "start_time": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "end_time": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "sesion_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "link": {
                     "type": "string",
                     "uniqueItems": false
                 }
