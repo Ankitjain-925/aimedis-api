@@ -658,7 +658,7 @@ router.get("/AppointOfDate/:date", function (req, res, next) {
 });
 
 //Added by Ankita
-router.get("/AppointOfDate1/:date", CheckRole("show_appointment"), function (req, res, next) {
+router.get("/AppointOfDate1/:date", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -692,7 +692,7 @@ router.get("/AppointOfDate1/:date", CheckRole("show_appointment"), function (req
   }
 });
 
-router.get("/AppointmentByDate1", CheckRole("show_appointment"), function (req, res, next) {
+router.get("/AppointmentByDate1", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -739,7 +739,7 @@ router.get("/AppointmentByDate1", CheckRole("show_appointment"), function (req, 
 });
 
 
-router.get("/AppointmentByDate", CheckRole("show_appointment"), function (req, res, next) {
+router.get("/AppointmentByDate", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {

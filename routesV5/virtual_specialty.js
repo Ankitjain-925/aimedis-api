@@ -374,7 +374,7 @@ router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, 
     }
 });
 
-router.get("/GetAllArchivedTask/:house_id", CheckRole('archive_task'), function (req, res, next) {
+router.get("/GetAllArchivedTask/:house_id", CheckRole('show_task'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
@@ -2942,7 +2942,7 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
     }
   })
   
-  router.post("/CalenderFilter", function (req, res) {
+  router.post("/CalenderFilter", CheckRole('show_calendar_data'), function (req, res) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
