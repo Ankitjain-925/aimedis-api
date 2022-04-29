@@ -167,7 +167,7 @@ router.put("/Question/:questionaire_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     questionaire.updateOne(
-      { 'questions._id': req.params.questionaire_id },{$push:{questions:req.body}},
+      { _id: req.params.questionaire_id },
       req.body,
       function (err, userdata) {
         if (err) {

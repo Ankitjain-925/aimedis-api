@@ -2841,7 +2841,7 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
   
   }
   
-  router.post("/TaskFilter", function (req, res) {
+  router.post("/TaskFilter", CheckRole('show_task'), function (req, res) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
