@@ -441,7 +441,66 @@ router.post("/approvedrequest", function (req, res) {
         }
       }
     );
+  }else{
+    virtual_Task.updateOne(
+      { _id: req.body.task_id },
+      { approved: false },
+      function (err, data) {
+        if (err && !data) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+            error: err,
+          });
+        } else {
+          sendData = `Dear Patient<br/>
+            Your request for the sick leave certificate is decline by the doctor`
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (req.body.email !== "") {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.email,
+                  subject: "Approve sick leave request by Doctor",
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+                console.log("mail", mailOptions);
+                if (sendmail) {
+                  console.log("Mail is sent ");
+                  res.json({
+                    status: 200,
+                    message: "Mail sent Successfully",
+                    hassuccessed: true,
+                  });
+                } else {
+                  console.log("err");
+                  res.json({
+                    status: 200,
+                    msg: "Mail is not sent",
+                    hassuccessed: false,
+                  });
+                }
+              } else {
+                console.log("no email");
+                res.json({
+                  status: 200,
+                  msg: "Mail is not sent",
+                  hassuccessed: false,
+                });
+              }
+            }
+          );
+        }
+      }
+    );
   }
+
 });
 
 router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
@@ -529,7 +588,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
           })
         }
 
-        if (
+        else if (
           key === "Number_Insurance_Company" ||
           key === "Insurance_number_of_Person" ||
           key === "Status"
@@ -538,13 +597,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
             k: key.replace(/_/g, " "),
             v: value,
           });
-        }
-        if (key === "") {
-          Data.push({
-            k: key,
-            v: value,
-          });
-
         }
 
         else if (key === "created_at") {
@@ -605,7 +657,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         html_to_pdf.generatePdfs(file, options).then((output) => {
           const file = `${__dirname}/${filename}`;
           if (req.query.usefor === 'mail') {
-            var sendData =`<div></div>`
+            var sendData = `<div></div>`
             console.log("sendData", sendData)
             generateTemplate(
               EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
@@ -618,9 +670,9 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                     html: html,
                     attachments: [
                       {   // utf-8 string as an attachment
-                          filename:filename ,
-                          path:file
-                       
+                        filename: filename,
+                        path: file
+
                       }]
                   };
                   let sendmail = transporter.sendMail(mailOptions);
@@ -656,7 +708,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
       } else {
         res.json({ status: 200, hassuccessed: true, filename: filename });
       }
-      
 
     }
   } catch (e) {
@@ -666,45 +717,86 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
 });
 
-router.post("/SickleaveCretificateToPatient", function (req, res) {
-  var sendData = `<div> </div>`
-  console.log("sendData", sendData)
-  generateTemplate(
-    EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
-    (error, html) => {
-      if (req.body.email !== "") {
-        let mailOptions = {
-          from: "contact@aimedis.com",
-          to: req.body.email,
-          subject: "Sick leave certificate request",
-          html: html,
-        };
-        let sendmail = transporter.sendMail(mailOptions);
-        console.log("mail", mailOptions);
-        if (sendmail) {
-          console.log("Mail is sent ");
 
-          res.json({
-            status: 200,
-            message: "Mail sent Successfully",
-            hassuccessed: true,
-          });
-        } else {
-          console.log("err");
-          res.json({
-            status: 200,
-            msg: "Mail is not sent",
-            hassuccessed: false,
-          });
-        }
-      } else {
-        console.log("no email");
-        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-      }
-    }
-  );
-});
+// router.get("/Add/:sesion_id", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     sick_meeting.findOne({ sesion_id: req.params.sesion_id }, function (err, data) {
+//       console.log("err", err)
+//       if (err) {
+//         res.json({
+//           status: 200,
+//           hassuccessed: false,
+//           message: "Something went wrong.",
+//           error: err,
+//         });
+//       } else {
+//         console.log("data", data)
+//         let today = new Date();
+//         let ttime = new Date();
+//         let final_date = today.getFullYear() + "/" + today.getMonth() + "/" + today.getDate();
+//         let final = ttime.getHours() + ":" + ttime.getMinutes() + ":" + ttime.getSeconds();
+//         console.log("today", final_date)
+//         console.log("tt", final)
+//         console.log("12",data.date)
+//         if (data.date < final_date) {
+//           console.log("1")
+//           res.json({
+//             status: 200,
+//             hassuccessed: true,
+//             message: "Link Expire",
+//           });
 
 
+//         }
+//         else if (data.date > final_date) {
+//           console.log("2")
+//           res.json({
+//             status: 200,
+//             hassuccessed: true,
+//             message: "Link will active soon",
+//           });
+
+
+//         }
+//         else if (data.date == final_date) {
+//           console.log("3")
+//           if (data.start_time <= final && data.end_time >= final)
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "link active",
+//             });
+//           else if (data.start_time > final) {
+//             console.log("4")
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "link start soon",
+//             });
+//           }
+//           else if (data.start_time > final) {
+//             console.log("5")
+//             res.json({
+//               status: 200,
+//               hassuccessed: true,
+//               message: "Link Expire",
+//             });
+//           }
+
+
+//         }
+
+//       }
+//     });
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
 module.exports = router;
