@@ -723,44 +723,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
 });
 
-router.post("/SickleaveCretificateToPatient", function (req, res) {
-  var sendData = `<div> </div>`
-  console.log("sendData", sendData)
-  generateTemplate(
-    EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
-    (error, html) => {
-      if (req.body.email !== "") {
-        let mailOptions = {
-          from: "contact@aimedis.com",
-          to: req.body.email,
-          subject: "Sick leave certificate request",
-          html: html,
-        };
-        let sendmail = transporter.sendMail(mailOptions);
-        console.log("mail", mailOptions);
-        if (sendmail) {
-          console.log("Mail is sent ");
-
-          res.json({
-            status: 200,
-            message: "Mail sent Successfully",
-            hassuccessed: true,
-          });
-        } else {
-          console.log("err");
-          res.json({
-            status: 200,
-            msg: "Mail is not sent",
-            hassuccessed: false,
-          });
-        }
-      } else {
-        console.log("no email");
-        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-      }
-    }
-  );
-});
 
 router.get("/Add/:sesion_id", function (req, res, next) {
   const token = req.headers.token;
