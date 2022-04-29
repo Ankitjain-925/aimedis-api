@@ -167,7 +167,7 @@ router.put("/Question/:questionaire_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     questionaire.updateOne(
-      { _id: req.params.questionaire_id },
+      { 'questions._id': req.params.questionaire_id },{$push:{questions:req.body}},
       req.body,
       function (err, userdata) {
         if (err) {
@@ -178,6 +178,7 @@ router.put("/Question/:questionaire_id", function (req, res, next) {
             error: err,
           });
         } else {
+          console.log("userdata",userdata)
           res.json({
             status: 200,
             hassuccessed: true,

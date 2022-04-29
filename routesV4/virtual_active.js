@@ -37,6 +37,7 @@ var billinvoice1 = fs.readFileSync(join(`${__dirname}/medical.html`), "utf8");
 var billinvoice2 = fs.readFileSync(join(`${__dirname}/2image.html`), "utf8");
 var billinvoice3 = fs.readFileSync(join(`${__dirname}/3image.html`), "utf8");
 var bill = fs.readFileSync(join(`${__dirname}/bill.html`), "utf8");
+var sick = fs.readFileSync(join(`${__dirname}/email.html`), "utf8");
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
 const { virtual } = require("../schema/topic.js");
@@ -452,7 +453,7 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    sick_meeting.findByIdAndRemove({ _id: req.params.sesion_id }, function (err, data) {
+    sick_meeting.findByIdAndRemove({ _id: req.params.meeting_id }, function (err, data) {
       if (err) {
         res.json({
           status: 200,
