@@ -446,7 +446,7 @@ router.post("/approvedrequest", function (req, res) {
         }
       }
     );
-  }else{
+  } else {
     virtual_Task.updateOne(
       { _id: req.body.task_id },
       { approved: false },
@@ -724,7 +724,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 });
 
 
-router.get("/Add/:sesion_id", function (req, res, next) {
+router.get("/Linktime/:sesion_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -741,12 +741,16 @@ router.get("/Add/:sesion_id", function (req, res, next) {
         console.log("data", data)
         let today = new Date();
         let ttime = new Date();
-        let final_date = today.getFullYear() + "/" + today.getMonth() + "/" + today.getDate();
-        let final = ttime.getHours() + ":" + ttime.getMinutes() + ":" + ttime.getSeconds();
+        let final_date = today.getFullYear() + " / " + ("0" + (today.getDate())).slice(-2) + " / " + ("0" + (today.getMonth() + 1)).slice(-2);
+        let final = ttime.getHours() + ":" + ttime.getMinutes();
+        
+        let data_d = getDate(data.date, "YYYY/DD/MM");
+        console.log("data_d", data_d)
+
         console.log("today", final_date)
         console.log("tt", final)
-        console.log("12",data.date)
-        if (data.date < final_date) {
+        console.log("12", data.date)
+        if (data_d < final_date) {
           console.log("1")
           res.json({
             status: 200,
@@ -756,7 +760,7 @@ router.get("/Add/:sesion_id", function (req, res, next) {
 
 
         }
-        else if (data.date > final_date) {
+        else if (data_d > final_date) {
           console.log("2")
           res.json({
             status: 200,
@@ -766,7 +770,7 @@ router.get("/Add/:sesion_id", function (req, res, next) {
 
 
         }
-        else if (data.date == final_date) {
+        else if (data_d == final_date) {
           console.log("3")
           if (data.start_time <= final && data.end_time >= final)
             res.json({
@@ -782,7 +786,7 @@ router.get("/Add/:sesion_id", function (req, res, next) {
               message: "link start soon",
             });
           }
-          else if (data.start_time > final) {
+          else if (data.end_time < final ) {
             console.log("5")
             res.json({
               status: 200,
