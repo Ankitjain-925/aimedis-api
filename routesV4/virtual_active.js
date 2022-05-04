@@ -306,8 +306,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_Task.find(
-      { patient_id: req.params.patient_id },
-      { task_type: "sick_leave" },
+      { patient_id: req.params.patient_id ,task_type: "sick_leave" },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -317,6 +316,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
+          console.log("userdata",userdata)
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
