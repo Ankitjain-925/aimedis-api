@@ -786,7 +786,7 @@ router.get("/AppointmentByDate", function (req, res, next) {
   }
 });
 
-router.post("/appointment", CheckRole("Add_appointment"), function (req, res) {
+router.post("/appointment", function (req, res) {
   var Appointments = new Appointment(req.body);
   Appointments.save(function (err, user_data) {
     if (err && !user_data) {

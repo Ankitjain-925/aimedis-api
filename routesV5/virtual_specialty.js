@@ -490,7 +490,7 @@ router.get("/ProfessionalTask/:patient_profile_id", function (req, res, next) {
     }
 });
 
-router.get("/ProfessionalTask/:patient_profile_id/:house_id", function (req, res, next) {
+router.get("/ProfessionalTask/:patient_profile_id/:house_id", CheckRole('show_task'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
@@ -1843,6 +1843,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
         });
     }
 });
+
 router.post("/addPatientToVH", CheckRole("add_patient"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -2152,8 +2153,6 @@ router.get("/sortinfo1/:patient_id", function (req, res, next) {
     }
 
 })
-
-
 
 router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
     const token = (req.headers.token)
