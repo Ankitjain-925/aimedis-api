@@ -428,9 +428,14 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
         house_id: req.params.house_id,
         archived: { $ne: true },
         $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
+        $and: [
+          { task_type: { $ne: "sick_leave" } },
+          { task_type: { $exists: true } },
+        ],
       },
       function (err, userdata) {
         if (err && !userdata) {
+          console.log("err", err);
           res.json({
             status: 200,
             hassuccessed: false,
@@ -438,6 +443,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
+          console.log("userdata", userdata);
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -2856,42 +2862,33 @@ router.post("/downloadPEBill", function (req, res, next) {
       return options.inverse(this);
     });
     var admit = [];
-    var bill2=[];
-    var birthday=[];
+    var bill2 = [];
+    var birthday = [];
     // var Data=[];
     {
-    Object.entries(req.body).map(([key, value]) => {
-     if(key === 'data'){
-        Object.entries(value).map(([key1, value1])=>{
-          if(key1==="birthday"){
-            key1 = getDate(value1, "YYYY/MM/DD")
-            birthday.push({ key1 });
-          
-          }
-
-        })
-      }
-      else if (key === "admit_date") {
-        admit.push({ k: "admit_date", v: getDate(value, "YYYY/MM/DD") });
-
-      }
-      else if (key === "bill_date") {
-        bill2.push({ k: "bill_date", v: getDate(value, "YYYY/MM/DD") });
-
-      }
-    
-      
-    });
-    console.log("birthday",birthday)
-    // console.log("data",Data)
-
-  }
+      Object.entries(req.body).map(([key, value]) => {
+        if (key === "data") {
+          Object.entries(value).map(([key1, value1]) => {
+            if (key1 === "birthday") {
+              key1 = getDate(value1, "YYYY/MM/DD");
+              birthday.push({ key1 });
+            }
+          });
+        } else if (key === "admit_date") {
+          admit.push({ k: "admit_date", v: getDate(value, "YYYY/MM/DD") });
+        } else if (key === "bill_date") {
+          bill2.push({ k: "bill_date", v: getDate(value, "YYYY/MM/DD") });
+        }
+      });
+      console.log("birthday", birthday);
+      // console.log("data",Data)
+    }
     var template = handlebars.compile(bill);
     var htmlToSend = template({
       bill2: bill2,
       admit: admit,
       pat_info: req.body,
-      birthday:birthday
+      birthday: birthday,
     });
 
     var filename = "GeneratedReport.pdf";
@@ -2913,8 +2910,13 @@ router.post("/downloadPEBill", function (req, res, next) {
       res.json({ status: 200, hassuccessed: true, filename: filename });
     }
   } catch (e) {
-    console.log("e",e)
-    res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: e })
+    console.log("e", e);
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+      error: e,
+    });
   }
 });
 

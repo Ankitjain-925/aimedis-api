@@ -815,7 +815,8 @@ router.delete("/AddInvoice/:bill_id/:house_id", CheckRole('delete_invoice'), fun
     }
 });
 
-router.put("/AddInvoice/:bill_id", function (req, res, next) {
+router.put("/AddInvoice/:bill_id", function (req, res) {
+    console.log('dsfdsfsdfds')
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
@@ -824,6 +825,7 @@ router.put("/AddInvoice/:bill_id", function (req, res, next) {
             req.body,
             function (err, userdata) {
                 if (err) {
+                    console.log('dsfdsfsdfds222221111111')
                     res.json({
                         status: 200,
                         hassuccessed: false,
@@ -831,6 +833,7 @@ router.put("/AddInvoice/:bill_id", function (req, res, next) {
                         error: err,
                     });
                 } else {
+                    console.log('dsfdsfsdfds22222')
                     res.json({
                         status: 200,
                         hassuccessed: true,
@@ -2695,7 +2698,7 @@ router.post("/downloadPEBill", function (req, res, next) {
 
 });
 
-router.get("/AddInvoice/:house_id/:status", CheckRole('set_invoice_status'), function (req, res, next) {
+router.get("/AddInvoice/:house_id/:status", CheckRole('show_invoice'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {

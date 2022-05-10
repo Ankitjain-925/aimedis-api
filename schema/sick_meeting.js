@@ -49,8 +49,8 @@ var SickSchema = new Schema(
       unique: true,
     },
     link: {
-      type: String,
-      required: false,
+      type: Object,
+      required: true,
       unique: true,
     },
   },
