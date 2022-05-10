@@ -306,7 +306,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     virtual_Task.find(
-      { patient_id: req.params.patient_id ,task_type: "sick_leave" },
+      { patient_id: req.params.patient_id, task_type: "sick_leave" },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -316,7 +316,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("userdata",userdata)
+          console.log("userdata", userdata)
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -738,19 +738,18 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
           error: err,
         });
       } else {
-        console.log("data", data)
-        let today = new Date();
+        let today = new Date().setHours(0, 0, 0, 0);
         let ttime = new Date();
-        let final_date = today.getFullYear() + " / " + ("0" + (today.getDate())).slice(-2) + " / " + ("0" + (today.getMonth() + 1)).slice(-2);
+        console.log("today",today)
+       
         let final = ttime.getHours() + ":" + ttime.getMinutes();
-        
-        let data_d = getDate(data.date, "YYYY/DD/MM");
+
+        let data_d = new Date(data.date).setHours(0, 0, 0, 0);
         console.log("data_d", data_d)
 
-        console.log("today", final_date)
-        console.log("tt", final)
-        console.log("12", data.date)
-        if (data_d < final_date) {
+        if ( 
+          moment(today).isAfter( data_d )
+        ) {
           console.log("1")
           res.json({
             status: 200,
@@ -760,7 +759,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
 
         }
-        else if (data_d > final_date) {
+        else if (
+          moment(today).isBefore( data_d )
+        ) {
           console.log("2")
           res.json({
             status: 200,
@@ -770,7 +771,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
 
         }
-        else if (data_d == final_date) {
+        else if (
+          moment(today).isSame( data_d )
+        ) {
           console.log("3")
           if (data.start_time <= final && data.end_time >= final)
             res.json({
@@ -786,7 +789,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               message: "link start soon",
             });
           }
-          else if (data.end_time < final ) {
+          else if (data.end_time < final) {
             console.log("5")
             res.json({
               status: 200,
