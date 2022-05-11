@@ -3038,7 +3038,7 @@ router.post("/CalenderFilter", function (req, res) {
               console.log("data1", data1)
               let  patient_en = data1.map((element) => {
                 console.log("element",element)
-              var  VirtualtToSearchWith = new Appointments({ patient: element });
+              var  VirtualtToSearchWith = new Appointments({ patient: element.patient_id });
               VirtualtToSearchWith.encryptFieldsSync();
               console.log("VirtualtToSearchWith", VirtualtToSearchWith);
               return VirtualtToSearchWith.patient;
