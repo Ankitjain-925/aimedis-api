@@ -441,7 +441,7 @@ router.post("/approvedrequest", function (req, res) {
         }
       }
     );
-  } else {
+  }else{
     virtual_Task.updateOne(
       { _id: req.body.task_id },
       { approved: false, is_decline : true },
@@ -788,17 +788,17 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
           }
 
 
-//         }
+        }
 
-//       }
-//     });
-//   } else {
-//     res.json({
-//       status: 200,
-//       hassuccessed: false,
-//       message: "Authentication required.",
-//     });
-//   }
-// });
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 module.exports = router;

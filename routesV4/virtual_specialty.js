@@ -3035,12 +3035,9 @@ router.post("/CalenderFilter", function (req, res) {
               res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
             }
             else {
-              console.log("data1", data1)
               let  patient_en = data1.map((element) => {
-                console.log("element",element)
-              var  VirtualtToSearchWith = new Appointments({ patient: element });
+              var  VirtualtToSearchWith = new Appointments({ patient:  element.patient_id });
               VirtualtToSearchWith.encryptFieldsSync();
-              console.log("VirtualtToSearchWith", VirtualtToSearchWith);
               return VirtualtToSearchWith.patient;
               })
 
@@ -3103,10 +3100,8 @@ router.post("/temp1", function (req, res) {
   // VirtualtToSearchWith.encryptFieldsSync();
 
   patient_en = patient_id.map((element) => {
-    console.log("element", element)
     VirtualtToSearchWith = new Appointments({ patient: element });
   VirtualtToSearchWith.encryptFieldsSync();
-  console.log("VirtualtToSearchWith", VirtualtToSearchWith);
   return VirtualtToSearchWith.patient;
   })
   console.log("patient_en", patient_en)
