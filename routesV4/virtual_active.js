@@ -738,69 +738,79 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
           error: err,
         });
       } else {
-        let today = new Date().setHours(0, 0, 0, 0);
-        let ttime = new Date();
-        console.log("today",today)
-       
-        let final = ttime.getHours() + ":" + ttime.getMinutes();
+        console.log("data",data)
+        if (data !==null) {
+          let today = new Date().setHours(0, 0, 0, 0);
+          let ttime = new Date();
+          console.log("today", today)
 
-        let data_d = new Date(data.date).setHours(0, 0, 0, 0);
-        console.log("data_d", data_d)
+          let final = ttime.getHours() + ":" + ttime.getMinutes();
 
-        if ( 
-          moment(today).isAfter( data_d )
-        ) {
-          console.log("1")
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Link Expire",
-          });
+          let data_d = new Date(data.date).setHours(0, 0, 0, 0);
+          console.log("data_d", data_d)
 
-
-        }
-        else if (
-          moment(today).isBefore( data_d )
-        ) {
-          console.log("2")
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Link will active soon",
-          });
-
-
-        }
-        else if (
-          moment(today).isSame( data_d )
-        ) {
-          console.log("3")
-          if (data.start_time <= final && data.end_time >= final)
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "link active",
-            });
-          else if (data.start_time > final) {
-            console.log("4")
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "link start soon",
-            });
-          }
-          else if (data.end_time < final) {
-            console.log("5")
+          if (
+            moment(today).isAfter(data_d)
+          ) {
+            console.log("1")
             res.json({
               status: 200,
               hassuccessed: true,
               message: "Link Expire",
             });
+
+
           }
+          else if (
+            moment(today).isBefore(data_d)
+          ) {
+            console.log("2")
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Link will active soon",
+            });
 
 
+          }
+          else if (
+            moment(today).isSame(data_d)
+          ) {
+            console.log("3")
+            if (data.start_time <= final && data.end_time >= final)
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "link active",
+              });
+            else if (data.start_time > final) {
+              console.log("4")
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "link start soon",
+              });
+            }
+            else if (data.end_time < final) {
+              console.log("5")
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Link Expire",
+              });
+            }
+
+
+          }
         }
-
+        else {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Invalid Session ID",
+          
+          })
+        }
       }
     });
   } else {
