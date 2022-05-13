@@ -283,7 +283,7 @@ router.post("/AddMeeting", function (req, res, next) {
           ${req.body.patient_link}
         Please remind the date and timing as alloted.</div>`;
 
-        var sendData1 = `<div>Dear Patient<br/>
+        var sendData1 = `<div>Dear Doctor<br/>
         The payment process for sick leave certificate application is completed successfully.
         <br/>
         Please do join the Video call at
@@ -293,7 +293,7 @@ router.post("/AddMeeting", function (req, res, next) {
           ${req.body.end}
           <br/>
         Your Video call joining link is
-          ${req.body.patient_link}
+          ${req.body.doctor_link}
         Please remind the date and timing as alloted.</div>`;
         if (req.body.patient_mail !== "" && req.body.doctor_mail !== "") {
           generateTemplate(
