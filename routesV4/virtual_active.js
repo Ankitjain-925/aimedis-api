@@ -473,25 +473,22 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    sick_meeting.findByIdAndRemove(
-      { _id: req.params.meeting_id },
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Speciality is Deleted Successfully",
-          });
-        }
+    sick_meeting.findByIdAndRemove(req.params.meeting_id, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+          error: err,
+        });
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          message: "Speciality is Deleted Successfully",
+        });
       }
-    );
+    });
   } else {
     res.json({
       status: 200,
@@ -501,7 +498,7 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   }
 });
 
-router.post("/AddMeeting", reqFilter, function (req, res, next) {
+router.post("/AddMeeting", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {

@@ -11,7 +11,7 @@ var questionaire = require("../schema/questionaire");
 var Institute = require("../schema/institute.js");
 var Appointments = require("../schema/appointments");
 var virtual_step = require("../schema/virtual_step");
-var virtual_step = require("../schema/sick_meeting");
+var sick_meeting = require("../schema/sick_meeting");
 var answerspatient = require("../schema/answerspatient");
 var Prescription = require("../schema/prescription");
 var Cretificate = require("../schema/sick_certificate");
@@ -266,13 +266,80 @@ router.post("/AddMeeting", function (req, res, next) {
   if (legit) {
     var sick_meetings = new sick_meeting(req.body);
     sick_meetings.save(function (err, user_data) {
+      console.log("err", err);
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
+        var sendData = `<div>Dear Patient,<br/>
+        Your payment process for sick leave certificate application is completed successfully.
+          "<br/>";
+        Please do join the Video call at  
+          ${req.body.date}
+          from the time slot
+          ${req.body.start}
+          ${req.body.end}
+        <br/>
+        Your Video call joining link is
+          ${req.body.patient_link}
+        Please remind the date and timing as alloted.</div>`;
+
+        var sendData1 = `<div>Dear Patient<br/>
+        The payment process for sick leave certificate application is completed successfully.
+        <br/>
+        Please do join the Video call at
+          ${req.body.date}
+          from the time slot
+          ${req.body.start}+""+
+          ${req.body.end}
+          <br/>
+        Your Video call joining link is
+          ${req.body.patient_link}
+        Please remind the date and timing as alloted.</div>`;
+        if (req.body.patient_mail !== "" && req.body.doctor_mail !== "") {
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_mail,
+                  subject: "Sick leave certificate request",
+                  html: html,
+                };
+
+                let sendmail = transporter.sendMail(mailOptions);
+              }
+            }
+          );
+
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData1,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions1 = {
+                  from: "contact@aimedis.com",
+                  to: req.body.doctor_mail,
+                  subject: "Sick leave certificate request",
+                  html: html,
+                };
+
+                let sendmail1 = transporter.sendMail(mailOptions1);
+              }
+            }
+          );
+        }
+
         res.json({
           status: 200,
           message: "Added Successfully",
           hassuccessed: true,
+          data: user_data,
         });
       }
     });
@@ -310,6 +377,82 @@ router.get("/PatientTask/:profile_id", function (req, res, next) {
       hassuccessed: false,
       message: "Authentication required.",
     });
+  }
+});
+
+router.post("/patientmail", function (req, res) {
+  var sendData = "Dear Patient," + "<br/>";
+  "Your payment process for sick leave certificate application is completed successfully." +
+    "<br/>";
+  "Please do join the Video call at " +
+    req.body.date +
+    "from the time slot " +
+    req.body.start +
+    -+req.body.end +
+    "<br/>";
+  "Your Video call joining link is" +
+    req.body.patient_link +
+    "Please remind the date and timing as alloted.";
+  var sendData1 = "Dear Patient," + "<br/>";
+  "Your payment process for sick leave certificate application is completed successfully." +
+    "<br/>";
+  "Please do join the Video call at " +
+    req.body.date +
+    "from the time slot " +
+    req.body.start +
+    -+req.body.end +
+    "<br/>";
+  "Your Video call joining link is" +
+    req.body.patient_link +
+    "Please remind the date and timing as alloted.";
+  if (req.body.patient_mail !== "" && req.body.doctor_mail !== "") {
+    generateTemplate(
+      EMAIL.generalEmail.createTemplate("en", {
+        title: "",
+        content: sendData,
+      }),
+      (error, html) => {
+        if (!error) {
+          let mailOptions = {
+            from: "contact@aimedis.com",
+            to: req.body.patient_mail,
+            subject: "Sick leave certificate request",
+            html: html,
+          };
+
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
+            console.log("mail sent");
+          }
+        }
+      }
+    );
+
+    generateTemplate(
+      EMAIL.generalEmail.createTemplate("en", {
+        title: "",
+        content: sendData1,
+      }),
+      (error, html) => {
+        if (!error) {
+          let mailOptions1 = {
+            from: "contact@aimedis.com",
+            to: req.body.doctor_mail,
+            subject: "Sick leave certificate request",
+            html: html,
+          };
+
+          let sendmail1 = transporter.sendMail(mailOptions1);
+          if (sendmail1) {
+            res.json({
+              status: 200,
+              message: "Mail sent Successfully",
+              hassuccessed: true,
+            });
+          }
+        }
+      }
+    );
   }
 });
 
