@@ -177,8 +177,11 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let house_id= req.params.house_id
+    const VirtualtToSearchWith = new Virtual_Specialty({house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
     Virtual_Specialty.find(
-      { house_id: req.params.house_id },
+      {$or:[{ house_id: req.params.house_id },{house_id:VirtualtToSearchWith.house_id}]},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -951,10 +954,14 @@ router.get("/AddInvoice/:house_id/:status", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var search = { house_id: req.params.house_id };
+    let house_id= req.body.house_id
+    const VirtualtToSearchWith = new virtual_Invoice({house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+
+    var search = { house_id: {$in:[req.params.house_id,VirtualtToSearchWith.house_id] }};
     if (req.params.status !== "all") {
       var search = {
-        house_id: req.params.house_id,
+        house_id:{$in:[ req.params.house_id,VirtualtToSearchWith.house_id]},
         "status.value": req.params.status,
       };
     }
@@ -3281,7 +3288,10 @@ router.post("/LeftInfoPatient", function (req, res) {
                           }
                         });
                       }
-                      virtual_Invoice.find({ case_id: data._id.toString() }).exec(function (err, invoice) {
+                      let case_id= data._id.toString()
+                      const VirtualtToSearchWith = new virtual_cases({case_id });
+                      VirtualtToSearchWith.encryptFieldsSync();
+                      virtual_Invoice.find({ case_id:{$in:[ case_id, VirtualtToSearchWith.case_id ] }}).exec(function (err, invoice) {
                         if (err) {
                           res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
                         } else {
@@ -4512,7 +4522,10 @@ function taskfromhouseid(item) {
 function invoicefromhouseid(data) {
   return new Promise((resolve, reject) => {
     try {
-      virtual_Invoice.find({ $or: [{ house_id: data.house_id }] }).exec(function (err, invoice) {
+      let house_id =data.house_id;
+        const VirtualtToSearchWith = new virtual_Task({ house_id });
+        VirtualtToSearchWith.encryptFieldsSync();
+      virtual_Invoice.find({ $or: [{ house_id:house_id },{house_id:VirtualtToSearchWith.house_id}] }).exec(function (err, invoice) {
         if (err) {
           resolve([])
         } else {
