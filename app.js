@@ -20,7 +20,10 @@ const axios = require("axios");
 var CryptoJS = require("crypto-js");
 
 var moment = require("moment");
-mongoose.connect(config.database, { useNewUrlParser: true });
+mongoose.connect(config.database, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 mongoose.set("debug", true);
 
 var app = express();
@@ -110,7 +113,7 @@ io.on("connection", (socket) => {
 // mongoTools
 //     .mongorestore({
 //       uri: config.database,
-//       dumpFile: '/BackupDB/aimedis__2022-04-05_000000.gz',
+//       dumpFile: '/BackupDB/aimedis__2022-05-05_120000.gz',
 //       dropBeforeRestore: true,
 //       dropboxToken: process.env.DBT,
 //     })
@@ -346,27 +349,6 @@ app.use("/api/v5/marketing", merketing5);
 // app.use("/api/v4/bk", bk)
 
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
-
-app.use("/api/v5/User", UserData5);
-app.use("/api/v5/UserProfile", UserProfile5);
-app.use("/api/v5/SaveCSV", SaveCSV5);
-app.use("/api/v5/stripeCheckout", stripeCheckout5);
-app.use("/api/v5/lms_stripeCheckout", lms_stripeCheckout5);
-app.use("/api/v5/emergency_record", emergency_record5);
-app.use("/api/v5/rightinfo", rightinfo5);
-app.use("/api/v5/lms", lms5);
-app.use("/api/v5/certificate", certificate5);
-app.use("/api/v5/admin", adminse5);
-app.use("/api/v5/aws", Uploadcerts5);
-app.use("/api/v5/blockchain", bloackchain5);
-app.use("/api/v5/cron", cronPrecess5);
-app.use("/api/v5/vh", vspecialty5);
-app.use("/api/v5/step", vstep5);
-app.use("/api/v5/questionaire", questionaire5);
-app.use("/api/v5/cases", vcases5);
-app.use("/api/v5/hospitaladmin", hadmin5);
-app.use("/api/v5/cometUserList", comet5);
-app.use("/api/v5/marketing", merketing5);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

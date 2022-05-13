@@ -4,6 +4,13 @@ var express = require("express");
 var re = require("../regions.json");
 let router = express.Router();
 const axios = require("axios");
+var User = require("../schema/user");
+const json2csv = require('json2csv').parse;
+const moment = require('moment');
+const fs = require('fs');
+const fields = ['email', 'first_name', 'last_name'];
+const path = require('path')
+
 router.get("/sign_s3", (req, res) => {
   if (
     req.query.bucket &&
@@ -100,5 +107,35 @@ router.post("/sign_s3", (req, res) => {
     res.json({ success: true, data: { returnData } });
   });
 });
+
+router.get('/getData', function (req, res) {
+  User.find({verified : "true"}, function (err, data) {
+    if (err && !data) {
+      return res.status(500).json({ err });
+    }
+    else {
+      let csv
+      try {
+        csv = json2csv(data, { fields });
+      } catch (err) {
+        return res.status(500).json({ err });
+      }
+      const dateTime = moment().format('YYYYMMDDhhmmss');
+      const filePath = path.join(__dirname, "..", "public", "csv-" + dateTime + ".csv")
+      fs.writeFile(filePath, csv, function (err) {
+        if (err) {
+          return res.json(err).status(500);
+        }
+        else {
+          // setTimeout(function () {
+          //   fs.unlinkSync(filePath); // delete this file after 30 seconds
+          // }, 30000)
+          return res.json("/exports/csv-" + dateTime + ".csv");
+        }
+      });
+
+    }
+  })
+})
 
 module.exports = router;
