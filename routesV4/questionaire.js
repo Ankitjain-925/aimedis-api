@@ -113,8 +113,11 @@ router.get("/GetAnswerspatient/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let house_id =req.params.house_id
+    const messageToSearchWith = new answerspatient({house_id });
+    messageToSearchWith.encryptFieldsSync();
     answerspatient.find(
-      { house_id: req.params.house_id },
+      {$or:[ {house_id: req.params.house_id},{house_id:messageToSearchWith.house_id}] },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -205,7 +208,7 @@ router.get("/GetQuestionaire/:house_id", function (req, res, next) {
     const messageToSearchWith = new questionaire({ house_id });
     messageToSearchWith.encryptFieldsSync();
     questionaire.find(
-      { house_id: messageToSearchWith.house_id },
+      { $or:[{house_id: messageToSearchWith.house_id},{house_id:house_id}] },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({

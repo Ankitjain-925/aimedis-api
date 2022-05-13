@@ -814,8 +814,12 @@ router.get("/GetService/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+
+    let house_id =req.params.house_id
+    const messageToSearchWith = new virtual_Service({house_id });
+    messageToSearchWith.encryptFieldsSync();
     virtual_Service.find(
-      { house_id: req.params.house_id },
+      { $or:[{house_id: req.params.house_id},{house_id:messageToSearchWith.house_id}]},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
