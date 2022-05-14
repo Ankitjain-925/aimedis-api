@@ -822,32 +822,59 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
               if (data.start_time <= final && data.end_time >= final)
+                virtual_Task.find(
+                  { task_id: data.task_id, is_payment: "true" },
+                  function (err, userdata) {
+                    if (err && !userdata) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Payment is Incomplete",
+                        error: err,
+                      });
+                    } else {
+                      console.log("userdata", userdata);
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "link active",
+                      });
+                    }
+                  }
+                );
+              else {
                 res.json({
                   status: 200,
-                  hassuccessed: true,
-                  message: "link active",
-                });
-              else if (data.start_time > final) {
-                console.log("4");
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "link start soon",
-                });
-              } else if (data.end_time < final) {
-                console.log("5");
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Link Expire",
+                  hassuccessed: false,
+                  message: "Authentication required.",
                 });
               }
+            } else if (data.start_time > final) {
+              console.log("4");
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "link start soon",
+              });
+            } else if (data.end_time < final) {
+              console.log("5");
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Link Expire",
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Invalid Session ID",
+              });
             }
           } else {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "Invalid Session ID",
+              message: "Data is null",
             });
           }
         }
