@@ -241,8 +241,6 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                 sickleave: user,
               });
             }
-
-
           }
           res.json({
             status: 200,
