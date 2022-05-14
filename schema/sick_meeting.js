@@ -9,7 +9,7 @@ var SickSchema = new Schema(
     patient_profile_id: {
       type: String,
       required: false,
-      unique: true,
+      unique: false,
     },
     patient_id: {
       type: String,
@@ -19,7 +19,7 @@ var SickSchema = new Schema(
     doctor_profile_id: {
       type: String,
       required: false,
-      unique: true,
+      unique: false,
     },
     doctor_id: {
       type: String,
@@ -48,10 +48,16 @@ var SickSchema = new Schema(
       required: false,
       unique: true,
     },
+
     link: {
-      type: String,
-      required: false,
+      type: Object,
+      required: true,
       unique: true,
+    },
+    task_id: {
+      type: String,
+      required: true,
+      unique: false,
     },
   },
   { strict: false },
@@ -62,6 +68,14 @@ SickSchema.index({ area: "2dsphere" });
 
 SickSchema.plugin(mongooseFieldEncryption, {
   fields: [
+    "patient_profile_id",
+    "profile_id",
+    "doctor_profile_id",
+    "doctor_id",
+    "start_time",
+    "end_time",
+    "date",
+    "sesion_id",
   ],
   secret: process.env.SOME_32BYTE_BASE64_STRING,
   saltGenerator: function (secret) {

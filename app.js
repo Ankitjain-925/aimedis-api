@@ -20,7 +20,10 @@ const axios = require("axios");
 var CryptoJS = require("crypto-js");
 
 var moment = require("moment");
-mongoose.connect(config.database, { useNewUrlParser: true , useUnifiedTopology: true });
+mongoose.connect(config.database, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 mongoose.set("debug", true);
 
 var app = express();
@@ -37,34 +40,31 @@ const appAdmin = express();
 appAdmin.use(express.static(path.join(__dirname, "./build/admin")));
 app.use(express.static(path.join(__dirname, "./build/main")));
 
-const server = require("http").createServer(app)
+const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
-  transports: ['polling'],
+  transports: ["polling"],
   cors: {
-    origin: "*"
-  }
-
-})
+    origin: "*",
+  },
+});
 ////////////admin+main+end/////////////
 
-
-io.on('connection', (socket) => {
-  console.log('A user is connected');
+io.on("connection", (socket) => {
+  console.log("A user is connected");
 
   socket.on("update", (data) => {
-    console.log("data", data)
-    socket.broadcast.emit("data_shown", data)
+    console.log("data", data);
+    socket.broadcast.emit("data_shown", data);
   });
   socket.on("addpatient", (data) => {
-    console.log("addpatient", data)
-    socket.broadcast.emit("email_accept", data)
+    console.log("addpatient", data);
+    socket.broadcast.emit("email_accept", data);
   });
   socket.on("decline", (data) => {
-    console.log("decline", data)
-    socket.broadcast.emit("email_decline", data)
-  })
-
-})
+    console.log("decline", data);
+    socket.broadcast.emit("email_decline", data);
+  });
+});
 
 // cron.schedule("*/1 * * * *", () => {
 //   mongoTools
@@ -153,7 +153,6 @@ io.on('connection', (socket) => {
 // var AuthCheck = function (req, res, next) {
 //   if(req.headers.authorization){
 
-
 //     if(req.headers.authorization==="Aimedis23")
 //     {
 //       console.log('Hew1')
@@ -240,8 +239,8 @@ var vcases4 = require("./routesV4/virtual_cases");
 var hadmin4 = require("./routesV4/h_admin");
 var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
-var vactive= require("./routesV4/virtual_active")
-var market = require("./routesV4/marketing")
+var vactive = require("./routesV4/virtual_active");
+var market = require("./routesV4/marketing");
 
 var UserData5 = require("./routesV5/UserTrack");
 var UserProfile5 = require("./routesV5/userProfile");
@@ -260,7 +259,7 @@ var vspecialty5 = require("./routesV5/virtual_specialty");
 var vstep5 = require("./routesV5/virtual_step");
 var questionaire5 = require("./routesV5/questionaire");
 var vcases5 = require("./routesV5/virtual_cases");
-var hadmin5= require("./routesV5/h_admin");
+var hadmin5 = require("./routesV5/h_admin");
 var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
 
@@ -323,7 +322,8 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
-app.use("/api/v4/vactive",vactive)
+app.use("/api/v4/vactive", vactive);
+
 
 app.use("/api/v5/User", UserData5);
 app.use("/api/v5/UserProfile", UserProfile5);
