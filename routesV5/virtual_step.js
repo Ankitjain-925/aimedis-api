@@ -43,7 +43,7 @@ router.put("/AddStep/:house_id", CheckRole('edit_step'), function (req, res, nex
     }
 });
   
-router.post("/AddStep", CheckRole('add_step'), function (req, res, next) {
+router.post("/AddStep", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
 

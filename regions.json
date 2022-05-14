@@ -6,7 +6,8 @@
        {"bucket" :  "aimedis-0004", "region" : "us-west-1"},
        {"bucket" :  "aimedis-0005", "region" : "us-west-1"},
        {"bucket" :  "aimedis-0006", "region" : "eu-west-1"}, 
-       {"bucket" : "aimedisfirstbucket", "region" : "ap-south-1"}
+       {"bucket" : "aimedisfirstbucket", "region" : "ap-south-1"},
+       {"bucket" : "aimedis-eu-germany-1", "region" : "eu-central-1"}
     ]
 }
 

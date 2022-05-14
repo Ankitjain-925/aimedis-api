@@ -7,22 +7,17 @@ var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
 var picture_Evaluation = require("../schema/pictureevaluation_feedback");
 var User = require("../schema/user.js");
-var questionaire = require("../schema/questionaire")
+var questionaire = require("../schema/questionaire");
 var Institute = require("../schema/institute.js");
-var Appointments = require("../schema/appointments")
-var virtual_step = require("../schema/virtual_step")
-var answerspatient = require("../schema/answerspatient")
-var Prescription = require("../schema/prescription")
-var Cretificate = require("../schema/sick_certificate")
-var sick_meeting = require("../schema/sick_meeting")
+var Appointments = require("../schema/appointments");
+var virtual_step = require("../schema/virtual_step");
+var answerspatient = require("../schema/answerspatient");
+var Prescription = require("../schema/prescription");
+var Cretificate = require("../schema/sick_certificate");
+var sick_meeting = require("../schema/sick_meeting");
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
 const moment = require("moment");
-const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
-var fullinfo = [];
-var newcf = [];
-const { getMsgLang, trans } = require("./GetsetLang");
-const sendSms = require("./sendSms");
 var fs = require("fs");
 const { join } = require("path");
 const {
@@ -52,25 +47,25 @@ var transporter = nodemailer.createTransport({
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },
-})
-var mongoose = require('mongoose');
+});
+var mongoose = require("mongoose");
 
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
-    "01",
-    "02",
-    "03",
-    "04",
-    "05",
-    "06",
-    "07",
-    "08",
-    "09",
-    "10",
-    "11",
-    "12",
-  ],
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12",
+    ],
     month = monthNames[d.getMonth()],
     day = d.getDate(),
     year = d.getFullYear();
@@ -84,16 +79,24 @@ function getDate(date, dateFormat) {
   }
 }
 
-
+const reqFilter = (req, resp, next) => {
+  if (!req.query.age) {
+    resp.send("Please provide your age");
+  } else if (req.query.age < 18) {
+    resp.send("You are under aged");
+  } else {
+    next();
+  }
+};
 
 function getTimeStops(start, end, timeslots, breakstart, breakend) {
   var startTime = moment(start, "HH:mm");
-  console.log("startTime", startTime)
+  console.log("startTime", startTime);
   var endTime = moment(end, "HH:mm");
-  console.log("endTime", endTime)
+  console.log("endTime", endTime);
 
   var timeslot = parseInt(timeslots, 10);
-  console.log("timeslot", timeslot)
+  console.log("timeslot", timeslot);
 
   if (endTime.isBefore(startTime)) {
     endTime.add(1, "day");
@@ -104,165 +107,181 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
     timeStops.push(new moment(startTime).format("HH:mm"));
     startTime.add(timeslot, "minutes");
   }
-  console.log("time", timeStops)
+  console.log("time", timeStops);
   return timeStops;
 }
-
-
-
 
 router.get("/SelectDocforSickleave", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  var institute_id = process.env.institute_id
+  var institute_id = process.env.institute_id;
   if (legit) {
-    User.find({ current_available: true, institute_id: institute_id }).countDocuments().exec(function (err, total) {
-      console.log("total", total)
-      var random = Math.floor(Math.random() * total);
-      if (total > 1) {
-        User.find({ current_available: true, institute_id: institute_id }).skip(random).limit(1).exec(function (err, userdata) {
-
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong",
-              error: err,
-            });
-          } else {
-            var finalArray = [];
-            for (let i = 0; i < userdata.length; i++) {
-
-              let monday,
-                tuesday,
-                wednesday,
-                thursday,
-                friday,
-                saturday,
-                sunday,
-                custom_text;
-              var user = [];
-
-              for (let j = 0; j < userdata[i].sickleave_appointment.length; j++) {
-                if (userdata[i].sickleave_appointment[j].custom_text) {
-                  custom_text = Userinfo[i].sickleave_appointment[j].custom_text;
-                }
-                console.log("qwwer", userdata[i].sickleave_appointment[j])
-                if (
-                  (userdata[i].sickleave_appointment[j].monday_start,
-                    userdata[i].sickleave_appointment[j].monday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots)
-                ) {
-                  console.log("1")
-                  monday = getTimeStops(
-                    userdata[i].sickleave_appointment[j].monday_start,
-                    userdata[i].sickleave_appointment[j].monday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots
-                  );
-                  console.log("w", monday)
-                }
-                if (
-                  (userdata[i].sickleave_appointment[j].tuesday_start,
-                    userdata[i].sickleave_appointment[j].tuesday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots)
-                ) {
-                  tuesday = getTimeStops(
-                    userdata[i].sickleave_appointment[j].tuesday_start,
-                    userdata[i].sickleave_appointment[j].tuesday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots
-                  );
-
-                }
-                if (
-                  (userdata[i].sickleave_appointment[j].wednesday_start,
-                    userdata[i].sickleave_appointment[j].wednesday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots)
-                ) {
-                  wednesday = getTimeStops(
-                    userdata[i].sickleave_appointment[j].wednesday_start,
-                    userdata[i].sickleave_appointment[j].wednesday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots
-                  );
-                }
-                if (
-                  (userdata[i].sickleave_appointment[j].thursday_start,
-                    userdata[i].sickleave_appointment[j].thursday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots)
-                ) {
-                  thursday = getTimeStops(
-                    userdata[i].sickleave_appointment[j].thursday_start,
-                    userdata[i].sickleave_appointment[j].thursday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots
-                  );
-                }
-                if (
-                  (userdata[i].sickleave_appointment[j].friday_start,
-                    userdata[i].sickleave_appointment[j].friday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots)
-                ) {
-                  friday = getTimeStops(
-                    userdata[i].sickleave_appointment[j].friday_start,
-                    userdata[i].sickleave_appointment[j].friday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots
-                  );
-                }
-                if (
-                  (userdata[i].sickleave_appointment[j].saturday_start,
-                    userdata[i].sickleave_appointment[j].saturday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots)
-                ) {
-                  saturday = getTimeStops(
-                    userdata[i].sickleave_appointment[j].saturday_start,
-                    userdata[i].sickleave_appointment[j].saturday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots
-                  );
-                }
-                if (
-                  (userdata[i].sickleave_appointment[j].sunday_start,
-                    userdata[i].sickleave_appointment[j].sunday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots)
-                ) {
-
-                  sunday = getTimeStops(
-                    userdata[i].sickleave_appointment[j].sunday_start,
-                    userdata[i].sickleave_appointment[j].sunday_end,
-                    userdata[i].sickleave_appointment[j].duration_of_timeslots
-                  );
-                }
-                user.push({
-                  monday,
-                  tuesday,
-                  wednesday,
-                  thursday,
-                  friday,
-                  saturday,
-                  sunday,
-                  custom_text
+    User.find({ current_available: true, institute_id: institute_id })
+      .countDocuments()
+      .exec(function (err, total) {
+        console.log("total", total);
+        var random = Math.floor(Math.random() * total);
+        if (total > 1) {
+          User.find({ current_available: true, institute_id: institute_id })
+            .skip(random)
+            .limit(1)
+            .exec(function (err, userdata) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
                 });
-                console.log("user", user)
+              } else {
+                var finalArray = [];
+                for (let i = 0; i < userdata.length; i++) {
+                  let monday,
+                    tuesday,
+                    wednesday,
+                    thursday,
+                    friday,
+                    saturday,
+                    sunday,
+                    custom_text;
+                  var user = [];
+
+                  for (
+                    let j = 0;
+                    j < userdata[i].sickleave_appointment.length;
+                    j++
+                  ) {
+                    if (userdata[i].sickleave_appointment[j].custom_text) {
+                      custom_text =
+                        Userinfo[i].sickleave_appointment[j].custom_text;
+                    }
+                    console.log("qwwer", userdata[i].sickleave_appointment[j]);
+                    if (
+                      (userdata[i].sickleave_appointment[j].monday_start,
+                      userdata[i].sickleave_appointment[j].monday_end,
+                      userdata[i].sickleave_appointment[j]
+                        .duration_of_timeslots)
+                    ) {
+                      console.log("1");
+                      monday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].monday_start,
+                        userdata[i].sickleave_appointment[j].monday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                      console.log("w", monday);
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].tuesday_start,
+                      userdata[i].sickleave_appointment[j].tuesday_end,
+                      userdata[i].sickleave_appointment[j]
+                        .duration_of_timeslots)
+                    ) {
+                      tuesday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].tuesday_start,
+                        userdata[i].sickleave_appointment[j].tuesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].wednesday_start,
+                      userdata[i].sickleave_appointment[j].wednesday_end,
+                      userdata[i].sickleave_appointment[j]
+                        .duration_of_timeslots)
+                    ) {
+                      wednesday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].wednesday_start,
+                        userdata[i].sickleave_appointment[j].wednesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].thursday_start,
+                      userdata[i].sickleave_appointment[j].thursday_end,
+                      userdata[i].sickleave_appointment[j]
+                        .duration_of_timeslots)
+                    ) {
+                      thursday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].thursday_start,
+                        userdata[i].sickleave_appointment[j].thursday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].friday_start,
+                      userdata[i].sickleave_appointment[j].friday_end,
+                      userdata[i].sickleave_appointment[j]
+                        .duration_of_timeslots)
+                    ) {
+                      friday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].friday_start,
+                        userdata[i].sickleave_appointment[j].friday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].saturday_start,
+                      userdata[i].sickleave_appointment[j].saturday_end,
+                      userdata[i].sickleave_appointment[j]
+                        .duration_of_timeslots)
+                    ) {
+                      saturday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].saturday_start,
+                        userdata[i].sickleave_appointment[j].saturday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].sunday_start,
+                      userdata[i].sickleave_appointment[j].sunday_end,
+                      userdata[i].sickleave_appointment[j]
+                        .duration_of_timeslots)
+                    ) {
+                      sunday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].sunday_start,
+                        userdata[i].sickleave_appointment[j].sunday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    user.push({
+                      monday,
+                      tuesday,
+                      wednesday,
+                      thursday,
+                      friday,
+                      saturday,
+                      sunday,
+                      custom_text,
+                    });
+                    console.log("user", user);
+                  }
+                  finalArray.push({
+                    data: userdata[i],
+                    sickleave: user,
+                  });
+                }
               }
-              finalArray.push({
-                data: userdata[i],
-                sickleave: user,
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                data: finalArray,
               });
-            }
+            });
+        } else {
 
-
-          }
           res.json({
             status: 200,
-            hassuccessed: true,
-            data: finalArray,
+            hassuccessed: false,
+            message: "Institute Don't have doctor",
           });
-        })
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Institute Don't have doctor",
-        });
-      }
-    })
+        }
+      });
   } else {
     res.json({
       status: 200,
@@ -271,7 +290,6 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
     });
   }
 });
-
 
 router.get("/PatientTask/:profile_id", function (req, res, next) {
   const token = req.headers.token;
@@ -316,7 +334,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("userdata", userdata)
+          console.log("userdata", userdata);
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -333,17 +351,16 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
 router.post("/DoctorMail", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
     Here is the new Sick leave certificate request from the 
-      ${req.body.first_name + "" +
-    req.body.last_name + "" +
-    req.body.profile_id},
+      ${
+        req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id
+      },
       for the time slot 
-      ${req.body.start + "" +
-    req.body.end},
+      ${req.body.start + "" + req.body.end},
       at
       ${req.body.date}
       <br/>
-      Please check the list of requests from the list page. Please update the status of request also accordingly.</div>`
-  console.log("sendData", sendData)
+      Please check the list of requests from the list page. Please update the status of request also accordingly.</div>`;
+  console.log("sendData", sendData);
   generateTemplate(
     EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
     (error, html) => {
@@ -380,7 +397,6 @@ router.post("/DoctorMail", function (req, res) {
   );
 });
 
-
 router.post("/approvedrequest", function (req, res) {
   if (req.body.for_manage === "approved") {
     virtual_Task.updateOne(
@@ -402,7 +418,7 @@ router.post("/approvedrequest", function (req, res) {
               ${req.body.start} 
               to
               ${req.body.end}
-              So, for the further process please complete your payment process from the request list page`
+              So, for the further process please complete your payment process from the request list page`;
           generateTemplate(
             EMAIL.generalEmail.createTemplate("en", {
               title: "",
@@ -449,7 +465,7 @@ router.post("/approvedrequest", function (req, res) {
   } else {
     virtual_Task.updateOne(
       { _id: req.body.task_id },
-      { approved: false },
+      { approved: false, is_decline: true },
       function (err, data) {
         if (err && !data) {
           res.json({
@@ -460,7 +476,7 @@ router.post("/approvedrequest", function (req, res) {
           });
         } else {
           sendData = `Dear Patient<br/>
-            Your request for the sick leave certificate is decline by the doctor`
+            Your request for the sick leave certificate is decline by the doctor`;
           generateTemplate(
             EMAIL.generalEmail.createTemplate("en", {
               title: "",
@@ -505,7 +521,6 @@ router.post("/approvedrequest", function (req, res) {
       }
     );
   }
-
 });
 
 
@@ -513,7 +528,9 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+
     sick_meeting.findByIdAndRemove({_id:req.params.meeting_id}, function (err, data) {
+
       if (err) {
         res.json({
           status: 200,
@@ -537,8 +554,6 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
     });
   }
 });
-
-
 
 router.post("/AddMeeting", function (req, res, next) {
   const token = req.headers.token;
@@ -582,19 +597,14 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
     {
       Object.entries(req.body).map(([key, value]) => {
-
-        if (key === 'info') {
+        if (key === "info") {
           Object.entries(value).map(([key1, value1]) => {
             if (key1 === "birthday") {
-              key1 = getDate(value1, "YYYY/MM/DD")
+              key1 = getDate(value1, "YYYY/MM/DD");
               birthday.push({ key1 });
-
             }
-
-          })
-        }
-
-        else if (
+          });
+        } else if (
           key === "Number_Insurance_Company" ||
           key === "Insurance_number_of_Person" ||
           key === "Status"
@@ -603,34 +613,30 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
             k: key.replace(/_/g, " "),
             v: value,
           });
-        }
-
-        else if (key === "created_at") {
+        } else if (key === "created_at") {
           date1.push({ k: "created_at", v: getDate(value, "YYYY/MM/DD") });
-
-        }
-        else if (key === "work_since") {
+        } else if (key === "work_since") {
           work_since.push({ k: "work_since", v: getDate(value, "YYYY/MM/DD") });
-        }
-        else if (key === "work_until") {
+        } else if (key === "work_until") {
           work_until.push({ k: "work_until", v: getDate(value, "YYYY/MM/DD") });
-
+        } else if (key === "detected_at") {
+          detected_at.push({
+            k: "detected_at",
+            v: getDate(value, "YYYY/MM/DD"),
+          });
         }
-        else if (key === "detected_at") {
-          detected_at.push({ k: "detected_at", v: getDate(value, "YYYY/MM/DD") });
-        }
 
-        console.log("work_since", work_since)
-
+        console.log("work_since", work_since);
       });
 
-      console.log("birthday", birthday)
+      console.log("birthday", birthday);
 
-
-      let data1 = date1.map((element) => { return element.v })
+      let data1 = date1.map((element) => {
+        return element.v;
+      });
 
       var template = handlebars.compile(sick);
-      let house_name = ""
+      let house_name = "";
 
       var htmlToSend = template({
         birthday: birthday,
@@ -640,9 +646,8 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         work_since: work_since,
         work_until: work_until,
         detected_at: detected_at,
-
       });
-      var filename = "GeneratedReport.pdf"
+      var filename = "GeneratedReport.pdf";
       logo1 =
         "data:image/png;base64,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";
       logo2 =
@@ -662,11 +667,13 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         let file = [{ content: htmlToSend }];
         html_to_pdf.generatePdfs(file, options).then((output) => {
           const file = `${__dirname}/${filename}`;
-          if (req.query.usefor === 'mail') {
-            var sendData = `<div></div>`
-            console.log("sendData", sendData)
+          if (req.query.usefor === "mail") {
+            var sendData = `<div></div>`;
             generateTemplate(
-              EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
+              EMAIL.generalEmail.createTemplate("en", {
+                title: "",
+                content: sendData,
+              }),
               (error, html) => {
                 if (req.body.email !== "") {
                   let mailOptions = {
@@ -675,11 +682,12 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                     subject: "Sick leave certificate request",
                     html: html,
                     attachments: [
-                      {   // utf-8 string as an attachment
+                      {
+                        // utf-8 string as an attachment
                         filename: filename,
-                        path: file
-
-                      }]
+                        path: file,
+                      },
+                    ],
                   };
                   let sendmail = transporter.sendMail(mailOptions);
                   console.log("mail", mailOptions);
@@ -701,34 +709,84 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                   }
                 } else {
                   console.log("no email");
-                  res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+                  res.json({
+                    status: 200,
+                    msg: "Mail is not sent",
+                    hassuccessed: false,
+                  });
                 }
               }
             );
-          }
-          else {
+          } else {
             res.download(file);
           }
-
         });
       } else {
         res.json({ status: 200, hassuccessed: true, filename: filename });
       }
-
-
     }
   } catch (e) {
-    console.log("e", e)
-    res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: e })
+    console.log("e", e);
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+      error: e,
+    });
   }
-
 });
 
+router.post("/SickleaveCretificateToPatient", function (req, res) {
+  var sendData = `<div>Dear Doctor <br/>
+  Here is the new Sick leave certificate request from the 
+    ${req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id},
+    for the time slot 
+    ${req.body.start + "" + req.body.end},
+    at
+    ${req.body.date}
+    <br/>
+    Please check the list of requests from the list page. Please update the status of request also accordingly.</div>`;
+  console.log("sendData", sendData);
+  generateTemplate(
+    EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
+    (error, html) => {
+      if (req.body.email !== "") {
+        let mailOptions = {
+          from: "contact@aimedis.com",
+          to: req.body.email,
+          subject: "Sick leave certificate request",
+          html: html,
+        };
+        let sendmail = transporter.sendMail(mailOptions);
+        console.log("mail", mailOptions);
+        if (sendmail) {
+          console.log("Mail is sent ");
 
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        } else {
+          console.log("err");
+          res.json({
+            status: 200,
+            msg: "Mail is not sent",
+            hassuccessed: false,
+          });
+        }
+      } else {
+        console.log("no email");
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    }
+  );
+});
 router.get("/Linktime/:sesion_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+
     const VirtualtToSearchWith = new sick_meeting({ sesion_id : req.params.sesion_id});
     VirtualtToSearchWith.encryptFieldsSync();
     sick_meeting.findOne({ $or:[{ sesion_id:VirtualtToSearchWith.sesion_id },{sesion_id:req.params.sesion_id}] }, function (err, data) {
@@ -761,61 +819,59 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               hassuccessed: true,
               message: "Link Expire",
             });
+            let final = ttime.getHours() + ":" + ttime.getMinutes();
 
+            let data_d = new Date(data.date).setHours(0, 0, 0, 0);
+            console.log("data_d", data_d);
 
-          }
-          else if (
-            moment(today).isBefore(data_d)
-          ) {
-            console.log("2")
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Link will active soon",
-            });
-
-
-          }
-          else if (
-            moment(today).isSame(data_d)
-          ) {
-            console.log("3")
-            if (data.start_time <= final && data.end_time >= final)
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "link active",
-              });
-            else if (data.start_time > final) {
-              console.log("4")
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "link start soon",
-              });
-            }
-            else if (data.end_time < final) {
-              console.log("5")
+            if (moment(today).isAfter(data_d)) {
+              console.log("1");
               res.json({
                 status: 200,
                 hassuccessed: true,
                 message: "Link Expire",
               });
+            } else if (moment(today).isBefore(data_d)) {
+              console.log("2");
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Link will active soon",
+              });
+            } else if (moment(today).isSame(data_d)) {
+              console.log("3");
+              if (data.start_time <= final && data.end_time >= final)
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "link active",
+                });
+              else if (data.start_time > final) {
+                console.log("4");
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "link start soon",
+                });
+              } else if (data.end_time < final) {
+                console.log("5");
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "Link Expire",
+                });
+              }
             }
-
-
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Invalid Session ID",
+            });
           }
         }
-        else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Invalid Session ID",
-          
-          })
-        }
       }
-    });
+    );
   } else {
     res.json({
       status: 200,
