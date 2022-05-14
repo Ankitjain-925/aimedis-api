@@ -74,7 +74,7 @@ var AnswSchema = new mongoose.Schema({
 
 },{ strict: false });
 AnswSchema.plugin(mongooseFieldEncryption, {
-    fields: ["question_id","patient_id","house_id"],
+    fields: ["question_id","patient_id","house_id","house_logo","house_name","questionaire_id"],
     secret: process.env.SOME_32BYTE_BASE64_STRING,
     saltGenerator: function (secret) {
         return "1234567890123456"; // should ideally use the secret to return a string of length 16

@@ -265,13 +265,15 @@ router.post("/checkbedAvailabilityByWard",CheckRole("show_speciality") ,function
   let legit = jwtconfig.verify(token);
   var beds = [];
   newArray = [];
-
+  let house_id= req.body.house_id
+  const VirtualtToSearchWith = new virtual_cases({house_id });
+  VirtualtToSearchWith.encryptFieldsSync();
   //  if (legit) {
   virtual_cases.find(
     {
       "wards._id": req.body.ward_id,
       "speciality._id": req.body.specialty_id,
-      "house_id": req.body.house_id,
+      house_id:{$in: [house_id,VirtualtToSearchWith.house_id]},
       inhospital: true
     },
     function (err, userdata) {
@@ -332,12 +334,15 @@ router.post("/checkbedAvailability",function (req, res, next) {
   var bed = 0;
   newArray = [];
   //  if (legit) {
+    let house_id= req.body.house_id
+    const VirtualtToSearchWith = new virtual_cases({house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
   virtual_cases.find(
     {
       "wards._id": req.body.ward_id,
       "speciality._id": req.body.specialty_id,
       "rooms._id": req.body.room_id,
-      "house_id": req.body.house_id,
+      house_id: {$in: [house_id,VirtualtToSearchWith.house_id]},
       inhospital: true
     },
     function (err, userdata) {
@@ -432,8 +437,11 @@ router.put("/Discharge/:patient_id/:admin_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let patient_id= req.params.patient_id
+    const VirtualtToSearchWith = new virtual_cases({patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
     virtual_cases.updateOne(
-      { patient_id: req.params.patient_Id, },
+      { $or:[{patient_id: patient_id},{patient_id:VirtualtToSearchWith.patient_id} ]},
       { inhospital: false },
       function (err, userdata) {
         if (err && !userdata) {
@@ -481,7 +489,10 @@ router.get('/patient/:patient_id', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   if (legit) {
   newDatafull = [];
-  virtual_cases.findOne({ patient_id: req.params.patient_id, inhospital: { $eq: true } }, function (err, userdata) {
+  let patient_id= req.params.patient_id
+    const VirtualtToSearchWith = new virtual_cases({patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+  virtual_cases.findOne({ patient_id:{$in:[ patient_id,VirtualtToSearchWith.patient_id]}, inhospital: { $eq: true } }, function (err, userdata) {
     if (err && !userdata) {
       res.json({ status: 200, hassuccessed: false, message: "patient not found", error: err })
       } else {
