@@ -3442,150 +3442,72 @@ router.delete("/AddTrack", function (req, res, next) {
 router.post("/LeftInfoPatient", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  var leftdataPatient = {};
+  var leftdataPatient = {}
   if (legit) {
-    let house_id = req.body.house_id;
+    let house_id = req.body.house_id
     const VirtualtToSearchWith = new User({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Case.findOne(
-      {
-        $or: [{ house_id: house_id, house_id: VirtualtToSearchWith.house_id }],
-        patient_id: req.body.patient_id,
-        inhospital: true,
-      },
-      function (err, data) {
-        if (err & !data) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          try {
-            leftdataPatient.data = data;
-            if (data) {
-              virtual_Task.aggregate(
-                [
-                  {
-                    $facet: {
-                      total_task: [
-                        {
-                          $match: {
-                            case_id: data._id.toString(),
-                            status: { $exists: true },
-                          },
-                        },
-                        { $count: "total_task" },
-                      ],
-                      done_task: [
-                        {
-                          $match: {
-                            case_id: data._id.toString(),
-                            status: "done",
-                          },
-                        },
-                        { $count: "done_task" },
-                      ],
-                    },
-                  },
-                  {
-                    $project: {
-                      total_task: {
-                        $arrayElemAt: ["$total_task.total_task", 0],
-                      },
-                      done_task: { $arrayElemAt: ["$done_task.done_task", 0] },
-                    },
-                  },
-                ],
-                function (err, results) {
-                  if (results && results.length > 0) {
-                    leftdataPatient.done_task = results[0].done_task;
-                    leftdataPatient.total_task = results[0].total_task;
-                  }
-                  User.findOne({ _id: req.body.patient_id }).exec(function (
-                    err,
-                    data2
-                  ) {
+    virtual_Case.findOne({ $or: [{ house_id: house_id, house_id: VirtualtToSearchWith.house_id }], patient_id: req.body.patient_id, inhospital: true }, function (err, data) {
+      if (err & !data) {
+        res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+      } else {
+        try {
+          leftdataPatient.data = data;
+          if (data) {
+            virtual_Task.aggregate([
+              {
+                "$facet": {
+                  "total_task": [
+                    { "$match": { "case_id": data._id.toString(), "status": { "$exists": true, } } },
+                    { "$count": "total_task" },
+                  ],
+                  "done_task": [
+                    { "$match": { "case_id": data._id.toString(), "status": "done" } },
+                    { "$count": "done_task" }
+                  ]
+                }
+              },
+              {
+                "$project": {
+                  "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
+                  "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
+                }
+              }
+            ], function (err, results) {
+              if (results && results.length > 0) {
+                leftdataPatient.done_task = results[0].done_task;
+                leftdataPatient.total_task = results[0].total_task;
+              }
+              User.findOne({ _id: req.body.patient_id }).exec(function (err, data2) {
+                if (err) {
+                  res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+                }
+                else {
+                  let treck_record = data2 && data2.track_record
+                  leftdataPatient.entries = treck_record.length
+                  let sum = 0
+                  treck_record.forEach((element) => {
+                    if (element.attachfile && element.attachfile.length > 0) {
+                      sum = element.attachfile.length + sum
+                      leftdataPatient.document_file = sum
+                    }
+                  })
+                  virtual_step.findOne({ "steps.case_numbers.case_id": data._id.toString() }).exec(function (err, data3) {
                     if (err) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "Something went wrong.",
-                        error: err,
-                      });
+                      res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
                     } else {
-                      let treck_record = data2 && data2.track_record;
-                      leftdataPatient.entries = treck_record.length;
-                      let sum = 0;
-                      treck_record.forEach((element) => {
-                        if (
-                          element.attachfile &&
-                          element.attachfile.length > 0
-                        ) {
-                          sum = element.attachfile.length + sum;
-                          leftdataPatient.document_file = sum;
-                        }
-                      });
-                      virtual_step
-                        .findOne({
-                          "steps.case_numbers.case_id": data._id.toString(),
-                        })
-                        .exec(function (err, data3) {
-                          if (err) {
-                            res.json({
-                              status: 200,
-                              hassuccessed: false,
-                              message: "Something went wrong.",
-                              error: err,
-                            });
-                          } else {
-                            if (
-                              data3 &&
-                              data3.steps &&
-                              data3.steps.length > 0
-                            ) {
-                              data3.steps.map((item) => {
-                                if (
-                                  item.case_numbers &&
-                                  item.case_numbers.length > 0
-                                ) {
-                                  item.case_numbers.map((item2) => {
-                                    if (item2.case_id == data._id.toString()) {
-                                      leftdataPatient.step = item;
-                                    }
-                                  });
-                                }
-                              });
-                            }
-                            virtual_Invoice
-                              .find({ case_id: data._id.toString() })
-                              .exec(function (err, invoice) {
-                                if (err) {
-                                  res.json({
-                                    status: 200,
-                                    hassuccessed: false,
-                                    message: "Something went wrong.",
-                                    error: err,
-                                  });
-                                } else {
-                                  leftdataPatient.invoice = invoice;
-                                  res.json({
-                                    status: 200,
-                                    hassuccessed: true,
-                                    message: "succefully find",
-                                    data: leftdataPatient,
-                                  });
-                                }
-                              });
+                      if (data3 && data3.steps && data3.steps.length > 0) {
+                        data3.steps.map((item) => {
+                          if (item.case_numbers && item.case_numbers.length > 0) {
+                            item.case_numbers.map((item2) => {
+                              if (item2.case_id == data._id.toString()) {
+                                leftdataPatient.step = item;
+                              }
+                            })
                           }
                         });
-
                       }
-                      let case_id= data._id.toString()
-                      const VirtualtToSearchWith = new virtual_cases({case_id });
-                      VirtualtToSearchWith.encryptFieldsSync();
-                      virtual_Invoice.find({ case_id:{$in:[ case_id, VirtualtToSearchWith.case_id ] }}).exec(function (err, invoice) {
+                      virtual_Invoice.find({ case_id: data._id.toString() }).exec(function (err, invoice) {
                         if (err) {
                           res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
                         } else {
@@ -3593,30 +3515,23 @@ router.post("/LeftInfoPatient", function (req, res) {
                           res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: leftdataPatient })
                         }
                       })
-
                     }
-                  });
+                  })
                 }
-              );
-            } else {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "succefully find",
-                data: [],
-              });
-            }
-          } catch (e) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong.",
-              error: e,
-            });
+              })
+
+            })
+          } else {
+            res.json({ status: 200, hassuccessed: true, message: 'succefully find', data: [] })
+
           }
         }
+        catch (e) {
+          res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: e })
+        }
+
       }
-    );
+    })
   } else {
     res.json({
       status: 200,
@@ -3625,6 +3540,7 @@ router.post("/LeftInfoPatient", function (req, res) {
     });
   }
 });
+
 router.post("/deletehouse", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
