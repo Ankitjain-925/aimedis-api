@@ -72,7 +72,7 @@ var invoiceSchema = new Schema({
     }
 },{ strict: false });
 
-invoiceSchema.plugin(mongooseFieldEncryption, { fields: [ "invoice_id" ], secret: process.env.SOME_32BYTE_BASE64_STRING,
+invoiceSchema.plugin(mongooseFieldEncryption, { fields: [ "invoice_id","house_id","case_id","total_amount"], secret: process.env.SOME_32BYTE_BASE64_STRING,
 saltGenerator: function (secret) {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
   } });

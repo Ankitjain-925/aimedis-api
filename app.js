@@ -233,7 +233,6 @@ var Uploadcerts4 = require("./routesV4/uploadcerts");
 var bloackchain4 = require("./routesV4/blockchain");
 var cronPrecess4 = require("./routesV4/cron");
 var vspecialty4 = require("./routesV4/virtual_specialty");
-var vspecialty44 = require("./routesV4/sick_meeting");
 var vstep4 = require("./routesV4/virtual_step");
 var questionaire4 = require("./routesV4/questionaire");
 var vcases4 = require("./routesV4/virtual_cases");
@@ -263,6 +262,7 @@ var vcases5 = require("./routesV5/virtual_cases");
 var hadmin5 = require("./routesV5/h_admin");
 var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
+var vactive5 = require("./routesV5/virtual_active")
 
 app.use("/api/v1/User", UserData);
 app.use("/api/v1/UserProfile", UserProfile);
@@ -317,7 +317,6 @@ app.use("/api/v4/aws", Uploadcerts4);
 app.use("/api/v4/blockchain", bloackchain4);
 app.use("/api/v4/cron", cronPrecess4);
 app.use("/api/v4/vh", vspecialty4);
-app.use("/api/v4/vh1", vspecialty44);
 app.use("/api/v4/step", vstep4);
 app.use("/api/v4/questionaire", questionaire4);
 app.use("/api/v4/cases", vcases4);
@@ -325,6 +324,7 @@ app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
 app.use("/api/v4/vactive", vactive);
+
 
 app.use("/api/v5/User", UserData5);
 app.use("/api/v5/UserProfile", UserProfile5);
@@ -346,9 +346,12 @@ app.use("/api/v5/cases", vcases5);
 app.use("/api/v5/hospitaladmin", hadmin5);
 app.use("/api/v5/cometUserList", comet5);
 app.use("/api/v5/marketing", merketing5);
+app.use("/api/v5/vactive", vactive5);
+
 // app.use("/api/v4/bk", bk)
 
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
+
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
