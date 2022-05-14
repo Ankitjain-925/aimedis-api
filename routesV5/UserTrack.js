@@ -1844,8 +1844,11 @@ router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let house_id= req.params.house_id
+    const VirtualtToSearchWith = new virtual_Case({house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
     virtual_Case.find(
-      { $and: [{ house_id: req.params.house_id }, { inhospital: true }] },
+      { $and: [{ house_id:{$or:[req.params.house_id,VirtualtToSearchWith.house_id]} }, { inhospital: true }] },
       function (err, user_data) {
         if (err && !user_data) {
           res.json({

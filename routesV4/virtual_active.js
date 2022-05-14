@@ -323,8 +323,11 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let patient_id= req.params.patient_id
+    var  VirtualtToSearchWith = new virtual_Task({  patient_id});
+    VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find(
-      { patient_id: req.params.patient_id, task_type: "sick_leave" },
+      { patient_id: {$in:[patient_id,VirtualtToSearchWith.patient_id]}, task_type: "sick_leave" },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
