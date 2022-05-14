@@ -200,8 +200,11 @@ router.post("/AddCase", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    const patient_id = req.body.patient_id;
+    const messageToSearchWith1 = new virtual_cases({ patient_id });
+    messageToSearchWith1.encryptFieldsSync();
     virtual_cases.findOne(
-      { patient_id: req.body.patient_id, inhospital: { $eq: true }, house_id: req.body.house_id },
+      { patient_id:{$in:[ req.body.patient_id,messageToSearchWith1.patient_id]}, inhospital: { $eq: true }, house_id: req.body.house_id },
       function (err, userdata) {
         try{
 
