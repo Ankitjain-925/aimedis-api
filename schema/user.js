@@ -405,7 +405,9 @@ var UserSchema = new Schema(
   { timestamps: true }
 );
 
-UserSchema.index({ area: "2dsphere" });
+
+UserSchema.index({ area: '2dsphere' });
+
 
 UserSchema.plugin(mongooseFieldEncryption, {
   fields: [
