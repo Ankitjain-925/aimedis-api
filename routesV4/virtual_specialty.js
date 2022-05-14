@@ -425,7 +425,6 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
   if (legit) {
     virtual_Task.find(
       {
-<<<<<<< HEAD
         house_id: req.params.house_id,
         archived: { $ne: true },
         $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
@@ -437,17 +436,6 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
       function (err, userdata) {
         if (err && !userdata) {
           console.log("err", err);
-=======
-        house_id: req.params.house_id, archived: { $ne: true },
-        $or: [
-          { is_payment: { $exists: false } },
-          { is_payment: true }],
-        $and: [{ task_type: { $ne: "sick_leave" } }, { task_type: { $exists: true } }]
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          console.log("err", err)
->>>>>>> 0e64ac55204972fe6ee97a0aa2167505c8551247
           res.json({
             status: 200,
             hassuccessed: false,
@@ -455,11 +443,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
-<<<<<<< HEAD
           console.log("userdata", userdata);
-=======
-          console.log("userdata", userdata)
->>>>>>> 0e64ac55204972fe6ee97a0aa2167505c8551247
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -3249,7 +3233,6 @@ router.post("/CalenderFilter", function (req, res) {
 
           virtual_Case.find(condition3, function (err, data1) {
             if (err) {
-<<<<<<< HEAD
               res.json({
                 status: 200,
                 hassuccessed: false,
@@ -3293,31 +3276,6 @@ router.post("/CalenderFilter", function (req, res) {
                         data: appointments,
                       });
                     }
-=======
-              res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
-            }
-            else {
-              let  patient_en = data1.map((element) => {
-              var  VirtualtToSearchWith = new Appointments({ patient:  element.patient_id });
-              VirtualtToSearchWith.encryptFieldsSync();
-              return VirtualtToSearchWith.patient;
-              })
-
-
-              let patient_id = data1.map((element) => { return element.patient_id })
-
-              patient_id = [...patient_id, ...patient_en]
-
-              Appointments.find({ patient: { $in: patient_id } }, function (err, appointments) {
-                if (err) {
-                  res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
-
-                } else {
-                  console.log("appointments", appointments)
-                  if (req.body.filter == "All") {
-                    let final_data = [...data, ...data1, ...appointments]
-                    res.json({ status: 200, hassuccessed: true, data: final_data })
->>>>>>> 0e64ac55204972fe6ee97a0aa2167505c8551247
                   }
                 }
               );
@@ -3346,37 +3304,39 @@ router.post("/CalenderFilter", function (req, res) {
 });
 
 router.post("/temp1", function (req, res) {
-  let patient_id = ["5e871b1ec8a5ee77d0ceba36","60113e84b488aa271effa411"]
-  console.log(" pati", patient_id)
+  let patient_id = ["5e871b1ec8a5ee77d0ceba36", "60113e84b488aa271effa411"];
+  console.log(" pati", patient_id);
 
   // var VirtualtToSearchWith= new  Appointments({patient:{ $in:patient_id} });
   // VirtualtToSearchWith.encryptFieldsSync();
 
   patient_en = patient_id.map((element) => {
     VirtualtToSearchWith = new Appointments({ patient: element });
-  VirtualtToSearchWith.encryptFieldsSync();
-  return VirtualtToSearchWith.patient;
-  })
-  console.log("patient_en", patient_en)
- patient_id = [...patient_id, ...patient_en]
+    VirtualtToSearchWith.encryptFieldsSync();
+    return VirtualtToSearchWith.patient;
+  });
+  console.log("patient_en", patient_en);
+  patient_id = [...patient_id, ...patient_en];
 
-  Appointments.find({ patient: { $in: patient_id } } , function (err, appointments) {
-    if (err) {
-      console.log("err", err)
-      res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err })
+  Appointments.find(
+    { patient: { $in: patient_id } },
+    function (err, appointments) {
+      if (err) {
+        console.log("err", err);
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+          error: err,
+        });
+      } else {
+        console.log("appointments", appointments);
 
-    } else {
-      console.log("appointments", appointments)
-
-      res.json({ status: 200, hassuccessed: true, data: appointments })
+        res.json({ status: 200, hassuccessed: true, data: appointments });
+      }
     }
-
-
-
-  })
-
-})
-
+  );
+});
 
 router.post("/billfilter", function (req, res) {
   const token = req.headers.token;
