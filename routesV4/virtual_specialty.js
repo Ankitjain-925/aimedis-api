@@ -3558,9 +3558,17 @@ router.post("/deletehouse", function (req, res) {
         }
       });
     });
+    let patient_en = house_id.map((element) => {
+      var VirtualtToSearchWith = new virtual_Case({ house_id: element });
+      VirtualtToSearchWith.encryptFieldsSync();
+      return VirtualtToSearchWith.house_id;
+    })
+
+    let final_house_id=[...patient_en,...house_id]
+
     virtual_Case
       .updateMany(
-        { house_id: { $in: house_id } },
+        { house_id: { $in: final_house_id } },
         { $set: { inhospital: false } }
       )
       .exec(function (err, data1) {
