@@ -874,7 +874,8 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
           }
         }
       }
-    });
+
+  });
   } else {
     res.json({
       status: 200,
