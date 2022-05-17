@@ -45,7 +45,7 @@ var Inhospital = [];
 var InhopspitalInvoice = [];
 var transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
-  port: 2525,
+  port: 25,
   secure: false,
   auth: {
     user: process.env.MAIL_USER,
@@ -362,46 +362,70 @@ router.put("/AddTask/:task_id", function (req, res, next) {
           });
         } else {
           if (req.body.is_decline) {
-            User.findOne({ _id: req.body.patient_id }, function (err, data) {
-              if (err) {
-                res.json({
-                  status: 200,
-                  message: "Something went wrong.",
-                  error: err,
-                });
-              } else {
-                var sendData = `<div> Dear ${data.first_name + " " + data.last_name
-                  },
-                </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
-
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData,
-                  }),
-                  (error, html) => {
-                    if (!error) {
-                      let mailOptions = {
-                        from: "contact@aimedis.com",
-                        to: data.email,
-                        subject: "Decline picture evaluation",
-                        html: html,
-                      };
-
-                      let sendmail = transporter.sendMail(mailOptions);
-                      if (sendmail) {
+            console.log('dfgdfgdfgdfg')
+            virtual_Task.findOne(
+              { _id: req.params.task_id }, function (err, data1) {
+                if (err) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+                  if(data1.task_type==="picture_evaluation"){
+                    User.findOne({ _id: req.body.patient_id }, function (err, data) {
+                      if (err) {
                         res.json({
                           status: 200,
-                          message: "Mail sent Successfully",
-                          hassuccessed: true,
+                          message: "Something went wrong.",
+                          error: err,
                         });
+                      } else {
+                        var sendData = `<div> Dear ${data.first_name + " " + data.last_name
+                          },
+                        </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
+                  
+                        generateTemplate(
+                          EMAIL.generalEmail.createTemplate("en", {
+                            title: "",
+                            content: sendData,
+                          }),
+                          (error, html) => {
+                            if (!error) {
+                              let mailOptions = {
+                                from: "contact@aimedis.com",
+                                to: data.email,
+                                subject: "Decline picture evaluation",
+                                html: html,
+                              };
+                  
+                              let sendmail = transporter.sendMail(mailOptions);
+                              if (sendmail) {
+                                res.json({
+                                  status: 200,
+                                  message: "Mail sent Successfully",
+                                  hassuccessed: true,
+                                });
+                              }
+                            }
+                          }
+                        );
                       }
-                    }
+                    });
                   }
-                );
-              }
-            });
-          } else {
+                  else {
+                    res.json({
+                      status: 200,
+                      hassuccessed: true,
+                      message: "Task is updated",
+                      data: userdata,
+                    });
+                  }
+                }
+              }) 
+            } 
+           else {
             res.json({
               status: 200,
               hassuccessed: true,
@@ -428,13 +452,18 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
     let house_id = req.params.house_id
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
+   
     virtual_Task.find(
       {
         house_id: { $in: [house_id, VirtualtToSearchWith.house_id] }, archived: { $ne: true },
         $or: [
           { is_payment: { $exists: false } },
           { is_payment: true }],
-        $and: [{ task_type: { $ne: "sick_leave" } }, { task_type: { $exists: true } }]
+        $and: [{$or: [
+          { task_type: { $ne: "sick_leave" }  },
+          { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] }, { task_type: { $exists: true } }]
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -4045,17 +4074,13 @@ router.post("/trackrecordsforpatient", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    let patient_id = req.body.patient_id;
-    const VirtualtToSearchWith = new virtual_Task({
-      patient_id: req.body.patient_id,
-    });
-    VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Task
-      .find({
-        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
-        task_type: "picture_evaluation",
-      })
-      .exec(function (err, data) {
+    let patient_id = req.body.patient_id
+      const VirtualtToSearchWith = new virtual_Task({ patient_id: req.body.patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      const VirtualtToSearchWith1 = new virtual_Task({ task_type: "picture_evaluation" })
+      VirtualtToSearchWith1.encryptFieldsSync();
+      virtual_Task.find({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] }, task_type:{$in : ["picture_evaluation", VirtualtToSearchWith1.task_type ]}
+    }).sort({created_at:1}).exec(function (err, data) {
         if (err) {
           console.log("err", err);
           res.json({
@@ -4064,6 +4089,7 @@ router.post("/trackrecordsforpatient", function (req, res) {
             message: "Something went wrong",
           });
         } else {
+          console.log("data",data)
           if (data.length > 0) {
             res.json({
               status: 200,
@@ -4893,13 +4919,15 @@ function taskfromhouseid(item) {
         let house_id = item.house_id;
         const VirtualtToSearchWith = new virtual_Task({ house_id });
         VirtualtToSearchWith.encryptFieldsSync();
+        const VirtualtToSearchWith1 = new virtual_Task({ task_type : "picture_evaluation" });
+        VirtualtToSearchWith1.encryptFieldsSync();
         virtual_Task
           .find({
             $or: [
               { house_id: item.house_id },
               { house_id: VirtualtToSearchWith.house_id },
             ],
-            task_type: { $ne: "picture_evaluation" },
+            $or :[ {task_type:  { $ne: "picture_evaluation" }}, {task_type : { $ne : VirtualtToSearchWith1.task_type}}]
           })
           .exec(function (err, task) {
             if (err) {

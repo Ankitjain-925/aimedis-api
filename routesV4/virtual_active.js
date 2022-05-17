@@ -326,8 +326,12 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
     let patient_id= req.params.patient_id
     var  VirtualtToSearchWith = new virtual_Task({  patient_id});
     VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
     virtual_Task.find(
-      { patient_id: {$in:[patient_id,VirtualtToSearchWith.patient_id]}, task_type: "sick_leave" },
+      { patient_id: {$in:[patient_id,VirtualtToSearchWith.patient_id]}, $or: [
+        { task_type: { $ne: "sick_leave" }  },
+        { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
