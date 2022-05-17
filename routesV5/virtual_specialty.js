@@ -2808,6 +2808,7 @@ router.get("/AddInvoice/:house_id/:status", CheckRole('show_invoice'), function 
           error: err,
         });
       } else {
+        userdata.sort(mysort1)
         res.json({ status: 200, hassuccessed: true, data: userdata });
       }
     });
@@ -2963,6 +2964,15 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
       return -1;
     }
 
+}
+function mysort1(a, b) {
+  if (a.created_at && b.created_at) {
+    var x = a.created_at.toLowerCase();
+    var y = b.created_at.toLowerCase();
+    return x > y ? 1 : x < y ? -1 : 0;
+  } else {
+    return -1;
+  }
 }
 router.post("/TaskFilter", function (req, res) {
     const token = req.headers.token;
@@ -3786,33 +3796,48 @@ router.post("/TaskFilter", function (req, res) {
   // })
   
   router.post("/trackrecordsforpatient", function (req, res) {
-    const token = req.headers.token
-    let legit = jwtconfig.verify(token)
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
     if (legit) {
       let patient_id = req.body.patient_id
-      const VirtualtToSearchWith = new virtual_Task({ patient_id: req.body.patient_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-      const VirtualtToSearchWith1 = new virtual_Task({ task_type: "picture_evaluation" })
-      VirtualtToSearchWith1.encryptFieldsSync();
-      virtual_Task.find({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] }, task_type:{$in : ["picture_evaluation", VirtualtToSearchWith1.task_type ]} 
-    }).sort({created_at:1}).exec(function (err, data) {
-        if (err) {
-          console.log("err", err)
-          res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
-        }
-        else {
-          if (data.length > 0) {
-            res.json({ status: 200, hassuccessed: true, data: data, message: "Successfully fetch" })
+        const VirtualtToSearchWith = new virtual_Task({ patient_id: req.body.patient_id });
+        VirtualtToSearchWith.encryptFieldsSync();
+        const VirtualtToSearchWith1 = new virtual_Task({ task_type: "picture_evaluation" })
+        VirtualtToSearchWith1.encryptFieldsSync();
+        virtual_Task.find({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] }, task_type:{$in : ["picture_evaluation", VirtualtToSearchWith1.task_type ]}
+      }).exec(function (err, data) {
+          if (err) {
+            console.log("err", err);
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
           } else {
-            res.json({ status: 200, hassuccessed: false, message: 'No Task Found' })
-  
+            console.log("data",data)
+            data.sort(mysort1)
+            if (data.length > 0) {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                data: data,
+                message: "Successfully fetch",
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "No Task Found",
+              });
+            }
           }
-        }
-  
-      })
+        });
     } else {
-      res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
-  
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
     }
   })
   
