@@ -446,7 +446,15 @@ router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, 
     const VirtualtToSearchWith = new virtual_Task({house_id });
     VirtualtToSearchWith.encryptFieldsSync();
         virtual_Task.find(
-            { house_id: {$in:[house_id,VirtualtToSearchWith.house_id]}, archived: { $ne: true } },
+          {
+            house_id: { $in: [house_id, VirtualtToSearchWith.house_id] }, archived: { $ne: true },
+            $or: [
+              { is_payment: { $exists: false } },
+              { is_payment: true }],
+            $and: [{$or: [
+              { task_type: { $ne: "sick_leave" }  },
+              { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] }, { task_type: { $exists: false } }]
+          },
             function (err, userdata) {
                 if (err && !userdata) {
                     res.json({
@@ -2777,35 +2785,39 @@ router.post("/downloadPEBill", function (req, res, next) {
 });
 
 router.get("/AddInvoice/:house_id/:status", CheckRole('show_invoice'), function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-        var search = { house_id: req.params.house_id };
-        if (req.params.status !== "all") {
-            var search = {
-                house_id: req.params.house_id,
-                "status.value": req.params.status,
-            };
-        }
-        virtual_Invoice.find(search, function (err, userdata) {
-            if (err && !userdata) {
-                res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    message: "invoice not found",
-                    error: err,
-                });
-            } else {
-                res.json({ status: 200, hassuccessed: true, data: userdata });
-            }
-        });
-    } else {
-        res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Authentication required.",
-        });
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    let house_id = req.params.house_id
+    const VirtualtToSearchWith = new virtual_Invoice({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+
+    var search = { house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] } };
+    if (req.params.status !== "all") {
+      var search = {
+        house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
+        "status.value": req.params.status,
+      };
     }
+    virtual_Invoice.find(search, function (err, userdata) {
+      if (err && !userdata) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "invoice not found",
+          error: err,
+        });
+      } else {
+        res.json({ status: 200, hassuccessed: true, data: userdata });
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 router.get("/patientjourneyQue/:patient_id", function (req, res) {
