@@ -53,19 +53,19 @@ var mongoose = require("mongoose");
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
-      "01",
-      "02",
-      "03",
-      "04",
-      "05",
-      "06",
-      "07",
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-    ],
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ],
     month = monthNames[d.getMonth()],
     day = d.getDate(),
     year = d.getFullYear();
@@ -158,9 +158,9 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                     console.log("qwwer", userdata[i].sickleave_appointment[j]);
                     if (
                       (userdata[i].sickleave_appointment[j].monday_start,
-                      userdata[i].sickleave_appointment[j].monday_end,
-                      userdata[i].sickleave_appointment[j]
-                        .duration_of_timeslots)
+                        userdata[i].sickleave_appointment[j].monday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
                     ) {
                       console.log("1");
                       monday = getTimeStops(
@@ -173,9 +173,9 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].tuesday_start,
-                      userdata[i].sickleave_appointment[j].tuesday_end,
-                      userdata[i].sickleave_appointment[j]
-                        .duration_of_timeslots)
+                        userdata[i].sickleave_appointment[j].tuesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
                     ) {
                       tuesday = getTimeStops(
                         userdata[i].sickleave_appointment[j].tuesday_start,
@@ -186,9 +186,9 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].wednesday_start,
-                      userdata[i].sickleave_appointment[j].wednesday_end,
-                      userdata[i].sickleave_appointment[j]
-                        .duration_of_timeslots)
+                        userdata[i].sickleave_appointment[j].wednesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
                     ) {
                       wednesday = getTimeStops(
                         userdata[i].sickleave_appointment[j].wednesday_start,
@@ -199,9 +199,9 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].thursday_start,
-                      userdata[i].sickleave_appointment[j].thursday_end,
-                      userdata[i].sickleave_appointment[j]
-                        .duration_of_timeslots)
+                        userdata[i].sickleave_appointment[j].thursday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
                     ) {
                       thursday = getTimeStops(
                         userdata[i].sickleave_appointment[j].thursday_start,
@@ -212,9 +212,9 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].friday_start,
-                      userdata[i].sickleave_appointment[j].friday_end,
-                      userdata[i].sickleave_appointment[j]
-                        .duration_of_timeslots)
+                        userdata[i].sickleave_appointment[j].friday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
                     ) {
                       friday = getTimeStops(
                         userdata[i].sickleave_appointment[j].friday_start,
@@ -225,9 +225,9 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].saturday_start,
-                      userdata[i].sickleave_appointment[j].saturday_end,
-                      userdata[i].sickleave_appointment[j]
-                        .duration_of_timeslots)
+                        userdata[i].sickleave_appointment[j].saturday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
                     ) {
                       saturday = getTimeStops(
                         userdata[i].sickleave_appointment[j].saturday_start,
@@ -238,9 +238,9 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].sunday_start,
-                      userdata[i].sickleave_appointment[j].sunday_end,
-                      userdata[i].sickleave_appointment[j]
-                        .duration_of_timeslots)
+                        userdata[i].sickleave_appointment[j].sunday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
                     ) {
                       sunday = getTimeStops(
                         userdata[i].sickleave_appointment[j].sunday_start,
@@ -323,15 +323,17 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    let patient_id= req.params.patient_id
-    var  VirtualtToSearchWith = new virtual_Task({  patient_id});
+    let patient_id = req.params.patient_id
+    var VirtualtToSearchWith = new virtual_Task({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
     const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
     VirtualtToSearchWith1.encryptFieldsSync();
     virtual_Task.find(
-      { patient_id: {$in:[patient_id,VirtualtToSearchWith.patient_id]}, $or: [
-        { task_type: { $ne: "sick_leave" }  },
-        { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] },
+      {
+        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] }, $or: [
+          { task_type: { $ne: "sick_leave" } },
+          { task_type: { $ne: VirtualtToSearchWith1.task_type } }]
+      },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -358,9 +360,8 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
 router.post("/DoctorMail", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
     Here is the new Sick leave certificate request from the 
-      ${
-        req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id
-      },
+      ${req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id
+    },
       for the time slot 
       ${req.body.start + "" + req.body.end},
       at
@@ -536,7 +537,7 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
 
-    sick_meeting.findByIdAndRemove({_id:req.params.meeting_id}, function (err, data) {
+    sick_meeting.findByIdAndRemove({ _id: req.params.meeting_id }, function (err, data) {
 
       if (err) {
         res.json({
@@ -568,13 +569,79 @@ router.post("/AddMeeting", function (req, res, next) {
   if (legit) {
     var sick_meetings = new sick_meeting(req.body);
     sick_meetings.save(function (err, user_data) {
+      console.log("err", err);
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
+        var sendData = `Dear Patient,
+
+        Your payment process for sick leave certificate application is completed successfully.
+        Please do join the Video call at ${req.body.date} from the time slot  ${req.body.start} to ${req.body.end} 
+        Your Video call joining link is   ${req.body.patient_link}
+        Please remind the date and timing as alloted.`;
+
+        var sendData1 = `Dear Doctor,
+
+        The payment process for sick leave certificate application is completed successfully.
+        Please do join the Video call at  ${req.body.date} from the time slot ${req.body.start} to ${req.body.end}
+        Your Video call joining link is  ${req.body.doctor_link}
+        Please remind the date and timing as alloted.</div>`;
+
+        if (req.body.patient_mail !== "") {
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_mail,
+                  subject: "Sick leave certificate request",
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+              }
+            }
+          );
+          User.find(
+            { _id: req.body.doctor_id },
+            function (err, userdata) {
+              if (err && !userdata) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                generateTemplate(
+                  EMAIL.generalEmail.createTemplate("en", {
+                    title: "",
+                    content: sendData1,
+                  }),
+                  (error, html) => {
+                    if (!error) {
+                      let mailOptions1 = {
+                        from: "contact@aimedis.com",
+                        to: userdata.email,
+                        subject: "Sick leave certificate request",
+                        html: html,
+                      };
+                      let sendmail1 = transporter.sendMail(mailOptions1);
+                    }
+                  }
+                );
+              }
+            }
+          );
+        }
         res.json({
           status: 200,
           message: "Added Successfully",
           hassuccessed: true,
+          data: user_data,
         });
       }
     });
@@ -794,9 +861,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
 
-    const VirtualtToSearchWith = new sick_meeting({ sesion_id : req.params.sesion_id});
+    const VirtualtToSearchWith = new sick_meeting({ sesion_id: req.params.sesion_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    sick_meeting.findOne({ $or:[{ sesion_id:VirtualtToSearchWith.sesion_id },{sesion_id:req.params.sesion_id}] }, function (err, data) {
+    sick_meeting.findOne({ $or: [{ sesion_id: VirtualtToSearchWith.sesion_id }, { sesion_id: req.params.sesion_id }] }, function (err, data) {
       console.log("err", err)
       if (err) {
         res.json({
@@ -806,8 +873,8 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
           error: err,
         });
       } else {
-        console.log("data",data)
-        if (data !==null) {
+        console.log("data", data)
+        if (data !== null) {
           let today = new Date().setHours(0, 0, 0, 0);
           let ttime = new Date();
           console.log("today", today)
@@ -848,11 +915,26 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
               if (data.start_time <= final && data.end_time >= final)
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "link active",
-                });
+                virtual_Task.find(
+                  { _id: data.task_id, is_payment: true },
+                  function (err, userdata) {
+                    if (err && !userdata) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Payment is Incomplete",
+                        error: err,
+                      });
+                    } else {
+                      console.log("userdata", userdata);
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "link active",
+                      });
+                    }
+                  }
+                );
               else if (data.start_time > final) {
                 console.log("4");
                 res.json({
@@ -879,7 +961,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         }
       }
 
-  });
+    });
   } else {
     res.json({
       status: 200,
