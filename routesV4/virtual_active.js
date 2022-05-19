@@ -934,7 +934,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               { sesion_id: VirtualtToSearchWith.sesion_id },
                               { sesion_id: req.params.sesion_id },
                             ],
-                          }
+                          },
                           function (err, data) {
                             console.log("err", err);
                             if (err) {
