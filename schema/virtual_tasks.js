@@ -237,11 +237,6 @@ var TaskSchema = new Schema(
       required: false,
       unique: false,
     },
-    task_id: {
-      type: String,
-      required: true,
-      unique: false,
-    },
     isviewed: {
       type: Boolean,
       required: false,
