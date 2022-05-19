@@ -863,7 +863,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
       sesion_id: req.params.sesion_id,
     });
     VirtualtToSearchWith.encryptFieldsSync();
-    sick_meeting.findOne(
+    sick_meeting.find(
       {
         $or: [
           { sesion_id: VirtualtToSearchWith.sesion_id },
@@ -919,7 +919,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                 });
               } else if (moment(today).isSame(data_d)) {
                 console.log("3");
-                if (data.start_time <= final && data.end_time >= final)
+                if (data.start_time <= final && data.end_time >= final) {
                   virtual_Task.find(
                     { _id: data.task_id, is_payment: true },
                     function (err, userdata) {
@@ -928,7 +928,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                           sesion_id: req.params.sesion_id,
                         });
                         VirtualtToSearchWith.encryptFieldsSync();
-                        sick_meeting.findByIdAndRemove(
+                        sick_meeting.deleteOne(
                           {
                             $or: [
                               { sesion_id: VirtualtToSearchWith.sesion_id },
@@ -964,7 +964,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       }
                     }
                   );
-                else if (data.start_time > final) {
+                } else if (data.start_time > final) {
                   console.log("4");
                   res.json({
                     status: 200,
