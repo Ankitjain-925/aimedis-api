@@ -454,18 +454,22 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
     VirtualtToSearchWith.encryptFieldsSync();
     const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
     VirtualtToSearchWith1.encryptFieldsSync();
-
+    const VirtualtToSearchWith2 = new virtual_Task({ task_type: "picture_evaluation" });
+    VirtualtToSearchWith2.encryptFieldsSync();
+   
     virtual_Task.find(
       {
         house_id: { $in: [house_id, VirtualtToSearchWith.house_id] }, archived: { $ne: true },
         $or: [
           { is_payment: { $exists: false } },
           { is_payment: true }],
-        $and: [{
-          $or: [
-            { task_type: { $ne: "sick_leave" } },
-            { task_type: { $ne: VirtualtToSearchWith1.task_type } }]
-        }, { task_type: { $exists: false } }]
+        $or: [
+          { task_type: { $ne: "sick_leave" }  },
+          { task_type: { $ne: VirtualtToSearchWith1.task_type }},
+          { task_type: { $ne: "picture_evaluation" }  },
+          { task_type: { $ne: VirtualtToSearchWith2.task_type }},
+          { task_type: { $exists: false } }
+        ]
       },
       function (err, userdata) {
         if (err && !userdata) {
