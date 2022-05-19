@@ -274,7 +274,6 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
               });
             });
         } else {
-
           res.json({
             status: 200,
             hassuccessed: false,
@@ -323,11 +322,19 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    let patient_id= req.params.patient_id
-    var  VirtualtToSearchWith = new virtual_Task({  patient_id});
+    let patient_id = req.params.patient_id;
+    var VirtualtToSearchWith = new virtual_Task({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
     virtual_Task.find(
-      { patient_id: {$in:[patient_id,VirtualtToSearchWith.patient_id]}, task_type: "sick_leave" },
+      {
+        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+        $or: [
+          { task_type: { $ne: "sick_leave" } },
+          { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+        ],
+      },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -526,29 +533,29 @@ router.post("/approvedrequest", function (req, res) {
   }
 });
 
-
 router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-
-    sick_meeting.findByIdAndRemove({_id:req.params.meeting_id}, function (err, data) {
-
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "Speciality is Deleted Successfully",
-        });
+    sick_meeting.findByIdAndRemove(
+      { _id: req.params.meeting_id },
+      function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Speciality is Deleted Successfully",
+          });
+        }
       }
-    });
+    );
   } else {
     res.json({
       status: 200,
@@ -564,13 +571,76 @@ router.post("/AddMeeting", function (req, res, next) {
   if (legit) {
     var sick_meetings = new sick_meeting(req.body);
     sick_meetings.save(function (err, user_data) {
+      console.log("err", err);
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
+        var sendData = `Dear Patient,
+
+        Your payment process for sick leave certificate application is completed successfully.
+        Please do join the Video call at ${req.body.date} from the time slot  ${req.body.start} to ${req.body.end} 
+        Your Video call joining link is   ${req.body.patient_link}
+        Please remind the date and timing as alloted.`;
+
+        var sendData1 = `Dear Doctor,
+
+        The payment process for sick leave certificate application is completed successfully.
+        Please do join the Video call at  ${req.body.date} from the time slot ${req.body.start} to ${req.body.end}
+        Your Video call joining link is  ${req.body.doctor_link}
+        Please remind the date and timing as alloted.</div>`;
+
+        if (req.body.patient_mail !== "") {
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_mail,
+                  subject: "Sick leave certificate request",
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+              }
+            }
+          );
+          User.find({ _id: req.body.doctor_id }, function (err, userdata) {
+            if (err && !userdata) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+              });
+            } else {
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData1,
+                }),
+                (error, html) => {
+                  if (!error) {
+                    let mailOptions1 = {
+                      from: "contact@aimedis.com",
+                      to: userdata.email,
+                      subject: "Sick leave certificate request",
+                      html: html,
+                    };
+                    let sendmail1 = transporter.sendMail(mailOptions1);
+                  }
+                }
+              );
+            }
+          });
+        }
         res.json({
           status: 200,
           message: "Added Successfully",
           hassuccessed: true,
+          data: user_data,
         });
       }
     });
@@ -789,39 +859,33 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-
-    const VirtualtToSearchWith = new sick_meeting({ sesion_id : req.params.sesion_id});
+    const VirtualtToSearchWith = new sick_meeting({
+      sesion_id: req.params.sesion_id,
+    });
     VirtualtToSearchWith.encryptFieldsSync();
-    sick_meeting.findOne({ $or:[{ sesion_id:VirtualtToSearchWith.sesion_id },{sesion_id:req.params.sesion_id}] }, function (err, data) {
-      console.log("err", err)
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        console.log("data",data)
-        if (data !==null) {
-          let today = new Date().setHours(0, 0, 0, 0);
-          let ttime = new Date();
-          console.log("today", today)
+    sick_meeting.findOne(
+      {
+        $or: [
+          { sesion_id: VirtualtToSearchWith.sesion_id },
+          { sesion_id: req.params.sesion_id },
+        ],
+      },
+      function (err, data) {
+        console.log("err", err);
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          console.log("data", data);
+          if (data !== null) {
+            let today = new Date().setHours(0, 0, 0, 0);
+            let ttime = new Date();
+            console.log("today", today);
 
-          let final = ttime.getHours() + ":" + ttime.getMinutes();
-
-          let data_d = new Date(data.date).setHours(0, 0, 0, 0);
-          console.log("data_d", data_d)
-
-          if (
-            moment(today).isAfter(data_d)
-          ) {
-            console.log("1")
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Link Expire",
-            });
             let final = ttime.getHours() + ":" + ttime.getMinutes();
 
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
@@ -834,74 +898,119 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                 hassuccessed: true,
                 message: "Link Expire",
               });
-            } else if (moment(today).isBefore(data_d)) {
-              console.log("2");
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "Link will active soon",
-              });
-            } else if (moment(today).isSame(data_d)) {
-              console.log("3");
-              if (data.start_time <= final && data.end_time >= final)
-                virtual_Task.find(
-                  { task_id: data.task_id, is_payment: "true" },
-                  function (err, userdata) {
-                    if (err && !userdata) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "Payment is Incomplete",
-                        error: err,
-                      });
-                    } else {
-                      console.log("userdata", userdata);
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        message: "link active",
-                      });
-                    }
-                  }
-                );
-              else {
+              let final = ttime.getHours() + ":" + ttime.getMinutes();
+
+              let data_d = new Date(data.date).setHours(0, 0, 0, 0);
+              console.log("data_d", data_d);
+
+              if (moment(today).isAfter(data_d)) {
+                console.log("1");
                 res.json({
                   status: 200,
                   hassuccessed: false,
-                  message: "Authentication required.",
+                  message: "Link Expire",
+                });
+              } else if (moment(today).isBefore(data_d)) {
+                console.log("2");
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Link will active soon",
+                });
+              } else if (moment(today).isSame(data_d)) {
+                console.log("3");
+                if (data.start_time <= final && data.end_time >= final)
+                  virtual_Task.find(
+                    { _id: data.task_id, is_payment: true },
+                    function (err, userdata) {
+                      if (err && !userdata) {
+                        const VirtualtToSearchWith = new sick_meeting({
+                          sesion_id: req.params.sesion_id,
+                        });
+                        VirtualtToSearchWith.encryptFieldsSync();
+                        sick_meeting.findByIdAndRemove(
+                          {
+                            $or: [
+                              { sesion_id: VirtualtToSearchWith.sesion_id },
+                              { sesion_id: req.params.sesion_id },
+                            ],
+                          },
+                          function (err, data) {
+                            console.log("err", err);
+                            if (err) {
+                              console.log("message", "Something went wrong");
+                            } else {
+                              console.log(
+                                "message",
+                                "Speciality is Deleted Successfully"
+                              );
+                            }
+                          }
+                        );
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "Payment is Incomplete",
+                          error: err,
+                        });
+                      } else {
+                        console.log("userdata", userdata);
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "link active",
+                          data: { Task: userdata, Session: data },
+                        });
+                      }
+                    }
+                  );
+                else if (data.start_time > final) {
+                  console.log("4");
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "link start soon",
+                  });
+                } else if (data.end_time < final) {
+                  console.log("5");
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Link Expire",
+                  });
+                }
+              } else if (data.start_time > final) {
+                console.log("4");
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "link start soon",
+                });
+              } else if (data.end_time < final) {
+                console.log("5");
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Link Expire",
+                });
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Invalid Session ID",
                 });
               }
-            } else if (data.start_time > final) {
-              console.log("4");
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "link start soon",
-              });
-            } else if (data.end_time < final) {
-              console.log("5");
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "Link Expire",
-              });
             } else {
               res.json({
                 status: 200,
                 hassuccessed: false,
-                message: "Invalid Session ID",
+                message: "Data is null",
               });
             }
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Data is null",
-            });
           }
         }
       }
-  });
+    );
   } else {
     res.json({
       status: 200,

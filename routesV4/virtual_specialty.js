@@ -45,7 +45,7 @@ var Inhospital = [];
 var InhopspitalInvoice = [];
 var transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
-  port: 2525,
+  port: 25,
   secure: false,
   auth: {
     user: process.env.MAIL_USER,
@@ -367,46 +367,74 @@ router.put("/AddTask/:task_id", function (req, res, next) {
           });
         } else {
           if (req.body.is_decline) {
-            User.findOne({ _id: req.body.patient_id }, function (err, data) {
-              if (err) {
-                res.json({
-                  status: 200,
-                  message: "Something went wrong.",
-                  error: err,
-                });
-              } else {
-                var sendData = `<div> Dear ${
-                  data.first_name + " " + data.last_name
-                },
-                </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
+            console.log("dfgdfgdfgdfg");
+            virtual_Task.findOne(
+              { _id: req.params.task_id },
+              function (err, data1) {
+                if (err) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+                  if (data1.task_type === "picture_evaluation") {
+                    User.findOne(
+                      { _id: req.body.patient_id },
+                      function (err, data) {
+                        if (err) {
+                          res.json({
+                            status: 200,
+                            message: "Something went wrong.",
+                            error: err,
+                          });
+                        } else {
+                          var sendData = `<div> Dear ${
+                            data.first_name + " " + data.last_name
+                          },
+                        </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
 
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData,
-                  }),
-                  (error, html) => {
-                    if (!error) {
-                      let mailOptions = {
-                        from: "contact@aimedis.com",
-                        to: data.email,
-                        subject: "Decline picture evaluation",
-                        html: html,
-                      };
+                          generateTemplate(
+                            EMAIL.generalEmail.createTemplate("en", {
+                              title: "",
+                              content: sendData,
+                            }),
+                            (error, html) => {
+                              if (!error) {
+                                let mailOptions = {
+                                  from: "contact@aimedis.com",
+                                  to: data.email,
+                                  subject: "Decline picture evaluation",
+                                  html: html,
+                                };
 
-                      let sendmail = transporter.sendMail(mailOptions);
-                      if (sendmail) {
-                        res.json({
-                          status: 200,
-                          message: "Mail sent Successfully",
-                          hassuccessed: true,
-                        });
+                                let sendmail =
+                                  transporter.sendMail(mailOptions);
+                                if (sendmail) {
+                                  res.json({
+                                    status: 200,
+                                    message: "Mail sent Successfully",
+                                    hassuccessed: true,
+                                  });
+                                }
+                              }
+                            }
+                          );
+                        }
                       }
-                    }
+                    );
+                  } else {
+                    res.json({
+                      status: 200,
+                      hassuccessed: true,
+                      message: "Task is updated",
+                      data: userdata,
+                    });
                   }
-                );
+                }
               }
-            });
+            );
           } else {
             res.json({
               status: 200,
@@ -434,14 +462,22 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
     let house_id = req.params.house_id;
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
+
     virtual_Task.find(
       {
         house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
         archived: { $ne: true },
         $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
         $and: [
-          { task_type: { $ne: "sick_leave" } },
-          { task_type: { $exists: true } },
+          {
+            $or: [
+              { task_type: { $ne: "sick_leave" } },
+              { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+            ],
+          },
+          { task_type: { $exists: false } },
         ],
       },
       function (err, userdata) {
@@ -1022,7 +1058,7 @@ router.get("/AddInvoice/:house_id/:status", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    let house_id = req.body.house_id;
+    let house_id = req.params.house_id;
     const VirtualtToSearchWith = new virtual_Invoice({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
 
@@ -1044,6 +1080,7 @@ router.get("/AddInvoice/:house_id/:status", function (req, res, next) {
           error: err,
         });
       } else {
+        userdata.sort(mysort1);
         res.json({ status: 200, hassuccessed: true, data: userdata });
       }
     });
@@ -1121,14 +1158,13 @@ router.post("/checkPatient", function (req, res, next) {
             });
           } else {
             try {
-              console.log("userdata", userdata);
               if (userdata) {
                 var createCase = false;
                 if (req.body.pin) {
                   createCase = req.body.pin == userdata.pin ? true : false;
                 } else {
-                  var pos =
-                    userdata &&
+                  var pos = 0;
+                  userdata &&
                     userdata.assosiated_by.filter(
                       (data) => data.institute_id === req.body.institute_id
                     );
@@ -2199,8 +2235,22 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    const messageToSearchWithlast3 = new virtual_Case({
+      house_id: req.params.house_id,
+    });
+    messageToSearchWithlast3.encryptFieldsSync();
     virtual_Case.find(
-      { $and: [{ house_id: req.params.house_id }, { inhospital: true }] },
+      {
+        $and: [
+          {
+            house_id: {
+              $in: [req.params.house_id, messageToSearchWithlast3.house_id],
+            },
+          },
+          { inhospital: true },
+          { verifiedbyPatient: true },
+        ],
+      },
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -3141,6 +3191,15 @@ function mySorter(a, b) {
     return -1;
   }
 }
+function mysort1(a, b) {
+  if (a.created_at && b.created_at) {
+    var x = a.created_at.toLowerCase();
+    var y = b.created_at.toLowerCase();
+    return x > y ? 1 : x < y ? -1 : 0;
+  } else {
+    return -1;
+  }
+}
 
 router.post("/TaskFilter", function (req, res) {
   const token = req.headers.token;
@@ -3695,9 +3754,17 @@ router.post("/deletehouse", function (req, res) {
         }
       });
     });
+    let patient_en = house_id.map((element) => {
+      var VirtualtToSearchWith = new virtual_Case({ house_id: element });
+      VirtualtToSearchWith.encryptFieldsSync();
+      return VirtualtToSearchWith.house_id;
+    });
+
+    let final_house_id = [...patient_en, ...house_id];
+
     virtual_Case
       .updateMany(
-        { house_id: { $in: house_id } },
+        { house_id: { $in: final_house_id } },
         { $set: { inhospital: false } }
       )
       .exec(function (err, data1) {
@@ -4190,10 +4257,16 @@ router.post("/trackrecordsforpatient", function (req, res) {
       patient_id: req.body.patient_id,
     });
     VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({
+      task_type: "picture_evaluation",
+    });
+    VirtualtToSearchWith1.encryptFieldsSync();
     virtual_Task
       .find({
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
-        task_type: "picture_evaluation",
+        task_type: {
+          $in: ["picture_evaluation", VirtualtToSearchWith1.task_type],
+        },
       })
       .exec(function (err, data) {
         if (err) {
@@ -4204,6 +4277,8 @@ router.post("/trackrecordsforpatient", function (req, res) {
             message: "Something went wrong",
           });
         } else {
+          console.log("data", data);
+          data.sort(mysort1);
           if (data.length > 0) {
             res.json({
               status: 200,
@@ -5033,13 +5108,20 @@ function taskfromhouseid(item) {
         let house_id = item.house_id;
         const VirtualtToSearchWith = new virtual_Task({ house_id });
         VirtualtToSearchWith.encryptFieldsSync();
+        const VirtualtToSearchWith1 = new virtual_Task({
+          task_type: "picture_evaluation",
+        });
+        VirtualtToSearchWith1.encryptFieldsSync();
         virtual_Task
           .find({
             $or: [
               { house_id: item.house_id },
               { house_id: VirtualtToSearchWith.house_id },
             ],
-            task_type: { $ne: "picture_evaluation" },
+            $or: [
+              { task_type: { $ne: "picture_evaluation" } },
+              { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+            ],
           })
           .exec(function (err, task) {
             if (err) {
