@@ -448,7 +448,7 @@ router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, 
     const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
     VirtualtToSearchWith1.encryptFieldsSync();
     const VirtualtToSearchWith2 = new virtual_Task({ task_type: "picture_evaluation" });
-    VirtualtToSearchWith2.encryptlFieldsSync();
+    VirtualtToSearchWith2.encryptFieldsSync();
    
     virtual_Task.find(
       {
@@ -456,17 +456,18 @@ router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, 
         $or: [
           { is_payment: { $exists: false } },
           { is_payment: true }],
-        $and: [{$or: [
+        $or: [
           { task_type: { $ne: "sick_leave" }  },
-          { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] },
-          { task_type: { $eq: "picture_evaluation" }  },
-          { task_type: { $eq: VirtualtToSearchWith2.task_type }} ] }
-          { task_type: { $exists: false } }]
+          { task_type: { $ne: VirtualtToSearchWith1.task_type }},
+          { task_type: { $ne: "picture_evaluation" }  },
+          { task_type: { $ne: VirtualtToSearchWith2.task_type }},
+          { task_type: { $exists: false } }
+        ]
       },
       function (err, userdata) {
         if (err && !userdata) {
           console.log("err", err);
-
+          
           res.json({
             status: 200,
             hassuccessed: false,
@@ -474,7 +475,7 @@ router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, 
             error: err,
           });
         } else {
-
+          userdata.sort(mysort1)
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }

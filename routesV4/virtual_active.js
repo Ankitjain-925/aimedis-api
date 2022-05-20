@@ -564,96 +564,102 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
 });
 
 router.post("/AddMeeting", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    var sick_meetings = new sick_meeting(req.body);
-    sick_meetings.save(function (err, user_data) {
-      console.log("err", err);
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        var sendData = `Dear Patient,
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+      var sick_meetings = new sick_meeting(req.body);
+      sick_meetings.save(function (err, user_data) {
+        console.log("err", err);
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+    var meetingDate = getDate(req.body.date, "YYYY/MM/DD")
+           var sendData = `Dear Patient,
 
-        Your payment process for sick leave certificate application is completed successfully.
-        Please do join the Video call at ${req.body.date} from the time slot  ${req.body.start} to ${req.body.end} 
-        Your Video call joining link is   ${req.body.patient_link}
-        Please remind the date and timing as alloted.`;
+    Your payment process for sick leave certificate application is completed successfully.
+    Please do join the Video call at ${meetingDate} from the time slot  ${req.body.start_time} to ${req.body.end_time} 
+    Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : 'Not mentioned'}
+    Please remind the date and timing as alloted.`;
 
-        var sendData1 = `Dear Doctor,
+    var sendData1 = `Dear Doctor,
 
-        The payment process for sick leave certificate application is completed successfully.
-        Please do join the Video call at  ${req.body.date} from the time slot ${req.body.start} to ${req.body.end}
-        Your Video call joining link is  ${req.body.doctor_link}
-        Please remind the date and timing as alloted.</div>`;
+    The payment process for sick leave certificate application is completed successfully.
+    Please do join the Video call at  ${meetingDate} from the time slot ${req.body.start_time} to ${req.body.end_time}
+    Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : 'Not mentioned'}
+    Please remind the date and timing as alloted.</div>`;
+  
+          if (req.body.patient_mail !== "") {
+            generateTemplate(
+              EMAIL.generalEmail.createTemplate("en", {
+                title: "",
+                content: sendData,
+              }),
+              (error, html) => {
+                if (!error) {
+                  let mailOptions = {
+                    from: "contact@aimedis.com",
+                    to: req.body.patient_mail,
+                    subject: "Link for the Sick leave certificate",
+                    html: html,
+                  };
 
-        if (req.body.patient_mail !== "") {
-          generateTemplate(
-            EMAIL.generalEmail.createTemplate("en", {
-              title: "",
-              content: sendData,
-            }),
-            (error, html) => {
-              if (!error) {
-                let mailOptions = {
-                  from: "contact@aimedis.com",
-                  to: req.body.patient_mail,
-                  subject: "Link for video call regarding sick leave certificate",
-                  html: html,
-                };
-                let sendmail = transporter.sendMail(mailOptions);
-              }
-            }
-          );
-          User.find(
-            { _id: req.body.doctor_id },
-            function (err, userdata) {
-              if (err && !userdata) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData1,
-                  }),
-                  (error, html) => {
-                    if (!error) {
-                      let mailOptions1 = {
-                        from: "contact@aimedis.com",
-                        to: userdata.email,
-                        subject: "Link for video call regarding sick leave certificate",
-                        html: html,
-                      };
-                      let sendmail1 = transporter.sendMail(mailOptions1);
-                    }
-                  }
-                );
-              }
-            }
-          );
-        }
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-          data: user_data,
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
+                  let sendmail = transporter.sendMail(mailOptions);
+                  if (sendmail) {
+                    console.log('y');
+                  }
+                }
+              }
+            );
+            console.log('req.body.doctor_id', req.body.doctor_id)
+            User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
+              if (err && !userdata) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
+              } else {
+    console.log('userdata.email, ', userdata, userdata.email)
+                generateTemplate(
+                  EMAIL.generalEmail.createTemplate("en", {
+                    title: "",
+                    content: sendData1,
+                  }),
+                  (error, html) => {
+                    if (!error) {
+                      let mailOptions1 = {
+                        from: "contact@aimedis.com",
+                        to: userdata.email,
+                        subject: "Link for the sick leave certificate",
+                        html: html,
+                      };
+                      let sendmail1 = transporter.sendMail(mailOptions1);
+                      if (sendmail1) {
+                           console.log('y2');
+                      }
+                    }
+                  }
+                );
+              }
+            });
+   res.json({
+              status: 200,
+              message: "Mail sent Successfully",
+              hassuccessed: true,
+            });
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  });
+  
 router.post("/downloadSickleaveCertificate", function (req, res, next) {
   try {
     handlebars.registerHelper("ifCond", function (v1, v2, options) {

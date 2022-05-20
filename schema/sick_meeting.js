@@ -45,14 +45,14 @@ var SickSchema = new Schema(
     },
     sesion_id: {
       type: String,
-      required: false,
-      unique: true,
+      required: true,
+      unique: false,
     },
 
     link: {
       type: Object,
       required: true,
-      unique: true,
+      unique: false,
     },
     task_id: {
       type: String,
@@ -60,8 +60,7 @@ var SickSchema = new Schema(
       unique: false,
     },
   },
-  { strict: false },
-  { timestamps: true }
+  { strict: false }
 );
 
 SickSchema.index({ area: "2dsphere" });
