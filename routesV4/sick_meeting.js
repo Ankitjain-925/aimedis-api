@@ -315,38 +315,35 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
               }
             }
           );
-          User.find(
-            { _id: req.params.user_id }
-            function (err, userdata) {
-              if (err && !userdata) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData1,
-                  }),
-                  (error, html) => {
-                    if (!error) {
-                      let mailOptions1 = {
-                        from: "contact@aimedis.com",
-                        to: userdata.email,
-                        subject: "Sick leave certificate request",
-                        html: html,
-                      };
+          User.find({ _id: req.params.user_id }, function (err, userdata) {
+            if (err && !userdata) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+              });
+            } else {
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData1,
+                }),
+                (error, html) => {
+                  if (!error) {
+                    let mailOptions1 = {
+                      from: "contact@aimedis.com",
+                      to: userdata.email,
+                      subject: "Sick leave certificate request",
+                      html: html,
+                    };
 
-                      let sendmail1 = transporter.sendMail(mailOptions1);
-                    }
+                    let sendmail1 = transporter.sendMail(mailOptions1);
                   }
-                );
-              }
+                }
+              );
             }
-          );
+          });
         }
 
         res.json({

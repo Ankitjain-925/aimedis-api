@@ -1020,4 +1020,110 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   }
 });
 
+router.post("/AddMeeting/:user_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var sick_meetings = new sick_meeting(req.body);
+    sick_meetings.save(function (err, user_data) {
+      console.log("err", err);
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        var sendData = `<div>Dear Patient,<br/>
+        Your payment process for sick leave certificate application is completed successfully.
+          "<br/>";
+        Please do join the Video call at  
+          ${req.body.date}
+          from the time slot
+          ${req.body.start}
+          ${req.body.end}
+        <br/>
+        Your Video call joining link is
+          ${req.body.patient_link}
+        Please remind the date and timing as alloted.</div>`;
+
+        var sendData1 = `<div>Dear Doctor<br/>
+        The payment process for sick leave certificate application is completed successfully.
+        <br/>
+        Please do join the Video call at
+          ${req.body.date}
+          from the time slot
+          ${req.body.start}+""+
+          ${req.body.end}
+          <br/>
+        Your Video call joining link is
+          ${req.body.doctor_link}
+        Please remind the date and timing as alloted.</div>`;
+
+        if (req.body.patient_mail !== "") {
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_mail,
+                  subject: "Sick leave certificate request",
+                  html: html,
+                };
+                console.log(html);
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
+                  console.log(html);
+                }
+              }
+            }
+          );
+          User.find({ _id: req.params.user_id }, function (err, userdata) {
+            if (err && !userdata) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+              });
+            } else {
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData1,
+                }),
+                (error, html) => {
+                  if (!error) {
+                    let mailOptions1 = {
+                      from: "contact@aimedis.com",
+                      to: userdata.email,
+                      subject: "Sick leave certificate request",
+                      html: html,
+                    };
+                    console.log(html);
+                    let sendmail1 = transporter.sendMail(mailOptions1);
+                    if (sendmail1) {
+                      console.log(html);
+                    }
+                  }
+                }
+              );
+            }
+          });
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 module.exports = router;
