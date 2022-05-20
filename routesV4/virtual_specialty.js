@@ -493,11 +493,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
-  } else {
+    userdata.sort(mysort1)
     res.json({
       status: 200,
       hassuccessed: false,

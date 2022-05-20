@@ -600,7 +600,7 @@ router.post("/AddMeeting", function (req, res, next) {
                 let mailOptions = {
                   from: "contact@aimedis.com",
                   to: req.body.patient_mail,
-                  subject: "Sick leave certificate request",
+                  subject: "Link for video call regarding sick leave certificate",
                   html: html,
                 };
                 let sendmail = transporter.sendMail(mailOptions);
