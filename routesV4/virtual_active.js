@@ -855,6 +855,7 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
     }
   );
 });
+
 router.get("/Linktime/:sesion_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
