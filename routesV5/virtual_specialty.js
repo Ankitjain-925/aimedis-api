@@ -439,42 +439,53 @@ router.put("/AddTask/:task_id/:house_id", CheckRole('edit_task'), function (req,
 });
 
 router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-        let house_id = req.params.house_id
-    const VirtualtToSearchWith = new virtual_Task({house_id });
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    let house_id = req.params.house_id
+    const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-        virtual_Task.find(
-          {
-            house_id: { $in: [house_id, VirtualtToSearchWith.house_id] }, archived: { $ne: true },
-            $or: [
-              { is_payment: { $exists: false } },
-              { is_payment: true }],
-            $and: [{$or: [
-              { task_type: { $ne: "sick_leave" }  },
-              { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] }, { task_type: { $exists: false } }]
-          },
-            function (err, userdata) {
-                if (err && !userdata) {
-                    res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "Something went wrong",
-                        error: err,
-                    });
-                } else {
-                    res.json({ status: 200, hassuccessed: true, data: userdata });
-                }
-            }
-        );
-    } else {
-        res.json({
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    const VirtualtToSearchWith2 = new virtual_Task({ task_type: "picture_evaluation" });
+    VirtualtToSearchWith2.encryptlFieldsSync();
+   
+    virtual_Task.find(
+      {
+        house_id: { $in: [house_id, VirtualtToSearchWith.house_id] }, archived: { $ne: true },
+        $or: [
+          { is_payment: { $exists: false } },
+          { is_payment: true }],
+        $and: [{$or: [
+          { task_type: { $ne: "sick_leave" }  },
+          { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] },
+          { task_type: { $eq: "picture_evaluation" }  },
+          { task_type: { $eq: VirtualtToSearchWith2.task_type }} ] }
+          { task_type: { $exists: false } }]
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          console.log("err", err);
+
+          res.json({
             status: 200,
             hassuccessed: false,
-            message: "Authentication required.",
-        });
-    }
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 router.get("/GetAllArchivedTask/:house_id", CheckRole('show_task'), function (req, res, next) {
