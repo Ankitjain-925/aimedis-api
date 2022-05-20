@@ -474,7 +474,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
       function (err, userdata) {
         if (err && !userdata) {
           console.log("err", err);
-
+          
           res.json({
             status: 200,
             hassuccessed: false,
@@ -482,7 +482,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
-
+          userdata.sort(mysort1)
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
