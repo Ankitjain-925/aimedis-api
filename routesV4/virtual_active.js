@@ -600,7 +600,8 @@ router.post("/AddMeeting", function (req, res, next) {
                 let mailOptions = {
                   from: "contact@aimedis.com",
                   to: req.body.patient_mail,
-                  subject: "Link for video call regarding sick leave certificate",
+                  subject:
+                    "Link for video call regarding sick leave certificate",
                   html: html,
                 };
                 let sendmail = transporter.sendMail(mailOptions);
@@ -1079,7 +1080,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
               }
             }
           );
-          User.find({ _id: req.params.user_id }, function (err, userdata) {
+          User.find(req.params.user_id, function (err, userdata) {
             if (err && !userdata) {
               res.json({
                 status: 200,
@@ -1101,7 +1102,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
                       subject: "Sick leave certificate request",
                       html: html,
                     };
-                    console.log(html);
+                    console.log(userdata.email);
                     let sendmail1 = transporter.sendMail(mailOptions1);
                     if (sendmail1) {
                       console.log(html);

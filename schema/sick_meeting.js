@@ -67,13 +67,9 @@ var SickSchema = new Schema(
 SickSchema.index({ area: "2dsphere" });
 
 SickSchema.plugin(mongooseFieldEncryption, {
-  fields: [
-    "patient_profile_id",
-    "patient_id",
-    "doctor_profile_id",
-    "doctor_id",
-    "link",
-    "sesion_id",
+
+  fields: ["patient_profile_id","patient_id","doctor_profile_id","doctor_id","link","sesion_id"
+
   ],
   secret: process.env.SOME_32BYTE_BASE64_STRING,
   saltGenerator: function (secret) {
