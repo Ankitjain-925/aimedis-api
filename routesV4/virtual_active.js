@@ -926,9 +926,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               });
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
-              if (data.start_time <= final && data.end_time >= final) {
+              if (data[0].start_time <= final && data[0].end_time >= final) {
                 virtual_Task.find(
-                  { _id: data.task_id, is_payment: true },
+                  { patient_id: data[0].patient_id, is_payment: true },
                   function (err, userdata) {
                     if (err && !userdata) {
                       const VirtualtToSearchWith = new sick_meeting({
@@ -971,14 +971,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data.start_time > final) {
+              } else if (data[0].start_time > final) {
                 console.log("4");
                 res.json({
                   status: 200,
                   hassuccessed: false,
                   message: "link start soon",
                 });
-              } else if (data.end_time < final) {
+              } else if (data[0].end_time < final) {
                 console.log("5");
                 res.json({
                   status: 200,
@@ -986,20 +986,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   message: "Link Expire",
                 });
               }
-            } else if (data.start_time > final) {
-              console.log("4");
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "link start soon",
-              });
-            } else if (data.end_time < final) {
-              console.log("5");
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Link Expire",
-              });
             } else {
               res.json({
                 status: 200,
