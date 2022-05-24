@@ -15,6 +15,7 @@ var answerspatient = require("../schema/answerspatient");
 var Prescription = require("../schema/prescription");
 var Cretificate = require("../schema/sick_certificate");
 var sick_meeting = require("../schema/sick_meeting");
+var marketing_user = require("../schema/marketing_user");
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
 const moment = require("moment");
@@ -575,19 +576,28 @@ router.post("/AddMeeting", function (req, res, next) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
+        var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
         var sendData = `Dear Patient,
 
-        Your payment process for sick leave certificate application is completed successfully.
-        Please do join the Video call at ${req.body.date} from the time slot  ${req.body.start} to ${req.body.end} 
-        Your Video call joining link is   ${req.body.patient_link}
-        Please remind the date and timing as alloted.`;
+    Your payment process for sick leave certificate application is completed successfully.
+    Please do join the Video call at ${meetingDate} from the time slot  ${
+          req.body.start_time
+        } to ${req.body.end_time} 
+    Your Video call joining link is  ${
+      req.body.link ? req.body.link.patient_link : "Not mentioned"
+    }
+    Please remind the date and timing as alloted.`;
 
         var sendData1 = `Dear Doctor,
 
-        The payment process for sick leave certificate application is completed successfully.
-        Please do join the Video call at  ${req.body.date} from the time slot ${req.body.start} to ${req.body.end}
-        Your Video call joining link is  ${req.body.doctor_link}
-        Please remind the date and timing as alloted.</div>`;
+    The payment process for sick leave certificate application is completed successfully.
+    Please do join the Video call at  ${meetingDate} from the time slot ${
+          req.body.start_time
+        } to ${req.body.end_time}
+    Your Video call joining link is  ${
+      req.body.link ? req.body.link.doctor_link : "Not mentioned"
+    }
+    Please remind the date and timing as alloted.</div>`;
 
         if (req.body.patient_mail !== "") {
           generateTemplate(
@@ -600,15 +610,19 @@ router.post("/AddMeeting", function (req, res, next) {
                 let mailOptions = {
                   from: "contact@aimedis.com",
                   to: req.body.patient_mail,
-                  subject:
-                    "Link for video call regarding sick leave certificate",
+                  subject: "Link for the Sick leave certificate",
                   html: html,
                 };
+
                 let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
+                  console.log("y");
+                }
               }
             }
           );
-          User.find({ _id: req.body.doctor_id }, function (err, userdata) {
+          console.log("req.body.doctor_id", req.body.doctor_id);
+          User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
             if (err && !userdata) {
               res.json({
                 status: 200,
@@ -617,6 +631,7 @@ router.post("/AddMeeting", function (req, res, next) {
                 error: err,
               });
             } else {
+              console.log("userdata.email, ", userdata, userdata.email);
               generateTemplate(
                 EMAIL.generalEmail.createTemplate("en", {
                   title: "",
@@ -627,22 +642,24 @@ router.post("/AddMeeting", function (req, res, next) {
                     let mailOptions1 = {
                       from: "contact@aimedis.com",
                       to: userdata.email,
-                      subject: "Sick leave certificate request",
+                      subject: "Link for the sick leave certificate",
                       html: html,
                     };
                     let sendmail1 = transporter.sendMail(mailOptions1);
+                    if (sendmail1) {
+                      console.log("y2");
+                    }
                   }
                 }
               );
             }
           });
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
         }
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-          data: user_data,
-        });
       }
     });
   } else {
@@ -890,97 +907,70 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
             let final = ttime.getHours() + ":" + ttime.getMinutes();
 
-            let data_d = new Date(data.date).setHours(0, 0, 0, 0);
+            let data_d = new Date(data[0].date).setHours(0, 0, 0, 0);
             console.log("data_d", data_d);
 
             if (moment(today).isAfter(data_d)) {
               console.log("1");
               res.json({
                 status: 200,
-                hassuccessed: true,
+                hassuccessed: false,
                 message: "Link Expire",
               });
-              let final = ttime.getHours() + ":" + ttime.getMinutes();
-
-              let data_d = new Date(data.date).setHours(0, 0, 0, 0);
-              console.log("data_d", data_d);
-
-              if (moment(today).isAfter(data_d)) {
-                console.log("1");
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Link Expire",
-                });
-              } else if (moment(today).isBefore(data_d)) {
-                console.log("2");
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Link will active soon",
-                });
-              } else if (moment(today).isSame(data_d)) {
-                console.log("3");
-                if (data.start_time <= final && data.end_time >= final) {
-                  virtual_Task.find(
-                    { _id: data.task_id, is_payment: true },
-                    function (err, userdata) {
-                      if (err && !userdata) {
-                        const VirtualtToSearchWith = new sick_meeting({
-                          sesion_id: req.params.sesion_id,
-                        });
-                        VirtualtToSearchWith.encryptFieldsSync();
-                        sick_meeting.deleteOne(
-                          {
-                            $or: [
-                              { sesion_id: VirtualtToSearchWith.sesion_id },
-                              { sesion_id: req.params.sesion_id },
-                            ],
-                          },
-                          function (err, data) {
-                            console.log("err", err);
-                            if (err) {
-                              console.log("message", "Something went wrong");
-                            } else {
-                              console.log(
-                                "message",
-                                "Speciality is Deleted Successfully"
-                              );
-                            }
+            } else if (moment(today).isBefore(data_d)) {
+              console.log("2");
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Link will active soon",
+              });
+            } else if (moment(today).isSame(data_d)) {
+              console.log("3");
+              if (data.start_time <= final && data.end_time >= final) {
+                virtual_Task.find(
+                  { _id: data.task_id, is_payment: true },
+                  function (err, userdata) {
+                    if (err && !userdata) {
+                      const VirtualtToSearchWith = new sick_meeting({
+                        sesion_id: req.params.sesion_id,
+                      });
+                      VirtualtToSearchWith.encryptFieldsSync();
+                      sick_meeting.deleteOne(
+                        {
+                          $or: [
+                            { sesion_id: VirtualtToSearchWith.sesion_id },
+                            { sesion_id: req.params.sesion_id },
+                          ],
+                        },
+                        function (err, data) {
+                          console.log("err", err);
+                          if (err) {
+                            console.log("message", "Something went wron");
+                          } else {
+                            console.log(
+                              "message",
+                              "Speciality is Deleted Successfully"
+                            );
                           }
-                        );
-                        res.json({
-                          status: 200,
-                          hassuccessed: false,
-                          message: "Payment is Incomplete",
-                          error: err,
-                        });
-                      } else {
-                        console.log("userdata", userdata);
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          message: "link active",
-                          data: { Task: userdata, Session: data },
-                        });
-                      }
+                        }
+                      );
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Payment is Incomplete",
+                        error: err,
+                      });
+                    } else {
+                      console.log("userdata", userdata);
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "link active",
+                        data: { Task: userdata, Session: data },
+                      });
                     }
-                  );
-                } else if (data.start_time > final) {
-                  console.log("4");
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    message: "link start soon",
-                  });
-                } else if (data.end_time < final) {
-                  console.log("5");
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    message: "Link Expire",
-                  });
-                }
+                  }
+                );
               } else if (data.start_time > final) {
                 console.log("4");
                 res.json({
@@ -995,20 +985,34 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   hassuccessed: false,
                   message: "Link Expire",
                 });
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Invalid Session ID",
-                });
               }
+            } else if (data.start_time > final) {
+              console.log("4");
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "link start soon",
+              });
+            } else if (data.end_time < final) {
+              console.log("5");
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Link Expire",
+              });
             } else {
               res.json({
                 status: 200,
                 hassuccessed: false,
-                message: "Data is null",
+                message: "Invalid Session ID",
               });
             }
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Data is null",
+            });
           }
         }
       }
@@ -1128,4 +1132,5 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
     });
   }
 });
+
 module.exports = router;

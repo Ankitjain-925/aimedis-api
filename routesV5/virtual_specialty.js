@@ -918,35 +918,33 @@ router.post("/AddService", CheckRole("add_service"), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var Virtual_Services = new virtual_Service(req.body);
-    Virtual_Services.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
-      }
+    let house_id = req.params.house_id;
+    const VirtualtToSearchWith = new virtual_Task({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    const VirtualtToSearchWith2 = new virtual_Task({
+      task_type: "picture_evaluation",
     });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+    VirtualtToSearchWith2.encryptFieldsSync();
 
-router.get("/GetService/:house_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Service.find(
-      { house_id: req.params.house_id },
+    virtual_Task.find(
+      {
+        house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
+        archived: { $ne: true },
+        $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
+        $or: [
+          { task_type: { $ne: "sick_leave" } },
+          { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+          { task_type: { $ne: "picture_evaluation" } },
+          { task_type: { $ne: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
+      },
       function (err, userdata) {
         if (err && !userdata) {
+          console.log("err", err);
+
           res.json({
             status: 200,
             hassuccessed: false,
@@ -954,6 +952,7 @@ router.get("/GetService/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
+          userdata.sort(mysort1);
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
