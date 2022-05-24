@@ -496,12 +496,20 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
           userdata.sort(mysort1);
           res.json({
             status: 200,
-            hassuccessed: false,
-            message: "Authentication required.",
+            hassuccessed: true,
+            message: "success",
+            data: userdata,
           });
         }
       }
     );
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
   }
 });
 
