@@ -882,7 +882,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
       sesion_id: req.params.sesion_id,
     });
     VirtualtToSearchWith.encryptFieldsSync();
-    sick_meeting.find(
+    sick_meeting.findOne(
       {
         $or: [
           { sesion_id: VirtualtToSearchWith.sesion_id },
@@ -904,10 +904,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             let today = new Date().setHours(0, 0, 0, 0);
             let ttime = new Date();
             console.log("today", today);
+            // let ttime1 = moment().hour()+":"+ moment().minute();
+            // console.log("ttime1",ttime1)
+
+            
 
             let final = ttime.getHours() + ":" + ttime.getMinutes();
 
-            let data_d = new Date(data[0].date).setHours(0, 0, 0, 0);
+            let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             console.log("data_d", data_d);
 
             if (moment(today).isAfter(data_d)) {
@@ -926,60 +930,71 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               });
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
-              if (data[0].start_time <= final && data[0].end_time >= final) {
-                console.log("3");
-                virtual_Task.find(
-                  { patient_id: data[0].patient_id, is_payment: true },
+
+              if (data.start_time <= final && data.end_time >= final) {
+                virtual_Task.findOne(
+                  { _id : data.task_id, is_payment: true },
+
                   function (err, userdata) {
                     if (err && !userdata) {
-                      const VirtualtToSearchWith = new sick_meeting({
-                        sesion_id: req.params.sesion_id,
-                      });
-                      VirtualtToSearchWith.encryptFieldsSync();
-                      sick_meeting.deleteOne(
-                        {
-                          $or: [
-                            { sesion_id: VirtualtToSearchWith.sesion_id },
-                            { sesion_id: req.params.sesion_id },
-                          ],
-                        },
-                        function (err, data) {
-                          console.log("err", err);
-                          if (err) {
-                            console.log("message", "Something went wron");
-                          } else {
-                            console.log(
-                              "message",
-                              "Speciality is Deleted Successfully"
-                            );
-                          }
-                        }
-                      );
                       res.json({
                         status: 200,
                         hassuccessed: false,
-                        message: "Payment is Incomplete",
+                        message: "Something went wrong",
                         error: err,
                       });
                     } else {
                       console.log("userdata", userdata);
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        message: "link active",
-                        data: { Task: userdata, Session: data },
-                      });
+                      if(userdata!== null){
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "link active",
+                          data: { Task: userdata, Session: data },
+                        });
+                      }
+                      else{
+                        console.log("12334")
+                        const VirtualtToSearchWith = new sick_meeting({
+                          sesion_id: req.params.sesion_id,
+                        });
+                        VirtualtToSearchWith.encryptFieldsSync();
+                        sick_meeting.deleteOne(
+                          {
+                            $or: [
+                              { sesion_id: VirtualtToSearchWith.sesion_id },
+                              { sesion_id: req.params.sesion_id },
+                            ],
+                          },
+                          function (err, data) {
+                            console.log("err", err);
+                            if (err) {
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Something went wrong"});
+                            } else {
+                              res.json({ 
+                                status: 200,
+                                hassuccessed: false,
+                                meessage: "Payment process is incomplete"
+                              })
+                              
+                            }
+                          }
+                        );
+                      }
                     }
                   }
                 );
-              } else if (data[0].start_time > final) {
+              } else if (data.start_time > final) {
                 console.log("4");
                 res.json({
                   status: 200,
                   hassuccessed: false,
                   message: "link start soon",
                 });
-              } else if (data[0].end_time < final) {
+              } else if (data.end_time < final) {
                 console.log("5");
                 res.json({
                   status: 200,
@@ -987,18 +1002,12 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   message: "Link Expire",
                 });
               }
-            } else {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Invalid Session ID",
-              });
-            }
+            } 
           } else {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "Data is null",
+              message: "Invalid Session ID",
             });
           }
         }
