@@ -930,9 +930,11 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               });
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
+
               if (data.start_time <= final && data.end_time >= final) {
                 virtual_Task.findOne(
                   { _id : data.task_id, is_payment: true },
+
                   function (err, userdata) {
                     if (err && !userdata) {
                       res.json({
