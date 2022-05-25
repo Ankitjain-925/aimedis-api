@@ -926,7 +926,8 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               });
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
-              if (data[0].start_time <= final && data[0].end_time >= final) {
+              if (data[0].start_time <= final && data[0].end_time <= final) {
+                console.log("3");
                 virtual_Task.find(
                   { patient_id: data[0].patient_id, is_payment: true },
                   function (err, userdata) {
