@@ -503,8 +503,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
         }
       }
     );
-  }
-  else {
+  } else {
     res.json({
       status: 200,
       hassuccessed: false,
@@ -3747,158 +3746,57 @@ router.post("/LeftInfoPatient", function (req, res) {
   }
 });
 
-// router.post("/deletehouse", function (req, res) {
-//   const token = req.headers.token;
-//   let legit = jwtconfig.verify(token);
-//   if (legit) {
-//     let house_id = req.body.house_id;
-
-//     User.updateMany(
-//       { "houses.value": house_id },
-//       { $pull: { houses: { value: house_id } } }
-//     ).exec(function (err, data) {
-//       if (err && !data) {
-//         console.log("eeee", err);
-//       } else {
-//         console.log("data1111", data);
-//       }
-//     });
-
-//     let VirtualtToSearchWith = new virtual_Case({ house_id });
-//     VirtualtToSearchWith.encryptFieldsSync();
-
-//     virtual_Case
-//       .updateOne(
-//         {
-//           $or: [
-//             { house_id: house_id },
-//             { house_id: VirtualtToSearchWith.house_id },
-//           ],
-//         },
-
-//         { inhospital: false }
-//       )
-
-//       .exec(function (err, data1) {
-//         if (err) {
-//           res.json({
-//             status: 200,
-//             hassuccessed: false,
-//             msg: "Something went wrong",
-//             error: err,
-//           });
-//         } else {
-//           console.log("data1", data1);
-//           res.json({
-//             status: 200,
-//             hassuccessed: true,
-//             message: "Update in houses",
-//           });
-//         }
-//       });
-//   } else {
-//     // res.json({
-//     //   status: 200,
-//     //   hassuccessed: false,
-//     //   msg: "Authentication require.",
-//     // });
-//     let house_id = req.body.house_id;
-
-//     User.updateMany(
-//       { "houses.value": house_id },
-//       { $pull: { houses: { value: house_id } } }
-//     ).exec(function (err, data) {
-//       if (err && !data) {
-//         console.log("eeee", err);
-//       } else {
-//         console.log("data1111", data);
-//       }
-//     });
-
-//     let VirtualtToSearchWith = new virtual_Case({ house_id });
-//     VirtualtToSearchWith.encryptFieldsSync();
-
-//     virtual_Case
-//       .updateOne(
-//         {
-//           $or: [
-//             { house_id: house_id },
-//             { house_id: VirtualtToSearchWith.house_id },
-//           ],
-//         },
-
-//         { inhospital: false }
-//       )
-
-//       .exec(function (err, data1) {
-//         if (err) {
-//           res.json({
-//             status: 200,
-//             hassuccessed: false,
-//             msg: "Something went wrong",
-//             error: err,
-//           });
-//         } else {
-//           console.log("data1", data1);
-//           res.json({
-//             status: 200,
-//             hassuccessed: true,
-//             message: "Update in houses",
-//           });
-//         }
-//       });
-//   }
-// });
-
 router.post("/deletehouse", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
     let house_id = req.body.house_id;
-    house_id.forEach((element, index) => {
-      User.updateMany({ houses: element }, { $pull: { houses: element } }).exec(
-        function (err, data) {
-          if (err && !data) {
-            console.log("eeee", err);
-          } else {
-            console.log("data1111", index, data);
-          }
-        }
-      );
-    });
-    let patient_en = house_id.map((element) => {
-      var VirtualtToSearchWith = new virtual_Case({ house_id: element });
-      VirtualtToSearchWith.encryptFieldsSync();
-      return VirtualtToSearchWith.house_id;
+
+    User.updateMany(
+      { "houses.value": house_id },
+      { $pull: { houses: { value: house_id } } }
+    ).exec(function (err, data) {
+      if (err && !data) {
+        console.log("eeee", err);
+      } else {
+        console.log("data1111", data);
+      }
     });
 
-    let final_house_id = [...patient_en, ...house_id];
-    house_id.forEach((element1, index) => {
-      Institute.updateMany(
-        {
-          "institute_groups.houses.house_id": element1,
-        },
-        {
-          $pull: {
-            institute_groups: {
-              houses: { $elemMatch: { house_id: element1 } },
-            },
+    let VirtualtToSearchWith = new virtual_Case({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+
+    Institute.updateMany(
+      {
+        "institute_groups.houses.house_id": house_id,
+      },
+      {
+        $pull: {
+          institute_groups: {
+            houses: { $elemMatch: { house_id: house_id } },
           },
-        }
-      ).exec(function (err, data) {
-        if (err && !data) {
-          console.log("123", err);
-        } else {
-          console.log("werr", data);
-        }
-      });
+        },
+      }
+    ).exec(function (err, data) {
+      if (err && !data) {
+        console.log("123", err);
+      } else {
+        console.log("werr", data);
+      }
     });
 
     virtual_Case
-      .updateMany(
-        { house_id: { $in: final_house_id } },
-        { $set: { inhospital: false } }
+      .updateOne(
+        {
+          $or: [
+            { house_id: house_id },
+            { house_id: VirtualtToSearchWith.house_id },
+          ],
+        },
+
+        { inhospital: false }
       )
+
       .exec(function (err, data1) {
         if (err) {
           res.json({
@@ -3920,10 +3818,85 @@ router.post("/deletehouse", function (req, res) {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Authentication required.",
+      msg: "Authentication require.",
     });
   }
 });
+
+// router.post("/deletehous", function (req, res) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     let house_id = req.body.house_id;
+//     house_id.forEach((element, index) => {
+//       User.updateMany({ houses: element }, { $pull: { houses: element } }).exec(
+//         function (err, data) {
+//           if (err && !data) {
+//             console.log("eeee", err);
+//           } else {
+//             console.log("data1111", index, data);
+//           }
+//         }
+//       );
+//     });
+//     let patient_en = house_id.map((element) => {
+//       var VirtualtToSearchWith = new virtual_Case({ house_id: element });
+//       VirtualtToSearchWith.encryptFieldsSync();
+//       return VirtualtToSearchWith.house_id;
+//     });
+
+//     let final_house_id = [...patient_en, ...house_id];
+//     house_id.forEach((element1, index) => {
+//       Institute.updateMany(
+//         {
+//           "institute_groups.houses.house_id": element1,
+//         },
+//         {
+//           $pull: {
+//             institute_groups: {
+//               houses: { $elemMatch: { house_id: element1 } },
+//             },
+//           },
+//         }
+//       ).exec(function (err, data) {
+//         if (err && !data) {
+//           console.log("123", err);
+//         } else {
+//           console.log("werr", data);
+//         }
+//       });
+//     });
+
+//     virtual_Case
+//       .updateMany(
+//         { house_id: { $in: final_house_id } },
+//         { $set: { inhospital: false } }
+//       )
+//       .exec(function (err, data1) {
+//         if (err) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             msg: "Something went wrong",
+//             error: err,
+//           });
+//         } else {
+//           console.log("data1", data1);
+//           res.json({
+//             status: 200,
+//             hassuccessed: true,
+//             message: "Update in houses",
+//           });
+//         }
+//       });
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       msg: "Authentication required.",
+//     });
+//   }
+// });
 
 router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;
