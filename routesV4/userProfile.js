@@ -9178,7 +9178,7 @@ router.delete("/delete1234/:_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    marketing_user.deleteOne({ _id: req.params._id }, function (err, data) {
+    marketing_user.deleteOne({ email: req.params._id }, function (err, data) {
       if (err) {
         console.log("err", err);
         res.json({
@@ -9205,6 +9205,7 @@ router.delete("/delete1234/:_id", function (req, res) {
 });
 
 router.post("/Metadata1234", function (req, res, next) {
+  req.body.email = req.body.email && req.body.email.tolowerCase();
   var marketing_users = new marketing_user(req.body);
   marketing_users.save(function (err, user_data) {
     if (err && !user_data) {

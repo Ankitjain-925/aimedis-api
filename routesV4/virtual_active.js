@@ -901,17 +901,23 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         } else {
           console.log("data", data);
           if (data !== null) {
-            let today = new Date().setHours(0, 0, 0, 0);
-            let ttime = new Date();
+            // let today = new Date().setHours(0, 0, 0, 0);
+            // console.log("today",today)
+
+            let today =moment().format("MM / DD / YYYY")
+            // let ttime = new Date();
             console.log("today", today);
-            // let ttime1 = moment().hour()+":"+ moment().minute();
-            // console.log("ttime1",ttime1)
+            let ttime = moment().format("HH:mm")
+            console.log("ttime1",ttime)
 
             
 
-            let final = ttime.getHours() + ":" + ttime.getMinutes();
+            // let final = ttime.getHours() + ":" + ttime.getMinutes();
 
-            let data_d = new Date(data.date).setHours(0, 0, 0, 0);
+            let final =ttime
+            console.log("final",final)
+            // let data_d = new Date(data.date).setHours(0, 0, 0, 0);
+            let data_d = moment().utc().format(data.date,"DD / MM / YYYY")
             console.log("data_d", data_d);
 
             if (moment(today).isAfter(data_d)) {
@@ -930,11 +936,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               });
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
-
-              if (data.start_time <= final && data.end_time >= final) {
+              if (data.start_time <= ttime && data.end_time >= ttime) {
                 virtual_Task.findOne(
                   { _id : data.task_id, is_payment: true },
-
                   function (err, userdata) {
                     if (err && !userdata) {
                       res.json({
@@ -987,14 +991,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data.start_time > final) {
+              } else if (data.start_time > ttime) {
                 console.log("4");
                 res.json({
                   status: 200,
                   hassuccessed: false,
                   message: "link start soon",
                 });
-              } else if (data.end_time < final) {
+              } else if (data.end_time < ttime) {
                 console.log("5");
                 res.json({
                   status: 200,
@@ -1021,6 +1025,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
     });
   }
 });
+
 
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
