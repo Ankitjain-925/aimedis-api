@@ -9178,7 +9178,8 @@ router.delete("/marketing_user/:email", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    const messageToSearchWith = new User({ email: req.params.email });
+var email = req.params.email && req.params.email.toLowerCase();
+    const messageToSearchWith = new User({ email: email });
     messageToSearchWith.encryptFieldsSync();
     marketing_user.deleteOne(
       {
@@ -9203,6 +9204,7 @@ router.delete("/marketing_user/:email", function (req, res) {
             hassuccessed: true,
           });
         }
+
       }
     );
   } else {
@@ -9214,12 +9216,14 @@ router.delete("/marketing_user/:email", function (req, res) {
   }
 });
 
+
 router.post("/marketing_user", function (req, res, next) {
   var email = req.body.email.toLowerCase();
   req.body.email = email;
   datas = { ...req.body };
   console.log(req.body.email);
   var marketing_users = new marketing_user(datas);
+
   marketing_users.save(function (err, user_data) {
     if (err && !user_data) {
       res.json({ status: 200, message: "Something went wrong.", error: err });

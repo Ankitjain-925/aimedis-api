@@ -34,5 +34,5 @@ MarketingSchema.plugin(mongooseFieldEncryption, {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
   },
 });
-var Marketing = mongoose.model("Marketing", MarketingSchema);
+var Marketing = mongoose.model("marketing_user", MarketingSchema);
 module.exports = Marketing;
