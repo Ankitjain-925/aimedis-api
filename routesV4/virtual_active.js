@@ -902,17 +902,30 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
           console.log("data", data);
           if (data !== null) {
             let today = new Date().setHours(0, 0, 0, 0);
-            let ttime = new Date();
-            console.log("today", today);
-            // let ttime1 = moment().hour()+":"+ moment().minute();
-            // console.log("ttime1",ttime1)
+            // console.log("today",today)
 
+            // let today =moment().format("MM-DD-YYYY")
+            // let ttime = new Date();
+            // console.log("today", today);
+
+
+            let ttime = moment().format("HH:mm")
+            console.log("ttime1",ttime)
+            
+            let data_start =moment(data.start_time).format("HH:mm")
+            console.log("data_start",data_start)
+
+            let data_end = moment(data.end_time).format("HH:mm")
+            console.log("data_end",data_end)
             
 
-            let final = ttime.getHours() + ":" + ttime.getMinutes();
+            // let final = ttime.getHours() + ":" + ttime.getMinutes();
 
+            // let final =ttime.toLocaleTimeString([], { hour12: false ,hour: '2-digit', minute: '2-digit'})
+            // console.log("final",final)
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
-            console.log("data_d", data_d);
+            // let data_d = moment().format(data.date,"MM-DD-YYYY")
+            
 
             if (moment(today).isAfter(data_d)) {
               console.log("1");
@@ -930,7 +943,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               });
             } else if (moment(today).isSame(data_d)) {
               console.log("3");
-              if (data.start_time <= final && data.end_time >= final) {
+              if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
                   { _id : data.task_id, is_payment: true },
                   function (err, userdata) {
@@ -985,14 +998,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data.start_time > final) {
+              } else if (data_start > ttime) {
                 console.log("4");
                 res.json({
                   status: 200,
                   hassuccessed: false,
                   message: "link start soon",
                 });
-              } else if (data.end_time < final) {
+              } else if (data_end < ttime) {
                 console.log("5");
                 res.json({
                   status: 200,
