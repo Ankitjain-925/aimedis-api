@@ -418,6 +418,7 @@ router.post("/approvedrequest", function (req, res) {
         err: err,
       });
     } else {
+      if(result){
       if (req.body.for_manage === "approved") {
         virtual_Task.updateOne(
           { _id: req.body.task_id },
@@ -541,6 +542,7 @@ router.post("/approvedrequest", function (req, res) {
           }
         );
       }
+    }
     }
   });
 });
