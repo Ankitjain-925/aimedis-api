@@ -462,8 +462,8 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
     let house_id = req.params.house_id;
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
-    VirtualtToSearchWith1.encryptFieldsSync();
+    // const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    // VirtualtToSearchWith1.encryptFieldsSync();
 
     const VirtualtToSearchWith2 = new virtual_Task({
       task_type: "picture_evaluation",
@@ -476,10 +476,10 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
         archived: { $ne: true },
         $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
         $or: [
-          { task_type: { $ne: "sick_leave" } },
-          { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-          { task_type: { $ne: "picture_evaluation" } },
-          { task_type: { $ne: VirtualtToSearchWith2.task_type } },
+          // { task_type: { $ne: "sick_leave" } },
+          // { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
           { task_type: { $exists: false } },
         ],
       },
@@ -503,8 +503,7 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
         }
       }
     );
-  }
-  else {
+  } else {
     res.json({
       status: 200,
       hassuccessed: false,
@@ -3747,109 +3746,6 @@ router.post("/LeftInfoPatient", function (req, res) {
   }
 });
 
-// router.post("/deletehouse", function (req, res) {
-//   const token = req.headers.token;
-//   let legit = jwtconfig.verify(token);
-//   if (legit) {
-//     let house_id = req.body.house_id;
-
-//     User.updateMany(
-//       { "houses.value": house_id },
-//       { $pull: { houses: { value: house_id } } }
-//     ).exec(function (err, data) {
-//       if (err && !data) {
-//         console.log("eeee", err);
-//       } else {
-//         console.log("data1111", data);
-//       }
-//     });
-
-//     let VirtualtToSearchWith = new virtual_Case({ house_id });
-//     VirtualtToSearchWith.encryptFieldsSync();
-
-//     virtual_Case
-//       .updateOne(
-//         {
-//           $or: [
-//             { house_id: house_id },
-//             { house_id: VirtualtToSearchWith.house_id },
-//           ],
-//         },
-
-//         { inhospital: false }
-//       )
-
-//       .exec(function (err, data1) {
-//         if (err) {
-//           res.json({
-//             status: 200,
-//             hassuccessed: false,
-//             msg: "Something went wrong",
-//             error: err,
-//           });
-//         } else {
-//           console.log("data1", data1);
-//           res.json({
-//             status: 200,
-//             hassuccessed: true,
-//             message: "Update in houses",
-//           });
-//         }
-//       });
-//   } else {
-//     // res.json({
-//     //   status: 200,
-//     //   hassuccessed: false,
-//     //   msg: "Authentication require.",
-//     // });
-//     let house_id = req.body.house_id;
-
-//     User.updateMany(
-//       { "houses.value": house_id },
-//       { $pull: { houses: { value: house_id } } }
-//     ).exec(function (err, data) {
-//       if (err && !data) {
-//         console.log("eeee", err);
-//       } else {
-//         console.log("data1111", data);
-//       }
-//     });
-
-//     let VirtualtToSearchWith = new virtual_Case({ house_id });
-//     VirtualtToSearchWith.encryptFieldsSync();
-
-//     virtual_Case
-//       .updateOne(
-//         {
-//           $or: [
-//             { house_id: house_id },
-//             { house_id: VirtualtToSearchWith.house_id },
-//           ],
-//         },
-
-//         { inhospital: false }
-//       )
-
-//       .exec(function (err, data1) {
-//         if (err) {
-//           res.json({
-//             status: 200,
-//             hassuccessed: false,
-//             msg: "Something went wrong",
-//             error: err,
-//           });
-//         } else {
-//           console.log("data1", data1);
-//           res.json({
-//             status: 200,
-//             hassuccessed: true,
-//             message: "Update in houses",
-//           });
-//         }
-//       });
-//   }
-// });
-
 router.post("/deletehouse", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -3924,6 +3820,80 @@ router.post("/deletehouse", function (req, res) {
     });
   }
 });
+// router.post("/deletehous", function (req, res) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     let house_id = req.body.house_id;
+//     house_id.forEach((element, index) => {
+//       User.updateMany({ houses: element }, { $pull: { houses: element } }).exec(
+//         function (err, data) {
+//           if (err && !data) {
+//             console.log("eeee", err);
+//           } else {
+//             console.log("data1111", index, data);
+//           }
+//         }
+//       );
+//     });
+//     let patient_en = house_id.map((element) => {
+//       var VirtualtToSearchWith = new virtual_Case({ house_id: element });
+//       VirtualtToSearchWith.encryptFieldsSync();
+//       return VirtualtToSearchWith.house_id;
+//     });
+
+//     let final_house_id = [...patient_en, ...house_id];
+//     house_id.forEach((element1, index) => {
+//       Institute.updateMany(
+//         {
+//           "institute_groups.houses.house_id": element1,
+//         },
+//         {
+//           $pull: {
+//             institute_groups: {
+//               houses: { $elemMatch: { house_id: element1 } },
+//             },
+//           },
+//         }
+//       ).exec(function (err, data) {
+//         if (err && !data) {
+//           console.log("123", err);
+//         } else {
+//           console.log("werr", data);
+//         }
+//       });
+//     });
+
+//     virtual_Case
+//       .updateMany(
+//         { house_id: { $in: final_house_id } },
+//         { $set: { inhospital: false } }
+//       )
+//       .exec(function (err, data1) {
+//         if (err) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             msg: "Something went wrong",
+//             error: err,
+//           });
+//         } else {
+//           console.log("data1", data1);
+//           res.json({
+//             status: 200,
+//             hassuccessed: true,
+//             message: "Update in houses",
+//           });
+//         }
+//       });
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       msg: "Authentication required.",
+//     });
+//   }
+// });
 
 router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;
