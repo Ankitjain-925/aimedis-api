@@ -9174,27 +9174,39 @@ router.post("/verifyStripe", (req, res) => {
   }
 });
 
-router.delete("/delete1234/:_id", function (req, res) {
+router.delete("/marketing_user/:email", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    marketing_user.deleteOne({ email: req.params._id }, function (err, data) {
-      if (err) {
-        console.log("err", err);
-        res.json({
-          status: 200,
-          message: "Something went wrong.",
-          error: err,
-          hassuccessed: false,
-        });
-      } else {
-        res.json({
-          status: 200,
-          message: "Deleted",
-          hassuccessed: true,
-        });
+var email = req.params.email && req.params.email.toLowerCase();
+    const messageToSearchWith = new User({ email: email });
+    messageToSearchWith.encryptFieldsSync();
+    marketing_user.deleteOne(
+      {
+        $or: [
+          { email: messageToSearchWith.email },
+          { email: req.params.email },
+        ],
+      },
+      function (err, data) {
+        if (err) {
+          console.log("err", err);
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "Deleted",
+            hassuccessed: true,
+          });
+        }
+
       }
-    });
+    );
   } else {
     res.json({
       status: 200,
@@ -9204,9 +9216,14 @@ router.delete("/delete1234/:_id", function (req, res) {
   }
 });
 
-router.post("/Metadata1234", function (req, res, next) {
-  req.body.email = req.body.email && req.body.email.tolowerCase();
-  var marketing_users = new marketing_user(req.body);
+
+router.post("/marketing_user", function (req, res, next) {
+  var email = req.body.email.toLowerCase();
+  req.body.email = email;
+  datas = { ...req.body };
+  console.log(req.body.email);
+  var marketing_users = new marketing_user(datas);
+
   marketing_users.save(function (err, user_data) {
     if (err && !user_data) {
       res.json({ status: 200, message: "Something went wrong.", error: err });
