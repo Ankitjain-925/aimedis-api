@@ -122,7 +122,7 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
       .exec(function (err, total) {
         console.log("total", total);
         var random = Math.floor(Math.random() * total);
-        if (total > 1) {
+        if (total >= 1) {
           User.find({ current_available: true, institute_id: institute_id })
             .skip(random)
             .limit(1)
@@ -345,7 +345,6 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("userdata", userdata);
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -418,7 +417,6 @@ router.post("/approvedrequest", function (req, res) {
         err: err,
       });
     } else {
-      if(result){
       if (req.body.for_manage === "approved") {
         virtual_Task.updateOne(
           { _id: req.body.task_id },
@@ -542,7 +540,6 @@ router.post("/approvedrequest", function (req, res) {
           }
         );
       }
-    }
     }
   });
 });
@@ -783,7 +780,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                   let mailOptions = {
                     from: "contact@aimedis.com",
                     to: req.body.email,
-                    subject: "Sick leave certificate request",
+                    subject: "Sick leave certificate",
                     html: html,
                     attachments: [
                       {
@@ -793,6 +790,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                       },
                     ],
                   };
+
                   let sendmail = transporter.sendMail(mailOptions);
                   console.log("mail", mailOptions);
                   if (sendmail) {
@@ -888,9 +886,9 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
 });
 
 router.get("/Linktime/:sesion_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
+  // const token = req.headers.token;
+  // let legit = jwtconfig.verify(token);
+  // if (legit) {
     const VirtualtToSearchWith = new sick_meeting({
       sesion_id: req.params.sesion_id,
     });
@@ -1037,13 +1035,13 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         }
       }
     );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
+  // } else {
+  //   res.json({
+  //     status: 200,
+  //     hassuccessed: false,
+  //     message: "Authentication required.",
+  //   });
+  // }
 });
 
 
