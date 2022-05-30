@@ -418,21 +418,21 @@ router.post("/approvedrequest", function (req, res) {
         err: err,
       });
     } else {
-      if(result){
-      if (req.body.for_manage === "approved") {
-        virtual_Task.updateOne(
-          { _id: req.body.task_id },
-          { approved: true },
-          function (err, data) {
-            if (err && !data) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "Something went wrong",
-                error: err,
-              });
-            } else {
-              sendData = `Dear Patient<br/>
+      if (result) {
+        if (req.body.for_manage === "approved") {
+          virtual_Task.updateOne(
+            { _id: req.body.task_id },
+            { approved: true },
+            function (err, data) {
+              if (err && !data) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                sendData = `Dear Patient<br/>
             Your request for the sick leave certificate is accepted by the doctor on 
              ${req.body.date}
               at 
@@ -440,109 +440,109 @@ router.post("/approvedrequest", function (req, res) {
               to
               ${req.body.end}
               So, for the further process please complete your payment process from the request list page`;
-              generateTemplate(
-                EMAIL.generalEmail.createTemplate("en", {
-                  title: "",
-                  content: sendData,
-                }),
-                (error, html) => {
-                  if (result.email !== "") {
-                    let mailOptions = {
-                      from: "contact@aimedis.com",
-                      to: result.email,
-                      subject: "Approve sick leave request by Doctor",
-                      html: html,
-                    };
-                    let sendmail = transporter.sendMail(mailOptions);
-                    console.log("mail", mailOptions);
-                    if (sendmail) {
-                      console.log("Mail is sent ");
-                      res.json({
-                        status: 200,
-                        message: "Mail sent Successfully",
-                        hassuccessed: true,
-                      });
+                generateTemplate(
+                  EMAIL.generalEmail.createTemplate("en", {
+                    title: "",
+                    content: sendData,
+                  }),
+                  (error, html) => {
+                    if (result.email !== "") {
+                      let mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: result.email,
+                        subject: "Approve sick leave request by Doctor",
+                        html: html,
+                      };
+                      let sendmail = transporter.sendMail(mailOptions);
+                      console.log("mail", mailOptions);
+                      if (sendmail) {
+                        console.log("Mail is sent ");
+                        res.json({
+                          status: 200,
+                          message: "Mail sent Successfully",
+                          hassuccessed: true,
+                        });
+                      } else {
+                        console.log("err");
+                        res.json({
+                          status: 200,
+                          msg: "Mail is not sent",
+                          hassuccessed: false,
+                        });
+                      }
                     } else {
-                      console.log("err");
+                      console.log("no email");
                       res.json({
                         status: 200,
                         msg: "Mail is not sent",
                         hassuccessed: false,
                       });
                     }
-                  } else {
-                    console.log("no email");
-                    res.json({
-                      status: 200,
-                      msg: "Mail is not sent",
-                      hassuccessed: false,
-                    });
                   }
-                }
-              );
+                );
+              }
             }
-          }
-        );
-      } else {
-        virtual_Task.updateOne(
-          { _id: req.body.task_id },
-          { approved: false, is_decline: true },
-          function (err, data) {
-            if (err && !data) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "Something went wrong",
-                error: err,
-              });
-            } else {
-              sendData = `Dear Patient<br/>
+          );
+        } else {
+          virtual_Task.updateOne(
+            { _id: req.body.task_id },
+            { approved: false, is_decline: true },
+            function (err, data) {
+              if (err && !data) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                sendData = `Dear Patient<br/>
             Your request for the sick leave certificate is decline by the doctor`;
-              generateTemplate(
-                EMAIL.generalEmail.createTemplate("en", {
-                  title: "",
-                  content: sendData,
-                }),
-                (error, html) => {
-                  if (result.email !== "") {
-                    let mailOptions = {
-                      from: "contact@aimedis.com",
-                      to: result.email,
-                      subject: "Approve sick leave request by Doctor",
-                      html: html,
-                    };
-                    let sendmail = transporter.sendMail(mailOptions);
-                    console.log("mail", mailOptions);
-                    if (sendmail) {
-                      console.log("Mail is sent ");
-                      res.json({
-                        status: 200,
-                        message: "Mail sent Successfully",
-                        hassuccessed: true,
-                      });
+                generateTemplate(
+                  EMAIL.generalEmail.createTemplate("en", {
+                    title: "",
+                    content: sendData,
+                  }),
+                  (error, html) => {
+                    if (result.email !== "") {
+                      let mailOptions = {
+                        from: "contact@aimedis.com",
+                        to: result.email,
+                        subject: "Approve sick leave request by Doctor",
+                        html: html,
+                      };
+                      let sendmail = transporter.sendMail(mailOptions);
+                      console.log("mail", mailOptions);
+                      if (sendmail) {
+                        console.log("Mail is sent ");
+                        res.json({
+                          status: 200,
+                          message: "Mail sent Successfully",
+                          hassuccessed: true,
+                        });
+                      } else {
+                        console.log("err");
+                        res.json({
+                          status: 200,
+                          msg: "Mail is not sent",
+                          hassuccessed: false,
+                        });
+                      }
                     } else {
-                      console.log("err");
+                      console.log("no email");
                       res.json({
                         status: 200,
                         msg: "Mail is not sent",
                         hassuccessed: false,
                       });
                     }
-                  } else {
-                    console.log("no email");
-                    res.json({
-                      status: 200,
-                      msg: "Mail is not sent",
-                      hassuccessed: false,
-                    });
                   }
-                }
-              );
+                );
+              }
             }
-          }
-        );
+          );
+        }
       }
-    }
     }
   });
 });
@@ -921,16 +921,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             // let ttime = new Date();
             // console.log("today", today);
 
+            let ttime = moment().format("HH:mm");
+            console.log("ttime1", ttime);
 
-            let ttime = moment().format("HH:mm")
-            console.log("ttime1",ttime)
-            
-            let data_start =moment(data.start_time).format("HH:mm")
-            console.log("data_start",data_start)
+            let data_start = moment(data.start_time).format("HH:mm");
+            console.log("data_start", data_start);
 
-            let data_end = moment(data.end_time).format("HH:mm")
-            console.log("data_end",data_end)
-            
+            let data_end = moment(data.end_time).format("HH:mm");
+            console.log("data_end", data_end);
 
             // let final = ttime.getHours() + ":" + ttime.getMinutes();
 
@@ -938,7 +936,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             // console.log("final",final)
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             // let data_d = moment().format(data.date,"MM-DD-YYYY")
-            
 
             if (moment(today).isAfter(data_d)) {
               console.log("1");
@@ -958,7 +955,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               console.log("3");
               if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
-                  { _id : data.task_id, is_payment: true },
+                  { _id: data.task_id, is_payment: true },
                   function (err, userdata) {
                     if (err && !userdata) {
                       res.json({
@@ -969,16 +966,15 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       console.log("userdata", userdata);
-                      if(userdata!== null){
+                      if (userdata !== null) {
                         res.json({
                           status: 200,
                           hassuccessed: true,
                           message: "link active",
                           data: { Task: userdata, Session: data },
                         });
-                      }
-                      else{
-                        console.log("12334")
+                      } else {
+                        console.log("12334");
                         const VirtualtToSearchWith = new sick_meeting({
                           sesion_id: req.params.sesion_id,
                         });
@@ -996,14 +992,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-                                message: "Something went wrong"});
+                                message: "Something went wrong",
+                              });
                             } else {
-                              res.json({ 
+                              res.json({
                                 status: 200,
                                 hassuccessed: false,
-                                meessage: "Payment process is incomplete"
-                              })
-                              
+                                meessage: "Payment process is incomplete",
+                              });
                             }
                           }
                         );
@@ -1026,7 +1022,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   message: "Link Expire",
                 });
               }
-            } 
+            }
           } else {
             res.json({
               status: 200,
@@ -1045,7 +1041,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
     });
   }
 });
-
 
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
@@ -1154,4 +1149,35 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
   }
 });
 
+router.put("/UpdateTask/:task_id", function (req, res, next) {
+  virtual_Task.findOneAndUpdate(
+    { _id: req.params.task_id },
+    { meetingjoined: true },
+    (err, doc1) => {
+      if (err && !doc1) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "update data failed",
+          error: err,
+        });
+      } else {
+        if (doc1.nModified == "0") {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "User is not found",
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Updated",
+            data: doc1,
+          });
+        }
+      }
+    }
+  );
+});
 module.exports = router;
