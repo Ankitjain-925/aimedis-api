@@ -404,6 +404,7 @@ router.get('/pharmacyPrescription/:UserId', function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
 });
+
 function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
         return promise.then(function () {

@@ -417,20 +417,21 @@ router.post("/approvedrequest", function (req, res) {
         err: err,
       });
     } else {
-      if (req.body.for_manage === "approved") {
-        virtual_Task.updateOne(
-          { _id: req.body.task_id },
-          { approved: true },
-          function (err, data) {
-            if (err && !data) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "Something went wrong",
-                error: err,
-              });
-            } else {
-              sendData = `Dear Patient<br/>
+      if (result) {
+        if (req.body.for_manage === "approved") {
+          virtual_Task.updateOne(
+            { _id: req.body.task_id },
+            { approved: true },
+            function (err, data) {
+              if (err && !data) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                sendData = `Dear Patient<br/>
             Your request for the sick leave certificate is accepted by the doctor on 
              ${req.body.date}
               at 
@@ -920,14 +921,16 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             // let ttime = new Date();
             // console.log("today", today);
 
-            let ttime = moment().format("HH:mm");
-            console.log("ttime1", ttime);
 
-            let data_start = moment(data.start_time).format("HH:mm");
-            console.log("data_start", data_start);
+            let ttime = moment().format("HH:mm")
+            console.log("ttime1",ttime)
+            
+            let data_start =moment(data.start_time).format("HH:mm")
+            console.log("data_start",data_start)
 
-            let data_end = moment(data.end_time).format("HH:mm");
-            console.log("data_end", data_end);
+            let data_end = moment(data.end_time).format("HH:mm")
+            console.log("data_end",data_end)
+            
 
             // let final = ttime.getHours() + ":" + ttime.getMinutes();
 
@@ -935,6 +938,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             // console.log("final",final)
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             // let data_d = moment().format(data.date,"MM-DD-YYYY")
+            
 
             if (moment(today).isAfter(data_d)) {
               console.log("1");
@@ -954,7 +958,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               console.log("3");
               if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
-                  { _id: data.task_id, is_payment: true },
+                  { _id : data.task_id, is_payment: true },
                   function (err, userdata) {
                     if (err && !userdata) {
                       res.json({
@@ -965,15 +969,16 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       console.log("userdata", userdata);
-                      if (userdata !== null) {
+                      if(userdata!== null){
                         res.json({
                           status: 200,
                           hassuccessed: true,
                           message: "link active",
                           data: { Task: userdata, Session: data },
                         });
-                      } else {
-                        console.log("12334");
+                      }
+                      else{
+                        console.log("12334")
                         const VirtualtToSearchWith = new sick_meeting({
                           sesion_id: req.params.sesion_id,
                         });
@@ -991,14 +996,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-                                message: "Something went wrong",
-                              });
+                                message: "Something went wrong"});
                             } else {
-                              res.json({
+                              res.json({ 
                                 status: 200,
                                 hassuccessed: false,
-                                meessage: "Payment process is incomplete",
-                              });
+                                meessage: "Payment process is incomplete"
+                              })
+                              
                             }
                           }
                         );
@@ -1021,7 +1026,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   message: "Link Expire",
                 });
               }
-            }
+            } 
           } else {
             res.json({
               status: 200,
@@ -1040,6 +1045,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   //   });
   // }
 });
+
 
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
