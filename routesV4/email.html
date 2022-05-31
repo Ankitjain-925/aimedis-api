@@ -46,17 +46,17 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Name First Name</label> -->
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.info.first_name}}&nbsp;{{pat_info.info.last_name}}" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.name}}" />
                                     </div>
                                 </td>
                                 <td width="40%" style="padding-left: 2px; vertical-align: bottom;">
                                     <label
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         DOB</label>
-                                    <div>{{#each birthday}}
+                                    <div>
                                         <input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{key1}}" />
-                                            {{/each}}
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.birthday}}" />
+                                         
                                     </div>
                                 </td>
                             </tr>
@@ -71,7 +71,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Number Insurance Company</label> -->
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Number_Insurance_Company}}" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.number_insurance_company}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="padding-right: 2px; vertical-align: bottom;">
@@ -82,7 +82,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Insurance number of Person</label> -->
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Insurance_number_of_Person}}" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.insurance_number_person}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="vertical-align: bottom;">
@@ -93,7 +93,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Status</label> -->
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"  value="{{pat_info.Status}}" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"  value="{{pat_info.status}}" />
                                     </div>
                                 </td>
                             </tr>
@@ -108,7 +108,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Hospital Number</label> -->
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Hospital_Number}}" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.hospital_number}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="padding-right: 2px; vertical-align: bottom;">
@@ -119,7 +119,7 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Doctor Number</label> -->
                                     <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.Doctor_Number}}" />
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.doctor_number}}" />
                                     </div>
                                 </td>
                                 <td width="33.33%" style="vertical-align: bottom;">
@@ -129,8 +129,11 @@
                                     <label
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Status</label>
-                                    <div><input type="text"
-                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{date}}" />
+                                    <div>
+                                       
+                                        <input type="text"
+                                            style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;" value="{{pat_info.date}}" />
+                                            
                                     </div>
                                 </td>
                             </tr>
@@ -146,7 +149,7 @@
                                          <tr><label style="display: block;font-style: normal;font-weight: 500;font-size: 15px;line-height: 18px;color: #404646;margin-bottom: 2px;">
                                             First Time Certification</label></tr>  
                                          <tr>  
-                                            <td><input type="checkbox" value={{pat_info.Workincident}} checked={{pat_info.Workincident}}==true?true?false /></td>
+                                            <td><input type="checkbox" value={{pat_info.workincident}} checked={{pat_info.workincident}}==true?true?false /></td>
                                             <td>
                                                 <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                     Erstbescheinigung</label>
@@ -155,7 +158,7 @@
                                             </td>
                                          </tr>
                                          <tr>  
-                                            <td><input type="checkbox" value={{pat_info.Occupational}}  checked={{pat_info.Occupational}}==true?true?false/></td>
+                                            <td><input type="checkbox" value={{pat_info.occupational_disease}}  checked={{pat_info.occupational_disease}}==true?true?false/></td>
                                             <td>
                                                 <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                 Arbeitsunfall, Arbeitsunfallfolgen, Berufskrankheit</label>
@@ -172,7 +175,7 @@
                                                 Continuation of certification</label>
                                             </tr>    
                                             <tr>  
-                                               <td><input type="checkbox" value={{pat_info.Special_Doctor}} checked={{pat_info.Special_Doctor}}==true?true?false > </input></td>
+                                               <td><input type="checkbox" value={{pat_info.sent_special_doctor}} checked={{pat_info.sent_special_doctor}}==true?true?false > </input></td>
                                                <td>
                                                    <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                     Folgebescheinigung</label>
@@ -181,7 +184,7 @@
                                                </td>
                                             </tr>
                                             <tr>  
-                                               <td><input type="checkbox" value={{pat_info.zugewiesen}} checked={{pat_info.zugewiesen}}==true?true?false ></input></td>
+                                               <td><input type="checkbox" value={{pat_info.assigned_doctor}} checked={{pat_info.assigned_doctor}}==true?true?false ></input></td>
                                                <td>
                                                    <label style="display: block;color: #a12f21;font-style: normal;font-weight: 600;font-size: 15px;margin-bottom: 0px;line-height: 17px;">
                                                     Dem Durchgangsarzt zugewiesen</label>
@@ -205,7 +208,7 @@
                                     Imposible to work since</label> -->
                             </td>
                             <td style="display: flex;justify-content: right;align-items: center;padding-left: 12px;">
-                                {{#each work_since}}
+                               
                                 <!-- <input
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-radius: 4px 0px 0px 4px;" >{{v}}</input>
                                 <input
@@ -216,8 +219,8 @@
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input> -->
-                                    <input value="{{v}}" />
-                                {{/each}}
+                                    <input value="{{pat_info.imposible}}" />
+                               
                                 </td>
                         </tr>
                         <tr>
@@ -240,9 +243,9 @@
                                 <input
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input>
                             </td> -->
-                            {{#each work_until}}
-                            <input value= "{{v}}" />
-                            {{/each}}
+                           
+                            <input value= "{{pat_info.most_likely}}" />
+                          
                         </tr>
                         <tr>
                             <td>
@@ -264,9 +267,9 @@
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center;" ></input>
                                 <input
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input> -->
-                                    {{#each detected_at}}
-                                    <input value="{{v}}" />
-                                    {{/each}}
+                                  
+                                    <input value="{{pat_info.detected_at}}" />
+                                  
                                 </td>
                         </tr>
                     </table>
@@ -274,6 +277,7 @@
                 </td>
                 <td width="40%" style="vertical-align: top; padding-left: 10px; position: relative;">
                     <table>
+                       
                         <tr>
                             <td><label
                                     style="display: block; color: #a12f21; font-style: normal; font-weight: 600; font-size: 19px; line-height: 21px; margin: 0px;">
@@ -282,6 +286,9 @@
                         <tr style="position: absolute;bottom: 0px;">
                             <td
                                 style="border: 1.5px solid #a12f219c;padding: 18px;padding-top: 124px;border-radius: 6px;text-align: center;background: #ffffff;width: 100%;">
+                                {{# each Dataa}}
+                                {{v}}
+                                {{/ each}}
                                 <!-- <label
                                     style="display: block;font-style: normal;font-weight: 600;font-size: 14px;line-height: 16px;color: #404646;margin-bottom: 3px">Stemp
                                     and Signature of the Doctor</label> -->
