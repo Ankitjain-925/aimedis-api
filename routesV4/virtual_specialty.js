@@ -2978,7 +2978,6 @@ router.post("/downloadPEBill", function (req, res, next) {
           bill2.push({ k: "bill_date", v: getDate(value, "YYYY/MM/DD") });
         }
       });
-      console.log("birthday", birthday);
       // console.log("data",Data)
     }
     var template = handlebars.compile(bill);
@@ -3008,7 +3007,6 @@ router.post("/downloadPEBill", function (req, res, next) {
       res.json({ status: 200, hassuccessed: true, filename: filename });
     }
   } catch (e) {
-    console.log("e", e);
     res.json({
       status: 200,
       hassuccessed: false,
@@ -3328,6 +3326,7 @@ router.post("/CalenderFilter", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var patient_id = req.body.patient_id;
     const VirtualtToSearchWith = new virtual_Task({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
@@ -3427,6 +3426,13 @@ router.post("/CalenderFilter", function (req, res) {
         }
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong."
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -3473,6 +3479,7 @@ router.post("/billfilter", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     let house_id = req.body.house_id;
     var VirtualtToSearchWith = new virtual_Invoice({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
@@ -3522,6 +3529,13 @@ router.post("/billfilter", function (req, res) {
         }
       }
     });
+  }catch(err){
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -3578,6 +3592,7 @@ router.post("/LeftInfoPatient", function (req, res) {
   let legit = jwtconfig.verify(token);
   var leftdataPatient = {};
   if (legit) {
+    try{
     let house_id = req.body.house_id;
     const VirtualtToSearchWith = new User({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
@@ -3737,6 +3752,13 @@ router.post("/LeftInfoPatient", function (req, res) {
         }
       }
     );
+    }catch(err){
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Something went wrong",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -3750,6 +3772,7 @@ router.post("/deletehouse", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     let house_id = req.body.house_id;
     house_id.forEach((element, index) => {
       User.updateMany({ houses: element }, { $pull: { houses: element } }).exec(
@@ -3812,6 +3835,13 @@ router.post("/deletehouse", function (req, res) {
           });
         }
       });
+    }catch(err){
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Something went wrong",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -4007,6 +4037,7 @@ router.post("/getSubmitQuestionnaire", function (req, res) {
   let legit = jwtconfig.verify(token);
   let result = {};
   if (legit) {
+    try{
     let patient_id = req.body.patient_id;
     const VirtualtToSearchWith = new answerspatient({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
@@ -4067,6 +4098,13 @@ router.post("/getSubmitQuestionnaire", function (req, res) {
         }
       }
     );
+    }catch(err){
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -4080,6 +4118,7 @@ router.post("/virtualstep1", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     virtual_step.find({ house_id: req.body.house_id }, function (err, data) {
       if (err) {
         console.log("err", err);
@@ -4108,7 +4147,15 @@ router.post("/virtualstep1", function (req, res, next) {
           });
         }
       }
+   
     });
+  }catch(e){
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -4122,6 +4169,7 @@ router.post("/virtualstep2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     let house_id = req.body.house_id;
     const VirtualtToSearchWith = new virtual_Task({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
@@ -4163,6 +4211,13 @@ router.post("/virtualstep2", function (req, res, next) {
         }
       }
     );
+    }catch(err){
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong",
+      });
+    }
   } else {
     res.json({
       status: 200,

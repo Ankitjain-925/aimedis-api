@@ -95,12 +95,9 @@ const reqFilter = (req, resp, next) => {
 
 function getTimeStops(start, end, timeslots, breakstart, breakend) {
   var startTime = moment(start, "HH:mm");
-  console.log("startTime", startTime);
   var endTime = moment(end, "HH:mm");
-  console.log("endTime", endTime);
 
   var timeslot = parseInt(timeslots, 10);
-  console.log("timeslot", timeslot);
 
   if (endTime.isBefore(startTime)) {
     endTime.add(1, "day");
@@ -111,7 +108,6 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
     timeStops.push(new moment(startTime).format("HH:mm"));
     startTime.add(timeslot, "minutes");
   }
-  console.log("time", timeStops);
   return timeStops;
 }
 
@@ -123,7 +119,6 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
     User.find({ current_available: true, institute_id: institute_id })
       .countDocuments()
       .exec(function (err, total) {
-        console.log("total", total);
         var random = Math.floor(Math.random() * total);
         if (total >= 1) {
           User.find({ current_available: true, institute_id: institute_id })
@@ -159,21 +154,18 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                       custom_text =
                         Userinfo[i].sickleave_appointment[j].custom_text;
                     }
-                    console.log("qwwer", userdata[i].sickleave_appointment[j]);
                     if (
                       (userdata[i].sickleave_appointment[j].monday_start,
                         userdata[i].sickleave_appointment[j].monday_end,
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots)
                     ) {
-                      console.log("1");
                       monday = getTimeStops(
                         userdata[i].sickleave_appointment[j].monday_start,
                         userdata[i].sickleave_appointment[j].monday_end,
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
                       );
-                      console.log("w", monday);
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].tuesday_start,
@@ -263,7 +255,6 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                       sunday,
                       custom_text,
                     });
-                    // console.log("user", user);
                   }
                   finalArray.push({
                     data: userdata[i],
@@ -348,7 +339,6 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("userdata", userdata);
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -373,7 +363,6 @@ router.post("/DoctorMail", function (req, res) {
       ${req.body.date}
       <br/>
       Please check the list of requests from the list page. Please update the status of request also accordingly.</div>`;
-  console.log("sendData", sendData);
   generateTemplate(
     EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
     (error, html) => {
@@ -385,9 +374,7 @@ router.post("/DoctorMail", function (req, res) {
           html: html,
         };
         let sendmail = transporter.sendMail(mailOptions);
-        console.log("mail", mailOptions);
         if (sendmail) {
-          console.log("Mail is sent ");
 
           res.json({
             status: 200,
@@ -395,7 +382,6 @@ router.post("/DoctorMail", function (req, res) {
             hassuccessed: true,
           });
         } else {
-          console.log("err");
           res.json({
             status: 200,
             msg: "Mail is not sent",
@@ -403,7 +389,6 @@ router.post("/DoctorMail", function (req, res) {
           });
         }
       } else {
-        console.log("no email");
         res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
       }
     }
@@ -411,6 +396,7 @@ router.post("/DoctorMail", function (req, res) {
 });
 
 router.post("/approvedrequest", function (req, res) {
+  try{
   User.findOne({ _id: req.body.patient_id }, function (err, result) {
     if (err) {
       res.json({
@@ -455,16 +441,13 @@ router.post("/approvedrequest", function (req, res) {
                       html: html,
                     };
                     let sendmail = transporter.sendMail(mailOptions);
-                    console.log("mail", mailOptions);
                     if (sendmail) {
-                      console.log("Mail is sent ");
                       res.json({
                         status: 200,
                         message: "Mail sent Successfully",
                         hassuccessed: true,
                       });
                     } else {
-                      console.log("err");
                       res.json({
                         status: 200,
                         msg: "Mail is not sent",
@@ -472,7 +455,6 @@ router.post("/approvedrequest", function (req, res) {
                       });
                     }
                   } else {
-                    console.log("no email");
                     res.json({
                       status: 200,
                       msg: "Mail is not sent",
@@ -513,16 +495,13 @@ router.post("/approvedrequest", function (req, res) {
                       html: html,
                     };
                     let sendmail = transporter.sendMail(mailOptions);
-                    console.log("mail", mailOptions);
                     if (sendmail) {
-                      console.log("Mail is sent ");
                       res.json({
                         status: 200,
                         message: "Mail sent Successfully",
                         hassuccessed: true,
                       });
                     } else {
-                      console.log("err");
                       res.json({
                         status: 200,
                         msg: "Mail is not sent",
@@ -530,7 +509,6 @@ router.post("/approvedrequest", function (req, res) {
                       });
                     }
                   } else {
-                    console.log("no email");
                     res.json({
                       status: 200,
                       msg: "Mail is not sent",
@@ -545,6 +523,13 @@ router.post("/approvedrequest", function (req, res) {
       }
     }
   });
+}catch(e){
+  res.json({
+    status: 200,
+    msg: "Something went wrong.",
+    hassuccessed: false,
+  });
+}
 });
 
 router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
@@ -583,9 +568,9 @@ router.post("/AddMeeting", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var sick_meetings = new sick_meeting(req.body);
     sick_meetings.save(function (err, user_data) {
-      console.log("err", err);
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
@@ -625,12 +610,10 @@ router.post("/AddMeeting", function (req, res, next) {
 
                 let sendmail = transporter.sendMail(mailOptions);
                 if (sendmail) {
-                  console.log("y");
                 }
               }
             }
           );
-          console.log("req.body.doctor_id", req.body.doctor_id);
           User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
             if (err && !userdata) {
               res.json({
@@ -640,7 +623,6 @@ router.post("/AddMeeting", function (req, res, next) {
                 error: err,
               });
             } else {
-              console.log("userdata.email, ", userdata, userdata.email);
               generateTemplate(
                 EMAIL.generalEmail.createTemplate("en", {
                   title: "",
@@ -656,7 +638,6 @@ router.post("/AddMeeting", function (req, res, next) {
                     };
                     let sendmail1 = transporter.sendMail(mailOptions1);
                     if (sendmail1) {
-                      console.log("y2");
                     }
                   }
                 }
@@ -671,6 +652,14 @@ router.post("/AddMeeting", function (req, res, next) {
         }
       }
     });
+  }catch(err){
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong",
+      error: err,
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -696,12 +685,106 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
     let comming = req.body
     let comming2 = req.query
-    GetDatafromAws(comming, comming2).then((result) => {
-      new_link.push(result)
+    console.log("1")
+  //   {
+  //   GetDatafromAws(comming, comming2).then((result) => {
+  //     new_link.push(result)
+  //     var template = handlebars.compile(sick);
+
+  //   htmlToSend1 = template({
+
+  //     pat_info: comming,
+  //     Dataa: new_link
+
+  //   });
+
+
+  //   })
+  // }
+{
+    Object.entries(comming).map(([key, value]) => {
+  
+      if (key == "fileattach") {
+
+        if (Array.isArray(value)) {
+          try {
+
+            value.forEach((v) => Data.push({ v: v.filename }));
+
+          
+            // Data.push({ v: final })
+            // console.log("Data", Data)
+          }
+          catch (e) {
+            console.log("e", e);
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: e,
+            });
+          }
+
+
+        }
+      }
+
+    });
+  }
+
+  Data.forEach((element) => {
+    console.log("element", element)
+    // console.log("element",req.query.bucket)
+
+    var file = element.v.split(".com/")[1];
+    var file2 = file.split("&")[0];
+    console.log("file2",file2)
+    if (
+      comming2.bucket &&
+      comming2.bucket !== "undefined" &&
+      comming2.bucket !== ""
+    ) {
+      var bucket = comming2.bucket;
+    } else {
+      var bucket = "aimedisfirstbucket";
+    }
+    var data =
+      re.regions &&
+      re.regions.length > 0 &&
+      re.regions.filter((value, key) => value.bucket === bucket);
+    var params = {
+      Bucket: bucket, // your bucket name,
+      Key: file2, // path to the object you're looking for
+    };
+    console.log("params", params)
+    aws.config.update({
+      region: data[0].region,
+      accessKeyId: process.env.S3_ACCESS_KEY,
+      secretAccessKey: process.env.S3_SECRET_KEY,
+      signatureVersion: "v4",
+    });
+    var s3 = new aws.S3({ apiVersion: "2006-03-01" });
+  
+    s3.getSignedUrl("getObject",params, function (err, url) {
+  
+      console.log("url",url)
+      new_link.push({ v: url })
+      console.log("data",new_link )
      
+      // resolve(url)
+    });
+    // })
+    // Data = new_link
+    // console.log("dta",Data)
 
+  })
+  var template = handlebars.compile(sick);
+    htmlToSend1 = template({
 
-    })
+      pat_info: comming,
+      Dataa: new_link
+
+    });
 
 
     // {
@@ -753,14 +836,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
      
     // }
 
-    var template = handlebars.compile(sick);
-
-    htmlToSend1 = template({
-
-      pat_info: comming,
-      Dataa: new_link
-
-    });
+   console.log("2",htmlToSend1)
 
     var htmlToSend = htmlToSend1
 
@@ -810,7 +886,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                   };
                   let sendmail = transporter.sendMail(mailOptions);
                   if (sendmail) {
-                    console.log("Mail is sent ");
 
                     res.json({
                       status: 200,
@@ -818,7 +893,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                       hassuccessed: true,
                     });
                   } else {
-                    console.log("err");
                     res.json({
                       status: 200,
                       msg: "Mail is not sent",
@@ -842,6 +916,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     }
   }
   catch (e) {
+    console.log("e",e)
     res.json({
       status: 200,
       hassuccessed: false,
@@ -915,7 +990,8 @@ function GetDatafromAws(comming, comming2) {
               Data.forEach((element) => {
 
                 var file = element.v.split(".com/")[1];
-
+                var file2 = file.split("&")[0];
+                //               console.log("file2",file2)
                 if (
                   comming2.bucket &&
                   comming2.bucket !== "undefined" &&
@@ -931,7 +1007,7 @@ function GetDatafromAws(comming, comming2) {
                   re.regions.filter((value, key) => value.bucket === bucket);
                 var params = {
                   Bucket: bucket, // your bucket name,
-                  Key: file, // path to the object you're looking for
+                  Key: file2, // path to the object you're looking for
                 };
                 aws.config.update({
                   region: data[0].region,
@@ -943,7 +1019,7 @@ function GetDatafromAws(comming, comming2) {
 
                 s3.getSignedUrl("getObject", params, function (err, url) {
 
-                  // console.log("url",url)
+                  console.log("url",url)
                   //     Data.push({ v: url })
                   // console.log("data", Data)
 
@@ -974,14 +1050,13 @@ function GetDatafromAws(comming, comming2) {
 router.post("/SickleaveCretificateToPatient", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
   Here is the new Sick leave certificate request from the 
-    ${req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id},
+    ${req.body.first_name + " " + req.body.last_name + " " + req.body.profile_id},
     for the time slot 
-    ${req.body.start + "" + req.body.end},
+    ${req.body.start + " to " + req.body.end},
     at
     ${req.body.date}
     <br/>
     Please check the list of requests from the list page. Please update the status of request also accordingly.</div>`;
-  console.log("sendData", sendData);
   generateTemplate(
     EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
     (error, html) => {
@@ -993,9 +1068,7 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
           html: html,
         };
         let sendmail = transporter.sendMail(mailOptions);
-        console.log("mail", mailOptions);
         if (sendmail) {
-          console.log("Mail is sent ");
 
           res.json({
             status: 200,
@@ -1003,7 +1076,6 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
             hassuccessed: true,
           });
         } else {
-          console.log("err");
           res.json({
             status: 200,
             msg: "Mail is not sent",
@@ -1011,7 +1083,6 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
           });
         }
       } else {
-        console.log("no email");
         res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
       }
     }
@@ -1022,6 +1093,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     const VirtualtToSearchWith = new sick_meeting({
       sesion_id: req.params.sesion_id,
     });
@@ -1034,7 +1106,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         ],
       },
       function (err, data) {
-        console.log("err", err);
         if (err) {
           res.json({
             status: 200,
@@ -1043,50 +1114,27 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("data", data);
           if (data !== null) {
             let today = new Date().setHours(0, 0, 0, 0);
-            // console.log("today",today)
-
-            // let today =moment().format("MM-DD-YYYY")
-            // let ttime = new Date();
-            // console.log("today", today);
-
-
             let ttime = moment().format("HH:mm")
-            console.log("ttime1", ttime)
 
             let data_start = moment(data.start_time).format("HH:mm")
-            console.log("data_start", data_start)
 
             let data_end = moment(data.end_time).format("HH:mm")
-            console.log("data_end", data_end)
-
-
-            // let final = ttime.getHours() + ":" + ttime.getMinutes();
-
-            // let final =ttime.toLocaleTimeString([], { hour12: false ,hour: '2-digit', minute: '2-digit'})
-            // console.log("final",final)
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
-            // let data_d = moment().format(data.date,"MM-DD-YYYY")
-
-
             if (moment(today).isAfter(data_d)) {
-              console.log("1");
               res.json({
                 status: 200,
                 hassuccessed: false,
                 message: "Link Expire",
               });
             } else if (moment(today).isBefore(data_d)) {
-              console.log("2");
               res.json({
                 status: 200,
                 hassuccessed: false,
                 message: "Link will active soon",
               });
             } else if (moment(today).isSame(data_d)) {
-              console.log("3");
               if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
                   { _id: data.task_id, is_payment: true },
@@ -1099,7 +1147,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                         error: err,
                       });
                     } else {
-                      console.log("userdata", userdata);
                       if (userdata !== null) {
                         res.json({
                           status: 200,
@@ -1109,7 +1156,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                         });
                       }
                       else {
-                        console.log("12334")
                         const VirtualtToSearchWith = new sick_meeting({
                           sesion_id: req.params.sesion_id,
                         });
@@ -1122,7 +1168,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                             ],
                           },
                           function (err, data) {
-                            console.log("err", err);
                             if (err) {
                               res.json({
                                 status: 200,
@@ -1144,14 +1189,12 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   }
                 );
               } else if (data_start > ttime) {
-                console.log("4");
                 res.json({
                   status: 200,
                   hassuccessed: false,
                   message: "link start soon",
                 });
               } else if (data_end < ttime) {
-                console.log("5");
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -1169,6 +1212,13 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         }
       }
     );
+    }catch(err){
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong"
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -1183,9 +1233,9 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var sick_meetings = new sick_meeting(req.body);
     sick_meetings.save(function (err, user_data) {
-      console.log("err", err);
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
@@ -1229,10 +1279,8 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
                   subject: "Sick leave certificate request",
                   html: html,
                 };
-                console.log(html);
                 let sendmail = transporter.sendMail(mailOptions);
                 if (sendmail) {
-                  console.log(html);
                 }
               }
             }
@@ -1259,10 +1307,8 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
                       subject: "Sick leave certificate request",
                       html: html,
                     };
-                    console.log(userdata.email);
                     let sendmail1 = transporter.sendMail(mailOptions1);
                     if (sendmail1) {
-                      console.log(html);
                     }
                   }
                 }
@@ -1277,6 +1323,13 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
         }
       }
     });
+  }catch(err){
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong"
+    });
+  }
   } else {
     res.json({
       status: 200,
