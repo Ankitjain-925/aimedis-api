@@ -406,20 +406,21 @@ router.post("/approvedrequest", function (req, res) {
         err: err,
       });
     } else {
-      if (req.body.for_manage === "approved") {
-        virtual_Task.updateOne(
-          { _id: req.body.task_id },
-          { approved: true },
-          function (err, data) {
-            if (err && !data) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "Something went wrong",
-                error: err,
-              });
-            } else {
-              sendData = `Dear Patient<br/>
+      if (result) {
+        if (req.body.for_manage === "approved") {
+          virtual_Task.updateOne(
+            { _id: req.body.task_id },
+            { approved: true },
+            function (err, data) {
+              if (err && !data) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                sendData = `Dear Patient<br/>
             Your request for the sick leave certificate is accepted by the doctor on 
              ${req.body.date}
               at 
@@ -461,26 +462,26 @@ router.post("/approvedrequest", function (req, res) {
                       hassuccessed: false,
                     });
                   }
-                }
-              );
+                );
+              }
             }
-          }
-        );
-      } else {
-        virtual_Task.updateOne(
-          { _id: req.body.task_id },
-          { approved: false, is_decline: true },
-          function (err, data) {
-            if (err && !data) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "Something went wrong",
-                error: err,
-              });
-            } else {
-              sendData = `Dear Patient<br/>
+          );
+        } else {
+          virtual_Task.updateOne(
+            { _id: req.body.task_id },
+            { approved: false, is_decline: true },
+            function (err, data) {
+              if (err && !data) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                sendData = `Dear Patient<br/>
             Your request for the sick leave certificate is decline by the doctor`;
+
               generateTemplate(
                 EMAIL.generalEmail.createTemplate("en", {
                   title: "",
@@ -501,6 +502,7 @@ router.post("/approvedrequest", function (req, res) {
                         message: "Mail sent Successfully",
                         hassuccessed: true,
                       });
+
                     } else {
                       res.json({
                         status: 200,
@@ -515,11 +517,11 @@ router.post("/approvedrequest", function (req, res) {
                       hassuccessed: false,
                     });
                   }
-                }
-              );
+                );
+              }
             }
-          }
-        );
+          );
+        }
       }
     }
   });
@@ -873,8 +875,10 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                 if (dta.email !== "") {
                   let mailOptions = {
                     from: "contact@aimedis.com",
+
                     to: dta.email,
                     subject: "Sick leave certificate request",
+
                     html: html,
                     attachments: [
                       {
@@ -884,6 +888,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                       },
                     ],
                   };
+
                   let sendmail = transporter.sendMail(mailOptions);
                   if (sendmail) {
 
@@ -1137,7 +1142,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             } else if (moment(today).isSame(data_d)) {
               if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
-                  { _id: data.task_id, is_payment: true },
+                  { _id : data.task_id, is_payment: true },
                   function (err, userdata) {
                     if (err && !userdata) {
                       res.json({
@@ -1154,6 +1159,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                           message: "link active",
                           data: { Task: userdata, Session: data },
                         });
+
                       }
                       else {
                         const VirtualtToSearchWith = new sick_meeting({
@@ -1172,14 +1178,18 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
+
                                 message: "Something went wrong"
+
                               });
                             } else {
-                              res.json({
+                              res.json({ 
                                 status: 200,
                                 hassuccessed: false,
+
                                 meessage: "Payment process is incomplete"
                               })
+
 
                             }
                           }
@@ -1201,7 +1211,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   message: "Link Expire",
                 });
               }
-            }
+            } 
           } else {
             res.json({
               status: 200,
@@ -1337,6 +1347,38 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+});
+
+router.put("/joinmeeting/:task_id", function (req, res, next) {
+  virtual_Task.findOneAndUpdate(
+    { _id: req.params.task_id },
+    { meetingjoined: true },
+    (err, doc1) => {
+      if (err && !doc1) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "update data failed",
+          error: err,
+        });
+      } else {
+        if (doc1.nModified == "0") {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "User is not found",
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Updated",
+            data: doc1,
+          });
+        }
+      }
+    }
+  );
 });
 
 module.exports = router;
