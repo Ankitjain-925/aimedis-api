@@ -1,3 +1,10 @@
+require("dotenv").config();
+var aws = require("aws-sdk");
+
+var re = require("../regions.json");
+
+const axios = require("axios");
+
 var express = require("express");
 let router = express.Router();
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
@@ -541,7 +548,7 @@ router.post("/approvedrequest", function (req, res) {
           );
         }
       }
-    }
+    
   });
 });
 
@@ -696,8 +703,78 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     var work_since = [];
     var work_until = [];
     var detected_at = [];
+    var image = [];
 
     {
+      
+      console.log("file", req.body.fileattach[0].filename.split("&")[0]);
+      var work=req.body.fileattach[0].filename.split("&")[0];
+      work_f = work.split(".com/")[1]
+      console.log("birthday", work_f);
+      console.log("file", req.body.fileattach[1].filename.split("&")[0]);
+      var work1 = req.body.fileattach[1].filename.split("&")[0];
+      work_f1 = work1.split(".com/")[1]
+      console.log("b", work_f1);
+      // GetDatafromAws(work-f, work_f1).then((result) => {
+      //   console.log("result", result)
+      //   new_link.push(result)
+      
+  
+      // })
+
+      if (
+        req.query.bucket &&
+        req.query.bucket !== "undefined" &&
+        req.query.bucket !== ""
+      ) {
+        var bucket = req.query.bucket;
+      } else {
+        var bucket = "aimedisfirstbucket";
+      }
+      var data =
+        re.regions &&
+        re.regions.length > 0 &&
+        re.regions.filter((value, key) => value.bucket === bucket);
+      var params = {
+        Bucket: bucket, // your bucket name,
+        Key: work_f, // path to the object you're looking for
+      };
+      var params1 = {
+        Bucket: bucket, // your bucket name,
+        Key: work_f1, // path to the object you're looking for
+      };
+      aws.config.update({
+        region: data[0].region,
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        secretAccessKey: process.env.S3_SECRET_KEY,
+        signatureVersion: "v4",
+      });
+      var s3 = new aws.S3({ apiVersion: "2006-03-01" });
+    
+      s3.getSignedUrl("getObject", params, function (err, url) {
+        if (err) {
+          res.json({
+            hassuccessed: false,
+            error: err,
+            msg: "Something went wrong.",
+          });
+          //return err;
+        } else {
+          console.log("url", url);
+        
+      s3.getSignedUrl("getObject", params1, function (err, url1) {
+        if (err) {
+          res.json({
+            hassuccessed: false,
+            error: err,
+            msg: "Something went wrong.",
+          });
+          //return err;
+        } else {
+          image.push({v:url1})
+          console.log("url", url1);
+          console.log("url", image);
+        
       Object.entries(req.body).map(([key, value]) => {
         if (key === "info") {
           Object.entries(value).map(([key1, value1]) => {
@@ -730,24 +807,31 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
         console.log("work_since", work_since);
       });
-
-      console.log("birthday", birthday);
-
+      // console.log("work_since", req.body);
+      let newperson = {
+        ...req.body,
+        img: url,
+        img1: url1
+      }
+      console.log(newperson);
       let data1 = date1.map((element) => {
         return element.v;
       });
 
       var template = handlebars.compile(sick);
       let house_name = "";
+      console.log("work_sinc",image);
 
       var htmlToSend = template({
+        
         birthday: birthday,
-        pat_info: req.body,
+        pat_info: newperson,
         Service: house_name,
         date: data1,
         work_since: work_since,
         work_until: work_until,
-        detected_at: detected_at,
+        detected_at: detected_at
+        
       });
       var filename = "GeneratedReport.pdf";
       logo1 =
@@ -828,6 +912,10 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         res.json({ status: 200, hassuccessed: true, filename: filename });
       }
     }
+  });
+}
+});
+    }
   } catch (e) {
     console.log("e", e);
     res.json({
@@ -838,6 +926,94 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     });
   }
 });
+
+function GetDatafromAws(work_f, work_f1) {
+  return new Promise((resolve, reject) => {
+    
+    try {
+      
+
+        if (
+          req.query.bucket &&
+          req.query.bucket !== "undefined" &&
+          req.query.bucket !== ""
+        ) {
+          var bucket = req.query.bucket;
+        } else {
+          var bucket = "aimedisfirstbucket";
+        }
+        var data =
+          re.regions &&
+          re.regions.length > 0 &&
+          re.regions.filter((value, key) => value.bucket === bucket);
+        var params = {
+          Bucket: bucket, // your bucket name,
+          Key: work_f, // path to the object you're looking for
+        };
+        var params1 = {
+          Bucket: bucket, // your bucket name,
+          Key: work_f1, // path to the object you're looking for
+        };
+        aws.config.update({
+          region: data[0].region,
+          accessKeyId: process.env.S3_ACCESS_KEY,
+          secretAccessKey: process.env.S3_SECRET_KEY,
+          signatureVersion: "v4",
+        });
+        var s3 = new aws.S3({ apiVersion: "2006-03-01" });
+      
+        s3.getSignedUrl("getObject", params, function (err, url) {
+          if (err) {
+            res.json({
+              hassuccessed: false,
+              error: err,
+              msg: "Something went wrong.",
+            });
+            //return err;
+          } else {
+            console.log("url", url);
+            
+          }
+        });
+        s3.getSignedUrl("getObject", params1, function (err, url1) {
+          if (err) {
+            res.json({
+              hassuccessed: false,
+              error: err,
+              msg: "Something went wrong.",
+            });
+            //return err;
+          } else {
+            console.log("url", url1);
+          
+          }
+        });
+
+      
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post("/SickleaveCretificateToPatient", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
