@@ -578,11 +578,13 @@ router.post("/AddMeeting", function (req, res, next) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
         var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+        var start_time= moment(req.body.start_time).format("HH:mm")
+        var end_time = moment(req.body.end_time).format("HH:mm")
         var sendData = `Dear Patient,
 
     Your payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at ${meetingDate} from the time slot  ${req.body.start_time
-          } to ${req.body.end_time} 
+    Please do join the Video call at ${meetingDate} from the time slot  ${start_time
+          } to ${end_time} 
     Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : "Not mentioned"
           }
     Please remind the date and timing as alloted.`;
@@ -590,8 +592,8 @@ router.post("/AddMeeting", function (req, res, next) {
         var sendData1 = `Dear Doctor,
 
     The payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at  ${meetingDate} from the time slot ${req.body.start_time
-          } to ${req.body.end_time}
+    Please do join the Video call at  ${meetingDate} from the time slot ${start_time
+          } to ${end_time}
     Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : "Not mentioned"
           }
     Please remind the date and timing as alloted.</div>`;
@@ -688,10 +690,10 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
     let comming = req.body
     let comming2 = req.query
-    console.log("1")
+ 
     {
     GetDatafromAws(comming, comming2).then((result) => {
-      console.log("res",result)
+    
       new_link.push(result)
     })
   }
@@ -715,10 +717,9 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
           
 //             // Data.push({ v: final })
-//             // console.log("Data", Data)
+//           
 //           }
 //           catch (e) {
-//             console.log("e", e);
 //             res.json({
 //               status: 200,
 //               hassuccessed: false,
@@ -735,12 +736,9 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 //   }
 
   // Data.forEach((element) => {
-  //   console.log("element", element)
-  //   // console.log("element",req.query.bucket)
 
   //   var file = element.v.split(".com/")[1];
   //   var file2 = file.split("&")[0];
-  //   console.log("file2",file2)
   //   if (
   //     comming2.bucket &&
   //     comming2.bucket !== "undefined" &&
@@ -758,7 +756,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
   //     Bucket: bucket, // your bucket name,
   //     Key: file2, // path to the object you're looking for
   //   };
-  //   console.log("params", params)
   //   aws.config.update({
   //     region: data[0].region,
   //     accessKeyId: process.env.S3_ACCESS_KEY,
@@ -769,15 +766,14 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
   
   //   s3.getSignedUrl("getObject",params, function (err, url) {
   
-  //     console.log("url",url)
+  //   
   //     new_link.push({ v: url })
-  //     console.log("data",new_link )
+  //  
      
   //     // resolve(url)
   //   });
   //   // })
   //   // Data = new_link
-  //   // console.log("dta",Data)
 
   // })
   // var template = handlebars.compile(sick);
@@ -800,15 +796,14 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     //           value.forEach((v) => Data.push({ v: v.filename }));
 
     //           Data.forEach((element) => {
-    //             console.log("element", element)
-    //             // console.log("element",req.query.bucket)
+    //      
 
     //             GetDatafromAws(element,comming).then((result)=>{
-    //               console.log("result",result)
+    //        
     //               new_link.push(result)
     //               var template = handlebars.compile(sick);
 
-    //                 console.log("ddd", Data)
+    // 
     //                 htmlToSend1 = template({
               
     //                   pat_info: comming,
@@ -818,10 +813,10 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
     //           })
     //           // Data.push({ v: final })
-    //           // console.log("Data", Data)
+   
     //         }
     //         catch (e) {
-    //           console.log("e", e);
+
     //           res.json({
     //             status: 200,
     //             hassuccessed: false,
@@ -838,7 +833,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
      
     // }
 
-   console.log("2",htmlToSend1)
+  
 
     var htmlToSend = htmlToSend1
 
@@ -921,7 +916,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     }
   }
   catch (e) {
-    console.log("e",e)
     res.json({
       status: 200,
       hassuccessed: false,
@@ -947,14 +941,10 @@ function GetDatafromAws(comming, comming2) {
               value.forEach((v) => Data.push({ v: v.filename }));
 
               Data.forEach((element) => {
-
                 GetDatafromAws1(element,comming2).then((result)=>{
-                  console.log("result",result)
-                  resolve(result)
+                  new_link.push({v:result})
+                  resolve(new_link)
                 })
-               
-              
-
               })
             
             }
@@ -973,17 +963,17 @@ function GetDatafromAws(comming, comming2) {
   })
 }
 
-function GetDatafromAws1(element,commingDat){
+function GetDatafromAws1(element,comming2){
   return new Promise((resolve, reject) => {
     var file = element.v.split(".com/")[1];
+    var file2 = file.split("&")[0];
     try{
-    console.log("file", file)
     if (
-      commingDat.bucket &&
-      commingDat.bucket !== "undefined" &&
-      commingDat.bucket !== ""
+      comming2.bucket &&
+      comming2.bucket !== "undefined" &&
+      comming2.bucket !== ""
     ) {
-      var bucket = commingDat.bucket;
+      var bucket = comming2.bucket;
     } else {
       var bucket = "aimedisfirstbucket";
     }
@@ -993,9 +983,8 @@ function GetDatafromAws1(element,commingDat){
       re.regions.filter((value, key) => value.bucket === bucket);
     var params = {
       Bucket: bucket, // your bucket name,
-      Key: file, // path to the object you're looking for
+      Key: file2, // path to the object you're looking for
     };
-    console.log("params", params)
     aws.config.update({
       region: data[0].region,
       accessKeyId: process.env.S3_ACCESS_KEY,
@@ -1005,99 +994,7 @@ function GetDatafromAws1(element,commingDat){
     var s3 = new aws.S3({ apiVersion: "2006-03-01" });
 
     s3.getSignedUrl("getObject", params, function (err, url) {
-
-      // console.log("url",url)
       // new_link.push({ v: url })
-      // console.log("data", new_link)
-
-     resolve(url)
-    });
-  }catch(e){
-    reject(e)
-  }
-  })
-
-}
-
-
-function GetDatafromAws(comming, comming2) {
-  return new Promise((resolve, reject) => {
-    var Data = [];
-    var new_link = []
-    try {
-      Object.entries(comming).map(([key, value]) => {
-
-
-        if (key == "fileattach") {
-
-          if (Array.isArray(value)) {
-            try {
-
-              value.forEach((v) => Data.push({ v: v.filename }));
-
-              Data.forEach((element) => {
-
-                GetDatafromAws1(element,comming2).then((result)=>{
-                  resolve(result)
-                })
-               
-              
-
-              })
-            
-            }
-            catch (e) {
-              reject(e)
-            }
-
-
-          }
-        }
-
-      });
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-function GetDatafromAws1(element,commingDat){
-  return new Promise((resolve, reject) => {
-    var file = element.v.split(".com/")[1];
-    try{
-    console.log("file", file)
-    if (
-      commingDat.bucket &&
-      commingDat.bucket !== "undefined" &&
-      commingDat.bucket !== ""
-    ) {
-      var bucket = commingDat.bucket;
-    } else {
-      var bucket = "aimedisfirstbucket";
-    }
-    var data =
-      re.regions &&
-      re.regions.length > 0 &&
-      re.regions.filter((value, key) => value.bucket === bucket);
-    var params = {
-      Bucket: bucket, // your bucket name,
-      Key: file, // path to the object you're looking for
-    };
-    console.log("params", params)
-    aws.config.update({
-      region: data[0].region,
-      accessKeyId: process.env.S3_ACCESS_KEY,
-      secretAccessKey: process.env.S3_SECRET_KEY,
-      signatureVersion: "v4",
-    });
-    var s3 = new aws.S3({ apiVersion: "2006-03-01" });
-
-    s3.getSignedUrl("getObject", params, function (err, url) {
-
-      // console.log("url",url)
-      // new_link.push({ v: url })
-      // console.log("data", new_link)
-
      resolve(url)
     });
   }catch(e){
@@ -1181,7 +1078,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
             // let today =moment().format("MM-DD-YYYY")
             // let ttime = new Date();
-            // console.log("today", today);
 
             let ttime = moment().format("HH:mm");
             let data_start = moment(data.start_time).format("HH:mm")
