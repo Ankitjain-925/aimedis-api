@@ -402,146 +402,7 @@ router.post("/DoctorMail", function (req, res) {
   );
 });
 
-router.post("/approvedrequest", function (req, res) {
-  try{
-  User.findOne({ _id: req.body.patient_id }, function (err, result) {
-    if (err) {
-      res.json({
-        status: 200,
-        message: "Something went wrong",
-        hassuccessed: false,
-        err: err,
-      });
-    } else {
-      if (result) {
-        if (req.body.for_manage === "approved") {
-          virtual_Task.updateOne(
-            { _id: req.body.task_id },
-            { approved: true },
-            function (err, data) {
-              if (err && !data) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  msg: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                sendData = `Dear Patient<br/>
-            Your request for the sick leave certificate is accepted by the doctor on 
-             ${req.body.date}
-              at 
-              ${req.body.start} 
-              to
-              ${req.body.end}
-              So, for the further process please complete your payment process from the request list page`;
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData,
-                  }),
-                  (error, html) => {
-                    if (result.email !== "") {
-                      let mailOptions = {
-                        from: "contact@aimedis.com",
-                        to: result.email,
-                        subject: "Approve sick leave request by Doctor",
-                        html: html,
-                      };
-                      let sendmail = transporter.sendMail(mailOptions);
-                      if (sendmail) {
-                        res.json({
-                          status: 200,
-                          message: "Mail sent Successfully",
-                          hassuccessed: true,
-                        });
-                      } else {
-                        res.json({
-                          status: 200,
-                          msg: "Mail is not sent",
-                          hassuccessed: false,
-                        });
-                      }
-                    } else {
-                      res.json({
-                        status: 200,
-                        msg: "Mail is not sent",
-                        hassuccessed: false,
-                      });
-                    }
-                  } 
-                );
-              }
-            }
-          }
-        );
-      } else {
-        virtual_Task.updateOne(
-          { _id: req.body.task_id },
-          { approved: false, is_decline: true },
-          function (err, data) {
-            if (err && !data) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "Something went wrong",
-                error: err,
-              });
-            } else {
-              sendData = `Dear Patient<br/>
-            Your request for the sick leave certificate is decline by the doctor`;
-              generateTemplate(
-                EMAIL.generalEmail.createTemplate("en", {
-                  title: "",
-                  content: sendData,
-                }),
-                (error, html) => {
-                  if (result.email !== "") {
-                    let mailOptions = {
-                      from: "contact@aimedis.com",
-                      to: result.email,
-                      subject: "Decline sick leave request by Doctor",
-                      html: html,
-                    };
-                    let sendmail = transporter.sendMail(mailOptions);
-                    if (sendmail) {
-                      res.json({
-                        status: 200,
-                        message: "Mail sent Successfully",
-                        hassuccessed: true,
-                      });
 
-                    } else {
-                      res.json({
-                        status: 200,
-                        msg: "Mail is not sent",
-                        hassuccessed: false,
-                      });
-                    }
-                  } else {
-                    res.json({
-                      status: 200,
-                      msg: "Mail is not sent",
-                      hassuccessed: false,
-                    });
-                  }
-              });
-              }
-            }
-          }
-        );
-      }
-    }
-
-  });
-}catch(e){
-  res.json({
-    status: 200,
-    msg: "Something went wrong.",
-    hassuccessed: false,
-  });
-}
-});
 
 router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   const token = req.headers.token;
@@ -574,6 +435,154 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
     });
   }
 });
+
+router.post("/approvedrequest", function (req, res) {
+  try{
+   User.findOne({ _id: req.body.patient_id }, function (err, result) {
+       if (err) {
+         res.json({
+           status: 200,
+           message: "Something went wrong",
+           hassuccessed: false,
+           err: err,
+         });
+       } else {
+           if (result) {
+
+               if (req.body.for_manage === "approved") {
+                   virtual_Task.updateOne(
+                       { _id: req.body.task_id },
+                       { approved: true },
+                       function (err, data) {
+                         if (err && !data) {
+                           res.json({
+                             status: 200,
+                             hassuccessed: false,
+                             msg: "Something went wrong",
+                             error: err,
+                           });
+                         } else {
+                           sendData = `Dear Patient<br/>
+                       Your request for the sick leave certificate is accepted by the doctor on 
+                        ${req.body.date}
+                         at 
+                         ${req.body.start} 
+                         to
+                         ${req.body.end}
+                         So, for the further process please complete your payment process from the request list page`;
+                           generateTemplate(
+                             EMAIL.generalEmail.createTemplate("en", {
+                               title: "",
+                               content: sendData,
+                             }),
+                             (error, html) => {
+                               if (result.email !== "") {
+                                 let mailOptions = {
+                                   from: "contact@aimedis.com",
+                                   to: result.email,
+                                   subject: "Approve sick leave request by Doctor",
+                                   html: html,
+                                 };
+                                 let sendmail = transporter.sendMail(mailOptions);
+                                 if (sendmail) {
+                                   res.json({
+                                     status: 200,
+                                     message: "Mail sent Successfully",
+                                     hassuccessed: true,
+                                   });
+                                 } else {
+                                   res.json({
+                                     status: 200,
+                                     msg: "Mail is not sent",
+                                     hassuccessed: false,
+                                   });
+                                 }
+                               } else {
+                                 res.json({
+                                   status: 200,
+                                   msg: "Mail is not sent",
+                                   hassuccessed: false,
+                                 });
+                               }
+                             } 
+                           );
+                         }
+                       }
+                     )
+               }
+               else{
+                   virtual_Task.updateOne(
+                       { _id: req.body.task_id },
+                       { approved: false, is_decline: true },
+                       function (err, data) {
+                         if (err && !data) {
+                           res.json({
+                             status: 200,
+                             hassuccessed: false,
+                             msg: "Something went wrong",
+                             error: err,
+                           });
+                         } else {
+                           sendData = `Dear Patient<br/>
+                           Your request for the sick leave certificate is decline by the doctor`;
+                             generateTemplate(
+                               EMAIL.generalEmail.createTemplate("en", {
+                                 title: "",
+                                 content: sendData,
+                               }),
+                               (error, html) => {
+                                 if (result.email !== "") {
+                                   let mailOptions = {
+                                     from: "contact@aimedis.com",
+                                     to: result.email,
+                                     subject: "Decline sick leave request by Doctor",
+                                     html: html,
+                                   };
+                                   let sendmail = transporter.sendMail(mailOptions);
+                                   if (sendmail) {
+                                     res.json({
+                                       status: 200,
+                                       message: "Mail sent Successfully",
+                                       hassuccessed: true,
+                                     });
+               
+                                   } else {
+                                     res.json({
+                                       status: 200,
+                                       msg: "Mail is not sent",
+                                       hassuccessed: false,
+                                     });
+                                   }
+                                 } else {
+                                   res.json({
+                                     status: 200,
+                                     msg: "Mail is not sent",
+                                     hassuccessed: false,
+                                   });
+                                 }
+                             });
+                         }
+               })
+               }
+           }
+           else{
+               res.json({
+                   status: 200,
+                   msg: "Something went wrong.",
+                   hassuccessed: false,
+                 });   
+           }
+          
+       }
+   })
+ }catch(e){
+   res.json({
+     status: 200,
+     msg: "Something went wrong.",
+     hassuccessed: false,
+   });
+ }
+ });
 
 router.post("/AddMeeting", function (req, res, next) {
   const token = req.headers.token;
@@ -1019,7 +1028,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
     let comming = req.body
     let comming2 = req.query
-    console.log("1", comming2)
+
 
     GetDatafromAws(comming, comming2).then((result) => {
       console.log(result)
@@ -1033,8 +1042,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         img: result
 
       }
-
-      console.log("res11111111111", newperson);
       htmlToSend1 = template({
 
         // pat_info: comming,
@@ -1048,143 +1055,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         // detected_at: detected_at
 
       });
-      // {
-      //     Object.entries(comming).map(([key, value]) => {
-
-      //       if (key == "fileattach") {
-
-      //         if (Array.isArray(value)) {
-      //           try {
-
-      //             value.forEach((v) => Data.push({ v: v.filename }));
-
-
-      //             // Data.push({ v: final })
-      //             // console.log("Data", Data)
-      //           }
-      //           catch (e) {
-      //             console.log("e", e);
-      //             res.json({
-      //               status: 200,
-      //               hassuccessed: false,
-      //               message: "Something went wrong.",
-      //               error: e,
-      //             });
-      //           }
-
-
-      //         }
-      //       }
-
-      //     });
-      //   }
-
-      // Data.forEach((element) => {
-      //   console.log("element", element)
-      //   // console.log("element",req.query.bucket)
-
-      //   var file = element.v.split(".com/")[1];
-      //   var file2 = file.split("&")[0];
-      //   console.log("file2",file2)
-      //   if (
-      //     comming2.bucket &&
-      //     comming2.bucket !== "undefined" &&
-      //     comming2.bucket !== ""
-      //   ) {
-      //     var bucket = comming2.bucket;
-      //   } else {
-      //     var bucket = "aimedisfirstbucket";
-      //   }
-      //   var data =
-      //     re.regions &&
-      //     re.regions.length > 0 &&
-      //     re.regions.filter((value, key) => value.bucket === bucket);
-      //   var params = {
-      //     Bucket: bucket, // your bucket name,
-      //     Key: file2, // path to the object you're looking for
-      //   };
-      //   console.log("params", params)
-      //   aws.config.update({
-      //     region: data[0].region,
-      //     accessKeyId: process.env.S3_ACCESS_KEY,
-      //     secretAccessKey: process.env.S3_SECRET_KEY,
-      //     signatureVersion: "v4",
-      //   });
-      //   var s3 = new aws.S3({ apiVersion: "2006-03-01" });
-
-      //   s3.getSignedUrl("getObject",params, function (err, url) {
-
-      //     console.log("url",url)
-      //     new_link.push({ v: url })
-      //     console.log("data",new_link )
-
-      //     // resolve(url)
-      //   });
-      //   // })
-      //   // Data = new_link
-      //   // console.log("dta",Data)
-
-      // })
-      // var template = handlebars.compile(sick);
-      //   htmlToSend1 = template({
-
-      //     pat_info: comming,
-      //     Dataa: new_link
-
-      //   });
-
-
-      // {
-      //   Object.entries(req.body).map(([key, value]) => {
-
-      //     if (key == "fileattach") {
-
-      //       if (Array.isArray(value)) {
-      //         try {
-
-      //           value.forEach((v) => Data.push({ v: v.filename }));
-
-      //           Data.forEach((element) => {
-      //             console.log("element", element)
-      //             // console.log("element",req.query.bucket)
-
-      //             GetDatafromAws(element,comming).then((result)=>{
-      //               console.log("result",result)
-      //               new_link.push(result)
-      //               var template = handlebars.compile(sick);
-
-      //                 console.log("ddd", Data)
-      //                 htmlToSend1 = template({
-
-      //                   pat_info: comming,
-      //                   Dataa: new_link})
-
-      //             })
-
-      //           })
-      //           // Data.push({ v: final })
-      //           // console.log("Data", Data)
-      //         }
-      //         catch (e) {
-      //           console.log("e", e);
-      //           res.json({
-      //             status: 200,
-      //             hassuccessed: false,
-      //             message: "Something went wrong.",
-      //             error: e,
-      //           });
-      //         }
-
-
-      //       }
-      //     }
-
-      //   });
-
-      // }
-
-      console.log("2", htmlToSend1)
-
+    
       var htmlToSend = htmlToSend1
 
 
@@ -1265,7 +1136,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
             res.download(file);
           }
         });
-      }
+      
     })
   }
   catch (e) {
@@ -1575,12 +1446,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
               message: "Invalid Session ID",
             });
           }
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Invalid Session ID",
-          });
         }
       }
     );
