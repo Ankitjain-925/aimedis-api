@@ -326,8 +326,8 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
       {
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
         $or: [
-          { task_type: { $ne: "sick_leave" } },
-          { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+          { task_type: { $eq: "sick_leave" } },
+          { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
       },
       function (err, userdata) {
@@ -339,7 +339,17 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
+          console.log("user",userdata)
+          if(userdata.length >0){
           res.json({ status: 200, hassuccessed: true, data: userdata });
+          }else{
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "NO data",
+              
+            });
+          }
         }
       }
     );
@@ -693,18 +703,18 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     let comming = req.body
     let comming2 = req.query
     console.log("1",comming2)
-    {
+    
     GetDatafromAws(comming, comming2).then((result) => {
       console.log("res",result)
-      new_link.push(result)
-    })
-  }
+      // new_link.push(result)
+   
+  
   var template = handlebars.compile(sick);
-
+console.log("last")
   htmlToSend1 = template({
 
     pat_info: comming,
-    Dataa: new_link
+    Dataa: result
 
   });
 // {
@@ -842,7 +852,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
      
     // }
 
-   console.log("2",htmlToSend1)
+  //  console.log("2",htmlToSend1)
 
     var htmlToSend = htmlToSend1
 
@@ -922,7 +932,8 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
           res.download(file);
         }
       });
-    }
+    } 
+  })
   }
   catch (e) {
     console.log("e",e)
