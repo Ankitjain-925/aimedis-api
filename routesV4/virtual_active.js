@@ -578,11 +578,15 @@ router.post("/AddMeeting", function (req, res, next) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
         var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+        var start_time= moment(req.body.start_time).format("HH:mm")
+        console.log("start_time",start_time)
+        var end_time = moment(req.body.end_time).format("HH:mm")
+        console.log("end_time",end_time)
         var sendData = `Dear Patient,
 
     Your payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at ${meetingDate} from the time slot  ${req.body.start_time
-          } to ${req.body.end_time} 
+    Please do join the Video call at ${meetingDate} from the time slot  ${start_time
+          } to ${end_time} 
     Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : "Not mentioned"
           }
     Please remind the date and timing as alloted.`;
@@ -590,8 +594,8 @@ router.post("/AddMeeting", function (req, res, next) {
         var sendData1 = `Dear Doctor,
 
     The payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at  ${meetingDate} from the time slot ${req.body.start_time
-          } to ${req.body.end_time}
+    Please do join the Video call at  ${meetingDate} from the time slot ${start_time
+          } to ${end_time}
     Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : "Not mentioned"
           }
     Please remind the date and timing as alloted.</div>`;
@@ -688,22 +692,21 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
     let comming = req.body
     let comming2 = req.query
-    console.log("1")
+    console.log("1",comming2)
     {
     GetDatafromAws(comming, comming2).then((result) => {
+      console.log("res",result)
       new_link.push(result)
-      var template = handlebars.compile(sick);
-
-    htmlToSend1 = template({
-
-      pat_info: comming,
-      Dataa: new_link
-
-    });
-
-
     })
   }
+  var template = handlebars.compile(sick);
+
+  htmlToSend1 = template({
+
+    pat_info: comming,
+    Dataa: new_link
+
+  });
 // {
 //     Object.entries(comming).map(([key, value]) => {
   
@@ -950,7 +953,9 @@ function GetDatafromAws(comming, comming2) {
               Data.forEach((element) => {
 
                 GetDatafromAws1(element,comming2).then((result)=>{
-                  resolve(result)
+                  console.log("result",result)
+                  new_link.push({v:result})
+                  resolve(new_link)
                 })
                
               
@@ -973,17 +978,18 @@ function GetDatafromAws(comming, comming2) {
   })
 }
 
-function GetDatafromAws1(element,commingDat){
+function GetDatafromAws1(element,comming2){
   return new Promise((resolve, reject) => {
     var file = element.v.split(".com/")[1];
+    var file2 = file.split("&")[0];
     try{
     console.log("file", file)
     if (
-      commingDat.bucket &&
-      commingDat.bucket !== "undefined" &&
-      commingDat.bucket !== ""
+      comming2.bucket &&
+      comming2.bucket !== "undefined" &&
+      comming2.bucket !== ""
     ) {
-      var bucket = commingDat.bucket;
+      var bucket = comming2.bucket;
     } else {
       var bucket = "aimedisfirstbucket";
     }
@@ -993,7 +999,7 @@ function GetDatafromAws1(element,commingDat){
       re.regions.filter((value, key) => value.bucket === bucket);
     var params = {
       Bucket: bucket, // your bucket name,
-      Key: file, // path to the object you're looking for
+      Key: file2, // path to the object you're looking for
     };
     console.log("params", params)
     aws.config.update({
