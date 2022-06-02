@@ -691,19 +691,18 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     console.log("1")
     {
     GetDatafromAws(comming, comming2).then((result) => {
+      console.log("res",result)
       new_link.push(result)
-      var template = handlebars.compile(sick);
-
-    htmlToSend1 = template({
-
-      pat_info: comming,
-      Dataa: new_link
-
-    });
-
-
     })
   }
+  var template = handlebars.compile(sick);
+
+  htmlToSend1 = template({
+
+    pat_info: comming,
+    Dataa: new_link
+
+  });
 // {
 //     Object.entries(comming).map(([key, value]) => {
   
@@ -950,6 +949,95 @@ function GetDatafromAws(comming, comming2) {
               Data.forEach((element) => {
 
                 GetDatafromAws1(element,comming2).then((result)=>{
+                  console.log("result",result)
+                  resolve(result)
+                })
+               
+              
+
+              })
+            
+            }
+            catch (e) {
+              reject(e)
+            }
+
+
+          }
+        }
+
+      });
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+function GetDatafromAws1(element,commingDat){
+  return new Promise((resolve, reject) => {
+    var file = element.v.split(".com/")[1];
+    try{
+    console.log("file", file)
+    if (
+      commingDat.bucket &&
+      commingDat.bucket !== "undefined" &&
+      commingDat.bucket !== ""
+    ) {
+      var bucket = commingDat.bucket;
+    } else {
+      var bucket = "aimedisfirstbucket";
+    }
+    var data =
+      re.regions &&
+      re.regions.length > 0 &&
+      re.regions.filter((value, key) => value.bucket === bucket);
+    var params = {
+      Bucket: bucket, // your bucket name,
+      Key: file, // path to the object you're looking for
+    };
+    console.log("params", params)
+    aws.config.update({
+      region: data[0].region,
+      accessKeyId: process.env.S3_ACCESS_KEY,
+      secretAccessKey: process.env.S3_SECRET_KEY,
+      signatureVersion: "v4",
+    });
+    var s3 = new aws.S3({ apiVersion: "2006-03-01" });
+
+    s3.getSignedUrl("getObject", params, function (err, url) {
+
+      // console.log("url",url)
+      // new_link.push({ v: url })
+      // console.log("data", new_link)
+
+     resolve(url)
+    });
+  }catch(e){
+    reject(e)
+  }
+  })
+
+}
+
+
+function GetDatafromAws(comming, comming2) {
+  return new Promise((resolve, reject) => {
+    var Data = [];
+    var new_link = []
+    try {
+      Object.entries(comming).map(([key, value]) => {
+
+
+        if (key == "fileattach") {
+
+          if (Array.isArray(value)) {
+            try {
+
+              value.forEach((v) => Data.push({ v: v.filename }));
+
+              Data.forEach((element) => {
+
+                GetDatafromAws1(element,comming2).then((result)=>{
                   resolve(result)
                 })
                
@@ -1063,9 +1151,9 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
 });
 
 router.get("/Linktime/:sesion_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
+  // const token = req.headers.token;
+  // let legit = jwtconfig.verify(token);
+  // if (legit) {
     try{
     const VirtualtToSearchWith = new sick_meeting({
       sesion_id: req.params.sesion_id,
@@ -1202,13 +1290,13 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         message: "Something went wrong"
       });
     }
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
+  // } else {
+  //   res.json({
+  //     status: 200,
+  //     hassuccessed: false,
+  //     message: "Authentication required.",
+  //   });
+  // }
 });
 
 
