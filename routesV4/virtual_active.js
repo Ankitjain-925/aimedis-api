@@ -333,8 +333,8 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
       {
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
         $or: [
-          { task_type: { $ne: "sick_leave" } },
-          { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+          { task_type: { $eq: "sick_leave" } },
+          { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
       },
       function (err, userdata) {
@@ -346,7 +346,17 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
+          console.log("user",userdata)
+          if(userdata.length >0){
           res.json({ status: 200, hassuccessed: true, data: userdata });
+          }else{
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "NO data",
+              
+            });
+          }
         }
       }
     );
@@ -997,12 +1007,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //     }
 //   })
 // }
-
-
-
-
-
-
 
 
 router.post("/downloadSickleaveCertificate", function (req, res, next) {
