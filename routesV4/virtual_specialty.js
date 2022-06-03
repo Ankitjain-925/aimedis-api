@@ -53,6 +53,7 @@ var transporter = nodemailer.createTransport({
   },
 });
 var mongoose = require("mongoose");
+const { encrypt, decrypt } = require("./Cryptofile.js");
 
 function getDate(date, dateFormat) {
   var d = new Date(date);
@@ -354,6 +355,12 @@ router.put("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    console.log('req.body1',req.body.payment_data)
+    if(req.body.payment_data && req.body.payment_data !== null){
+      console.log('Is not null')
+      req.body.payment_data = encrypt(JSON.stringify(req.body.payment_data))
+    }
+    console.log('req.body2',req.body.payment_data)
     virtual_Task.updateOne(
       { _id: req.params.task_id },
       req.body,
