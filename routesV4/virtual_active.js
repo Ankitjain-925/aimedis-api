@@ -1074,9 +1074,11 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         let file = [{ content: htmlToSend }];
         html_to_pdf.generatePdfs(file, options).then((output) => {
           const file = `${__dirname}/${filename}`;
-          if (comming2.usefor === "mail") {
+          if (comming.usefor === "mail") {
             User.findOne({ _id: comming.patient_id }, function (err, dta) {
-              var sendData = `<div></div>`;
+              var sendData = `<div>Dear Patient , <br/>
+              Here is the Certificate added by doctor on your sick leave certificate request. 
+              Please download it from here as well as from the request list page too.</div>`;
               generateTemplate(
                 EMAIL.generalEmail.createTemplate("en", {
                   title: "",
@@ -1086,15 +1088,14 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                   if (dta.email !== "") {
                     let mailOptions = {
                       from: "contact@aimedis.com",
-
                       to: dta.email,
-                      subject: "Sick leave certificate request",
+                      subject: "Sick leave certificate Download",
 
                       html: html,
                       attachments: [
                         {
                           // utf-8 string as an attachment
-                          filename: filename,
+                          filename: "sickleave_certificate.pdf",
                           path: file,
                         },
                       ],
@@ -1231,42 +1232,6 @@ function GetDatafromAws1(element, comming2) {
   })
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.post("/SickleaveCretificateToPatient", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
