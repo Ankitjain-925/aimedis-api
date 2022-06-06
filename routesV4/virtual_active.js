@@ -346,15 +346,15 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("user", userdata)
-          if (userdata.length > 0) {
-            res.json({ status: 200, hassuccessed: true, data: userdata });
-          } else {
+          console.log("user",userdata)
+          if(userdata.length >0){
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+          }else{
             res.json({
               status: 200,
               hassuccessed: false,
               message: "NO data",
-
+              
             });
           }
         }
@@ -447,32 +447,32 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
 });
 
 router.post("/approvedrequest", function (req, res) {
-  try {
-    User.findOne({ _id: req.body.patient_id }, function (err, result) {
-      if (err) {
-        res.json({
-          status: 200,
-          message: "Something went wrong",
-          hassuccessed: false,
-          err: err,
-        });
-      } else {
-        if (result) {
+  try{
+   User.findOne({ _id: req.body.patient_id }, function (err, result) {
+       if (err) {
+         res.json({
+           status: 200,
+           message: "Something went wrong",
+           hassuccessed: false,
+           err: err,
+         });
+       } else {
+           if (result) {
 
-          if (req.body.for_manage === "approved") {
-            virtual_Task.updateOne(
-              { _id: req.body.task_id },
-              { approved: true },
-              function (err, data) {
-                if (err && !data) {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    msg: "Something went wrong",
-                    error: err,
-                  });
-                } else {
-                  sendData = `Dear Patient<br/>
+               if (req.body.for_manage === "approved") {
+                   virtual_Task.updateOne(
+                       { _id: req.body.task_id },
+                       { approved: true },
+                       function (err, data) {
+                         if (err && !data) {
+                           res.json({
+                             status: 200,
+                             hassuccessed: false,
+                             msg: "Something went wrong",
+                             error: err,
+                           });
+                         } else {
+                           sendData = `Dear Patient<br/>
                        Your request for the sick leave certificate is accepted by the doctor on 
                         ${req.body.date}
                          at 
@@ -480,218 +480,218 @@ router.post("/approvedrequest", function (req, res) {
                          to
                          ${req.body.end}
                          So, for the further process please complete your payment process from the request list page`;
-                  generateTemplate(
-                    EMAIL.generalEmail.createTemplate("en", {
-                      title: "",
-                      content: sendData,
-                    }),
-                    (error, html) => {
-                      if (result.email !== "") {
-                        let mailOptions = {
-                          from: "contact@aimedis.com",
-                          to: result.email,
-                          subject: "Approve sick leave request by Doctor",
-                          html: html,
-                        };
-                        let sendmail = transporter.sendMail(mailOptions);
-                        if (sendmail) {
-                          res.json({
-                            status: 200,
-                            message: "Mail sent Successfully",
-                            hassuccessed: true,
-                          });
-                        } else {
-                          res.json({
-                            status: 200,
-                            msg: "Mail is not sent",
-                            hassuccessed: false,
-                          });
-                        }
-                      } else {
-                        res.json({
-                          status: 200,
-                          msg: "Mail is not sent",
-                          hassuccessed: false,
-                        });
-                      }
-                    }
-                  );
-                }
-              }
-            )
-          }
-          else {
-            virtual_Task.updateOne(
-              { _id: req.body.task_id },
-              { approved: false, is_decline: true },
-              function (err, data) {
-                if (err && !data) {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    msg: "Something went wrong",
-                    error: err,
-                  });
-                } else {
-                  sendData = `Dear Patient<br/>
+                           generateTemplate(
+                             EMAIL.generalEmail.createTemplate("en", {
+                               title: "",
+                               content: sendData,
+                             }),
+                             (error, html) => {
+                               if (result.email !== "") {
+                                 let mailOptions = {
+                                   from: "contact@aimedis.com",
+                                   to: result.email,
+                                   subject: "Approve sick leave request by Doctor",
+                                   html: html,
+                                 };
+                                 let sendmail = transporter.sendMail(mailOptions);
+                                 if (sendmail) {
+                                   res.json({
+                                     status: 200,
+                                     message: "Mail sent Successfully",
+                                     hassuccessed: true,
+                                   });
+                                 } else {
+                                   res.json({
+                                     status: 200,
+                                     msg: "Mail is not sent",
+                                     hassuccessed: false,
+                                   });
+                                 }
+                               } else {
+                                 res.json({
+                                   status: 200,
+                                   msg: "Mail is not sent",
+                                   hassuccessed: false,
+                                 });
+                               }
+                             } 
+                           );
+                         }
+                       }
+                     )
+               }
+               else{
+                   virtual_Task.updateOne(
+                       { _id: req.body.task_id },
+                       { approved: false, is_decline: true },
+                       function (err, data) {
+                         if (err && !data) {
+                           res.json({
+                             status: 200,
+                             hassuccessed: false,
+                             msg: "Something went wrong",
+                             error: err,
+                           });
+                         } else {
+                           sendData = `Dear Patient<br/>
                            Your request for the sick leave certificate is decline by the doctor`;
-                  generateTemplate(
-                    EMAIL.generalEmail.createTemplate("en", {
-                      title: "",
-                      content: sendData,
-                    }),
-                    (error, html) => {
-                      if (result.email !== "") {
-                        let mailOptions = {
-                          from: "contact@aimedis.com",
-                          to: result.email,
-                          subject: "Decline sick leave request by Doctor",
-                          html: html,
-                        };
-                        let sendmail = transporter.sendMail(mailOptions);
-                        if (sendmail) {
-                          res.json({
-                            status: 200,
-                            message: "Mail sent Successfully",
-                            hassuccessed: true,
-                          });
-
-                        } else {
-                          res.json({
-                            status: 200,
-                            msg: "Mail is not sent",
-                            hassuccessed: false,
-                          });
-                        }
-                      } else {
-                        res.json({
-                          status: 200,
-                          msg: "Mail is not sent",
-                          hassuccessed: false,
-                        });
-                      }
-                    });
-                }
-              })
-          }
-        }
-        else {
-          res.json({
-            status: 200,
-            msg: "Something went wrong.",
-            hassuccessed: false,
-          });
-        }
-
-      }
-    })
-  } catch (e) {
-    res.json({
-      status: 200,
-      msg: "Something went wrong.",
-      hassuccessed: false,
-    });
-  }
-});
+                             generateTemplate(
+                               EMAIL.generalEmail.createTemplate("en", {
+                                 title: "",
+                                 content: sendData,
+                               }),
+                               (error, html) => {
+                                 if (result.email !== "") {
+                                   let mailOptions = {
+                                     from: "contact@aimedis.com",
+                                     to: result.email,
+                                     subject: "Decline sick leave request by Doctor",
+                                     html: html,
+                                   };
+                                   let sendmail = transporter.sendMail(mailOptions);
+                                   if (sendmail) {
+                                     res.json({
+                                       status: 200,
+                                       message: "Mail sent Successfully",
+                                       hassuccessed: true,
+                                     });
+               
+                                   } else {
+                                     res.json({
+                                       status: 200,
+                                       msg: "Mail is not sent",
+                                       hassuccessed: false,
+                                     });
+                                   }
+                                 } else {
+                                   res.json({
+                                     status: 200,
+                                     msg: "Mail is not sent",
+                                     hassuccessed: false,
+                                   });
+                                 }
+                             });
+                         }
+               })
+               }
+           }
+           else{
+               res.json({
+                   status: 200,
+                   msg: "Something went wrong.",
+                   hassuccessed: false,
+                 });   
+           }
+          
+       }
+   })
+ }catch(e){
+   res.json({
+     status: 200,
+     msg: "Something went wrong.",
+     hassuccessed: false,
+   });
+ }
+ });
 
 router.post("/AddMeeting", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    try {
-      var sick_meetings = new sick_meeting(req.body);
-      sick_meetings.save(function (err, user_data) {
-        if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
-        } else {
-          var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-          var start_time = moment(req.body.start_time).format("HH:mm")
-          var end_time = moment(req.body.end_time).format("HH:mm")
-          var sendData = `Dear Patient,
+    try{
+    var sick_meetings = new sick_meeting(req.body);
+    sick_meetings.save(function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+        var start_time= moment(req.body.start_time).format("HH:mm")
+        var end_time = moment(req.body.end_time).format("HH:mm")
+        var sendData = `Dear Patient,
 
     Your payment process for sick leave certificate application is completed successfully.
     Please do join the Video call at ${meetingDate} from the time slot  ${start_time
-            } to ${end_time} 
+          } to ${end_time} 
     Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : "Not mentioned"
-            }
+          }
     Please remind the date and timing as alloted.`;
 
-          var sendData1 = `Dear Doctor,
+        var sendData1 = `Dear Doctor,
 
     The payment process for sick leave certificate application is completed successfully.
     Please do join the Video call at  ${meetingDate} from the time slot ${start_time
-            } to ${end_time}
+          } to ${end_time}
     Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : "Not mentioned"
-            }
+          }
     Please remind the date and timing as alloted.</div>`;
 
-          if (req.body.patient_mail !== "") {
-            generateTemplate(
-              EMAIL.generalEmail.createTemplate("en", {
-                title: "",
-                content: sendData,
-              }),
-              (error, html) => {
-                if (!error) {
-                  let mailOptions = {
-                    from: "contact@aimedis.com",
-                    to: req.body.patient_mail,
-                    subject: "Link for the Sick leave certificate",
-                    html: html,
-                  };
+        if (req.body.patient_mail !== "") {
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_mail,
+                  subject: "Link for the Sick leave certificate",
+                  html: html,
+                };
 
-                  let sendmail = transporter.sendMail(mailOptions);
-                  if (sendmail) {
-                  }
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
                 }
               }
-            );
-            User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
-              if (err && !userdata) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData1,
-                  }),
-                  (error, html) => {
-                    if (!error) {
-                      let mailOptions1 = {
-                        from: "contact@aimedis.com",
-                        to: userdata.email,
-                        subject: "Link for the sick leave certificate",
-                        html: html,
-                      };
-                      let sendmail1 = transporter.sendMail(mailOptions1);
-                      if (sendmail1) {
-                      }
+            }
+          );
+          User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
+            if (err && !userdata) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+              });
+            } else {
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData1,
+                }),
+                (error, html) => {
+                  if (!error) {
+                    let mailOptions1 = {
+                      from: "contact@aimedis.com",
+                      to: userdata.email,
+                      subject: "Link for the sick leave certificate",
+                      html: html,
+                    };
+                    let sendmail1 = transporter.sendMail(mailOptions1);
+                    if (sendmail1) {
                     }
                   }
-                );
-              }
-            });
-            res.json({
-              status: 200,
-              message: "Mail sent Successfully",
-              hassuccessed: true,
-            });
-          }
+                }
+              );
+            }
+          });
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
         }
-      });
-    } catch (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong",
-        error: err,
-      });
-    }
+      }
+    });
+  }catch(err){
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong",
+      error: err,
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -1017,12 +1017,12 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
       }
       return options.inverse(this);
     });
-
+   
     var new_link = []
-
-
+  
+   
     var birthday = [];
-
+    
 
 
     let comming = req.body
@@ -1043,13 +1043,13 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
       }
       htmlToSend1 = template({
 
-
+      
         birthday: birthday,
         pat_info: newperson,
-
+        
 
       });
-
+    
       var htmlToSend = htmlToSend1
 
 
@@ -1059,55 +1059,63 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
       logo2 =
         "data:image/png;base64,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";
 
+          
+        if (htmlToSend) {
+          var options = {
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            format: "A4",
+            path: `${__dirname}/${filename}`,
+            displayHeaderFooter: true,
+            margin: { top: 80, bottom: 80, left: 60, right: 60 },
+            headerTemplate: `<div style="text-align: center; width: 100%; font-size: 30px;"><img src="${logo1}" alt="Girl in a jacket" height="40"></div>`,
+            footerTemplate: `<div style="text-align: center;  width: 100%; font-size: 30px;"><img src="${logo2}" alt="Girl in a jacket" height="30"></div>`,
+          };
+        }
+        let file = [{ content: htmlToSend }];
+        html_to_pdf.generatePdfs(file, options).then((output) => {
+          const file = `${__dirname}/${filename}`;
+          if (comming.usefor === "mail") {
+            User.findOne({ _id: comming.patient_id }, function (err, dta) {
+              var sendData = `<div>Dear Patient , <br/>
+              Here is the Certificate added by doctor on your sick leave certificate request. 
+              Please download it from here as well as from the request list page too.</div>`;
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData,
+                }),
+                (error, html) => {
+                  if (dta.email !== "") {
+                    let mailOptions = {
+                      from: "contact@aimedis.com",
+                      to: dta.email,
+                      subject: "Sick leave certificate Download",
 
-      if (htmlToSend) {
-        var options = {
-          args: ["--no-sandbox", "--disable-setuid-sandbox"],
-          format: "A4",
-          path: `${__dirname}/${filename}`,
-          displayHeaderFooter: true,
-          margin: { top: 80, bottom: 80, left: 60, right: 60 },
-          headerTemplate: `<div style="text-align: center; width: 100%; font-size: 30px;"><img src="${logo1}" alt="Girl in a jacket" height="40"></div>`,
-          footerTemplate: `<div style="text-align: center;  width: 100%; font-size: 30px;"><img src="${logo2}" alt="Girl in a jacket" height="30"></div>`,
-        };
-      }
-      let file = [{ content: htmlToSend }];
-      html_to_pdf.generatePdfs(file, options).then((output) => {
-        const file = `${__dirname}/${filename}`;
-        if (comming2.usefor === "mail") {
-          User.findOne({ _id: comming.patient_id }, function (err, dta) {
-            var sendData = `<div></div>`;
-            generateTemplate(
-              EMAIL.generalEmail.createTemplate("en", {
-                title: "",
-                content: sendData,
-              }),
-              (error, html) => {
-                if (dta.email !== "") {
-                  let mailOptions = {
-                    from: "contact@aimedis.com",
+                      html: html,
+                      attachments: [
+                        {
+                          // utf-8 string as an attachment
+                          filename: "sickleave_certificate.pdf",
+                          path: file,
+                        },
+                      ],
+                    };
 
-                    to: dta.email,
-                    subject: "Sick leave certificate request",
+                    let sendmail = transporter.sendMail(mailOptions);
+                    if (sendmail) {
 
-                    html: html,
-                    attachments: [
-                      {
-                        // utf-8 string as an attachment
-                        filename: filename,
-                        path: file,
-                      },
-                    ],
-                  };
-
-                  let sendmail = transporter.sendMail(mailOptions);
-                  if (sendmail) {
-
-                    res.json({
-                      status: 200,
-                      message: "Mail sent Successfully",
-                      hassuccessed: true,
-                    });
+                      res.json({
+                        status: 200,
+                        message: "Mail sent Successfully",
+                        hassuccessed: true,
+                      });
+                    } else {
+                      res.json({
+                        status: 200,
+                        msg: "Mail is not sent",
+                        hassuccessed: false,
+                      });
+                    }
                   } else {
                     res.json({
                       status: 200,
@@ -1115,21 +1123,14 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                       hassuccessed: false,
                     });
                   }
-                } else {
-                  res.json({
-                    status: 200,
-                    msg: "Mail is not sent",
-                    hassuccessed: false,
-                  });
                 }
-              }
-            );
-          })
-        } else {
-          res.download(file);
-        }
-      });
-
+              );
+            })
+          } else {
+            res.download(file);
+          }
+        });
+      
     })
   }
   catch (e) {
@@ -1232,42 +1233,6 @@ function GetDatafromAws1(element, comming2) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.post("/SickleaveCretificateToPatient", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
   Here is the new Sick leave certificate request from the 
@@ -1314,7 +1279,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   // const token = req.headers.token;
   // let legit = jwtconfig.verify(token);
   // if (legit) {
-  try {
+    try{
     const VirtualtToSearchWith = new sick_meeting({
       sesion_id: req.params.sesion_id,
     });
@@ -1337,7 +1302,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         } else {
           if (data !== null) {
             let today = new Date().setHours(0, 0, 0, 0);
-
+   
 
             // let today =moment().format("MM-DD-YYYY")
             // let ttime = new Date();
@@ -1362,7 +1327,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             } else if (moment(today).isSame(data_d)) {
               if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
-                  { _id: data.task_id, is_payment: true },
+                  { _id : data.task_id, is_payment: true },
                   function (err, userdata) {
                     if (err && !userdata) {
                       res.json({
@@ -1372,7 +1337,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                         error: err,
                       });
                     } else {
-                      if (userdata !== null) {
+                      if(userdata!== null){
                         res.json({
                           status: 200,
                           hassuccessed: true,
@@ -1403,7 +1368,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
                               });
                             } else {
-                              res.json({
+                              res.json({ 
                                 status: 200,
                                 hassuccessed: false,
 
@@ -1431,7 +1396,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                   message: "Link Expire",
                 });
               }
-            }
+            } 
           } else {
             res.json({
               status: 200,
@@ -1442,13 +1407,13 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         }
       }
     );
-  } catch (err) {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Something went wrong"
-    });
-  }
+    }catch(err){
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong"
+      });
+    }
   // } else {
   //   res.json({
   //     status: 200,
@@ -1463,13 +1428,13 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    try {
-      var sick_meetings = new sick_meeting(req.body);
-      sick_meetings.save(function (err, user_data) {
-        if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
-        } else {
-          var sendData = `<div>Dear Patient,<br/>
+    try{
+    var sick_meetings = new sick_meeting(req.body);
+    sick_meetings.save(function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        var sendData = `<div>Dear Patient,<br/>
         Your payment process for sick leave certificate application is completed successfully.
           "<br/>";
         Please do join the Video call at  
@@ -1482,7 +1447,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
           ${req.body.patient_link}
         Please remind the date and timing as alloted.</div>`;
 
-          var sendData1 = `<div>Dear Doctor<br/>
+        var sendData1 = `<div>Dear Doctor<br/>
         The payment process for sick leave certificate application is completed successfully.
         <br/>
         Please do join the Video call at
@@ -1495,71 +1460,71 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
           ${req.body.doctor_link}
         Please remind the date and timing as alloted.</div>`;
 
-          if (req.body.patient_mail !== "") {
-            generateTemplate(
-              EMAIL.generalEmail.createTemplate("en", {
-                title: "",
-                content: sendData,
-              }),
-              (error, html) => {
-                if (!error) {
-                  let mailOptions = {
-                    from: "contact@aimedis.com",
-                    to: req.body.patient_mail,
-                    subject: "Sick leave certificate request",
-                    html: html,
-                  };
-                  let sendmail = transporter.sendMail(mailOptions);
-                  if (sendmail) {
-                  }
+        if (req.body.patient_mail !== "") {
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_mail,
+                  subject: "Sick leave certificate request",
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
                 }
               }
-            );
-            User.find(req.params.user_id, function (err, userdata) {
-              if (err && !userdata) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData1,
-                  }),
-                  (error, html) => {
-                    if (!error) {
-                      let mailOptions1 = {
-                        from: "contact@aimedis.com",
-                        to: userdata.email,
-                        subject: "Sick leave certificate request",
-                        html: html,
-                      };
-                      let sendmail1 = transporter.sendMail(mailOptions1);
-                      if (sendmail1) {
-                      }
+            }
+          );
+          User.find(req.params.user_id, function (err, userdata) {
+            if (err && !userdata) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+              });
+            } else {
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData1,
+                }),
+                (error, html) => {
+                  if (!error) {
+                    let mailOptions1 = {
+                      from: "contact@aimedis.com",
+                      to: userdata.email,
+                      subject: "Sick leave certificate request",
+                      html: html,
+                    };
+                    let sendmail1 = transporter.sendMail(mailOptions1);
+                    if (sendmail1) {
                     }
                   }
-                );
-              }
-            });
-            res.json({
-              status: 200,
-              message: "Mail sent Successfully",
-              hassuccessed: true,
-            });
-          }
+                }
+              );
+            }
+          });
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
         }
-      });
-    } catch (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong"
-      });
-    }
+      }
+    });
+  }catch(err){
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong"
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -1600,205 +1565,5 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
     }
   );
 });
-
-
-router.get("/Getinsti/:house_id", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  let house_name = "";
-  if (legit) {
-    Institute.findOne({
-      "institute_groups.houses.house_id": req.params.house_id,
-    }).exec(function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-        // console.log("data", data);
-        if (data) {
-          data.institute_groups.map((item) => {
-            // console.log("item", item);
-            item.houses.map((item2) => {
-              console.log("item", item2);
-              if (item2.house_id == req.params.house_id && item2.sickleave_certificate_amount != "") {
-                sickleave_certificate_amount = item2.sickleave_certificate_amount;
-              }
-
-            });
-          });
-          console.log("data", sickleave_certificate_amount);
-          res.json({ status: 200, hassuccessed: true, data: sickleave_certificate_amount });
-        } else {
-          var sickleave_certificate_amount = "20";
-
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "House not found",
-            data: sickleave_certificate_amount
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-
-// router.put("/AddTra/:house_id", function (req, res, next) {
-//   const token = req.headers.token;
-//   let legit = jwtconfig.verify(token);
-//   if (legit) {
-//     Institute.findOne(
-//       { "institute_groups.houses.house_id": req.params.house_id },
-
-
-//       function (err, data) {
-//         if (err && !data) {
-//           res.json({
-//             status: 200,
-//             hassuccessed: false,
-//             msg: "Something went wrong",
-//             error: err,
-//           });
-//         }
-//         else {
-
-//           data.institute_groups.map((item) => {
-//             // console.log("item", item);
-//             item.houses.map((item2) => {
-//               console.log("item",item2)
-//               if (item2.house_id == req.params.house_id) {
-//                 console.log("item222222222222", item2);
-//                 Institute.updateOne(
-//                   { "institute_groups.houses.house_id": req.params.house_id} ,
-//                   {$push:{institute_groups:{$each:[{"houses.sickleave_certificate_amount": req.body.sickleave_certificate_amount }]}}},
-//                   function (err, userdata) {
-//                     if (err && !userdata) {
-//                       console.log("err",err)
-//                       res.json({
-//                         status: 200,
-//                         hassuccessed: false,
-//                         msg: "Something went wrong",
-//                         error: err,
-//                       });
-//                     }
-//                     else {
-//                       res.json({
-//                         status: 200,
-//                         hassuccessed: true,
-//                         msg: "successful",
-//                         data: userdata,
-//                       });
-//                     }
-//                     console.log("item222222222222", item2);
-//                   }
-//                 );
-
-//               }
-//             });
-//           });
-//         }
-
-//       }
-//     );
-//   } else {
-//     res.json({
-//       status: 200,
-//       hassuccessed: false,
-//       msg: "Authentication required.",
-//     });
-//   }
-// });
-
-
-
-
-
-
-router.put("/AddTra/:house_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    // var track_id = {track_id : req.params.TrackId}
-
-// var ins_id = req.params.ins_id;
-// var hou_id = req.params.hou_id;
-
-    Institute.updateOne(
-      { "institute_groups.houses.house_id": req.params.house_id , "houses.house_id": req.params.house_id },
-      {
-        $set: {
-          "houses.sickleave_certificate_amount": 10
-        }
-      },
-      // {arrayfilters: [{'0._id': ins_id}, {'1._id' : hou_id}]},
-      function (err, data) {
-        if (err && !data) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-            error: err,
-          });
-        } else {
-
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            msg: "track is updated",
-            data: data,
-          });
-
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = router;
