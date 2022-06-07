@@ -336,6 +336,11 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
           { task_type: { $eq: "sick_leave" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
+        $or:[
+          {archived:{$ne:true}},
+          {archived: { $exists: false } }
+        ]
+        
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -1578,55 +1583,118 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
 var cron = require('node-cron');
 
 router.put("/linkarchive", function (req, res, next) {
-  sick_meeting.find()
-    .exec(function (err, doc1) {
-      if (err && !doc1) {
+
+  // cron.schedule('1 * * * * *', () => {
+    sick_meeting.find()
+      .exec(function (err, doc1) {
+        if (err && !doc1) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "update data failed",
+            error: err,
+          });
+        } else {
+          console.log("doc1", doc1)
+          let ttime = moment(Date.now()).format("YYYY-MM-DD")
+          let ttime1 = moment().format("HH:mm");
+          // let final= doc1.map((element)=>{
+          //   return element.endtime
+          // })
+
+          doc1.forEach((element) => {
+
+            var enddate = moment(element.date).format("YYYY-MM-DD");
+            var endtime = moment(element.end_time).format("HH:mm");
+
+            if (moment(ttime).diff(enddate, 'days') > 2 && ttime1 > endtime) {
+              console.log("2")
+
+
+              console.log("1")
+
+              virtual_Task.updateOne({ patient_id: element.patient_id }, { archived: true }, function (err, data) {
+                if (err) {
+                  console.log("err", err)
+                }
+                else {
+                  console.log("data", data)
+                }
+              })
+
+
+            }
+
+          })
+
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "update data ",
+
+          });
+        }
+      }
+      );
+  // })
+});
+
+
+router.post("/sickarchive", function (req, res) {
+
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    console.log("1")
+    task_type = "sick_leave"
+    const VirtualtToSearchWith = new virtual_Task({
+      task_type
+    });
+    VirtualtToSearchWith.encryptFieldsSync();
+
+    patient_id = req.body.patient_id
+    const VirtualtToSearchWith2 = new virtual_Task({
+      patient_id
+    })
+    VirtualtToSearchWith2.encryptFieldsSync();
+
+    virtual_Task.findOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith2.patient_id] }, archived: true, task_type: { $in: [task_type, VirtualtToSearchWith.task_type] } }, function (err, data) {
+      if (err) {
+        console.log("err",err)
         res.json({
           status: 200,
           hassuccessed: false,
           message: "update data failed",
-          error: err,
         });
+
       } else {
-        console.log("doc1", doc1)
-        let ttime = moment().format("HH:mm");
-        // let final= doc1.map((element)=>{
-        //   return element.endtime
-        // })
-
-        doc1.forEach((element) => {
-
-console.log("element",element)
-          if (ttime > element.endtime) {
-
-
-            cron.schedule('1 * * * * *', () => {
-console.log("1")
-
-              virtual_Task.UpdateMany({ patient_id: element.patient_id }, { archived: true }, function (err, data) {
-                if (err) {
-console.log("err",err)
-                }
-                else {
-console.log("data",data)
-                }
-              })
-            });
-
-          }
-        })
-
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "update data ",
-
-        });
+        console.log("data",data)
+        if (data != null) {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            data: data,
+          });
+        }
+        else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "No data"
+          });
+        }
       }
-    }
-    );
+    })
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 
-});
+})
 
 
 module.exports = router;
