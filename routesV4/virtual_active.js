@@ -1566,18 +1566,122 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
   );
 });
 
-<<<<<<< HEAD
+
+router.get("/GetAmount/:house_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  let house_name = "";
+  let userdata = "";
+  let sickleave_certificate_amount = "";
+  if (legit) {
+    Institute.findOne({
+      "institute_groups.houses.house_id": req.params.house_id,
+    }).exec(function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        // console.log("data", data);
+        if (data) {
+          data.institute_groups.map((item) => {
+            // console.log("item", item);
+            item.houses.map((item2) => {
+              // console.log("item", item2);
+
+              if (item2.house_id == req.params.house_id) {
+
+
+                if (item2.sickleave_certificate_amount !== "") {
+
+                  userdata = item2.sickleave_certificate_amount;
+                  console.log("item1");
+                }
+                else {
+                  userdata = item2.sickleave_certificate_amount = "20";
+
+                  console.log("item2");
+
+
+                }
+              }
+            });
+          });
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 
 
 
 
 
+router.put("/AddAmount/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    // var track_id = {track_id : req.params.TrackId}
+
+    //  var insid = req.params.ins_id;
+    //  var docuid = req.params.docu_id;
+
+    // Institute.updateOne(
+    //   { "institute_groups.houses.house_id": req.params.house_id, "houses.house_id": req.params.house_id },
+
+    //    {$push : { institute_groups: { houses: { $elemMatch: { sickleave_certificate_amount: req.body.sickleave_certificate_amount } } } } },
 
 
+       Institute.updateOne(
+        {
+            
+            'institute_groups.houses.house_id': req.params.house_id
+        },
+        {
+            $set: {
+                'institute_groups.$[].houses.$[].sickleave_certificate_amount': req.body.sickleave_certificate_amount
+            }
+        },
 
 
+      //  {arrayfilters: [{"elem._id": {$ne: "insid"}, 'belem._id' :{$ne : "docuid"}}]},
+      function (err, data) {
+        if (err && !data) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+            error: err,
+          });
+        } else {
 
-=======
->>>>>>> 3cd2e1c46a7a130dabc4b3382cb1bf457abcab70
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            msg: "track is updated",
+            data: data,
+          });
+
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
 module.exports = router;
