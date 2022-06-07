@@ -1684,7 +1684,6 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
     //    {$push : { institute_groups: { houses: { $elemMatch: { sickleave_certificate_amount: req.body.sickleave_certificate_amount } } } } },
 
 
-
        Institute.updateOne(
         {
             
@@ -1695,9 +1694,6 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
                 'institute_groups.$[].houses.$[].sickleave_certificate_amount': req.body.sickleave_certificate_amount
             }
         },
-
-
-
 
 
       //  {arrayfilters: [{"elem._id": {$ne: "insid"}, 'belem._id' :{$ne : "docuid"}}]},
