@@ -38,6 +38,10 @@ app.use(express.urlencoded({ extended: false }));
 const appAdmin = express();
 
 appAdmin.use(express.static(path.join(__dirname, "./build/admin")));
+
+const appAdmin1 = express();
+
+appAdmin1.use(express.static(path.join(__dirname, "./build/sickleave")));
 app.use(express.static(path.join(__dirname, "./build/main")));
 
 const server = require("http").createServer(app);
@@ -357,8 +361,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
 appAdmin.use((err, req, res, next) => {
-  console.log("er1r", err);
-  // return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+  // console.log("er1r", err);
+  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
 });
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -366,6 +370,17 @@ appAdmin.use(function (req, res, next) {
   next(err);
 });
 app.use("/admin", appAdmin);
+
+appAdmin1.use((err, req, res, next) => {
+  // console.log("er1r", err);
+  return res.sendFile(path.resolve( __dirname, 'build/sys-n-sick' , 'index.html'));
+});
+appAdmin1.use(function (req, res, next) {
+  var err = new Error("Not Found");
+  err.status = 404;
+  next(err);
+});
+app.use("/sys-n-sick", appAdmin1);
 ////////////admin+main+end/////////////
 
 // catch 404 and forward to error handler
@@ -377,13 +392,13 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  //  return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  console.log("err", err);
+   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+  // console.log("err", err);
   return err;
 });
 
-server.listen(5000, () => {
-  console.log("Server started on port 5000");
-});
+// server.listen(5000, () => {
+//   console.log("Server started on port 5000");
+// });
 
-// module.exports = app;
+module.exports = app;
