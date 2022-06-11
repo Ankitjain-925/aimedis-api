@@ -1634,8 +1634,8 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
   if (legit) {
     // var track_id = {track_id : req.params.TrackId}
 
-    //  var insid = req.params.ins_id;
-    //  var docuid = req.params.docu_id;
+      //  var insid = req.body.ins_id;
+      //  var docuid = req.body.docu_id;
 
     // Institute.updateOne(
     //   { "institute_groups.houses.house_id": req.params.house_id, "houses.house_id": req.params.house_id },
@@ -1645,18 +1645,21 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
 
        Institute.updateOne(
         {
+            // '_id': req.body.ins_id,
+            'institute_groups.houses.house_id':req.params.house_id
+        },
+        
+          { $set: {
+                'institute_groups.$.houses.$[e].sickleave_certificate_amount': req.body.sickleave_certificate_amount
+            }},
             
-            'institute_groups.houses.house_id': req.params.house_id
-        },
-        {
-            $set: {
-                'institute_groups.$[].houses.$[].sickleave_certificate_amount': req.body.sickleave_certificate_amount
-            }
-        },
+            {arrayfilters: [{ "e.house_id": req.params.house_id} ]},
+        
 
 
-      //  {arrayfilters: [{"elem._id": {$ne: "insid"}, 'belem._id' :{$ne : "docuid"}}]},
-      function (err, data) {
+        // 
+     function (err, data) {
+        console.log('data', err)
         if (err && !data) {
           res.json({
             status: 200,
@@ -1684,4 +1687,56 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
     });
   }
 });
+
+
+
+router.get("/Task/:patient_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+
+    let patient_id = req.params.patient_id;
+    var VirtualtToSearchWith = new virtual_Task({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    virtual_Task.find(
+      {
+        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+        $or: [
+          { task_type: { $eq: "sick_leave" } },
+          { task_type: { $eq: VirtualtToSearchWith1.task_type } },
+        ],
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
+
+      
+
+
+
+
+
+
 module.exports = router;
