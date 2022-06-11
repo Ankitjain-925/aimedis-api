@@ -1707,6 +1707,7 @@ router.get("/Task/:patient_id", function (req, res, next) {
           { task_type: { $eq: "sick_leave" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
+        archived: { $eq: true },
       },
       function (err, userdata) {
         if (err && !userdata) {
