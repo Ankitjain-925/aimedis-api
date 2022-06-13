@@ -372,15 +372,14 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
 
 router.post("/DoctorMail", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
-    Here is the new Sick leave certificate request from the 
-      ${req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id
-    },
-      for the time slot 
-      ${req.body.start + "" + req.body.end},
-      at
-      ${req.body.date}
-      <br/>
-      Please check the list of requests from the list page. Please update the status of request also accordingly.</div>`;
+  Here is the new Sick leave certificate request from the 
+    ${req.body.first_name + " " + req.body.last_name + " - (" + req.body.profile_id + " )"},
+    for the time slot 
+    ${req.body.start + " to " + req.body.end},
+    at
+    ${req.body.date}
+    <br/>
+    Please check the list of requests from the list page. Please update the status of request also accordingly.</div>`;
   generateTemplate(
     EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
     (error, html) => {
@@ -1237,7 +1236,7 @@ function GetDatafromAws1(element, comming2) {
 router.post("/SickleaveCretificateToPatient", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
   Here is the new Sick leave certificate request from the 
-    ${req.body.first_name + " " + req.body.last_name + " " + req.body.profile_id},
+    ${req.body.first_name + " " + req.body.last_name + " - (" + req.body.profile_id + " )"},
     for the time slot 
     ${req.body.start + " to " + req.body.end},
     at
