@@ -14,6 +14,11 @@ const Houses = new mongoose.Schema({
     required: false,
     unique: false
 },
+sickleave_certificate_amount:{
+  type: String,
+  required: false,
+  unique: false
+},
 },{ strict: false });
 
 Houses.plugin(mongooseFieldEncryption, {
