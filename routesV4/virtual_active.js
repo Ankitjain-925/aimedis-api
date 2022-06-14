@@ -1466,7 +1466,7 @@ router.get("/GetAmount/:house_id", function (req, res) {
               }
             });
           });
-          res.json({ status: 200, hassuccessed: true, data: userdata });
+          res.json({ status: 200, hassuccessed: true, sickleave_certificate_amount: userdata });
         }
 
       }
