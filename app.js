@@ -44,13 +44,11 @@ app.use(express.urlencoded({ extended: false }));
 
 ////////////admin+main/////////////
 const appAdmin = express();
-
-appAdmin.use(express.static(path.join(__dirname, "./build/admin")));
-
 const appAdmin1 = express();
 
-appAdmin1.use(express.static(path.join(__dirname, "./build/sickleave")));
-app.use(express.static(path.join(__dirname, "./build/main")));
+appAdmin.use(express.static(path.join(__dirname, "build/admin")));
+appAdmin1.use(express.static(path.join(__dirname, "build/sickleave")));
+app.use(express.static(path.join(__dirname, "build/main")));
 
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
@@ -80,6 +78,7 @@ io.on("connection", (socket) => {
 
 
 cron.schedule('0 0 */12 * * *', function(){
+  getData();
   var DatEtIME = new Date().getTime();
   fs.appendFile('sample.txt','Cron is running', 'utf8',
 	function(err) {		
@@ -182,7 +181,106 @@ backupProcess4.on('exit', (code, signal) => {
     console.log('Successfully backedup the database')
     }     
 });
+removeOldBackups();
 });
+
+
+function removeOldBackups() {
+  const directoryPath =path.join(__dirname, "./DBbackups/")
+fs.readdir(directoryPath, (err, files) => {
+  if (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Something went wrong",
+    });
+  }
+  else {
+    files.forEach(file => {
+      fs.stat(directoryPath + `/${file}`, function (err, data) {
+        let ttime = moment(Date.now()).format("YYYY-MM-DD")
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+          });
+        } else {
+          var enddate = moment(data.birthtime).format("YYYY-MM-DD");
+         difference= moment(ttime).diff(enddate, 'days')
+          if (moment(ttime).diff(enddate, 'days') >=10) {
+            fs.unlink(directoryPath + `/${file}`, function (err) {})
+          }
+        }
+      })
+    });
+  }
+});
+}
+
+function getData() {
+  var data = {
+    "include_deleted": false,
+    "include_has_explicit_shared_members": false,
+    "include_media_info": false,
+    "include_mounted_folders": true,
+    "include_non_downloadable_files": true,
+    "path": "/backupdb",
+    "recursive": false
+    }
+    var config = {
+      method: "POST",
+      url: `https://api.dropboxapi.com/2/files/list_folder`,
+      headers: {
+        authorization: `Bearer ${process.env.DBT}`,
+        'Content-Type': 'application/json',
+      },
+      data: data
+    };
+  
+    axios(config).then(function (data) {
+      let final_data = data.data.entries.sort(mySorter)
+     if (final_data.length > 50) {
+        var tempArray = final_data.slice(0,50);
+        var tempArray2 =final_data.slice(50);
+        tempArray2.forEach((item, index) => {
+            var data = JSON.stringify({
+              path: item.path_lower,
+            });
+
+            var config = {
+              method: "post",
+              url: "https://api.dropboxapi.com/2/files/delete_v2",
+              headers: {
+                Authorization:
+                  `Bearer ${process.env.DBT}`,
+                "Content-Type": "application/json",
+              },
+              data: data,
+            };
+
+            axios(config)
+              .then(function (response) {
+                console.log("done index", JSON.stringify(response.data));
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+          });
+      }
+    }).catch(function (error) {})
+  
+}
+
+function mySorter(a, b) {
+  if (a.server_modified && b.server_modified) {
+    var x = a.server_modified.toLowerCase();
+    var y = b.server_modified.toLowerCase();
+    return x > y ? -1 : x < y ? 1 : 0;
+  } else {
+    return -1;
+  }
+}
 
 function CallingDropBox(localFile, SetUrl){
      var config =  {
@@ -390,8 +488,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
 appAdmin.use((err, req, res, next) => {
-  // console.log("er1r", err);
-  return res.sendFile(path.resolve( __dirname, './build/admin' , 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
 });
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -401,8 +498,7 @@ appAdmin.use(function (req, res, next) {
 app.use("/sys-n-admin", appAdmin);
 
 appAdmin1.use((err, req, res, next) => {
-  // console.log("er1r", err);
-  return res.sendFile(path.resolve( __dirname, './build/sickleave' , 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
 });
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -421,9 +517,8 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname,'./build/main', 'index.html'));
+   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
   // console.log("err", err);
-  return err;
 });
 
 // server.listen(5000, () => {

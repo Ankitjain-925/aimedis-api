@@ -11,7 +11,7 @@ var questionaire = require("../schema/questionaire");
 var Institute = require("../schema/institute.js");
 var Appointments = require("../schema/appointments");
 var virtual_step = require("../schema/virtual_step");
-var virtual_step = require("../schema/sick_meeting");
+var sick_meeting = require("../schema/sick_meeting");
 var answerspatient = require("../schema/answerspatient");
 var Prescription = require("../schema/prescription");
 var Cretificate = require("../schema/sick_certificate");
@@ -5461,7 +5461,7 @@ function User_Case1(House_id) {
 function virtualCase(House_id) {
   return new Promise((resolve, reject) => {
     try {
-      const VirtualtToSearchWith = new virtual_cases({ house_id: House_id });
+      const VirtualtToSearchWith = new virtual_Case({ house_id: House_id });
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Case.countDocuments(
         {

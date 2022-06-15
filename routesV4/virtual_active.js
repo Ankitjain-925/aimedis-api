@@ -1073,6 +1073,7 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         };
       }
       let file = [{ content: htmlToSend }];
+      try{
       html_to_pdf.generatePdfs(file, options).then((output) => {
         const file = `${__dirname}/${filename}`;
         if (comming.usefor === "mail") {
@@ -1131,7 +1132,15 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
           res.download(file);
         }
       });
-
+    }
+    catch(e){
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Get catch error",
+        error: e,
+      });
+    }
     })
   }
   catch (e) {
@@ -1275,10 +1284,6 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
     }
   );
 });
-
-
-
-
 
 
 router.post("/AddMeeting/:user_id", function (req, res, next) {
@@ -1481,10 +1486,6 @@ router.get("/GetAmount/:house_id", function (req, res) {
 });
 
 
-
-
-
-
 router.put("/AddAmount/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1546,8 +1547,6 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
     });
   }
 });
-
-
 
 router.get("/Task/:patient_id", function (req, res, next) {
   const token = req.headers.token;
