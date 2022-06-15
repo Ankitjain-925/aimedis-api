@@ -309,6 +309,15 @@ function CallingDropBox(localFile, SetUrl){
 }
 
 // app.use(AuthCheck);
+// cron.schedule('1 * * * * *', () => {
+// console.log("enter 1 second")
+
+// app.use("localhost:5000/api/v4/vactive/linkarchive");
+
+// console.log("enter second")
+  
+// });
+
 
 var UserData = require("./routes/UserTrack");
 var UserProfile = require("./routes/userProfile");
