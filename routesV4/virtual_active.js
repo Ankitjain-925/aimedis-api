@@ -336,11 +336,11 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
           { task_type: { $eq: "sick_leave" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
-        $or:[
-          {archived:{$ne:true}},
-          {archived: { $exists: false } }
+        $or: [
+          { archived: { $ne: true } },
+          { archived: { $exists: false } }
         ]
-        
+
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -1584,7 +1584,7 @@ var cron = require('node-cron');
 
 router.put("/linkarchive", function (req, res, next) {
 
-  // cron.schedule('1 * * * * *', () => {
+  cron.schedule('1 * * * * *', () => {
     sick_meeting.find()
       .exec(function (err, doc1) {
         if (err && !doc1) {
@@ -1597,7 +1597,6 @@ router.put("/linkarchive", function (req, res, next) {
         } else {
           console.log("doc1", doc1)
           let ttime = moment(Date.now()).format("YYYY-MM-DD")
-          let ttime1 = moment().format("HH:mm");
           // let final= doc1.map((element)=>{
           //   return element.endtime
           // })
@@ -1605,15 +1604,13 @@ router.put("/linkarchive", function (req, res, next) {
           doc1.forEach((element) => {
 
             var enddate = moment(element.date).format("YYYY-MM-DD");
-            var endtime = moment(element.end_time).format("HH:mm");
+            
 
-            if (moment(ttime).diff(enddate, 'days') > 2 && ttime1 > endtime) {
-              console.log("2")
-
-
-              console.log("1")
-
-              virtual_Task.updateOne({ patient_id: element.patient_id }, { archived: true }, function (err, data) {
+            if (moment(ttime).diff(enddate, 'days') > 2 ) {
+              virtual_Task.updateMany({ _id:element.task_id,  $or: [
+                {meetingjoined: { $ne: true } },
+                { meetingjoined: { $exists: false } }
+              ] }, { archived: true }, function (err, data) {
                 if (err) {
                   console.log("err", err)
                 }
@@ -1626,17 +1623,10 @@ router.put("/linkarchive", function (req, res, next) {
             }
 
           })
-
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "update data ",
-
-          });
         }
       }
       );
-  // })
+  })
 });
 
 
@@ -1660,7 +1650,7 @@ router.post("/sickarchive", function (req, res) {
 
     virtual_Task.findOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith2.patient_id] }, archived: true, task_type: { $in: [task_type, VirtualtToSearchWith.task_type] } }, function (err, data) {
       if (err) {
-        console.log("err",err)
+        console.log("err", err)
         res.json({
           status: 200,
           hassuccessed: false,
@@ -1668,7 +1658,7 @@ router.post("/sickarchive", function (req, res) {
         });
 
       } else {
-        console.log("data",data)
+        console.log("data", data)
         if (data != null) {
           res.json({
             status: 200,
