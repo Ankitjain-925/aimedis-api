@@ -26,6 +26,11 @@ const ProfessionalInfo = new mongoose.Schema(
       required: false,
       unique: false,
     },
+    user_id: {
+      type: String,
+      required: false,
+      unique: false,
+    },
   },
   { strict: false }
 );
@@ -38,9 +43,19 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
   },
 });
 
+
+
+
+
+
 var TaskSchema = new Schema(
   {
     assinged_to: [ProfessionalInfo],
+    speciality: {
+      type: Object,
+      required: false,
+      unique: false,
+    },
     task_name: {
       type: String,
       required: true,
