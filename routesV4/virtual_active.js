@@ -1014,12 +1014,6 @@ router.post("/AddMeeting", function (req, res, next) {
 // }
 
 
-
-
-
-
-
-
 router.post("/downloadSickleaveCertificate", function (req, res, next) {
   try {
     handlebars.registerHelper("ifCond", function (v1, v2, options) {
@@ -1087,10 +1081,11 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         const file = `${__dirname}/${filename}`;
         if (comming.usefor === "mail") {
           User.findOne({ _id: comming.patient_id }, function (err, dta) {
-            var sendData = `<div>Dear Patient,
 
-            Doctor has added your certificate on your sick leave certificate request, you can download it form in attachment as well as from the request list page.
-            </div>`;
+            var sendData = `<div>Dear Patient , <br/>
+              Here is the Certificate added by doctor on your sick leave certificate request. 
+              Please download it from here as well as from the request list page too.</div>`;
+
             generateTemplate(
               EMAIL.generalEmail.createTemplate("en", {
                 title: "",
@@ -1102,13 +1097,13 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                     from: "contact@aimedis.com",
 
                     to: dta.email,
-                    subject: "Sick leave certificate request",
-
+                    subject: "Sick leave certificate Download",
                     html: html,
                     attachments: [
                       {
                         // utf-8 string as an attachment
-                        filename: filename,
+                        filename: "sickleave_certificate.pdf",
+
                         path: file,
                       },
                     ],
@@ -1246,7 +1241,6 @@ function GetDatafromAws1(element, comming2) {
 
 }
 
-
 router.post("/SickleaveCretificateToPatient", function (req, res) {
   var sendData = `<div>Dear Doctor <br/>
   Here is the new Sick leave certificate request from the 
@@ -1316,14 +1310,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         } else {
           if (data !== null) {
             let today = new Date().setHours(0, 0, 0, 0);
-
-
-            // let today =moment().format("MM-DD-YYYY")
-            // let ttime = new Date();
-
-            let ttime = moment().format("HH:mm");
-            let data_start = moment(data.start_time).format("HH:mm")
-
             let data_end = moment(data.end_time).format("HH:mm")
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             if (moment(today).isAfter(data_d)) {
@@ -1436,6 +1422,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   //   });
   // }
 });
+
 
 
 router.post("/AddMeeting/:user_id", function (req, res, next) {
@@ -1580,10 +1567,9 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
   );
 });
 
+
 var cron = require('node-cron');
-
 router.put("/linkarchive", function (req, res, next) {
-
   cron.schedule('1 * * * * *', () => {
     sick_meeting.find()
       .exec(function (err, doc1) {
@@ -1677,14 +1663,176 @@ router.post("/sickarchive", function (req, res) {
     })
   }
   else {
+ res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+}
+})
+
+
+router.get("/GetAmount/:house_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  let house_name = "";
+  let userdata = "";
+  let sickleave_certificate_amount = "";
+  if (legit) {
+    Institute.findOne({
+      "institute_groups.houses.house_id": req.params.house_id,
+    }).exec(function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        // console.log("data", data);
+        if (data) {
+          data.institute_groups.map((item) => {
+            // console.log("item", item);
+            item.houses.map((item2) => {
+              // console.log("item", item2);
+
+              if (item2.house_id == req.params.house_id) {
+
+
+                if (item2.sickleave_certificate_amount !== "") {
+
+                  userdata = item2.sickleave_certificate_amount;
+                  console.log("item1");
+                }
+                else {
+                  userdata = item2.sickleave_certificate_amount = "20";
+
+                  console.log("item2");
+
+
+                }
+              }
+            });
+          });
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+
+      }
+    });
+  } else {
     res.json({
       status: 200,
       hassuccessed: false,
       message: "Authentication required.",
     });
   }
+});
 
-})
+
+router.put("/AddAmount/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    // var track_id = {track_id : req.params.TrackId}
+
+    //  var insid = req.body.ins_id;
+    //  var docuid = req.body.docu_id;
+
+    // Institute.updateOne(
+    //   { "institute_groups.houses.house_id": req.params.house_id, "houses.house_id": req.params.house_id },
+
+    //    {$push : { institute_groups: { houses: { $elemMatch: { sickleave_certificate_amount: req.body.sickleave_certificate_amount } } } } },
+
+
+    Institute.updateOne(
+      {
+        // '_id': req.body.ins_id,
+        'institute_groups.houses.house_id': req.params.house_id
+      },
+
+      {
+        $set: {
+          'institute_groups.$.houses.$[e].sickleave_certificate_amount': req.body.sickleave_certificate_amount
+        }
+      },
+
+      { "arrayFilters" : [{ "e.house_id": req.params.house_id }] },
+
+
+
+      // 
+      function (err, data) {
+        console.log('data', err)
+        if (err && !data) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+            error: err,
+          });
+        } else {
+
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            msg: "track is updated",
+            data: data,
+          });
+
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
+});
+
+
+
+router.get("/Task/:patient_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+
+    let patient_id = req.params.patient_id;
+    var VirtualtToSearchWith = new virtual_Task({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    virtual_Task.find(
+      {
+        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+        $or: [
+          { task_type: { $eq: "sick_leave" } },
+          { task_type: { $eq: VirtualtToSearchWith1.task_type } },
+        ],
+        archived: { $eq: true },
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 
 module.exports = router;
