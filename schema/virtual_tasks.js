@@ -257,6 +257,11 @@ var TaskSchema = new Schema(
       required: false,
       unique: false,
     },
+    meetingjoined:{
+      type: Boolean,
+      required: true,
+      unique: false,
+    }
   },
   { strict: false }
 );
