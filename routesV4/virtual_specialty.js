@@ -37,6 +37,8 @@ var billinvoice1 = fs.readFileSync(join(`${__dirname}/medical.html`), "utf8");
 var billinvoice2 = fs.readFileSync(join(`${__dirname}/2image.html`), "utf8");
 var billinvoice3 = fs.readFileSync(join(`${__dirname}/3image.html`), "utf8");
 var bill = fs.readFileSync(join(`${__dirname}/bill.html`), "utf8");
+var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
+
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
 const { virtual } = require("../schema/topic.js");
@@ -2987,14 +2989,28 @@ router.post("/downloadPEBill", function (req, res, next) {
       });
       // console.log("data",Data)
     }
-    var template = handlebars.compile(bill);
+    if(req.body.type=="picture_evaluation"){
+      var template = handlebars.compile(bill);
+
     var htmlToSend = template({
       bill2: bill2,
       admit: admit,
       pat_info: req.body,
       birthday: birthday,
     });
+  }
+  else {
+    var template1 = handlebars.compile(bill3);
 
+    var htmlToSend2 = template1({
+      bill2: bill2,
+      admit: admit,
+      pat_info: req.body,
+      birthday: birthday,
+      amt:req.body.amt
+    });
+
+  }
     var filename = "GeneratedReport.pdf";
     if (htmlToSend) {
       var options = {
@@ -3010,7 +3026,23 @@ router.post("/downloadPEBill", function (req, res, next) {
         const file = `${__dirname}/${filename}`;
         res.download(file);
       });
-    } else {
+    } 
+    else if(htmlToSend2){
+      var options = {
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        format: "A4",
+        path: `${__dirname}/${filename}`,
+        displayHeaderFooter: true,
+        margin: { top: 80, bottom: 80, left: 60, right: 60 },
+      };
+
+      let file = [{ content: htmlToSend2 }];
+      html_to_pdf.generatePdfs(file, options).then((output) => {
+        const file = `${__dirname}/${filename}`;
+        res.download(file);
+      });
+    }
+    else {
       res.json({ status: 200, hassuccessed: true, filename: filename });
     }
   } catch (e) {
@@ -3022,6 +3054,7 @@ router.post("/downloadPEBill", function (req, res, next) {
     });
   }
 });
+
 
 router.get("/patientjourneyQue/:patient_id", function (req, res) {
   const token = req.headers.token;
