@@ -1276,6 +1276,193 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
   );
 });
 
+router.get("/Linktime/:sesion_id", function (req, res, next) {
+  // const token = req.headers.token;
+  // let legit = jwtconfig.verify(token);
+  // if (legit) {
+  try {
+    const VirtualtToSearchWith = new sick_meeting({
+      sesion_id: req.params.sesion_id,
+    });
+    VirtualtToSearchWith.encryptFieldsSync();
+    sick_meeting.findOne(
+      {
+        $or: [
+          { sesion_id: VirtualtToSearchWith.sesion_id },
+          { sesion_id: req.params.sesion_id },
+        ],
+      },
+      function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          if (data !== null) {
+            let today = new Date().setHours(0, 0, 0, 0);
+            console.log("data", today);
+
+            // let today =moment().format("MM-DD-YYYY")
+            // let ttime = new Date();
+
+            let ttime = moment().format("HH:mm");
+            console.log("data", ttime);
+            let data_start = moment(data.start_time).format("HH:mm");
+            console.log("data", data_start);
+            let data_end = moment(data.end_time).format("HH:mm");
+            console.log("data", data_end);
+            let data_d = new Date(data.date).setHours(0, 0, 0, 0);
+            if (moment(today).isAfter(data_d)) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Link Expire",
+              });
+            } else if (moment(today).isBefore(data_d)) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Link will active soon",
+              });
+            } else if (moment(today).isSame(data_d)) {
+              if ("18:00" <= ttime && "19:00" >= ttime) {
+                virtual_Task.findOne(
+                  { _id: data.task_id, is_payment: true },
+                  function (err, userdata) {
+                    if (err && !userdata) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Something went wrong",
+                        error: err,
+                      });
+                    } else {
+                      if (userdata !== null) {
+                        GetData(data).then((Mypat) => {
+                          let userdata1 = {
+                            ...data,
+                            ...Mypat
+                    
+                          }
+                          res.json({
+                            status: 200,
+                            hassuccessed: true,
+                            message: "link active",
+                            data: { Task: userdata, Session: userdata1 },
+                          });
+                        });
+                      }
+                      else {
+                        const VirtualtToSearchWith = new sick_meeting({
+                          sesion_id: req.params.sesion_id,
+                        });
+                        VirtualtToSearchWith.encryptFieldsSync();
+                        sick_meeting.deleteOne(
+                          {
+                            $or: [
+                              { sesion_id: VirtualtToSearchWith.sesion_id },
+                              { sesion_id: req.params.sesion_id },
+                            ],
+                          },
+                          function (err, data) {
+                            if (err) {
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+
+                                message: "Something went wrong"
+
+                              });
+                            } else {
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+
+                                meessage: "Payment process is incomplete"
+                              })
+
+
+                            }
+                          }
+                        );
+                      }
+                    }
+                  }
+                );
+              } else if (data_start > ttime) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "link start soon",
+                });
+              } else if (data_end < ttime) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Link Expire",
+                });
+              }
+            }
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Invalid Session ID",
+            });
+          }
+        }
+      }
+    );
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong"
+    });
+  }
+  // } else {
+  //   res.json({
+  //     status: 200,
+  //     hassuccessed: false,
+  //     message: "Authentication required.",
+  //   });
+  // }
+});
+
+
+function GetData(data) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      let patient_id = data.patient_id;
+      var VirtualtToSearchWith = new User({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      let doctor_id = data.doctor_id;
+      var VirtualtToSearchWith = new User({ doctor_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+     
+      User.findOne({
+        $or: [
+          { _id: data.patient_id },
+          { _id: VirtualtToSearchWith.patient_id },
+          { _id: data.doctor_id },
+          { _id: VirtualtToSearchWith.doctor_id },
+        ],
+      })
+        .exec()
+        .then(function (doc3) {
+          if (doc3) {
+            Mypat.push(doc3);
+            resolve(Mypat);
+          } else {
+            resolve(Mypat);
+          }
+        });
+    });
+  });
+}
 
 
 

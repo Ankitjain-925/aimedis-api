@@ -3238,6 +3238,7 @@ router.post("/TaskFilter", function (req, res) {
 
     virtual_Task.find(condition, function (err, data) {
       if (err & !data) {
+        // console.log("err", err);
         res.json({ status: 200, hassuccessed: true, error: err });
       } else {
         let condition3 = {
@@ -3255,11 +3256,12 @@ router.post("/TaskFilter", function (req, res) {
 
           virtual_Case.find(condition3, function (err, data1) {
             if (err) {
+              console.log("err", err);
               res.json({ status: 200, hassuccessed: true, error: err });
             } else {
-              var equals =
-                data1.length === data.length &&
-                data1.every((e, i) => e.patient_id === data[i].patient_id);
+              console.log("err", data1.length);
+              console.log("err", data.length);
+              var equals = data1.length === data.length ||  data1.every((e, i) => e.patient_id === data[i].patient_id);
               if (equals) {
                 res.json({ status: 200, hassuccessed: true, data: data1 });
               } else {
