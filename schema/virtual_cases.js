@@ -4,98 +4,67 @@ var Schema = mongoose.Schema;
 const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 
 const ProfessionalInfo = new mongoose.Schema({
-    image: {
+    image:{
         type: String,
         required: false,
         unique: false
     },
-    first_name: {
+    first_name:{
         type: String,
         required: false,
         unique: false
     },
-    last_name: {
+    last_name:{
         type: String,
         required: false,
         unique: false
     },
-    profile_id: {
+    profile_id:{
         type: String,
         required: false,
         unique: false
     },
-    alies_id: {
+    alies_id:{
         type: String,
         required: false,
         unique: false
-    },
-}, { strict: false });
+    }
+},{ strict: false });
 
 ProfessionalInfo.plugin(mongooseFieldEncryption, {
     fields: ["first_name", "last_name", "image", "profile_id", "alies_id"],
     secret: process.env.SOME_32BYTE_BASE64_STRING,
     saltGenerator: function (secret) {
         return "1234567890123456"; // should ideally use the secret to return a string of length 16
-    }
-});
-
-const RoomInfo = new mongoose.Schema({
-
-    room_name: {
-        type: String,
-        required: false,
-        unique: false
-    },
-}, { strict: false });
-
-RoomInfo.plugin(mongooseFieldEncryption, {
-    fields: [],
-    secret: process.env.SOME_32BYTE_BASE64_STRING,
-    saltGenerator: function (secret) {
-        return "1234567890123456"; // should ideally use the secret to return a string of length 16
-    }
-});
-
-const WardInfo = new mongoose.Schema({
-
-    ward_name: {
-        type: String,
-        required: false,
-        unique: false
-    },
-}, { strict: false });
-
-WardInfo.plugin(mongooseFieldEncryption, {
-    fields: [],
-    secret: process.env.SOME_32BYTE_BASE64_STRING,
-    saltGenerator: function (secret) {
-        return "1234567890123456"; // should ideally use the secret to return a string of length 16
-    }
-});
-
+} });
 
 var CaseSchema = new Schema({
-    speciality: {
+    speciality:{
         type: Object,
         required: false,
         unique: false
     },
-    case_number: {
-        type: String,
-        required: true,
-        unique: false
+    case_number:{
+      type: String,
+      required: true,
+      unique: false
     },
-    patient: {
+    patient:{
         type: Object,
         required: false,
         unique: false
     },
-
-
-    rooms: [RoomInfo],
-
-    wards: [WardInfo],
-    bed: {
+    wards: {
+        type: Object,
+        required: false,
+        unique: false
+    },
+    rooms: {
+        type: Object,
+        required: false,
+        unique: false
+    },
+    bed:{
         type: String,
         required: false,
         unique: false
@@ -105,7 +74,7 @@ var CaseSchema = new Schema({
         required: false,
         unique: false
     },
-    house_id: {
+    house_id:{
         type: String,
         required: true,
         unique: false
@@ -120,32 +89,32 @@ var CaseSchema = new Schema({
         required: false,
         unique: false
     },
-    total_comments: {
+    total_comments:{
         type: String,
         required: false,
         unique: false
     },
-    done_task: {
+    done_task: { 
         type: String,
         required: false,
         unique: false
     },
-    status: {
+    status:{
         type: Number,
         required: false,
-        unique: false
+        unique: false  
     },
-    viewQuestionaire: {
+    viewQuestionaire:{
         type: Boolean,
         required: false,
         unique: false
     },
-    submitQuestionaire: {
+    submitQuestionaire:{
         type: Boolean,
         required: false,
         unique: false
     },
-    verifiedbyPatient: {
+    verifiedbyPatient:{
         type: Boolean,
         required: false,
         unique: false
@@ -157,13 +126,11 @@ var CaseSchema = new Schema({
         type: Date,
     },
     assinged_to: [ProfessionalInfo],
-}, { strict: false });
+},{ strict: false });
 
-CaseSchema.plugin(mongooseFieldEncryption, {
-    fields: ["case_number", "house_id", "patient_id", "total_task", "status", "total_comments", "bed", "done_task"], secret: process.env.SOME_32BYTE_BASE64_STRING,
-    saltGenerator: function (secret) {
-        return "1234567890123456"; // should ideally use the secret to return a string of length 16
-    }
-});
+CaseSchema.plugin(mongooseFieldEncryption, { fields: [ "case_number","house_id","patient_id","total_task","status","total_comments","bed","done_task" ], secret: process.env.SOME_32BYTE_BASE64_STRING,
+saltGenerator: function (secret) {
+    return "1234567890123456"; // should ideally use the secret to return a string of length 16
+  } });
 var virtual_Case = mongoose.model('virtual_case', CaseSchema);
 module.exports = virtual_Case;

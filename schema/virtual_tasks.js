@@ -44,38 +44,6 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
 });
 
 
-const SpecialityInfo = new mongoose.Schema(
-  {
-    background_color: {
-      type: String,
-      required: false,
-      unique: false,
-    },
-    color: {
-      type: String,
-      required: false,
-      unique: false,
-    },
-    specialty_name: {
-      type: String,
-      required: false,
-      unique: false,
-    },
-   
-   
-  },
-  { strict: false }
-);
-
-SpecialityInfo.plugin(mongooseFieldEncryption, {
-  fields: ["_id"],
-  secret: process.env.SOME_32BYTE_BASE64_STRING,
-  saltGenerator: function (secret) {
-    return "1234567890123456"; // should ideally use the secret to return a string of length 16
-  },
-});
-
-
 
 
 
@@ -83,7 +51,11 @@ SpecialityInfo.plugin(mongooseFieldEncryption, {
 var TaskSchema = new Schema(
   {
     assinged_to: [ProfessionalInfo],
-    speciality: [SpecialityInfo],
+    speciality: {
+      type: Object,
+      required: false,
+      unique: false,
+    },
     task_name: {
       type: String,
       required: true,
