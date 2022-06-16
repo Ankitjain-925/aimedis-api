@@ -9179,7 +9179,7 @@ router.delete("/marketing_user/:email", function (req, res) {
   let legit = jwtconfig.verify(token);
   if (legit) {
 var email = req.params.email && req.params.email.toLowerCase();
-    const messageToSearchWith = new User({ email: email });
+    const messageToSearchWith = new marketing_user({ email: email });
     messageToSearchWith.encryptFieldsSync();
     marketing_user.deleteOne(
       {
