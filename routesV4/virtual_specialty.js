@@ -3292,9 +3292,9 @@ router.post("/TaskFilter", function (req, res) {
               console.log("err", err);
               res.json({ status: 200, hassuccessed: true, error: err });
             } else {
-              console.log("err", data1.length);
-              console.log("err", data.length);
-              var equals = data1.length === data.length ||  data1.every((e, i) => e.patient_id === data[i].patient_id);
+              
+              var equals = data1.length === data.length  &&  data1.every((e, i) =>e.patient_id === data[i].patient_id);
+              console.log("equal",equals)
               if (equals) {
                 res.json({ status: 200, hassuccessed: true, data: data1 });
               } else {
@@ -3649,7 +3649,7 @@ router.post("/LeftInfoPatient", function (req, res) {
             });
           } else {
             try {
-              leftdataPatient.data = data;
+              leftdataPatient = data;
               if (data) {
                 virtual_Task.aggregate(
                   [
@@ -3755,7 +3755,9 @@ router.post("/LeftInfoPatient", function (req, res) {
                                       error: err,
                                     });
                                   } else {
+                                    console.log("eeee", invoice);
                                     leftdataPatient.invoice = invoice;
+                                    console.log("eeee", leftdataPatient);
                                     res.json({
                                       status: 200,
                                       hassuccessed: true,

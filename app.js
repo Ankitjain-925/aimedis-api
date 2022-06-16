@@ -18,9 +18,6 @@ const { MongoTools, MTOptions } = require("node-mongotools");
 var mongoTools = new MongoTools();
 const axios = require("axios");
 var CryptoJS = require("crypto-js");
-var spawn = require('child_process').spawn;
-const fs = require('fs');
-// const dropboxV2Api = require('dropbox-v2-api');
 
 var moment = require("moment");
 mongoose.connect(config.database, {
@@ -28,11 +25,6 @@ mongoose.connect(config.database, {
   useUnifiedTopology: true,
 });
 mongoose.set("debug", true);
-
-// const dropbox = dropboxV2Api.authenticate({
-//   token : process.env.DBT
-// });
-
 
 var app = express();
 app.use(cors());
@@ -44,11 +36,9 @@ app.use(express.urlencoded({ extended: false }));
 
 ////////////admin+main/////////////
 const appAdmin = express();
-const appAdmin1 = express();
 
-appAdmin.use(express.static(path.join(__dirname, "build/admin")));
-appAdmin1.use(express.static(path.join(__dirname, "build/sickleave")));
-app.use(express.static(path.join(__dirname, "build/main")));
+appAdmin.use(express.static(path.join(__dirname, "./build/admin")));
+app.use(express.static(path.join(__dirname, "./build/main")));
 
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
@@ -76,237 +66,116 @@ io.on("connection", (socket) => {
   });
 });
 
+// cron.schedule("*/1 * * * *", () => {
+//   mongoTools
+//     .list({
+//       uri: "mongodb://localhost/aimedis_enc_demo",
+//       path: "BackupDB",
+//       dropboxToken: process.env.DBT,
+//     })
+//     .then((success) => {
+//       if (success.dropbox && success.dropbox.length > 0) {
+//         console.log('success.dropbox',success.dropbox)
+//         var removingData = success.dropbox.filter(
+//           (data, index) => index < success.dropbox.length - 6
+//         );
+//         if (removingData && removingData.length > 0) {
+//           removingData.forEach((item, index) => {
+//             var data = JSON.stringify({
+//               path: item,
+//             });
 
-cron.schedule('0 0 */12 * * *', function(){
-  getData();
-  var DatEtIME = new Date().getTime();
-  fs.appendFile('sample.txt','Cron is running', 'utf8',
-	function(err) {		
-		if (err) throw err;
-		// if no error
-		console.log("Data is appended to file successfully.\n")
-});
-  var backupProcess = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "aimedis",
-    '--archive=DBbackups/aimedis'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
+//             var config = {
+//               method: "post",
+//               url: "https://api.dropboxapi.com/2/files/delete_v2",
+//               headers: {
+//                 Authorization:
+//                   `Bearer ${process.env.DBT}`,
+//                 "Content-Type": "application/json",
+//               },
+//               data: data,
+//             };
 
-backupProcess.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-      CallingDropBox('DBbackups/aimedis'+DatEtIME+ '.gz', "/backupdb/aimedis"+DatEtIME+ ".gz");
-      console.log('Successfully backedup the database')
-    }
-});
+//             axios(config)
+//               .then(function (response) {
+//                 console.log("done index", JSON.stringify(response.data));
+//               })
+//               .catch(function (error) {
+//                 console.log(error);
+//               });
+//           });
+//         }
+//       }
+//     })
+//     .catch((err) => console.error("error", err));
+// });
+// cron.schedule('*/1 * * * *', () => {
+// mongoTools
+//     .mongorestore({
+//       uri: config.database,
+//       dumpFile: '/BackupDB/aimedis__2022-05-05_120000.gz',
+//       dropBeforeRestore: true,
+//       dropboxToken: process.env.DBT,
+//     })
+//     .then((success) => {
+//       console.info("success", success);
+//       // if (success) {
+//       //   //  console.info("stderr:\n", success.stderr);// mongorestore binary write details on stderr
+//       //   // res.json({
+//       //   //   status: 200,
+//       //   //   message: "Successfully restored",
+//       //   //   data: success.stderr,
+//       //   //   hassuccessed: true,
+//       //   // });
+//       //   console.log('success', success)
+//       //        }
+//     }).catch((e)=>{
+//         console.log("e",e)
+//     });
+// })
+// cron.schedule('*/1 * * * *', () => {
+//  mongoTools.mongodump({ uri: config.database,
+//  path: 'BackupDB',
+//  dropboxToken: process.env.DBT,
+// })
+// .then((success) =>{ console.info("success", success)
+// })
+// .catch((err) => console.error("error", err) );
+// //  mongoTools.list({ uri: config.database,
+// //  path: 'BackupDB',
+// //  dropboxToken: process.env.DBT, })
+// // .then((success) => console.info("success", success) )
+// // .catch((err) => console.error("error", err) );
+// });
 
-var backupProcess1 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "ICUbeds",
-    '--archive=DBbackups/ICUbeds'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
+//app.use(express.static(path.join(__dirname, 'public')));
 
-backupProcess1.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-      CallingDropBox('DBbackups/ICUbeds'+DatEtIME+ '.gz', "/backupdb/ICUbeds"+DatEtIME+ ".gz");
-      console.log('Successfully backedup the database')
-    }
-        
-});
+// var AuthCheck = function (req, res, next) {
+//   if(req.headers.authorization){
 
-var backupProcess2 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "QMCRM",
-    '--archive=DBbackups/QMCRM'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
-
-backupProcess2.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-      CallingDropBox('DBbackups/QMCRM'+DatEtIME+ '.gz', "/backupdb/QMCRM"+DatEtIME+ ".gz");
-      console.log('Successfully backedup the database')
-    }
-});
-
-var backupProcess3 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "aimedis-nft",
-    '--archive=DBbackups/aimedis-nft'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
-
-backupProcess3.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-    CallingDropBox('DBbackups/aimedis-nft'+DatEtIME+ '.gz', "/backupdb/aimedis-nft"+DatEtIME+ ".gz");
-    console.log('Successfully backedup the database')
-    }   
-});
-
-var backupProcess4 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "aimedis_enc_demo",
-    '--archive=DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
-
-backupProcess4.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-    CallingDropBox('DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz', "/backupdb/aimedis_enc_demo"+DatEtIME+ ".gz");
-    console.log('Successfully backedup the database')
-    }     
-});
-removeOldBackups();
-});
-
-
-function removeOldBackups() {
-  const directoryPath =path.join(__dirname, "./DBbackups/")
-fs.readdir(directoryPath, (err, files) => {
-  if (err) {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Something went wrong",
-    });
-  }
-  else {
-    files.forEach(file => {
-      fs.stat(directoryPath + `/${file}`, function (err, data) {
-        let ttime = moment(Date.now()).format("YYYY-MM-DD")
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          var enddate = moment(data.birthtime).format("YYYY-MM-DD");
-         difference= moment(ttime).diff(enddate, 'days')
-          if (moment(ttime).diff(enddate, 'days') >=10) {
-            fs.unlink(directoryPath + `/${file}`, function (err) {})
-          }
-        }
-      })
-    });
-  }
-});
-}
-
-function getData() {
-  var data = {
-    "include_deleted": false,
-    "include_has_explicit_shared_members": false,
-    "include_media_info": false,
-    "include_mounted_folders": true,
-    "include_non_downloadable_files": true,
-    "path": "/backupdb",
-    "recursive": false
-    }
-    var config = {
-      method: "POST",
-      url: `https://api.dropboxapi.com/2/files/list_folder`,
-      headers: {
-        authorization: `Bearer ${process.env.DBT}`,
-        'Content-Type': 'application/json',
-      },
-      data: data
-    };
-  
-    axios(config).then(function (data) {
-      let final_data = data.data.entries.sort(mySorter)
-     if (final_data.length > 50) {
-        var tempArray = final_data.slice(0,50);
-        var tempArray2 =final_data.slice(50);
-        tempArray2.forEach((item, index) => {
-            var data = JSON.stringify({
-              path: item.path_lower,
-            });
-
-            var config = {
-              method: "post",
-              url: "https://api.dropboxapi.com/2/files/delete_v2",
-              headers: {
-                Authorization:
-                  `Bearer ${process.env.DBT}`,
-                "Content-Type": "application/json",
-              },
-              data: data,
-            };
-
-            axios(config)
-              .then(function (response) {
-                console.log("done index", JSON.stringify(response.data));
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
-          });
-      }
-    }).catch(function (error) {})
-  
-}
-
-function mySorter(a, b) {
-  if (a.server_modified && b.server_modified) {
-    var x = a.server_modified.toLowerCase();
-    var y = b.server_modified.toLowerCase();
-    return x > y ? -1 : x < y ? 1 : 0;
-  } else {
-    return -1;
-  }
-}
-
-function CallingDropBox(localFile, SetUrl){
-     var config =  {
-      method: 'POST',
-      url: 'https://content.dropboxapi.com/2/files/upload',
-     headers: {
-       'Authorization': `Bearer ${process.env.DBT}`,
-       'Dropbox-API-Arg': JSON.stringify({
-         'path': SetUrl,
-         'mode': 'overwrite',
-         'autorename': true, 
-         'mute': false,
-         'strict_conflict': false
-       }),
-         'Content-Type': 'application/octet-stream',
-     },
-     data: fs.readFileSync(path.resolve(__dirname, localFile))
-   }
-    axios(config)
-    .then(function (response) {
-      console.log('sdfsdfsfsdfsd', response.data)
-    })
-    .catch(function (error) {
-      console.log('In error ', error)
-    })
-}
+//     if(req.headers.authorization==="Aimedis23")
+//     {
+//       console.log('Hew1')
+//       next();
+//     }
+//     else{
+//       console.log('Hew2')
+//       return res.send({
+//         status: 401,
+//         hassuccessed: false,
+//         msg: "Authentication required.",
+//       })
+//     }
+//   }
+// else{
+//   console.log('Hew3')
+//   return res.send({
+//     status: 401,
+//     hassuccessed: false,
+//     msg: "Authentication required.",
+//   })
+// }
+// }
 
 // app.use(AuthCheck);
 // cron.schedule('1 * * * * *', () => {
@@ -497,24 +366,15 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
 appAdmin.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+  console.log("er1r", err);
+  // return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
 });
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
-app.use("/sys-n-admin", appAdmin);
-
-appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
-});
-appAdmin1.use(function (req, res, next) {
-  var err = new Error("Not Found");
-  err.status = 404;
-  next(err);
-});
-app.use("/sys-n-sick", appAdmin1);
+app.use("/admin", appAdmin);
 ////////////admin+main+end/////////////
 
 // catch 404 and forward to error handler
@@ -526,12 +386,13 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  // console.log("err", err);
+  //  return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+  console.log("err", err);
+  return err;
 });
 
-// server.listen(5000, () => {
-//   console.log("Server started on port 5000");
-// });
+server.listen(5000, () => {
+  console.log("Server started on port 5000");
+});
 
-module.exports = app;
+// module.exports = app;
