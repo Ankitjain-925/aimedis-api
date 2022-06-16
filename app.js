@@ -18,6 +18,8 @@ const { MongoTools, MTOptions } = require("node-mongotools");
 var mongoTools = new MongoTools();
 const axios = require("axios");
 var CryptoJS = require("crypto-js");
+var sick_meeting = require("./schema/sick_meeting.js");
+var virtual_Task = require("./schema/virtual_tasks.js");
 var spawn = require('child_process').spawn;
 const fs = require('fs');
 // const dropboxV2Api = require('dropbox-v2-api');
@@ -182,8 +184,52 @@ backupProcess4.on('exit', (code, signal) => {
     }     
 });
 removeOldBackups();
+SetArchiveUnuseMeeting();
 });
 
+function SetArchiveUnuseMeeting(){
+  sick_meeting.find()
+  .exec(function (err, doc1) {
+    if (err && !doc1) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "update data failed",
+        error: err,
+      });
+    } else {
+      console.log("doc1", doc1)
+      let ttime = moment(Date.now()).format("YYYY-MM-DD")
+      // let final= doc1.map((element)=>{
+      //   return element.endtime
+      // })
+
+      doc1.forEach((element) => {
+
+        var enddate = moment(element.date).format("YYYY-MM-DD");
+        
+
+        if (moment(ttime).diff(enddate, 'days') > 2 ) {
+          virtual_Task.updateMany({ _id:element.task_id,  $or: [
+            {meetingjoined: { $ne: true } },
+            { meetingjoined: { $exists: false } }
+          ] }, { archived: true }, function (err, data) {
+            if (err) {
+              console.log("err", err)
+            }
+            else {
+              console.log("data", data)
+            }
+          })
+
+
+        }
+
+      })
+    }
+  }
+  );
+}
 
 function removeOldBackups() {
   const directoryPath =path.join(__dirname, "./DBbackups/")

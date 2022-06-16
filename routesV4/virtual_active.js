@@ -1481,9 +1481,6 @@ function GetData(data) {
   });
 }
 
-
-
-
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1625,55 +1622,6 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
     }
   );
 });
-
-
-var cron = require('node-cron');
-router.put("/linkarchive", function (req, res, next) {
-  cron.schedule('1 * * * * *', () => {
-    sick_meeting.find()
-      .exec(function (err, doc1) {
-        if (err && !doc1) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "update data failed",
-            error: err,
-          });
-        } else {
-          console.log("doc1", doc1)
-          let ttime = moment(Date.now()).format("YYYY-MM-DD")
-          // let final= doc1.map((element)=>{
-          //   return element.endtime
-          // })
-
-          doc1.forEach((element) => {
-
-            var enddate = moment(element.date).format("YYYY-MM-DD");
-            
-
-            if (moment(ttime).diff(enddate, 'days') > 2 ) {
-              virtual_Task.updateMany({ _id:element.task_id,  $or: [
-                {meetingjoined: { $ne: true } },
-                { meetingjoined: { $exists: false } }
-              ] }, { archived: true }, function (err, data) {
-                if (err) {
-                  console.log("err", err)
-                }
-                else {
-                  console.log("data", data)
-                }
-              })
-
-
-            }
-
-          })
-        }
-      }
-      );
-  })
-});
-
 
 router.post("/sickarchive", function (req, res) {
 
