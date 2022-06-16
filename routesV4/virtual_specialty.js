@@ -3346,14 +3346,15 @@ router.post("/CalenderFilter", function (req, res) {
       if (req.body.speciality_id) {
         condition["speciality._id"] = req.body.speciality_id;
       }
-      // if (req.body.patient_id) {
-      //   condition.patient_id = { $in: req.body.patient_id }
-      // }
+      if (req.body.patient_id) {
+      condition.patient_id = { $in: req.body.patient_id }
+      }
 
       virtual_Task.find(condition, function (err, data) {
         if (err & !data) {
           res.json({ status: 200, hassuccessed: true, error: err });
         } else {
+          console.log("appointments1", data);
           let condition3 = {
             house_id: {
               $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
@@ -3376,6 +3377,7 @@ router.post("/CalenderFilter", function (req, res) {
                   error: err,
                 });
               } else {
+                console.log("appointments2", data1);
                 let patient_en = data1.map((element) => {
                   var VirtualtToSearchWith = new Appointments({
                     patient: element.patient_id,
@@ -3401,7 +3403,7 @@ router.post("/CalenderFilter", function (req, res) {
                         error: err,
                       });
                     } else {
-                      console.log("appointments", appointments);
+                      console.log("appointments3", appointments);
                       if (req.body.filter == "All") {
                         let final_data = [...data, ...data1, ...appointments];
                         res.json({
