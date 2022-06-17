@@ -90,7 +90,7 @@ cron.schedule('0 0 */12 * * *', function(){
 });
   var backupProcess = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27017",
+    '--port',     "27170",
     '--db',       "aimedis",
     '--archive=DBbackups/aimedis'+DatEtIME+ '.gz',
     '--gzip'
@@ -109,7 +109,7 @@ backupProcess.on('exit', (code, signal) => {
 
 var backupProcess1 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27017",
+    '--port',     "27170",
     '--db',       "ICUbeds",
     '--archive=DBbackups/ICUbeds'+DatEtIME+ '.gz',
     '--gzip'
@@ -129,7 +129,7 @@ backupProcess1.on('exit', (code, signal) => {
 
 var backupProcess2 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27017",
+    '--port',     "27170",
     '--db',       "QMCRM",
     '--archive=DBbackups/QMCRM'+DatEtIME+ '.gz',
     '--gzip'
@@ -148,7 +148,7 @@ backupProcess2.on('exit', (code, signal) => {
 
 var backupProcess3 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27017",
+    '--port',     "27170",
     '--db',       "aimedis-nft",
     '--archive=DBbackups/aimedis-nft'+DatEtIME+ '.gz',
     '--gzip'
@@ -167,7 +167,7 @@ backupProcess3.on('exit', (code, signal) => {
 
 var backupProcess4 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27017",
+    '--port',     "27170",
     '--db',       "aimedis_enc_demo",
     '--archive=DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz',
     '--gzip'
