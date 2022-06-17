@@ -49,7 +49,7 @@ const appAdmin = express();
 const appAdmin1 = express();
 
 appAdmin.use(express.static(path.join(__dirname, "build/admin")));
-appAdmin1.use(express.static(path.join(__dirname, "build/sickleave")));
+appAdmin1.use(express.static(path.join(__dirname, "build/eval")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 const server = require("http").createServer(app);
@@ -553,14 +553,14 @@ appAdmin.use(function (req, res, next) {
 app.use("/sys-n-admin", appAdmin);
 
 appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
 });
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
-app.use("/sys-n-sick", appAdmin1);
+app.use("/sys-n-eval", appAdmin1);
 ////////////admin+main+end/////////////
 
 // catch 404 and forward to error handler
