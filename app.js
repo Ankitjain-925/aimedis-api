@@ -124,7 +124,6 @@ backupProcess1.on('exit', (code, signal) => {
       CallingDropBox('DBbackups/ICUbeds'+DatEtIME+ '.gz', "/backupdb/ICUbeds"+DatEtIME+ ".gz");
       console.log('Successfully backedup the database')
     }
-        
 });
 
 var backupProcess2 = spawn('mongodump', [
@@ -364,6 +363,46 @@ function CallingDropBox(localFile, SetUrl){
   
 // });
 
+cron.schedule('1 * * * * *', function () {
+  SetArchivePayment()
+})
+
+function SetArchivePayment() {
+  virtual_Task.find()
+    .exec(function (err, doc1) {
+      if (err && !doc1) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "update data failed",
+          error: err,
+        });
+      } else {
+        let ttime = moment(Date.now()).format("YYYY-MM-DD")
+        console.log("ttime", ttime)
+        doc1.forEach((element) => {
+          var enddate = moment(element.date).format("YYYY-MM-DD");
+          if (moment(ttime).diff(enddate, 'days') > 1) {
+            virtual_Task.updateMany({
+              _id: element._id, $or: [
+                { is_payment: { $ne: true } },
+                { is_payment: { $exists: false } }
+              ]
+            }, { archived: true }, function (err, data) {
+              if (err) {
+                console.log("err", err)
+              }
+              else {
+                console.log("data", data)
+              }
+            })
+          }
+        })
+      }
+    }
+    );
+}
+
 
 var UserData = require("./routes/UserTrack");
 var UserProfile = require("./routes/userProfile");
@@ -543,7 +582,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
 appAdmin.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+  return res.sendFile(path.resolve(__dirname, 'build/admin', 'index.html'));
 });
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -553,7 +592,7 @@ appAdmin.use(function (req, res, next) {
 app.use("/sys-n-admin", appAdmin);
 
 appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
+  return res.sendFile(path.resolve(__dirname, 'build/sickleave', 'index.html'));
 });
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -572,7 +611,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+  return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
   // console.log("err", err);
 });
 
