@@ -309,7 +309,7 @@ router.post('/AddUser', function (req, res, next) {
                         'Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>' +
                         'Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen.<br/><br/>' +
                         '<b>Ihr Aimedis Team</b><br/>' +
-                        '<b>Jetzt einloggen: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                        '<b>Jetzt einloggen: </b> <a href="https://aimedix.com">https://aimedix.com</a><br/>' +
                         '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
 
                     if (req.body.type == 'patient') {
@@ -321,8 +321,8 @@ router.post('/AddUser', function (req, res, next) {
                             'Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>' +
                             'Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen. <br/><br/><br/>' +
                             '<b>Ihr Aimedis Team</b><br/>' +
-                            '<b>Jetzt einloggen: </b>  <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                            '<b>Der Aimedis Blog:</b> <a href="https://sys.aimedis.io">https://blog.aimedis.com</a><br/>';
+                            '<b>Jetzt einloggen: </b>  <a href="https://aimedix.com">https://aimedix.com</a><br/>' +
+                            '<b>Der Aimedis Blog:</b> <a href="https://aimedix.com">https://blog.aimedis.com</a><br/>';
                     }
                 }
                 else {
@@ -333,7 +333,7 @@ router.post('/AddUser', function (req, res, next) {
                         'In the attachment to this email you will find the terms and conditions as well as the data protection regulations. <br/>' +
                         'You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>' +
                         '<b>Your Aimedis team</b><br/>' +
-                        '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                        '<b>Log in now:</b><a href="https://aimedix.com">https://aimedix.com</a><br/>' +
                         '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
 
                     if (req.body.type == 'patient') {
@@ -345,7 +345,7 @@ router.post('/AddUser', function (req, res, next) {
                             'In the attachment to this email you will find the terms and conditions as well as the data protection regulations.<br/>' +
                             'You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>' +
                             '<b>Your Aimedis team</b><br/><br/><br/><br/>' +
-                            '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                            '<b>Log in now:</b><a href="https://aimedix.com">https://aimedix.com</a><br/>' +
                             '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
                     }
                 }
@@ -412,7 +412,7 @@ router.post('/AddUser', function (req, res, next) {
                                         user_id = user_data._id;
                                         let token = user_data.usertoken;
                                         //let link = 'http://localhost:3000/';
-                                        let link = 'https://sys.aimedis.io/';
+                                        let link = 'https://aimedix.com/';
                                         let mailOptions = {
                                             from: "contact@aimedis.com",
                                             to: req.body.email,
@@ -2391,7 +2391,7 @@ router.post('/forgotPassword', function (req, res, next) {
     });
     promise.then((token) => {
         if (token !== '') {
-            var link = 'https://sys.aimedis.io/change-password';
+            var link = 'https://aimedix.com/change-password';
             // var link = 'http://localhost:3000/change-password';
             console.log('sdfsdf', req.body.lan)
             if (req.body.lan === 'de') {
@@ -2448,14 +2448,14 @@ if (legit) {
                         var dhtml = 'Der Doktor ('+req.body.first_name + ' ' +req.body.last_name +') Ich möchte, dass Sie Aimedis beitreten. Schickte auch diese Nachricht an Sie- <br/>'+
                         '<b>'+req.body.message+'</b><br/><br/><br/>'+
                         '<b>Ihr Aimedis Team</b><br/>' +
-'<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+'<b>Webadresse: </b> <a href="https://aimedix.com">https://aimedix.com</a><br/>' +
 '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
                     }
                     else {
                         var dhtml = 'The doctor ('+req.body.first_name + ' ' +req.body.last_name +') want to you join Aimedis. Also sent this message to you - <br/> . ' +
                         '<b>'+req.body.message+'</b><br/><br/><br/>'+
                         '<b>Ihr Aimedis Team</b><br/>' +
-                        '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                        '<b>Website Url:</b><a href="https://aimedix.com">https://aimedix.com</a><br/>' +
                         '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
                     }
                     var mailOptions = {
@@ -2488,13 +2488,13 @@ if (legit) {
                         if (req.body.lan === 'de') {
                             var dhtml = 'Sie haben eine Anfrage zum Hinzufügen eines Lieblingsarztes vom DOKTOR ('+req.body.first_name + ' ' +req.body.last_name +').<br/><br/><br/>'+
                             '<b>Ihr Aimedis Team</b><br/>' +
-                            '<b>Webadresse: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                            '<b>Webadresse: </b> <a href="https://aimedix.com">https://aimedix.com</a><br/>' +
                             '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
                         }
                         else {
                             var dhtml = 'You have got a request to add favorite doctor from the DOCTOR ('+req.body.first_name + ' ' +req.body.last_name +') .<br/><br/><br/> ' +
                             '<b>Your Aimedis team</b><br/>' +
-                            '<b>Website Url:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                            '<b>Website Url:</b><a href="https://aimedix.com">https://aimedix.com</a><br/>' +
                             '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>'; 
                         }
                         console.log('sdfs', user_data1.email)
