@@ -79,113 +79,113 @@ io.on("connection", (socket) => {
 });
 
 
-cron.schedule('0 0 */12 * * *', function(){
-  getData();
-  var DatEtIME = new Date().getTime();
-  fs.appendFile('sample.txt','Cron is running', 'utf8',
-	function(err) {		
-		if (err) throw err;
-		// if no error
-		console.log("Data is appended to file successfully.\n")
-});
-  var backupProcess = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "aimedis",
-    '--archive=DBbackups/aimedis'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
+// cron.schedule('0 0 */12 * * *', function(){
+//   getData();
+//   var DatEtIME = new Date().getTime();
+//   fs.appendFile('sample.txt','Cron is running', 'utf8',
+// 	function(err) {		
+// 		if (err) throw err;
+// 		// if no error
+// 		console.log("Data is appended to file successfully.\n")
+// });
+//   var backupProcess = spawn('mongodump', [
+//     '--host',     "localhost",
+//     '--port',     "27017",
+//     '--db',       "aimedis",
+//     '--archive=DBbackups/aimedis'+DatEtIME+ '.gz',
+//     '--gzip'
+//   ]);
 
-backupProcess.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-      CallingDropBox('DBbackups/aimedis'+DatEtIME+ '.gz', "/backupdb/aimedis"+DatEtIME+ ".gz");
-      console.log('Successfully backedup the database')
-    }
-});
+// backupProcess.on('exit', (code, signal) => {
+//     if(code) 
+//         console.log('Backup process exited with code ', code);
+//     else if (signal)
+//         console.error('Backup process was killed with singal ', signal);
+//     else {
+//       CallingDropBox('DBbackups/aimedis'+DatEtIME+ '.gz', "/backupdb/aimedis"+DatEtIME+ ".gz");
+//       console.log('Successfully backedup the database')
+//     }
+// });
 
-var backupProcess1 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "ICUbeds",
-    '--archive=DBbackups/ICUbeds'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
+// var backupProcess1 = spawn('mongodump', [
+//     '--host',     "localhost",
+//     '--port',     "27017",
+//     '--db',       "ICUbeds",
+//     '--archive=DBbackups/ICUbeds'+DatEtIME+ '.gz',
+//     '--gzip'
+//   ]);
 
-backupProcess1.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-      CallingDropBox('DBbackups/ICUbeds'+DatEtIME+ '.gz', "/backupdb/ICUbeds"+DatEtIME+ ".gz");
-      console.log('Successfully backedup the database')
-    }
+// backupProcess1.on('exit', (code, signal) => {
+//     if(code) 
+//         console.log('Backup process exited with code ', code);
+//     else if (signal)
+//         console.error('Backup process was killed with singal ', signal);
+//     else {
+//       CallingDropBox('DBbackups/ICUbeds'+DatEtIME+ '.gz', "/backupdb/ICUbeds"+DatEtIME+ ".gz");
+//       console.log('Successfully backedup the database')
+//     }
         
-});
+// });
 
-var backupProcess2 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "QMCRM",
-    '--archive=DBbackups/QMCRM'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
+// var backupProcess2 = spawn('mongodump', [
+//     '--host',     "localhost",
+//     '--port',     "27017",
+//     '--db',       "QMCRM",
+//     '--archive=DBbackups/QMCRM'+DatEtIME+ '.gz',
+//     '--gzip'
+//   ]);
 
-backupProcess2.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-      CallingDropBox('DBbackups/QMCRM'+DatEtIME+ '.gz', "/backupdb/QMCRM"+DatEtIME+ ".gz");
-      console.log('Successfully backedup the database')
-    }
-});
+// backupProcess2.on('exit', (code, signal) => {
+//     if(code) 
+//         console.log('Backup process exited with code ', code);
+//     else if (signal)
+//         console.error('Backup process was killed with singal ', signal);
+//     else {
+//       CallingDropBox('DBbackups/QMCRM'+DatEtIME+ '.gz', "/backupdb/QMCRM"+DatEtIME+ ".gz");
+//       console.log('Successfully backedup the database')
+//     }
+// });
 
-var backupProcess3 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "aimedis-nft",
-    '--archive=DBbackups/aimedis-nft'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
+// var backupProcess3 = spawn('mongodump', [
+//     '--host',     "localhost",
+//     '--port',     "27017",
+//     '--db',       "aimedis-nft",
+//     '--archive=DBbackups/aimedis-nft'+DatEtIME+ '.gz',
+//     '--gzip'
+//   ]);
 
-backupProcess3.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-    CallingDropBox('DBbackups/aimedis-nft'+DatEtIME+ '.gz', "/backupdb/aimedis-nft"+DatEtIME+ ".gz");
-    console.log('Successfully backedup the database')
-    }   
-});
+// backupProcess3.on('exit', (code, signal) => {
+//     if(code) 
+//         console.log('Backup process exited with code ', code);
+//     else if (signal)
+//         console.error('Backup process was killed with singal ', signal);
+//     else {
+//     CallingDropBox('DBbackups/aimedis-nft'+DatEtIME+ '.gz', "/backupdb/aimedis-nft"+DatEtIME+ ".gz");
+//     console.log('Successfully backedup the database')
+//     }   
+// });
 
-var backupProcess4 = spawn('mongodump', [
-    '--host',     "localhost",
-    '--port',     "27017",
-    '--db',       "aimedis_enc_demo",
-    '--archive=DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz',
-    '--gzip'
-  ]);
+// var backupProcess4 = spawn('mongodump', [
+//     '--host',     "localhost",
+//     '--port',     "27017",
+//     '--db',       "aimedis_enc_demo",
+//     '--archive=DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz',
+//     '--gzip'
+//   ]);
 
-backupProcess4.on('exit', (code, signal) => {
-    if(code) 
-        console.log('Backup process exited with code ', code);
-    else if (signal)
-        console.error('Backup process was killed with singal ', signal);
-    else {
-    CallingDropBox('DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz', "/backupdb/aimedis_enc_demo"+DatEtIME+ ".gz");
-    console.log('Successfully backedup the database')
-    }     
-});
-removeOldBackups();
-SetArchiveUnuseMeeting();
-});
+// backupProcess4.on('exit', (code, signal) => {
+//     if(code) 
+//         console.log('Backup process exited with code ', code);
+//     else if (signal)
+//         console.error('Backup process was killed with singal ', signal);
+//     else {
+//     CallingDropBox('DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz', "/backupdb/aimedis_enc_demo"+DatEtIME+ ".gz");
+//     console.log('Successfully backedup the database')
+//     }     
+// });
+// removeOldBackups();
+// SetArchiveUnuseMeeting();
+// });
 
 function SetArchiveUnuseMeeting(){
   sick_meeting.find()
