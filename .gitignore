@@ -1,1 +1,4 @@
 node_modules
+DBbackups
+# Secret file
+.env
