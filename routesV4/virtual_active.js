@@ -122,10 +122,12 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = process.env.institute_id;
+  console.log("user", institute_id)
   if (legit) {
     User.find({ current_available: true, institute_id: institute_id })
       .countDocuments()
       .exec(function (err, total) {
+        console.log("user", total)
         var random = Math.floor(Math.random() * total);
         if (total >= 1) {
           User.find({ current_available: true, institute_id: institute_id })
@@ -140,9 +142,15 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                   error: err,
                 });
               } else {
+                console.log("user", userdata)
                 var finalArray = [];
+                var unique = [];
+                var unique1 = [];
+                var unique2 = [];
+                var array1 = [];
                 for (let i = 0; i < userdata.length; i++) {
-                  let monday,
+                  console.log("user", userdata)
+                  var monday,
                     tuesday,
                     wednesday,
                     thursday,
@@ -159,7 +167,7 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                   ) {
                     if (userdata[i].sickleave_appointment[j].custom_text) {
                       custom_text =
-                        Userinfo[i].sickleave_appointment[j].custom_text;
+                        userdata[i].sickleave_appointment[j].custom_text;
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].monday_start,
@@ -172,6 +180,11 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                         userdata[i].sickleave_appointment[j].monday_end,
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
+                      );
+                      time_slot2 = getTimeStops(
+                        req.body.start,
+                        req.body.end,
+                        "10"
                       );
                     }
                     if (
@@ -186,6 +199,11 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
                       );
+                      time_slot2 = getTimeStops(
+                        req.body.start,
+                        req.body.end,
+                        "10"
+                      );
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].wednesday_start,
@@ -198,6 +216,11 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                         userdata[i].sickleave_appointment[j].wednesday_end,
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
+                      );
+                      time_slot2 = getTimeStops(
+                        req.body.start,
+                        req.body.end,
+                        "10"
                       );
                     }
                     if (
@@ -212,6 +235,11 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
                       );
+                      time_slot2 = getTimeStops(
+                        req.body.start,
+                        req.body.end,
+                        "10"
+                      );
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].friday_start,
@@ -224,6 +252,11 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                         userdata[i].sickleave_appointment[j].friday_end,
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
+                      );
+                      time_slot2 = getTimeStops(
+                        req.body.start,
+                        req.body.end,
+                        "10"
                       );
                     }
                     if (
@@ -238,6 +271,11 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
                       );
+                      time_slot2 = getTimeStops(
+                        req.body.start,
+                        req.body.end,
+                        "10"
+                      );
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].sunday_start,
@@ -251,7 +289,15 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
                       );
+                      time_slot2 = getTimeStops(
+                        req.body.start,
+                        req.body.end,
+                        "10"
+                      );
                     }
+
+
+                    console.log(time_slot2);
                     user.push({
                       monday,
                       tuesday,
@@ -263,17 +309,130 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                       custom_text,
                     });
                   }
-                  finalArray.push({
-                    data: userdata[i],
-                    sickleave: user,
+
+
+
+                }
+                const d = new Date(req.body.date);
+                var mo = d.getDay()
+                console.log(mo);
+                var weekday = new Array(7);
+                weekday[0] = "sunday";
+                weekday[1] = "monday";
+                weekday[2] = "tuesday";
+                weekday[3] = "wednesday";
+                weekday[4] = "thursday";
+                weekday[5] = "friday";
+                weekday[6] = "saturday";
+
+                // console.log("Today is " + weekday[mo]);
+
+                console.log("Today is ", user);
+
+              }
+
+              virtual_Task.findOne(
+                { approved_date: req.body.date },
+                function (err, user_data) {
+                  if (err && !user_data) {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "Something went wrong",
+                      error: err,
+                    });
+                  } else {
+                    console.log("1", user_data)
+                    if (user_data.is_payment == true) {
+                      for (i = 0; i <= 6; i++) {
+
+                        if (weekday[i] == weekday[mo]) {
+                          //  monday = weekday[i],
+                          if (weekday[mo] === "monday") {
+                            array1 = user[0].monday;
+                            console.log("111111111111111", weekday[mo])
+                            arra = array1.filter(val => !time_slot2.includes(val));
+                            user[0].monday = arra;
+                            console.log("1", user[0].monday)
+                           
+                          } 
+                          else if (weekday[mo] == "tuesday") {
+                            array1 = user[0].tuesday;
+                            console.log("2")
+                            arra = array1.filter(val => !time_slot2.includes(val));
+                            user[0].tuesday = arra;
+                           
+                          }
+                          else if (weekday[mo] === "wednesday") {
+                            array1 = user[0].wednesday;
+                            console.log("2")
+                            arra = array1.filter(val => !time_slot2.includes(val));
+                            user[0].wednesday = arra;
+                           
+                          }
+                          else if (weekday[mo] === "thursday") {
+                            array1 = user[0].thursday;
+                            console.log("2")
+                            arra = array1.filter(val => !time_slot2.includes(val));
+                            user[0].thursday = arra;
+                           
+                          }
+                          else if (weekday[mo] === "friday") {
+                            array1 = user[0].friday;
+                            console.log("2")
+                            arra = array1.filter(val => !time_slot2.includes(val));
+                            user[0].friday = arra;
+                           
+                          }
+                          else if (weekday[mo] === "saturday") {
+                            array1 = user[0].saturday;
+                            console.log("2")
+                            arra = array1.filter(val => !time_slot2.includes(val));
+                            user[0].saturday = arra;
+                           
+                          }
+                          else if (weekday[mo] === "sunday") {
+                            array1 = user[0].sunday;
+                            console.log("2")
+                            arra = array1.filter(val => !time_slot2.includes(val));
+                            user[0].sunday = arra;
+                           
+                          }
+                          else {
+
+                            console.log("3")
+
+                          }
+                        }
+                        
+                      }
+                    }
+                    else if (user_data.is_payment == false) {
+                      console.log("33333322233")
+                      user.push({
+                        monday,
+                        tuesday,
+                        wednesday,
+                        thursday,
+                        friday,
+                        saturday,
+                        sunday,
+                        custom_text,
+                      });
+                    }
+
+                    else {
+                      console.log("333333333333")
+                    }
+
+                  }
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    data: user,
                   });
                 }
-              }
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                data: finalArray,
-              });
+              );
             });
         } else {
           res.json({
@@ -291,6 +450,8 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
     });
   }
 });
+
+
 
 router.get("/PatientTask/:profile_id", function (req, res, next) {
   const token = req.headers.token;
@@ -1077,47 +1238,54 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         };
       }
       let file = [{ content: htmlToSend }];
-      try{
-      html_to_pdf.generatePdfs(file, options).then((output) => {
-        const file = `${__dirname}/${filename}`;
-        if (comming.usefor === "mail") {
-          User.findOne({ _id: comming.patient_id }, function (err, dta) {
+      try {
+        html_to_pdf.generatePdfs(file, options).then((output) => {
+          const file = `${__dirname}/${filename}`;
+          if (comming.usefor === "mail") {
+            User.findOne({ _id: comming.patient_id }, function (err, dta) {
 
-            var sendData = `<div>Dear Patient , <br/>
+              var sendData = `<div>Dear Patient , <br/>
               Here is the Certificate added by doctor on your sick leave certificate request. 
               Please download it from here as well as from the request list page too.</div>`;
 
-            generateTemplate(
-              EMAIL.generalEmail.createTemplate("en", {
-                title: "",
-                content: sendData,
-              }),
-              (error, html) => {
-                if (dta.email !== "") {
-                  let mailOptions = {
-                    from: "contact@aimedis.com",
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData,
+                }),
+                (error, html) => {
+                  if (dta.email !== "") {
+                    let mailOptions = {
+                      from: "contact@aimedis.com",
 
-                    to: dta.email,
-                    subject: "Sick leave certificate Download",
-                    html: html,
-                    attachments: [
-                      {
-                        // utf-8 string as an attachment
-                        filename: "sickleave_certificate.pdf",
+                      to: dta.email,
+                      subject: "Sick leave certificate Download",
+                      html: html,
+                      attachments: [
+                        {
+                          // utf-8 string as an attachment
+                          filename: "sickleave_certificate.pdf",
 
-                        path: file,
-                      },
-                    ],
-                  };
+                          path: file,
+                        },
+                      ],
+                    };
 
-                  let sendmail = transporter.sendMail(mailOptions);
-                  if (sendmail) {
+                    let sendmail = transporter.sendMail(mailOptions);
+                    if (sendmail) {
 
-                    res.json({
-                      status: 200,
-                      message: "Mail sent Successfully",
-                      hassuccessed: true,
-                    });
+                      res.json({
+                        status: 200,
+                        message: "Mail sent Successfully",
+                        hassuccessed: true,
+                      });
+                    } else {
+                      res.json({
+                        status: 200,
+                        msg: "Mail is not sent",
+                        hassuccessed: false,
+                      });
+                    }
                   } else {
                     res.json({
                       status: 200,
@@ -1125,29 +1293,22 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                       hassuccessed: false,
                     });
                   }
-                } else {
-                  res.json({
-                    status: 200,
-                    msg: "Mail is not sent",
-                    hassuccessed: false,
-                  });
                 }
-              }
-            );
-          })
-        } else {
-          res.download(file);
-        }
-      });
-    }
-    catch(e){
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Get catch error",
-        error: e,
-      });
-    }
+              );
+            })
+          } else {
+            res.download(file);
+          }
+        });
+      }
+      catch (e) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Get catch error",
+          error: e,
+        });
+      }
     })
   }
   catch (e) {
@@ -1362,7 +1523,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                           let userdata1 = {
                             ...data,
                             ...result
-                    
+
                           }
                           res.json({
                             status: 200,
@@ -1454,12 +1615,12 @@ function GetData(data) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       let patient_id = data.patient_id;
-      var VirtualtToSearchWith = new User({ _id : patient_id });
+      var VirtualtToSearchWith = new User({ _id: patient_id });
       VirtualtToSearchWith.encryptFieldsSync();
       let doctor_id = data.doctor_id;
-      var VirtualtToSearchWith1 = new User({ _id :  doctor_id });
+      var VirtualtToSearchWith1 = new User({ _id: doctor_id });
       VirtualtToSearchWith1.encryptFieldsSync();
-     
+
       User.findOne({
         $or: [
           { _id: data.patient_id },
@@ -1649,13 +1810,15 @@ router.put("/linkarchive", function (req, res, next) {
           doc1.forEach((element) => {
 
             var enddate = moment(element.date).format("YYYY-MM-DD");
-            
 
-            if (moment(ttime).diff(enddate, 'days') > 2 ) {
-              virtual_Task.updateMany({ _id:element.task_id,  $or: [
-                {meetingjoined: { $ne: true } },
-                { meetingjoined: { $exists: false } }
-              ] }, { archived: true }, function (err, data) {
+
+            if (moment(ttime).diff(enddate, 'days') > 2) {
+              virtual_Task.updateMany({
+                _id: element.task_id, $or: [
+                  { meetingjoined: { $ne: true } },
+                  { meetingjoined: { $exists: false } }
+                ]
+              }, { archived: true }, function (err, data) {
                 if (err) {
                   console.log("err", err)
                 }
@@ -1722,12 +1885,12 @@ router.post("/sickarchive", function (req, res) {
     })
   }
   else {
- res.json({
+    res.json({
       status: 200,
       hassuccessed: false,
       message: "Authentication required.",
     });
-}
+  }
 })
 
 
@@ -1815,7 +1978,7 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
         }
       },
 
-      { "arrayFilters" : [{ "e.house_id": req.params.house_id }] },
+      { "arrayFilters": [{ "e.house_id": req.params.house_id }] },
 
 
 
