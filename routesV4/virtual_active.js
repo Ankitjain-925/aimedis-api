@@ -118,7 +118,7 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
   return timeStops;
 }
 
-router.get("/SelectDocforSickleave", function (req, res, next) {
+router.post("/SelectDocforSickleave2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = process.env.institute_id;
