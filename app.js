@@ -576,8 +576,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-// server.listen(5000, () => {
-//   console.log("Server started on port 5000");
-// });
+server.listen(5000, () => {
+  console.log("Server started on port 5000");
+});
 
-module.exports = app;
+// module.exports = app;

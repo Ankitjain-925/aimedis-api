@@ -1506,7 +1506,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                 message: "Link will active soon",
               });
             } else if (moment(today).isSame(data_d)) {
-              if (data_start <= ttime && data_end >= ttime) {
+              if ( data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
                   { _id: data.task_id, is_payment: true },
                   function (err, userdata) {
@@ -1518,8 +1518,10 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                         error: err,
                       });
                     } else {
+                      console.log("data", userdata);
+
                       if (userdata !== null) {
-                        GetData(data).then((result) => {
+                        GetData(userdata).then((result) => {
                           let userdata1 = {
                             ...data,
                             ...result
@@ -1570,7 +1572,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data_start > ttime) {
+              } else if (data_start > ttime ) {
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -1612,6 +1614,8 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
 
 function GetData(data) {
+  console.log("yjgfuvuvujhvuvh" , data);
+  Mypat = [];
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       let patient_id = data.patient_id;
@@ -1624,9 +1628,9 @@ function GetData(data) {
       User.findOne({
         $or: [
           { _id: data.patient_id },
-          { _id: VirtualtToSearchWith.patient_id },
-          { _id: data.doctor_id },
-          { _id: VirtualtToSearchWith1.doctor_id },
+          { _id: VirtualtToSearchWith._id },
+          // { _id: data.doctor_id },
+          // { _id: VirtualtToSearchWith1._id },
         ],
       })
         .exec()
