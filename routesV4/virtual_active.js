@@ -1486,11 +1486,11 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
             // let ttime = new Date();
 
             let ttime = moment().format("HH:mm");
-            console.log("data", ttime);
+
             let data_start = moment(data.start_time).format("HH:mm");
-            console.log("data", data_start);
+
             let data_end = moment(data.end_time).format("HH:mm");
-            console.log("data", data_end);
+
 
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             if (moment(today).isAfter(data_d)) {
@@ -1506,7 +1506,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                 message: "Link will active soon",
               });
             } else if (moment(today).isSame(data_d)) {
-              if (data_start <= ttime && data_end >= ttime) {
+              if (data_start > ttime) {
                 virtual_Task.findOne(
                   { _id: data.task_id, is_payment: true },
                   function (err, userdata) {
@@ -1518,10 +1518,12 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                         error: err,
                       });
                     } else {
-                      console.log("data", userdata);
+
 
                       if (userdata !== null) {
-                        GetData(userdata).then((result) => {
+
+
+                        GetData(data).then((result) => {
                           let userdata1 = {
                             ...data,
                             ...result
@@ -1572,7 +1574,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data_start > ttime) {
+              } else if (data_start <= ttime && data_end >= ttime) {
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -1614,7 +1616,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
 
 function GetData(data) {
-  console.log("yjgfuvuvujhvuvh", data);
+
   Mypat = [];
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
@@ -1636,8 +1638,29 @@ function GetData(data) {
         .exec()
         .then(function (doc3) {
           if (doc3) {
-            Mypat.push(doc3);
-            resolve(Mypat);
+
+            User.findOne({
+              $or: [
+                { _id: doctor_id },
+                { _id: VirtualtToSearchWith1._id },
+                // { _id: data.doctor_id },
+                // { _id: VirtualtToSearchWith1._id },
+              ],
+            })
+              .exec()
+              .then(function (doc4) {
+                if (doc4) {
+
+                  Mypat.push(doc3.image);
+                  Mypat.push(doc4.image);
+
+                  resolve(Mypat);
+
+                } else {
+                  resolve(Mypat);
+                }
+              });
+
           } else {
             resolve(Mypat);
           }
