@@ -216,16 +216,17 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
 router.post("/AddTask", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
+  // if (legit) {
     Virtual_tasks = new virtual_Task(req.body);
     Virtual_tasks.save(function (err, user_data) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        console.log("user_data",user_data)
-        virtual_Task.updateOne({ _id: user_data._id }, { approved_date: req.body.created_at, approved:true }).exec(function (err, doc) {
+        var task_type= "sick_leave"
+        const VirtualtToSearchWith1 = new virtual_Task({task_type });
+        VirtualtToSearchWith1.encryptFieldsSync();
+        virtual_Task.updateOne({ _id: user_data._id, task_type:{ $in: [task_type, VirtualtToSearchWith1.task_type] }}, { approved_date: req.body.created_at, approved:true}).exec(function (err, doc1) {
           if (err && !doc) {
-            console.log("err", err)
             res.json({
               status: 200,
               hassuccessed: false,
@@ -330,13 +331,13 @@ router.post("/AddTask", function (req, res, next) {
         })
       }
     });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
+  // } else {
+  //   res.json({
+  //     status: 200,
+  //     hassuccessed: false,
+  //     message: "Authentication required.",
+  //   });
+  // }
 });
 
 router.delete("/AddTask/:task_id", function (req, res, next) {
