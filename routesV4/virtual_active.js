@@ -354,49 +354,49 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
                             arra = array1.filter(val => !time_slot2.includes(val));
                             user[0].monday = arra;
                             console.log("1", user[0].monday)
-                           
-                          } 
+
+                          }
                           else if (weekday[mo] == "tuesday") {
                             array1 = user[0].tuesday;
                             console.log("2")
                             arra = array1.filter(val => !time_slot2.includes(val));
                             user[0].tuesday = arra;
-                           
+
                           }
                           else if (weekday[mo] === "wednesday") {
                             array1 = user[0].wednesday;
                             console.log("2")
                             arra = array1.filter(val => !time_slot2.includes(val));
                             user[0].wednesday = arra;
-                           
+
                           }
                           else if (weekday[mo] === "thursday") {
                             array1 = user[0].thursday;
                             console.log("2")
                             arra = array1.filter(val => !time_slot2.includes(val));
                             user[0].thursday = arra;
-                           
+
                           }
                           else if (weekday[mo] === "friday") {
                             array1 = user[0].friday;
                             console.log("2")
                             arra = array1.filter(val => !time_slot2.includes(val));
                             user[0].friday = arra;
-                           
+
                           }
                           else if (weekday[mo] === "saturday") {
                             array1 = user[0].saturday;
                             console.log("2")
                             arra = array1.filter(val => !time_slot2.includes(val));
                             user[0].saturday = arra;
-                           
+
                           }
                           else if (weekday[mo] === "sunday") {
                             array1 = user[0].sunday;
                             console.log("2")
                             arra = array1.filter(val => !time_slot2.includes(val));
                             user[0].sunday = arra;
-                           
+
                           }
                           else {
 
@@ -404,7 +404,7 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
 
                           }
                         }
-                        
+
                       }
                     }
                     else if (user_data.is_payment == false) {
@@ -1506,7 +1506,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                 message: "Link will active soon",
               });
             } else if (moment(today).isSame(data_d)) {
-              if ( data_start <= ttime && data_end >= ttime) {
+              if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
                   { _id: data.task_id, is_payment: true },
                   function (err, userdata) {
@@ -1572,7 +1572,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data_start > ttime ) {
+              } else if (data_start > ttime) {
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -1614,7 +1614,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 
 
 function GetData(data) {
-  console.log("yjgfuvuvujhvuvh" , data);
+  console.log("yjgfuvuvujhvuvh", data);
   Mypat = [];
   return new Promise((resolve, reject) => {
     process.nextTick(() => {

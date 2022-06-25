@@ -7,6 +7,15 @@ Redirect 301 /swagger.json https://sys.aimedis.io/
 Redirect 301 /server.js https://sys.aimedis.io/
 Redirect 301 /passport.js https://sys.aimedis.io/
 Redirect 301 /routes/ https://sys.aimedis.io/
-Redirect 301 /routes2/ https://sys.aimedis.io/
-Redirect 301 /routes3/ https://sys.aimedis.io/
+Redirect 301 /routesV2/ https://sys.aimedis.io/
+Redirect 301 /routesV3/ https://sys.aimedis.io/
+Redirect 301 /routesV4/ https://sys.aimedis.io/
+Redirect 301 /routesV5/ https://sys.aimedis.io/
 Redirect 301 /models/ https://sys.aimedis.io/
+Redirect 301 /schema/ https://sys.aimedis.io/
+Redirect 301 /keys/ https://sys.aimedis.io/
+Redirect 301 /config/ https://sys.aimedis.io/
+Redirect 301 /public/ https://sys.aimedis.io/
+Redirect 301 /emailTemplate/ https://sys.aimedis.io/
+Redirect 301 /lib/ https://sys.aimedis.io/
+Redirect 301 /regions.json https://sys.aimedis.io/
