@@ -539,24 +539,26 @@ app.use("/api/v5/vactive", vactive5);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
-appAdmin.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
-});
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
+appAdmin.use((err, req, res, next) => {
+  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+});
+
 app.use("/sys-n-admin", appAdmin);
 
-appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
-});
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
+appAdmin1.use((err, req, res, next) => {
+  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
+});
+
 app.use("/sys-n-sick", appAdmin1);
 ////////////admin+main+end/////////////
 // catch 404 and forward to error handler
