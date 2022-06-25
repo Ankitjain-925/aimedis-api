@@ -216,7 +216,7 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
 router.post("/AddTask", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // if (legit) {
+  if (legit) {
     Virtual_tasks = new virtual_Task(req.body);
     Virtual_tasks.save(function (err, user_data) {
       if (err && !user_data) {
@@ -331,13 +331,13 @@ router.post("/AddTask", function (req, res, next) {
         })
       }
     });
-  // } else {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     message: "Authentication required.",
-  //   });
-  // }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 router.delete("/AddTask/:task_id", function (req, res, next) {
