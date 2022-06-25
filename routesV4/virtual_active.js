@@ -1506,7 +1506,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                 message: "Link will active soon",
               });
             } else if (moment(today).isSame(data_d)) {
-              if (data_start > ttime) {
+              if (data_start <= ttime && data_end >= ttime) {
                 virtual_Task.findOne(
                   { _id: data.task_id, is_payment: true },
                   function (err, userdata) {
@@ -1574,7 +1574,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data_start <= ttime && data_end >= ttime) {
+              } else if (data_start > ttime) {
                 res.json({
                   status: 200,
                   hassuccessed: false,
