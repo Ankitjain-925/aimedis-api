@@ -1480,16 +1480,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         } else {
           if (data !== null) {
             let today = new Date().setHours(0, 0, 0, 0);
-
-
-            // let today =moment().format("MM-DD-YYYY")
-            // let ttime = new Date();
-
             let ttime = moment().format("HH:mm");
-
             let data_start = moment(data.start_time).format("HH:mm");
             let data_end = moment(data.end_time).format("HH:mm");
-
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             if (moment(today).isAfter(data_d)) {
               res.json({
@@ -1516,15 +1509,12 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                         error: err,
                       });
                     } else {
-                      console.log("userdata",userdata)
                       if (userdata !== null) {
-
                         res.json({
                           status: 200,
                           hassuccessed: true,
                           message: "link active",
                           data: { Task: data, Session: userdata },
-
                         });
                       }
                       else {
@@ -1544,19 +1534,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-
                                 message: "Something went wrong"
-
                               });
                             } else {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-
                                 meessage: "Payment process is incomplete"
                               })
-
-
                             }
                           }
                         );
