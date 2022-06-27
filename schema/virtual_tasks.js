@@ -61,6 +61,11 @@ var TaskSchema = new Schema(
       required: true,
       unique: false,
     },
+    approved_date:{
+      type: Date,
+      required: false,
+      unique: false,
+    },
     description: {
       type: String,
       required: false,

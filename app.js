@@ -90,7 +90,7 @@ cron.schedule('0 0 */12 * * *', function(){
 });
   var backupProcess = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27170",
+    '--port',     "27017",
     '--db',       "aimedis",
     '--archive=DBbackups/aimedis'+DatEtIME+ '.gz',
     '--gzip'
@@ -109,7 +109,7 @@ backupProcess.on('exit', (code, signal) => {
 
 var backupProcess1 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27170",
+    '--port',     "27017",
     '--db',       "ICUbeds",
     '--archive=DBbackups/ICUbeds'+DatEtIME+ '.gz',
     '--gzip'
@@ -128,7 +128,7 @@ backupProcess1.on('exit', (code, signal) => {
 
 var backupProcess2 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27170",
+    '--port',     "27017",
     '--db',       "QMCRM",
     '--archive=DBbackups/QMCRM'+DatEtIME+ '.gz',
     '--gzip'
@@ -147,7 +147,7 @@ backupProcess2.on('exit', (code, signal) => {
 
 var backupProcess3 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27170",
+    '--port',     "27017",
     '--db',       "aimedis-nft",
     '--archive=DBbackups/aimedis-nft'+DatEtIME+ '.gz',
     '--gzip'
@@ -166,7 +166,7 @@ backupProcess3.on('exit', (code, signal) => {
 
 var backupProcess4 = spawn('mongodump', [
     '--host',     "localhost",
-    '--port',     "27170",
+    '--port',     "27017",
     '--db',       "aimedis_enc_demo",
     '--archive=DBbackups/aimedis_enc_demo'+DatEtIME+ '.gz',
     '--gzip'
@@ -581,24 +581,26 @@ app.use("/api/v5/vactive", vactive5);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
-appAdmin.use((err, req, res, next) => {
-  return res.sendFile(path.resolve(__dirname, 'build/admin', 'index.html'));
-});
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
+appAdmin.use((err, req, res, next) => {
+  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+});
+
 app.use("/sys-n-admin", appAdmin);
 
-appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve(__dirname, 'build/sickleave', 'index.html'));
-});
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
+appAdmin1.use((err, req, res, next) => {
+  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
+});
+
 app.use("/sys-n-sick", appAdmin1);
 ////////////admin+main+end/////////////
 
@@ -615,8 +617,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-// server.listen(5000, () => {
-//   console.log("Server started on port 5000");
-// });
+app.listen(5001, () => {
+  console.log("Server started on port 5000");
+});
 
-module.exports = app;
+ // module.exports = app;
