@@ -16,6 +16,5 @@ Redirect 301 /schema/ https://sys.aimedis.io/
 Redirect 301 /keys/ https://sys.aimedis.io/
 Redirect 301 /config/ https://sys.aimedis.io/
 Redirect 301 /public/ https://sys.aimedis.io/
-Redirect 301 /emailTemplate/ https://sys.aimedis.io/
 Redirect 301 /lib/ https://sys.aimedis.io/
 Redirect 301 /regions.json https://sys.aimedis.io/

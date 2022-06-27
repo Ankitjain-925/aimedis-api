@@ -1669,9 +1669,6 @@ function GetData(data) {
   });
 }
 
-
-
-
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
