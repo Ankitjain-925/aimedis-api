@@ -451,6 +451,185 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
   }
 });
 
+router.get("/SelectDocforSickleave", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  var institute_id = process.env.institute_id;
+  if (legit) {
+    User.find({ current_available: true, institute_id: institute_id })
+      .countDocuments()
+      .exec(function (err, total) {
+        console.log("total", total);
+        var random = Math.floor(Math.random() * total);
+        if (total > 1) {
+          User.find({ current_available: true, institute_id: institute_id })
+            .skip(random)
+            .limit(1)
+            .exec(function (err, userdata) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                var finalArray = [];
+                for (let i = 0; i < userdata.length; i++) {
+                  let monday,
+                    tuesday,
+                    wednesday,
+                    thursday,
+                    friday,
+                    saturday,
+                    sunday,
+                    custom_text;
+                  var user = [];
+
+                  for (
+                    let j = 0;
+                    j < userdata[i].sickleave_appointment.length;
+                    j++
+                  ) {
+                    if (userdata[i].sickleave_appointment[j].custom_text) {
+                      custom_text =
+                        Userinfo[i].sickleave_appointment[j].custom_text;
+                    }
+                    console.log("qwwer", userdata[i].sickleave_appointment[j]);
+                    if (
+                      (userdata[i].sickleave_appointment[j].monday_start,
+                        userdata[i].sickleave_appointment[j].monday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
+                    ) {
+                      console.log("1");
+                      monday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].monday_start,
+                        userdata[i].sickleave_appointment[j].monday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                      console.log("w", monday);
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].tuesday_start,
+                        userdata[i].sickleave_appointment[j].tuesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
+                    ) {
+                      tuesday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].tuesday_start,
+                        userdata[i].sickleave_appointment[j].tuesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].wednesday_start,
+                        userdata[i].sickleave_appointment[j].wednesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
+                    ) {
+                      wednesday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].wednesday_start,
+                        userdata[i].sickleave_appointment[j].wednesday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].thursday_start,
+                        userdata[i].sickleave_appointment[j].thursday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
+                    ) {
+                      thursday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].thursday_start,
+                        userdata[i].sickleave_appointment[j].thursday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].friday_start,
+                        userdata[i].sickleave_appointment[j].friday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
+                    ) {
+                      friday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].friday_start,
+                        userdata[i].sickleave_appointment[j].friday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].saturday_start,
+                        userdata[i].sickleave_appointment[j].saturday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
+                    ) {
+                      saturday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].saturday_start,
+                        userdata[i].sickleave_appointment[j].saturday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    if (
+                      (userdata[i].sickleave_appointment[j].sunday_start,
+                        userdata[i].sickleave_appointment[j].sunday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots)
+                    ) {
+                      sunday = getTimeStops(
+                        userdata[i].sickleave_appointment[j].sunday_start,
+                        userdata[i].sickleave_appointment[j].sunday_end,
+                        userdata[i].sickleave_appointment[j]
+                          .duration_of_timeslots
+                      );
+                    }
+                    user.push({
+                      monday,
+                      tuesday,
+                      wednesday,
+                      thursday,
+                      friday,
+                      saturday,
+                      sunday,
+                      custom_text,
+                    });
+                    console.log("user", user);
+                  }
+                  finalArray.push({
+                    data: userdata[i],
+                    sickleave: user,
+                  });
+                }
+              }
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                data: finalArray,
+              });
+            });
+        } else {
+
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Institute Don't have doctor",
+          });
+        }
+      });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 
 router.get("/PatientTask/:profile_id", function (req, res, next) {
