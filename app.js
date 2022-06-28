@@ -542,23 +542,25 @@ app.use("/api/v5/vactive", vactive5);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
-appAdmin.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
-});
+
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
+appAdmin.use((err, req, res, next) => {
+  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+});
 app.use("/sys-n-admin", appAdmin);
 
-appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
-});
+
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
+});
+appAdmin1.use((err, req, res, next) => {
+  return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
 });
 app.use("/sys-n-eval", appAdmin1);
 ////////////admin+main+end/////////////
@@ -576,8 +578,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-// server.listen(5000, () => {
-//   console.log("Server started on port 5000");
-// });
+server.listen(5000, () => {
+  console.log("Server started on port 5001");
+});
 
-module.exports = app;
+// module.exports = app;

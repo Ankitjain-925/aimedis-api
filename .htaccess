@@ -15,6 +15,5 @@ Redirect 301 /schema/ https://aimedix.com/
 Redirect 301 /keys/ https://aimedix.com/
 Redirect 301 /config/ https://aimedix.com/
 Redirect 301 /public/ https://aimedix.com/
-Redirect 301 /emailTemplate/ https://aimedix.com/
 Redirect 301 /lib/  https://aimedix.com/
 Redirect 301 /regions.json https://aimedix.com/
