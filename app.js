@@ -578,8 +578,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-server.listen(5000, () => {
-  console.log("Server started on port 5001");
-});
+// server.listen(5000, () => {
+//   console.log("Server started on port 5001");
+// });
 
-// module.exports = app;
+module.exports = app;
