@@ -3322,7 +3322,7 @@ router.post("/setCasenotInhospital", function (req, res) {
 router.post("/CalenderFilter", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
+  if (!legit) {
     try {
       var patient_id = req.body.patient_id;
       const VirtualtToSearchWith = new virtual_Task({ patient_id });
