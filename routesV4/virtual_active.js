@@ -451,7 +451,7 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
   }
 });
 
-router.get("/SelectDocforSickleave", function (req, res, next) {
+router.get("/SelectDocforSickleave", function (req, res, next) { 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = process.env.institute_id;
@@ -1633,9 +1633,9 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
 });
 
 router.get("/Linktime/:sesion_id", function (req, res, next) {
-//   const token = req.headers.token;
-//   let legit = jwtconfig.verify(token);
-//   if (legit) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
   try {
     const VirtualtToSearchWith = new sick_meeting({
       sesion_id: req.params.sesion_id,
@@ -1758,14 +1758,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
       hassuccessed: false,
       message: "Something went wrong"
     });
-}
-//   } else {
-//     res.json({
-//       status: 200,
-//       hassuccessed: false,
-//       message: "Authentication required.",
-//     });
-//   }
+  }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
 
 
