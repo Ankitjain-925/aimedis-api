@@ -3204,7 +3204,83 @@ function mysort1(a, b) {
   }
 }
 
+router.post("/TaskFilter", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var patient_id = req.body.patient_id;
+    const VirtualtToSearchWith = new virtual_Task({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
 
+    var house_id = req.body.house_id;
+    const VirtualtToSearchWith1 = new virtual_Task({ house_id });
+    VirtualtToSearchWith1.encryptFieldsSync();
+
+    var condition = {
+      house_id: { $in: [req.body.house_id, VirtualtToSearchWith1.house_id] },
+    };
+    if (req.body.assigned_to) {
+      condition["assinged_to.user_id"] = { $in: req.body.assigned_to };
+    }
+    if (req.body.status) {
+      condition.status = { $in: req.body.status };
+    }
+    if (req.body.speciality_id) {
+      condition["speciality._id"] = req.body.speciality_id;
+    }
+    if (req.body.patient_id) {
+      condition.patient_id = { $in: req.body.patient_id };
+    }
+
+    virtual_Task.find(condition, function (err, data) {
+      if (err & !data) {
+
+        res.json({ status: 200, hassuccessed: true, error: err });
+      } else {
+        let condition3 = {
+          house_id: {
+            $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
+          },
+        };
+        if (req.body.ward_id || req.body.room_id) {
+          if (req.body.room_id) {
+            condition3["rooms._id"] = req.body.room_id;
+          }
+          if (req.body.ward_id) {
+            condition3["wards._id"] = req.body.ward_id;
+          }
+
+          virtual_Case.find(condition3, function (err, data1) {
+            if (err) {
+         res.json({ status: 200, hassuccessed: true, error: err });
+            } else {
+              
+              var equals = data1.length === data.length  &&  data1.every((e, i) =>e.patient_id === data[i].patient_id);
+        
+              if (equals) {
+                res.json({ status: 200, hassuccessed: true, data: data1 });
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "No data found",
+                });
+              }
+            }
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: data });
+        }
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;
@@ -3243,7 +3319,127 @@ router.post("/setCasenotInhospital", function (req, res) {
   }
 });
 
+router.post("/CalenderFilter", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    try {
+      var patient_id = req.body.patient_id;
+      const VirtualtToSearchWith = new virtual_Task({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
 
+      var house_id = req.body.house_id;
+      const VirtualtToSearchWith1 = new virtual_Task({ house_id });
+      VirtualtToSearchWith1.encryptFieldsSync();
+
+      var condition = {
+        house_id: { $in: [req.body.house_id, VirtualtToSearchWith1.house_id] },
+      };
+      if (req.body.status) {
+        condition.status = { $in: req.body.status };
+      }
+      if (req.body.speciality_id) {
+        condition["speciality._id"] = req.body.speciality_id;
+      }
+      if (req.body.patient_id) {
+      condition.patient_id = { $in: req.body.patient_id }
+      }
+
+      virtual_Task.find(condition, function (err, data) {
+        if (err & !data) {
+          res.json({ status: 200, hassuccessed: true, error: err });
+        } else {
+     
+          let condition3 = {
+            house_id: {
+              $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
+            },
+          };
+          if (req.body.ward_id || req.body.room_id) {
+            if (req.body.room_id) {
+              condition3["rooms._id"] = req.body.room_id;
+            }
+            if (req.body.ward_id) {
+              condition3["wards._id"] = req.body.ward_id;
+            }
+
+            virtual_Case.find(condition3, function (err, data1) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong.",
+                  error: err,
+                });
+              } else {
+        
+                let patient_en = data1.map((element) => {
+                  var VirtualtToSearchWith = new Appointments({
+                    patient: element.patient_id,
+                  });
+                  VirtualtToSearchWith.encryptFieldsSync();
+                  return VirtualtToSearchWith.patient;
+                });
+
+                let patient_id = data1.map((element) => {
+                  return element.patient_id;
+                });
+
+                patient_id = [...patient_id, ...patient_en];
+
+                Appointments.find(
+                  { patient: { $in: patient_id } },
+                  function (err, appointments) {
+                    if (err) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Something went wrong.",
+                        error: err,
+                      });
+                    } else {
+                   
+                      if (req.body.filter == "All") {
+                        let final_data = [...data, ...data1, ...appointments];
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          data: final_data,
+                        });
+                      }
+                    }
+                  }
+                );
+
+                // res.json({ status: 200, hassuccessed: true, data: data1 })
+                // }
+                // else {
+                //   res.json({ status: 200, hassuccessed: false, message: "No data found" })
+
+                // }
+              }
+            });
+          } else {
+     
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      });
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong."
+      });
+    }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 router.post("/temp1", function (req, res) {
   let patient_id = ["5e871b1ec8a5ee77d0ceba36", "60113e84b488aa271effa411"];
