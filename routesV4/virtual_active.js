@@ -120,6 +120,39 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
 
 
 
+
+
+
+
+router.get("/PatientTask/:profile_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_Task.find(
+      { "assinged_to.profile_id": req.params.profile_id },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
 router.post("/SelectDocforSickleave2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -153,36 +186,6 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
       }
     );
     
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-
-
-router.get("/PatientTask/:profile_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Task.find(
-      { "assinged_to.profile_id": req.params.profile_id },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
   } else {
     res.json({
       status: 200,
