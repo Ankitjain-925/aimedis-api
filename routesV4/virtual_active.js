@@ -120,6 +120,49 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
 
 
 
+router.post("/SelectDocforSickleave2", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  
+  if (legit) {
+    virtual_Task.find(
+      { approved_date: req.body.date, task_type: "sick_leave"},
+      function (err, user_data) {
+        if (err && !user_data) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          var arr = [];
+          for (i = 0; i < user_data.length; i++) {
+            start = user_data[i].start
+            end = user_data[i].end
+            arr.push({ start: start, end: end })
+          }
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            data: arr,
+          });
+    
+        }
+    
+      }
+    );
+    
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
 
 router.get("/PatientTask/:profile_id", function (req, res, next) {
   const token = req.headers.token;
