@@ -1191,18 +1191,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         } else {
           if (data !== null) {
             let today = new Date().setHours(0, 0, 0, 0);
-
-
-            // let today =moment().format("MM-DD-YYYY")
-            // let ttime = new Date();
-
             let ttime = moment().format("HH:mm");
-
             let data_start = moment(data.start_time).format("HH:mm");
-
             let data_end = moment(data.end_time).format("HH:mm");
-
-
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             if (moment(today).isAfter(data_d)) {
               res.json({
@@ -1229,23 +1220,12 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                         error: err,
                       });
                     } else {
-
-
                       if (userdata !== null) {
-
-
-                        GetData(data).then((result) => {
-                          let userdata1 = {
-                            ...data,
-                            ...result
-
-                          }
-                          res.json({
-                            status: 200,
-                            hassuccessed: true,
-                            message: "link active",
-                            data: { Task: userdata, Session: userdata1 },
-                          });
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "link active",
+                          data: { Task: userdata, Session: data },
                         });
                       }
                       else {
@@ -1265,19 +1245,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-
                                 message: "Something went wrong"
-
                               });
                             } else {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-
                                 meessage: "Payment process is incomplete"
                               })
-
-
                             }
                           }
                         );
@@ -1324,61 +1299,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   //   });
   // }
 });
-
-
-function GetData(data) {
-
-  Mypat = [];
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      let patient_id = data.patient_id;
-      var VirtualtToSearchWith = new User({ _id: patient_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-      let doctor_id = data.doctor_id;
-      var VirtualtToSearchWith1 = new User({ _id: doctor_id });
-      VirtualtToSearchWith1.encryptFieldsSync();
-
-      User.findOne({
-        $or: [
-          { _id: data.patient_id },
-          { _id: VirtualtToSearchWith._id },
-          // { _id: data.doctor_id },
-          // { _id: VirtualtToSearchWith1._id },
-        ],
-      })
-        .exec()
-        .then(function (doc3) {
-          if (doc3) {
-
-            User.findOne({
-              $or: [
-                { _id: doctor_id },
-                { _id: VirtualtToSearchWith1._id },
-                // { _id: data.doctor_id },
-                // { _id: VirtualtToSearchWith1._id },
-              ],
-            })
-              .exec()
-              .then(function (doc4) {
-                if (doc4) {
-
-                  Mypat.push(doc3.image);
-                  Mypat.push(doc4.image);
-
-                  resolve(Mypat);
-
-                } else {
-                  resolve(Mypat);
-                }
-              });
-
-          } else {
-            resolve(Mypat);
-          }
-        });
-    });
-  });
-}
 
 
 
