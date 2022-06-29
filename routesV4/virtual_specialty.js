@@ -222,10 +222,10 @@ router.post("/AddTask", function (req, res, next) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        var task_type= "sick_leave"
-        const VirtualtToSearchWith1 = new virtual_Task({task_type });
+        var task_type = "sick_leave"
+        const VirtualtToSearchWith1 = new virtual_Task({ task_type });
         VirtualtToSearchWith1.encryptFieldsSync();
-        virtual_Task.updateOne({ _id: user_data._id, task_type:{ $in: [task_type, VirtualtToSearchWith1.task_type] }}, { approved_date: req.body.created_at, approved:true}).exec(function (err, doc1) {
+        virtual_Task.updateOne({ _id: user_data._id, task_type: { $in: [task_type, VirtualtToSearchWith1.task_type] } }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
           if (err && !doc) {
             res.json({
               status: 200,
@@ -235,98 +235,102 @@ router.post("/AddTask", function (req, res, next) {
             });
           }
           else {
-            User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
-              if (err && !doc) {
-                console.log("err", err)
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  msg: "User is not found",
-                  error: err,
-                });
-              } else {
-                if (doc == null || doc == "undefined") {
+              User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
+                if (err && !doc) {
+                  console.log("err", err)
                   res.json({
                     status: 200,
                     hassuccessed: false,
-                    msg: "User is not exist",
+                    msg: "User is not found",
+                    error: err,
                   });
                 } else {
-                  if (req.body.task_type !== "picture_evaluation") {
-                    var m = new Date();
-                    var dateString =
-                      m.getUTCFullYear() +
-                      "/" +
-                      (m.getUTCMonth() + 1) +
-                      "/" +
-                      m.getUTCDate() +
-                      " " +
-                      m.getUTCHours() +
-                      ":" +
-                      m.getUTCMinutes() +
-                      ":" +
-                      m.getUTCSeconds();
-                    var lan1 = getMsgLang(doc._id);
-                    lan1.then((result) => {
-                      result =
-                        result === "ch"
-                          ? "zh"
-                          : result === "sp"
-                            ? "es"
-                            : result === "rs"
-                              ? "ru"
-                              : result;
-                      var sms1 =
-                        "There was a task added on in your Aimedis profile -" +
-                        req.body.task_name +
-                        " (" +
-                        req.body.description +
-                        ") at " +
-                        dateString;
-                      trans(sms1, { source: "en", target: result }).then((res1) => {
-                        sendSms(doc.mobile, res1)
-                          .then((result) => { })
-                          .catch((e) => {
-
-                          });
-                      });
-                      if (doc.emergency_number && doc.emergency_number !== "") {
-                        var sms2 =
-                          "There was a task added on -" +
-                          doc.first_name +
-                          " " +
-                          doc.last_name +
-                          " Aimedis profile ( " +
-                          doc.profile_id +
-                          " )  " +
-                          " - " +
+                  if (doc == null || doc == "undefined") {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      msg: "User is not exist",
+                    });
+                  } else {
+                    if (req.body.task_type !== "picture_evaluation") {
+                      var m = new Date();
+                      var dateString =
+                        m.getUTCFullYear() +
+                        "/" +
+                        (m.getUTCMonth() + 1) +
+                        "/" +
+                        m.getUTCDate() +
+                        " " +
+                        m.getUTCHours() +
+                        ":" +
+                        m.getUTCMinutes() +
+                        ":" +
+                        m.getUTCSeconds();
+                      var lan1 = getMsgLang(doc._id);
+                      lan1.then((result) => {
+                        result =
+                          result === "ch"
+                            ? "zh"
+                            : result === "sp"
+                              ? "es"
+                              : result === "rs"
+                                ? "ru"
+                                : result;
+                        var sms1 =
+                          "There was a task added on in your Aimedis profile -" +
                           req.body.task_name +
                           " (" +
                           req.body.description +
                           ") at " +
                           dateString;
-                        trans(sms2, { source: "en", target: result }).then(
-                          (res1) => {
-                            sendSms(doc.emergency_number, res1)
-                              .then((result) => { })
-                              .catch((e) => {
+                        trans(sms1, { source: "en", target: result }).then((res1) => {
+                          sendSms(doc.mobile, res1)
+                            .then((result) => { })
+                            .catch((e) => {
 
-                              });
-                          }
-                        );
-                      }
+                            });
+                        });
+                        if (doc.emergency_number && doc.emergency_number !== "") {
+                          var sms2 =
+                            "There was a task added on -" +
+                            doc.first_name +
+                            " " +
+                            doc.last_name +
+                            " Aimedis profile ( " +
+                            doc.profile_id +
+                            " )  " +
+                            " - " +
+                            req.body.task_name +
+                            " (" +
+                            req.body.description +
+                            ") at " +
+                            dateString;
+                          trans(sms2, { source: "en", target: result }).then(
+                            (res1) => {
+                              sendSms(doc.emergency_number, res1)
+                                .then((result) => { })
+                                .catch((e) => {
+
+                                });
+                            }
+                          );
+                        }
+                        ApproveReq(doc,req.body.start,req.body.end,req.body.date).then(()=>{
+
+                        })
+                      });
+                    }
+
+                    res.json({
+                      status: 200,
+                      message: "Added Successfully",
+                      hassuccessed: true,
+                      data: user_data,
                     });
                   }
-
-                  res.json({
-                    status: 200,
-                    message: "Added Successfully",
-                    hassuccessed: true,
-                    data: user_data,
-                  });
                 }
-              }
-            });
+              });
+
           }
         })
       }
@@ -339,6 +343,47 @@ router.post("/AddTask", function (req, res, next) {
     });
   }
 });
+
+
+function ApproveReq(doc,start,end,date) {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log("user_data",date)
+      let date_fn=moment(date).format("YYYY-MM-DD")
+      sendData = `Dear Patient<br/>
+      Your request for the sick leave certificate is accepted by the doctor on 
+       ${date_fn}
+        at 
+        ${start} 
+        to
+        ${end}
+        So, for the further process please complete your payment process from the request list page.Do payment within 15 minutes.Otherwise your request will cancelled`;
+      generateTemplate(
+        EMAIL.generalEmail.createTemplate("en", {
+          title: "",
+          content: sendData,
+        }),
+        (error, html) => {
+            let mailOptions = {
+              from: "contact@aimedis.com",
+              to: doc.email,
+              subject: "Approve sick leave request by Doctor",
+              html: html,
+            };
+            let sendmail = transporter.sendMail(mailOptions);
+            if (sendmail) {
+            
+            } else {
+             reject(err)
+            }
+        }
+      );
+
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
 
 router.delete("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
