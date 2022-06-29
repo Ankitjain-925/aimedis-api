@@ -357,7 +357,7 @@ function ApproveReq(doc,start,end,date) {
         ${start} 
         to
         ${end}
-        So, for the further process please complete your payment process from the request list page.Do payment within 15 minutes.Otherwise your request will cancelled`;
+        So, for the further process please complete your payment process from the request list page. The payment process time is 15 minutes, So please do the payment for this request within 15 minutes. If there any delay in payment then the request automatic goes to the Archive or you need to do request again;
       generateTemplate(
         EMAIL.generalEmail.createTemplate("en", {
           title: "",
