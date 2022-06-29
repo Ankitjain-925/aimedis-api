@@ -2962,17 +2962,7 @@ router.post("/downloadPEBill", function (req, res, next) {
       });
       // console.log("data",Data)
     }
-    if (req.body.type == "picture_evaluation") {
-      var template = handlebars.compile(bill);
-
-      var htmlToSend = template({
-        bill2: bill2,
-        admit: admit,
-        pat_info: req.body,
-        birthday: birthday,
-      });
-    }
-    else {
+    if (req.body.type == "sick_leave") {
       var template1 = handlebars.compile(bill3);
 
       var htmlToSend2 = template1({
@@ -2982,7 +2972,16 @@ router.post("/downloadPEBill", function (req, res, next) {
         birthday: birthday,
         amt: req.body.amt
       });
+    }
+    else {
+      var template = handlebars.compile(bill);
 
+      var htmlToSend = template({
+        bill2: bill2,
+        admit: admit,
+        pat_info: req.body,
+        birthday: birthday,
+      }); 
     }
     var filename = "GeneratedReport.pdf";
     if (htmlToSend) {
