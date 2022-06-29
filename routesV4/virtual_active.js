@@ -118,330 +118,41 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
   return timeStops;
 }
 
+
+
 router.post("/SelectDocforSickleave2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  var institute_id = process.env.institute_id;
-  console.log("user", institute_id)
+  
   if (legit) {
-    User.find({ current_available: true, institute_id: institute_id })
-      .countDocuments()
-      .exec(function (err, total) {
-        console.log("user", total)
-        var random = Math.floor(Math.random() * total);
-        if (total >= 1) {
-          User.find({ current_available: true, institute_id: institute_id })
-            .skip(random)
-            .limit(1)
-            .exec(function (err, userdata) {
-              if (err) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                console.log("user", userdata)
-                var finalArray = [];
-                var unique = [];
-                var unique1 = [];
-                var unique2 = [];
-                var array1 = [];
-                for (let i = 0; i < userdata.length; i++) {
-                  console.log("user", userdata)
-                  var monday,
-                    tuesday,
-                    wednesday,
-                    thursday,
-                    friday,
-                    saturday,
-                    sunday,
-                    custom_text;
-                  var user = [];
-
-                  for (
-                    let j = 0;
-                    j < userdata[i].sickleave_appointment.length;
-                    j++
-                  ) {
-                    if (userdata[i].sickleave_appointment[j].custom_text) {
-                      custom_text =
-                        userdata[i].sickleave_appointment[j].custom_text;
-                    }
-                    if (
-                      (userdata[i].sickleave_appointment[j].monday_start,
-                        userdata[i].sickleave_appointment[j].monday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots)
-                    ) {
-                      monday = getTimeStops(
-                        userdata[i].sickleave_appointment[j].monday_start,
-                        userdata[i].sickleave_appointment[j].monday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots
-                      );
-                      time_slot2 = getTimeStops(
-                        req.body.start,
-                        req.body.end,
-                        "10"
-                      );
-                    }
-                    if (
-                      (userdata[i].sickleave_appointment[j].tuesday_start,
-                        userdata[i].sickleave_appointment[j].tuesday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots)
-                    ) {
-                      tuesday = getTimeStops(
-                        userdata[i].sickleave_appointment[j].tuesday_start,
-                        userdata[i].sickleave_appointment[j].tuesday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots
-                      );
-                      time_slot2 = getTimeStops(
-                        req.body.start,
-                        req.body.end,
-                        "10"
-                      );
-                    }
-                    if (
-                      (userdata[i].sickleave_appointment[j].wednesday_start,
-                        userdata[i].sickleave_appointment[j].wednesday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots)
-                    ) {
-                      wednesday = getTimeStops(
-                        userdata[i].sickleave_appointment[j].wednesday_start,
-                        userdata[i].sickleave_appointment[j].wednesday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots
-                      );
-                      time_slot2 = getTimeStops(
-                        req.body.start,
-                        req.body.end,
-                        "10"
-                      );
-                    }
-                    if (
-                      (userdata[i].sickleave_appointment[j].thursday_start,
-                        userdata[i].sickleave_appointment[j].thursday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots)
-                    ) {
-                      thursday = getTimeStops(
-                        userdata[i].sickleave_appointment[j].thursday_start,
-                        userdata[i].sickleave_appointment[j].thursday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots
-                      );
-                      time_slot2 = getTimeStops(
-                        req.body.start,
-                        req.body.end,
-                        "10"
-                      );
-                    }
-                    if (
-                      (userdata[i].sickleave_appointment[j].friday_start,
-                        userdata[i].sickleave_appointment[j].friday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots)
-                    ) {
-                      friday = getTimeStops(
-                        userdata[i].sickleave_appointment[j].friday_start,
-                        userdata[i].sickleave_appointment[j].friday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots
-                      );
-                      time_slot2 = getTimeStops(
-                        req.body.start,
-                        req.body.end,
-                        "10"
-                      );
-                    }
-                    if (
-                      (userdata[i].sickleave_appointment[j].saturday_start,
-                        userdata[i].sickleave_appointment[j].saturday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots)
-                    ) {
-                      saturday = getTimeStops(
-                        userdata[i].sickleave_appointment[j].saturday_start,
-                        userdata[i].sickleave_appointment[j].saturday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots
-                      );
-                      time_slot2 = getTimeStops(
-                        req.body.start,
-                        req.body.end,
-                        "10"
-                      );
-                    }
-                    if (
-                      (userdata[i].sickleave_appointment[j].sunday_start,
-                        userdata[i].sickleave_appointment[j].sunday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots)
-                    ) {
-                      sunday = getTimeStops(
-                        userdata[i].sickleave_appointment[j].sunday_start,
-                        userdata[i].sickleave_appointment[j].sunday_end,
-                        userdata[i].sickleave_appointment[j]
-                          .duration_of_timeslots
-                      );
-                      time_slot2 = getTimeStops(
-                        req.body.start,
-                        req.body.end,
-                        "10"
-                      );
-                    }
-
-
-                    console.log(time_slot2);
-                    user.push({
-                      monday,
-                      tuesday,
-                      wednesday,
-                      thursday,
-                      friday,
-                      saturday,
-                      sunday,
-                      custom_text,
-                    });
-                  }
-
-
-
-                }
-                const d = new Date(req.body.date);
-                var mo = d.getDay()
-                console.log(mo);
-                var weekday = new Array(7);
-                weekday[0] = "sunday";
-                weekday[1] = "monday";
-                weekday[2] = "tuesday";
-                weekday[3] = "wednesday";
-                weekday[4] = "thursday";
-                weekday[5] = "friday";
-                weekday[6] = "saturday";
-
-                // console.log("Today is " + weekday[mo]);
-
-                console.log("Today is ", user);
-
-              }
-
-              virtual_Task.findOne(
-                { approved_date: req.body.date },
-                function (err, user_data) {
-                  if (err && !user_data) {
-                    res.json({
-                      status: 200,
-                      hassuccessed: false,
-                      message: "Something went wrong",
-                      error: err,
-                    });
-                  } else {
-                    console.log("1", user_data)
-                    if (user_data.is_payment == true) {
-                      for (i = 0; i <= 6; i++) {
-
-                        if (weekday[i] == weekday[mo]) {
-                          //  monday = weekday[i],
-                          if (weekday[mo] === "monday") {
-                            array1 = user[0].monday;
-                            console.log("111111111111111", weekday[mo])
-                            arra = array1.filter(val => !time_slot2.includes(val));
-                            user[0].monday = arra;
-                            console.log("1", user[0].monday)
-
-                          }
-                          else if (weekday[mo] == "tuesday") {
-                            array1 = user[0].tuesday;
-                            console.log("2")
-                            arra = array1.filter(val => !time_slot2.includes(val));
-                            user[0].tuesday = arra;
-
-                          }
-                          else if (weekday[mo] === "wednesday") {
-                            array1 = user[0].wednesday;
-                            console.log("2")
-                            arra = array1.filter(val => !time_slot2.includes(val));
-                            user[0].wednesday = arra;
-
-                          }
-                          else if (weekday[mo] === "thursday") {
-                            array1 = user[0].thursday;
-                            console.log("2")
-                            arra = array1.filter(val => !time_slot2.includes(val));
-                            user[0].thursday = arra;
-
-                          }
-                          else if (weekday[mo] === "friday") {
-                            array1 = user[0].friday;
-                            console.log("2")
-                            arra = array1.filter(val => !time_slot2.includes(val));
-                            user[0].friday = arra;
-
-                          }
-                          else if (weekday[mo] === "saturday") {
-                            array1 = user[0].saturday;
-                            console.log("2")
-                            arra = array1.filter(val => !time_slot2.includes(val));
-                            user[0].saturday = arra;
-
-                          }
-                          else if (weekday[mo] === "sunday") {
-                            array1 = user[0].sunday;
-                            console.log("2")
-                            arra = array1.filter(val => !time_slot2.includes(val));
-                            user[0].sunday = arra;
-
-                          }
-                          else {
-
-                            console.log("3")
-
-                          }
-                        }
-
-                      }
-                    }
-                    else if (user_data.is_payment == false) {
-                      console.log("33333322233")
-                      user.push({
-                        monday,
-                        tuesday,
-                        wednesday,
-                        thursday,
-                        friday,
-                        saturday,
-                        sunday,
-                        custom_text,
-                      });
-                    }
-
-                    else {
-                      console.log("333333333333")
-                    }
-
-                  }
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    data: user,
-                  });
-                }
-              );
-            });
-        } else {
+    virtual_Task.find(
+      { approved_date: req.body.date, task_type: "sick_leave"},
+      function (err, user_data) {
+        if (err && !user_data) {
           res.json({
             status: 200,
             hassuccessed: false,
-            message: "Institute Don't have doctor",
+            message: "Something went wrong",
+            error: err,
           });
+        } else {
+          var arr = [];
+          for (i = 0; i < user_data.length; i++) {
+            start = user_data[i].start
+            end = user_data[i].end
+            arr.push({ start: start, end: end })
+          }
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            data: arr,
+          });
+    
         }
-      });
+    
+      }
+    );
+    
   } else {
     res.json({
       status: 200,
