@@ -357,7 +357,7 @@ function ApproveReq(doc,start,end,date) {
         ${start} 
         to
         ${end}
-        So, for the further process please complete your payment process from the request list page.Do payment within 15 minutes.Otherwise your request will cancelled`;
+        So, for the further process please complete your payment process from the request list page. The process of paymnet is 15 minutes process, So please do payment for this request within 15 minutes. Otherwise this request goes to at archive section automiatically.`;
       generateTemplate(
         EMAIL.generalEmail.createTemplate("en", {
           title: "",
