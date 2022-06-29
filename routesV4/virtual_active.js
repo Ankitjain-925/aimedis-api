@@ -118,8 +118,6 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
   return timeStops;
 }
 
-
-
 router.post("/SelectDocforSickleave2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
