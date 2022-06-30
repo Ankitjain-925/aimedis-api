@@ -56,6 +56,11 @@ var TaskSchema = new Schema(
       required: false,
       unique: false,
     },
+    amount:{
+      type: String,
+      required: false,
+      unique: false,
+    },
     start:{
       type: String,
       required: false,
