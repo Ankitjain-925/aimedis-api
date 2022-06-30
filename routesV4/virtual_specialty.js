@@ -2109,7 +2109,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           req.body.patient_name +
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
-          "https://aimedix.com/approveHospital/" +
+          "https://virtualhospital.aimedis.io/approveHospital/" +
           req.body.case_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
@@ -2152,7 +2152,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://aimedix.com/approveHospital/" +
+          " https://virtualhospital.aimedis.io/approveHospital/" +
           req.body.case_id;
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
@@ -5506,14 +5506,15 @@ function User_Case1(House_id) {
 function virtualCase(House_id) {
   return new Promise((resolve, reject) => {
     try {
+      console.log('sdfdsfsfsf', House_id)
       const VirtualtToSearchWith = new virtual_Case({ house_id: House_id });
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Case.countDocuments(
         {
-          house_id: { $in: [House_id, VirtualtToSearchWith.house_id] },
-          inhospital: true,
+          house_id: { $in: [House_id, VirtualtToSearchWith.house_id] }
         },
         function (err, count) {
+          console.log('counssssst', count)
           if (err) {
             reject(err);
           } else {

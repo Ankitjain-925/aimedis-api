@@ -380,15 +380,12 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
     virtual_Task.find(
       {
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+        archived: { $ne: true },
         $or: [
           { task_type: { $eq: "sick_leave" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
-        $or: [
-          { archived: { $ne: true } },
-          { archived: { $exists: false } }
-        ]
-
+     
       },
       function (err, userdata) {
         if (err && !userdata) {
