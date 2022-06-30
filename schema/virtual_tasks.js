@@ -56,12 +56,6 @@ var TaskSchema = new Schema(
       required: false,
       unique: false,
     },
-   
-    task_name: {
-      type: String,
-      required: true,
-      unique: false,
-    },
     start:{
       type: String,
       required: false,
@@ -70,6 +64,11 @@ var TaskSchema = new Schema(
     end:{
       type: String,
       required: false,
+      unique: false,
+    },
+    task_name: {
+      type: String,
+      required: true,
       unique: false,
     },
     approved_date:{
@@ -159,6 +158,16 @@ var TaskSchema = new Schema(
       unique: false,
     },
     treatment_so_far: {
+      type: String,
+      required: false,
+      unique: false,
+    },
+    start:{
+      type: String,
+      required: false,
+      unique: false,
+    },
+    end:{
       type: String,
       required: false,
       unique: false,
