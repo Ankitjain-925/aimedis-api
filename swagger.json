@@ -2966,7 +2966,7 @@
                     "type": "date",
                     "uniqueItems": false
                 },
-                "task_type": {
+                "doctor_id": {
                     "type": "string",
                     "uniqueItems": false
                 }
