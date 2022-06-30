@@ -2842,7 +2842,42 @@
                 }
             }
         },
-       
+        "/vactive/SelectDocforSickleave2": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "ADD",
+                        "in": "body",
+                        "description": "Booked Slot",
+                        "schema": {
+                            "$ref": "#/definitions/SelectDocforSickleave2"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "Booked Slot",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    }
+                }
+            }
+        },
+
         "/vactive/DoctorMail": {
             "parameters": [
                 {
@@ -2921,7 +2956,23 @@
                 }
             }
         },
-       
+        "SelectDocforSickleave2":{
+            "required": [
+             
+            ],
+            "properties": {
+                
+                "approved_date": {
+                    "type": "date",
+                    "uniqueItems": false
+                },
+                "task_type": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+
+        },
       
         "DoctorMail":{
             "required": [
