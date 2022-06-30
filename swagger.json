@@ -2842,41 +2842,6 @@
                 }
             }
         },
-        "/vactive/DoctorMail": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
-                "parameters": [
-                    {
-                        "name": "ADD",
-                        "in": "body",
-                        "description": "Mail to Doctor",
-                        "schema": {
-                            "$ref": "#/definitions/DoctorMail"
-                           
-                        }
-                    }
-                ],
-
-                "tags": [
-                    "sick"
-                ],
-                "summary": "Mail to doctor",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Add Data"
-                    }
-                }
-            }
-        },
         "/vactive/SelectDocforSickleave2": {
             "parameters": [
                 {
@@ -2911,7 +2876,43 @@
                     }
                 }
             }
+        },
+        "/vactive/DoctorMail": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "ADD",
+                        "in": "body",
+                        "description": "Mail to Doctor",
+                        "schema": {
+                            "$ref": "#/definitions/DoctorMail"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "sick"
+                ],
+                "summary": "Mail to doctor",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    }
+                }
+            }
         }
+       
 
     },
     "definitions": {
@@ -2930,23 +2931,7 @@
                 }
             }
         },
-        "SelectDocforSickleave2":{
-            "required": [
-             
-            ],
-            "properties": {
-                
-                "approved_date": {
-                    "type": "date",
-                    "uniqueItems": false
-                },
-                "task_type": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-
-        },
+       
         "user": {
             "required": [
              
@@ -2969,6 +2954,24 @@
                     "uniqueItems": false
                 }
             }
+        },
+       
+        "SelectDocforSickleave2":{
+            "required": [
+             
+            ],
+            "properties": {
+                
+                "approved_date": {
+                    "type": "date",
+                    "uniqueItems": false
+                },
+                "task_type": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+
         },
         "DoctorMail":{
             "required": [
