@@ -1482,7 +1482,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (!legit) {
+  if (legit) {
     try {
       var sick_meetings = new sick_meeting(req.body);
       sick_meetings.save(function (err, user_data) {
