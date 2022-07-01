@@ -237,7 +237,6 @@ router.post("/AddTask", function (req, res, next) {
           else {
             User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
               if (err && !doc) {
-                console.log("err", err)
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -348,7 +347,6 @@ router.post("/AddTask", function (req, res, next) {
 function ApproveReq(doc, start, end, date) {
   return new Promise((resolve, reject) => {
     try {
-      console.log("user_data", date)
       let date_fn = moment(date).format("YYYY-MM-DD")
       sendData = `Dear Patient<br/>
       Your request for the sick leave certificate is accepted by the doctor on 
@@ -2549,12 +2547,9 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
                   if (err & !room) {
                     res.json({ status: 200, hassuccessed: true, error: err });
                   } else {
-                    // console.log("rooms", room[0].rooms)
                     // wards.rooms.forEach((element) => {
                     //   if (room[0].rooms._id == element._id) {
-                    //     console.log("element.room",element.room)
                     //     wards.cases = element.room
-                    //     console.log("wards",wards)
                     //     res.json({ status: 200, hassuccessed: true, data: wards })
                     //   }
 
@@ -3005,7 +3000,6 @@ router.post("/downloadPEBill", function (req, res, next) {
           bill2.push({ k: "bill_date", v: getDate(value, "YYYY/MM/DD") });
         }
       });
-      // console.log("data",Data)
     }
     let task_id = req.body.task_id;
     var VirtualtToSearchWith = new virtual_Task({ _id: task_id });
@@ -3065,7 +3059,6 @@ router.post("/downloadPEBill", function (req, res, next) {
             });
           }
           else if (htmlToSend2) {
-            console.log(htmlToSend2)
             var options = {
               args: ["--no-sandbox", "--disable-setuid-sandbox"],
               format: "A4",
@@ -3313,7 +3306,6 @@ router.post("/TaskFilter", function (req, res) {
       });
 
       statuscheck = [...status, ...statuscheck];
-      console.log('statuscheck', statuscheck)
       condition.status = { $in: statuscheck };
     }
     if (req.body.speciality_id) {
@@ -3335,10 +3327,8 @@ router.post("/TaskFilter", function (req, res) {
 
     virtual_Task.find(condition, function (err, data) {
       if (err & !data) {
-        console.log("errr", err)
         res.json({ status: 200, hassuccessed: true, error: err });
       } else {
-        console.log("data", data)
         let condition3 = {
           house_id: {
             $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
@@ -3354,11 +3344,9 @@ router.post("/TaskFilter", function (req, res) {
 
           virtual_Case.find(condition3, function (err, data1) {
             if (err) {
-              console.log("err", err)
               res.json({ status: 200, hassuccessed: true, error: err });
             } else {
               var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id);
-              console.log("equals", equals)
               if (equals) {
                 res.json({ status: 200, hassuccessed: true, data: data1 });
               } else {
@@ -3768,7 +3756,6 @@ router.post("/LeftInfoPatient", function (req, res) {
                     },
                   ],
                   function (err, results) {
-                    console.log('results', results)
                     if (results && results.length > 0) {
                       leftdataPatient.done_task = results[0].done_task;
                       leftdataPatient.total_task = results[0].total_task;
@@ -4351,12 +4338,10 @@ router.post("/virtualstep2", function (req, res, next) {
 // router.get("/trackrecords", function (req, res) {
 //   const token = (req.headers.token)
 //   let legit = jwtconfig.verify(token)
-//   console.log("legit", legit)
 //   finaldata = []
 //   if (legit) {
 //     User.find().exec(function (err, data) {
 //       if (err) {
-//         console.log("err", err)
 //         res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
 
 //       }
@@ -4364,7 +4349,6 @@ router.post("/virtualstep2", function (req, res, next) {
 //         trackrecords = data.map((element) => {
 //           return element.track_record
 //         })
-//         // console.log("track", trackrecords)
 //         if (trackrecords.length > 0) {
 
 // //       }
@@ -4372,7 +4356,6 @@ router.post("/virtualstep2", function (req, res, next) {
 // //         trackrecords = data.map((element) => {
 // //           return element.track_record
 // //         })
-// //         // console.log("track", trackrecords)
 // //         if (trackrecords.length > 0) {
 
 // //           trackrecords.forEach((element2) => {
@@ -4383,9 +4366,7 @@ router.post("/virtualstep2", function (req, res, next) {
 // //               finaldata.push(lastdata[0].datetime_on)
 // //             }
 // //           })
-// //           console.log("finaldata", finaldata)
 // //           let finaldata1 = finaldata.length
-// //           console.log("finaldata123", finaldata1)
 // //           res.json({ status: 200, hassuccessed: true, data: finaldata1 })
 // //         }
 // //         else {
@@ -5531,7 +5512,6 @@ function User_Case1(House_id) {
 function virtualCase(House_id) {
   return new Promise((resolve, reject) => {
     try {
-      console.log('sdfdsfsfsf', House_id)
       const VirtualtToSearchWith = new virtual_Case({ house_id: House_id });
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Case.countDocuments(
@@ -5539,7 +5519,6 @@ function virtualCase(House_id) {
           house_id: { $in: [House_id, VirtualtToSearchWith.house_id] }
         },
         function (err, count) {
-          console.log('counssssst', count)
           if (err) {
             reject(err);
           } else {

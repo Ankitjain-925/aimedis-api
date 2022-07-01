@@ -57,7 +57,6 @@ router.post("/", function (req, res, next) {
       if (error) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        console.log("dfsfsd", result);
         res.json({
           status: 200,
           message: "Added Successfully",
