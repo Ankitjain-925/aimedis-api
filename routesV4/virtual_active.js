@@ -1486,14 +1486,17 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
         if (err && !user_data) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
+          var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+          var start_time = moment(req.body.start_time).format("HH:mm");
+            var end_time = moment(req.body.end_time).format("HH:mm");
           var sendData = `<div>Dear Patient,<br/>
         Your payment process for sick leave certificate application is completed successfully.
           "<br/>";
         Please do join the Video call at  
-          ${req.body.date}
+          ${meetingDate}
           from the time slot
-          ${req.body.start}
-          ${req.body.end}
+          ${start_time}
+          ${end_time}
         <br/>
         Your Video call joining link is
           ${req.body.patient_link}
@@ -1503,10 +1506,10 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
         The payment process for sick leave certificate application is completed successfully.
         <br/>
         Please do join the Video call at
-          ${req.body.date}
+          ${meetingDate}
           from the time slot
-          ${req.body.start}+""+
-          ${req.body.end}
+          ${start_time}+""+
+          ${end_time}
           <br/>
         Your Video call joining link is
           ${req.body.doctor_link}
