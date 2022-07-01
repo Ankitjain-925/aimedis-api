@@ -105,7 +105,7 @@ var CaseSchema = new Schema({
         unique: false
     },
     step: {
-        type: String,
+        type: Object,
         required: false,
         unique: false
     },

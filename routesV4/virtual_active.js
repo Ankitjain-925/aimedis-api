@@ -1,10 +1,6 @@
 require("dotenv").config();
-var aws = require("aws-sdk");
-
 var re = require("../regions.json");
-
 const axios = require("axios");
-
 var express = require("express");
 let router = express.Router();
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
