@@ -3024,6 +3024,7 @@ router.post("/downloadPEBill", function (req, res, next) {
             error: err,
           });
         } else {
+          var Date = getDate(userdata[0].created_at, "YYYY/MM/DD");
 
           if (req.body.type == "sick_leave") {
             var template1 = handlebars.compile(bill3);
@@ -3033,7 +3034,8 @@ router.post("/downloadPEBill", function (req, res, next) {
               admit: admit,
               pat_info: req.body,
               birthday: birthday,
-              amt: userdata[0].amount
+              amt: userdata[0].amount,
+              date: Date
             });
           }
           else {
