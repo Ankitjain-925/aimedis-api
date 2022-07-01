@@ -1390,12 +1390,29 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       if (userdata !== null) {
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          message: "link active",
-                          data: { Task: userdata, Session: data },
-                        });
+                        User.findOne({ _id: data.patient_id }, function (err, result) {
+                          if(err && !result){
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "link active",
+                              data: { Task: userdata, Session: data },
+                            });
+                          }
+                          else{
+                            var patient_info = userdata.patient;
+                            patient_info['image'] = result.image;
+                            userdata.patient = patient_info
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "link active",
+                              data: { Task: userdata, Session: data },
+                            });
+                          }
+                        })
+
+                        
                       }
                       else {
                         const VirtualtToSearchWith = new sick_meeting({
