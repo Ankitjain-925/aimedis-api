@@ -842,7 +842,6 @@ router.get("/pharmacyPrescription/:UserId", function (req, res, next) {
       } else {
         if (doc) {
           forEachPromise(doc.track_record, getAlltrack33).then((result) => {
-            console.log("trackrecord331");
             data = {
               first_name: doc.first_name,
               last_name: doc.last_name,
@@ -935,7 +934,6 @@ function getArAlltrack(data) {
                 } else {
                   return new_data;
                 }
-                console.log("Iam here", new_data);
               })
               .then(function (new_data) {
                 if (data.archive) {
@@ -1054,7 +1052,6 @@ function getAlltrack33(data) {
         })
         .then(function (new_data) {
           if (!data.archive && data.type === "prescription") {
-            console.log("dffdsf", new_data);
             trackrecord331.push(new_data);
           }
           resolve(trackrecord331);

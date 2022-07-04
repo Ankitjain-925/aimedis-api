@@ -16,12 +16,9 @@ router.post("/dataManager", function (req, res, next) {
   };
   axios(options)
     .then((rr) => {
-      console.log("options", options);
-      console.log("rr", rr);
       res.send(rr.data);
     })
     .catch((e) => {
-      console.log("error", e);
       res.send(e);
     });
 });

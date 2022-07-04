@@ -263,7 +263,6 @@ router.post("/Addadminuser", function (req, res, next) {
                                             error: err,
                                           });
                                         } else {
-                                          console.log("doc", doc);
                                           res.json({
                                             status: 200,
                                             message:
@@ -297,7 +296,6 @@ router.post("/Addadminuser", function (req, res, next) {
                               error: err,
                             });
                           } else {
-                            console.log("doc33", doc);
                             res.json({
                               status: 200,
                               message: "User is added Successfully",
@@ -464,7 +462,6 @@ function emptyBucket(bucketName, foldername) {
     if (err) return err;
 
     if (data.Contents.length == 0) {
-      console.log("Bucket is empty!");
     } else {
       params = { Bucket: bucketName };
       params.Delete = { Objects: [] };
@@ -1083,7 +1080,6 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
         })
       }
     }).catch((err) => {
-      console.log("err", err)
       res.json({ status: 200, hassuccessed: true, err: err })
 
     })
@@ -1121,7 +1117,6 @@ router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, r
       }
 
     }).catch((err) => {
-      console.log("err", err)
       res.json({ status: 200, hassuccessed: true, err: err })
 
     })
@@ -1166,7 +1161,6 @@ router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, r
 //              { last_name: req.body.search.toLowerCase() },{ last_name: req.body.search.toUpperCase() }, { email: req.body.search.toLowerCase() },{ email: req.body.search.toUpperCase() }]
 //           }] },function (err, data) {
 //           if (err && !data) {
-//             console.log("err", err)
 //             res.json({ status: 200, hassuccessed: false, message: "specialities not found", error: err })
 //           } else {
 //             res.json({ status: 200, hassuccessed: true, data: data })
@@ -1220,6 +1214,7 @@ router.post("/allHospitalusers", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+
     if (req.body.institue_id && req.body.type && req.body.search) {
       User.find({ institute_id: req.body.institue_id, type: req.body.type }).then((data) => {
         console.log("data", data)
@@ -1228,6 +1223,7 @@ router.post("/allHospitalusers", function (req, res) {
       })
     }
     else {
+
       res.json({
         status: 200,
         hassuccessed: false,
@@ -1245,9 +1241,6 @@ router.post("/allHospitalusers", function (req, res) {
 
 function SearchUser(searchKey, searchInto) {
   return searchInto.filter(user => {
-    console.log("user", user.email)
-    console.log("userfirst", user.first_name, "userlast", user.last_name)
-    console.log("searchKey", searchKey)
 
     searchKey = searchKey.toLowerCase()
     let email = user.email.toLowerCase().search(searchKey)

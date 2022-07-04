@@ -52,31 +52,31 @@ appAdmin.use(express.static(path.join(__dirname, "build/admin")));
 appAdmin1.use(express.static(path.join(__dirname, "build/sickleave")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
-  transports: ["polling"],
-  cors: {
-    origin: "*",
-  },
-});
-////////////admin+main+end/////////////
+// const server = require("http").createServer(app);
+// const io = require("socket.io")(server, {
+//   transports: ["polling"],
+//   cors: {
+//     origin: "*",
+//   },
+// });
+// ////////////admin+main+end/////////////
 
-io.on("connection", (socket) => {
-  console.log("A user is connected");
+// io.on("connection", (socket) => {
+//   console.log("A user is connected");
 
-  socket.on("update", (data) => {
-    console.log("data", data);
-    socket.broadcast.emit("data_shown", data);
-  });
-  socket.on("addpatient", (data) => {
-    console.log("addpatient", data);
-    socket.broadcast.emit("email_accept", data);
-  });
-  socket.on("decline", (data) => {
-    console.log("decline", data);
-    socket.broadcast.emit("email_decline", data);
-  });
-});
+//   socket.on("update", (data) => {
+//     console.log("data", data);
+//     socket.broadcast.emit("data_shown", data);
+//   });
+//   socket.on("addpatient", (data) => {
+//     console.log("addpatient", data);
+//     socket.broadcast.emit("email_accept", data);
+//   });
+//   socket.on("decline", (data) => {
+//     console.log("decline", data);
+//     socket.broadcast.emit("email_decline", data);
+//   });
+// });
 
 
 // cron.schedule('0 0 */12 * * *', function(){
@@ -211,7 +211,7 @@ function SetArchiveUnuseMeeting(){
         var enddate = moment(element.date).format("YYYY-MM-DD");
         
 
-        if (moment(ttime).diff(enddate, 'days') > 2 ) {
+        if (moment(ttime).diff(enddate, 'days') > 0 ) {
           virtual_Task.updateMany({ _id:element.task_id,  $or: [
             {meetingjoined: { $ne: true } },
             { meetingjoined: { $exists: false } }
@@ -622,4 +622,4 @@ app.use(function (err, req, res, next) {
 //   console.log("Server started on port 5000");
 // });
 
- module.exports = app;
+module.exports = app;
