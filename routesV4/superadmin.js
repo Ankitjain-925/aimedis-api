@@ -23,6 +23,11 @@ var API_KEY = process.env.ADMIN_API_KEY;
 var SECRET = process.env.ADMIN_API_SECRET;
 const Client = require("authy-client").Client;
 const authy = new Client({ key: API_KEY });
+var virtual_cases = require("../schema/virtual_cases.js");
+var virtual_tasks = require("../schema/virtual_tasks");
+var virtual_Invoice = require("../schema/virtual_invoice.js");
+var Appointments = require("../schema/appointments");
+
 
 var transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
@@ -493,10 +498,90 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         var buck = "aimedisfirstbucket";
       }
       emptyBucket(buck, data12.profile_id);
-      res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
+      var patient_id = req.params.UserId
+      const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      virtual_cases.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith1.patient_id] } },
+        {
+          '$unset': {
+            'patient.image': ''
+          }
+        }, function (err, data) {
+          if (err) {
+            console.log("err", err)
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            var patient_id = req.params.UserId
+            const VirtualtToSearchWith = new virtual_tasks({ patient_id });
+            VirtualtToSearchWith.encryptFieldsSync();
+            virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
+              {
+                '$unset': {
+                  'patient.image': ""
+                }
+              }, function (err, data) {
+                if (err) {
+                  console.log("1", err)
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    msg: "Something went wrong.",
+                    error: err,
+                  });
+                } else {
+
+                  virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
+                    {
+                      '$unset': {
+                        'patient.image': ""
+                      }
+                    }, function (err, data) {
+                      if (err) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          msg: "Something went wrong.",
+                          error: err,
+                        });
+                      } else {
+                        var patient = req.params.UserId
+                        const VirtualtToSearchWith2 = new Appointments({ patient });
+                        VirtualtToSearchWith2.encryptFieldsSync();
+                        Appointments.updateOne({
+                          patient: { $in: [patient, VirtualtToSearchWith2.patient] }
+                        }, {
+                          '$unset': {
+                            'patient_info.profile_image': ""
+                          }
+                        }, function (err, data) {
+                          if (err) {
+                            console.log("3", err)
+                            res.json({
+                              status: 200,
+                              hassuccessed: false,
+                              msg: "Something went wrong.",
+                              error: err,
+                            });
+                          } else {
+                            res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
+                          }
+
+                        })
+                      }
+                    })
+                }
+              })
+          }
+        })
     }
   });
 });
+
 
 router.put("/BlockUser/:UserId", function (req, res, next) {
   const token = req.headers.token;
@@ -947,28 +1032,28 @@ router.get("/allusers/:type", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-      var batchSize = 10000;
-      User.find({ type: req.params.type}).count().then((count) => {
-  
+    var batchSize = 10000;
+    User.find({ type: req.params.type }).count().then((count) => {
+
       //   const operations = [];
       //   for (let i = 0; i < count; i += batchSize) {
       //     operations.push(
-            User.find({type: req.params.type}).skip(0).limit(count).then((batchHandler) => {
-              res.json({ status: 200, hassuccessed: true, data: batchHandler })
-            })
+      User.find({ type: req.params.type }).skip(0).limit(count).then((batchHandler) => {
+        res.json({ status: 200, hassuccessed: true, data: batchHandler })
+      })
       //     )
       //   }
-      }).catch((err)=>{
-        res.json({ status: 200, hassuccessed: true, err: err })
-  
-      })
-  //   User.find({ type: req.params.type }, function (err, data){
-  //     if (err && !data) {
-  //       res.json({ status: 200, hassuccessed: false, message: "Users not found", error: err })
-  //     } else {
-  //       res.json({ status: 200, hassuccessed: true, data: data })
-  //     }
-  //   })  
+    }).catch((err) => {
+      res.json({ status: 200, hassuccessed: true, err: err })
+
+    })
+    //   User.find({ type: req.params.type }, function (err, data){
+    //     if (err && !data) {
+    //       res.json({ status: 200, hassuccessed: false, message: "Users not found", error: err })
+    //     } else {
+    //       res.json({ status: 200, hassuccessed: true, data: data })
+    //     }
+    //   })  
   } else {
     res.json({
       status: 200,
@@ -989,7 +1074,7 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
         const operations = [];
         operations.push(
           User.find({ type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).then((batchHandler) => {
-              res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count:count})
+            res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count: count })
           })
         )
       } else {
@@ -1016,21 +1101,21 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
 
 router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, res) {
   const token = req.headers.token;
-  
+
   let legit = jwtconfig.verify(token);
   if (legit) {
-    User.find({ institute_id: req.params.institute_id, type: req.params.type }).count().then((count)=>{
+    User.find({ institute_id: req.params.institute_id, type: req.params.type }).count().then((count) => {
       let pagenumber = req.params.pagenumber
       var page_limit = 20
       if (pagenumber && pagenumber > 0) {
         const operations = [];
         operations.push(
-          User.find({ institute_id: req.params.institute_id,type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).then((batchHandler) => {
-              res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count:count})
+          User.find({ institute_id: req.params.institute_id, type: req.params.type }).skip((pagenumber - 1) * page_limit).limit(page_limit).then((batchHandler) => {
+            res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count: count })
           })
         )
       } else {
-        User.find({institute_id: req.params.institute_id, type: req.params.type }).skip(0).limit(20).then((batchHandler) => {
+        User.find({ institute_id: req.params.institute_id, type: req.params.type }).skip(0).limit(20).then((batchHandler) => {
           res.json({ status: 200, hassuccessed: true, data: batchHandler, Total_count: count })
         })
       }
@@ -1073,7 +1158,7 @@ router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, r
 //       Userlastname1.encryptFieldsSync();
 //       const Userlastname2 = new User({ last_name : req.body.search.toLowerCase() });
 //       Userlastname2.encryptFieldsSync();
-     
+
 //         User.find({ $and: [{ type: req.body.type },
 //           {$or: [{ first_name: req.body.search }, { first_name: Userfirstname.first_name },{ first_name: Userfirstname1.first_name },{ first_name: Userfirstname2.first_name }, { email: Useremail.email },
 //             { last_name: req.body.search },{ last_name: req.body.search.toLowerCase() },{ last_name: req.body.search.toUpperCase() },{ first_name: req.body.search.toLowerCase() },{ first_name: req.body.search.toUpperCase() },
@@ -1109,19 +1194,19 @@ router.post("/allSearchusers", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-  if(req.body.type && req.body.search){
-    User.find({ type: req.body.type }).then((data) => {
-      let serach_value = SearchUser(req.body.search, data )
-      res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
-    })
-  }
-  else{
+    if (req.body.type && req.body.search) {
+      User.find({ type: req.body.type }).then((data) => {
+        let serach_value = SearchUser(req.body.search, data)
+        res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
+      })
+    }
+    else {
       res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "Please send type and search data",
-        });
-  }  
+        status: 200,
+        hassuccessed: false,
+        msg: "Please send type and search data",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -1135,20 +1220,20 @@ router.post("/allHospitalusers", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-  if(req.body.institue_id && req.body.type && req.body.search){
-    User.find({ institute_id:req.body.institue_id, type:req.body.type }).then((data) => {
-      console.log("data",data)
-      let serach_value = SearchUser(req.body.search, data )
-      res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
-    })
-  }
-  else{
+    if (req.body.institue_id && req.body.type && req.body.search) {
+      User.find({ institute_id: req.body.institue_id, type: req.body.type }).then((data) => {
+        console.log("data", data)
+        let serach_value = SearchUser(req.body.search, data)
+        res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
+      })
+    }
+    else {
       res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "Please send type and search data",
-        });
-  }  
+        status: 200,
+        hassuccessed: false,
+        msg: "Please send type and search data",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -1158,25 +1243,25 @@ router.post("/allHospitalusers", function (req, res) {
   }
 });
 
-function SearchUser (searchKey, searchInto) {
+function SearchUser(searchKey, searchInto) {
   return searchInto.filter(user => {
-    console.log("user",user.email)
-    console.log("userfirst",user.first_name,"userlast",user.last_name)
-    console.log("searchKey",searchKey)
+    console.log("user", user.email)
+    console.log("userfirst", user.first_name, "userlast", user.last_name)
+    console.log("searchKey", searchKey)
 
     searchKey = searchKey.toLowerCase()
-      let email = user.email.toLowerCase().search(searchKey)
-      let name = `${user.first_name} ${user.last_name}`
-      name = name.toLowerCase().search(searchKey)
-      if (name > -1) {
-          return user
-      }
-      else if (email > -1) {
-          return user
-      }
-      else {
-          return false
-      }
+    let email = user.email.toLowerCase().search(searchKey)
+    let name = `${user.first_name} ${user.last_name}`
+    name = name.toLowerCase().search(searchKey)
+    if (name > -1) {
+      return user
+    }
+    else if (email > -1) {
+      return user
+    }
+    else {
+      return false
+    }
   })
 };
 
