@@ -237,6 +237,7 @@ router.post("/AddTask", function (req, res, next) {
           else {
             User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
               if (err && !doc) {
+
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -347,6 +348,7 @@ router.post("/AddTask", function (req, res, next) {
 function ApproveReq(doc, start, end, date) {
   return new Promise((resolve, reject) => {
     try {
+
       let date_fn = moment(date).format("YYYY-MM-DD")
       sendData = `Dear Patient<br/>
       Your request for the sick leave certificate is accepted by the doctor on 
@@ -3034,7 +3036,6 @@ router.post("/downloadPEBill", function (req, res, next) {
           }
           else {
             var template = handlebars.compile(bill);
-
             var htmlToSend = template({
               bill2: bill2,
               admit: admit,
@@ -3051,6 +3052,7 @@ router.post("/downloadPEBill", function (req, res, next) {
               displayHeaderFooter: true,
               margin: { top: 80, bottom: 80, left: 60, right: 60 },
             };
+
 
             let file = [{ content: htmlToSend }];
             html_to_pdf.generatePdfs(file, options).then((output) => {
@@ -3095,7 +3097,7 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     newcf = [];
-    var patient_id = req.body.patient_id;
+    var patient_id = req.params.patient_id;
     const VirtualtToSearchWith = new virtual_Case({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
 
@@ -3187,7 +3189,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
     flatArraya = [];
     Inhospital = [];
     InhopspitalInvoice = [];
-    var patient_id = req.body.patient_id;
+    var patient_id = req.params.patient_id;
     const VirtualtToSearchWith = new virtual_Case({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
 
@@ -3329,6 +3331,7 @@ router.post("/TaskFilter", function (req, res) {
       if (err & !data) {
         res.json({ status: 200, hassuccessed: true, error: err });
       } else {
+
         let condition3 = {
           house_id: {
             $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
@@ -5331,14 +5334,17 @@ function taskfromhouseid(item) {
         VirtualtToSearchWith1.encryptFieldsSync();
         virtual_Task
           .find({
-            $or: [
-              { house_id: item.house_id },
-              { house_id: VirtualtToSearchWith.house_id },
-            ],
-            $or: [
-              { task_type: { $ne: "picture_evaluation" } },
-              { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-            ],
+            $and: [{
+              $or: [
+                { house_id: item.house_id },
+                { house_id: VirtualtToSearchWith.house_id },
+              ]
+            }, {
+              $or: [
+                { task_type: { $ne: "picture_evaluation" } },
+                { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+              ]
+            }]
           })
           .exec(function (err, task) {
             if (err) {
