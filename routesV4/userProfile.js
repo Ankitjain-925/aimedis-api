@@ -3,6 +3,9 @@ var express = require("express");
 let router = express.Router();
 var User = require("../schema/user.js");
 var Metadata = require("../schema/metadata");
+var virtual_Case = require("../schema/virtual_cases.js");
+var virtual_Task = require("../schema/virtual_tasks.js");
+var virtual_Invoice = require("../schema/virtual_invoice.js");
 var Appointment = require("../schema/appointments");
 var Prescription = require("../schema/prescription");
 var Second_opinion = require("../schema/second_option");
@@ -282,7 +285,7 @@ router.post("/UserLogin", function (req, res, next) {
                         { _id: user_data._id },
                         { $set: { logWrongPass: 0 } },
                         { new: true },
-                        (err, doc1) => {}
+                        (err, doc1) => { }
                       );
                       res.json({
                         status: 200,
@@ -328,7 +331,7 @@ router.post("/UserLogin", function (req, res, next) {
                           { _id: user_data._id },
                           { $set: { logWrongPass: 0 } },
                           { new: true },
-                          (err, doc1) => {}
+                          (err, doc1) => { }
                         );
                         res.json({
                           status: 200,
@@ -441,14 +444,14 @@ router.post("/UserLogin", function (req, res, next) {
                       { _id: user_data._id },
                       { $set: { logWrongPass: count, isblock: true } },
                       { new: true },
-                      (err, doc1) => {}
+                      (err, doc1) => { }
                     );
                   } else {
                     User.findOneAndUpdate(
                       { _id: user_data._id },
                       { $set: { logWrongPass: count } },
                       { new: true },
-                      (err, doc1) => {}
+                      (err, doc1) => { }
                     );
                   }
 
@@ -568,7 +571,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                         { _id: user_data._id },
                         { $set: { logWrongPass: 0 } },
                         { new: true },
-                        (err, doc1) => {}
+                        (err, doc1) => { }
                       );
                       res.json({
                         status: 200,
@@ -614,7 +617,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                           { _id: user_data._id },
                           { $set: { logWrongPass: 0 } },
                           { new: true },
-                          (err, doc1) => {}
+                          (err, doc1) => { }
                         );
                         res.json({
                           status: 200,
@@ -714,7 +717,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                     { _id: user_data._id },
                     { $set: { logWrongPass: count } },
                     { new: true },
-                    (err, doc1) => {}
+                    (err, doc1) => { }
                   );
                   res.json({
                     status: 450,
@@ -1279,7 +1282,7 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
               if (
                 data2 &&
                 new Date(req.body.birthday).setHours(0, 0, 0, 0) ===
-                  new Date(data2 && data2.birthday).setHours(0, 0, 0, 0)
+                new Date(data2 && data2.birthday).setHours(0, 0, 0, 0)
               ) {
                 console.log("for birthday");
                 res.json({
@@ -2006,6 +2009,7 @@ router.put("/Users/update", function (req, res, next) {
         });
       }
       if (changeStatus) {
+        let comming = req.body
         // if (req.body.password) {
         //     var enpassword = base64.encode(req.body.password);
         //     req.body.password = enpassword;
@@ -2054,11 +2058,16 @@ router.put("/Users/update", function (req, res, next) {
                         error: err,
                       });
                     } else {
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        message: "Updated",
-                      });
+                      UpdateData(comming, legit.id).then((result) => {
+                        
+                        if (result) {
+                          res.json({
+                            status: 200,
+                            hassuccessed: true,
+                            message: "Updated",
+                          });
+                        }
+                      })
                     }
                   }
                 );
@@ -2077,11 +2086,17 @@ router.put("/Users/update", function (req, res, next) {
                   error: err,
                 });
               } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Updated",
-                });
+                UpdateData(comming, legit.id).then((result) => {
+                  if (result) {
+                    res.json({
+                      status: 200,
+                      hassuccessed: true,
+                      message: "Updated",
+                    });
+                  }
+
+                })
+
               }
             }
           );
@@ -2096,6 +2111,91 @@ router.put("/Users/update", function (req, res, next) {
     });
   }
 });
+
+
+function UpdateData(data, id) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
+        const patient_id = id;
+        const messageToSearchWith1 = new virtual_Task({ patient_id });
+        messageToSearchWith1.encryptFieldsSync();
+        const messageToSearchWith2 = new virtual_Case({ patient_id });
+        messageToSearchWith2.encryptFieldsSync();
+        const messageToSearchWith3 = new Appointment({ patient_id });
+        messageToSearchWith3.encryptFieldsSync();
+        const messageToSearchWith4 = new virtual_Invoice({ patient: patient_id });
+        messageToSearchWith4.encryptFieldsSync();
+        virtual_Task.updateMany
+          ({
+            $or: [
+              { patient_id: id },
+              { patient_id: messageToSearchWith1.patient_id },
+            ],
+          },
+            data)
+          .exec()
+          .then(function (doc) {
+            if (doc) {
+              virtual_Case.updateMany
+                ({
+                  $or: [
+                    { patient_id: id },
+                    { patient_id: messageToSearchWith2.patient_id },
+                  ],
+                },
+                  data)
+                .exec()
+                .then(function (doc1) {
+                  if (doc1) {
+                    Appointment.updateMany
+                      ({
+                        $or: [
+                          { patient_id: id },
+                          { patient_id: messageToSearchWith3.patient_id },
+                        ],
+                      },
+                        data)
+                      .exec()
+                      .then(function (doc2) {
+                        if (doc2) {
+                          virtual_Invoice.updateMany
+                            ({
+                              $or: [
+                                { "patient.id": id },
+                                { "patient.id": messageToSearchWith4.patient },
+                              ],
+                            },
+                              data)
+                            .exec()
+                            .then(function (doc3) {
+                              if (doc3) {
+
+                                // Mypat.push(data);
+                                resolve(doc3);
+                              } else {
+                                resolve(doc3);
+                              }
+                            });
+                          resolve(doc2);
+                        }
+                      });
+                    resolve(doc1);
+                  }
+                });
+              resolve(doc);
+              // console.log(doc)
+
+            } else {
+              resolve(doc);
+            }
+          });
+      }
+
+
+    });
+  });
+}
 
 router.put("/Users/update/:user_id", function (req, res, next) {
   const token = req.headers.token;
@@ -5768,8 +5868,8 @@ router.post("/abletocancel/:doctor_id", function (req, res, next) {
           req.body.appointment_type === "appointments"
             ? Userinfo.private_appointments
             : req.body.appointment_type === "online_apointment"
-            ? Userinfo.online_appointment
-            : Userinfo.days_for_practices;
+              ? Userinfo.online_appointment
+              : Userinfo.days_for_practices;
         console.log("appot[0].appointment_hours", appot[0].appointment_hours);
         if (appot && appot.length > 0 && appot[0].appointment_hours) {
           if (req.body.timedifference >= appot[0].appointment_hours) {
@@ -5855,8 +5955,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].monday_start,
-                Userinfo[i].private_appointments[j].monday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].monday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].private_appointments[j].monday_start,
@@ -5866,8 +5966,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].tuesday_start,
-                Userinfo[i].private_appointments[j].tuesday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].tuesday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].private_appointments[j].tuesday_start,
@@ -5877,8 +5977,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].wednesday_start,
-                Userinfo[i].private_appointments[j].wednesday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].wednesday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].private_appointments[j].wednesday_start,
@@ -5888,8 +5988,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].thursday_start,
-                Userinfo[i].private_appointments[j].thursday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].thursday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].private_appointments[j].thursday_start,
@@ -5899,8 +5999,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].friday_start,
-                Userinfo[i].private_appointments[j].friday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].friday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].private_appointments[j].friday_start,
@@ -5910,8 +6010,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].saturday_start,
-                Userinfo[i].private_appointments[j].saturday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].saturday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].private_appointments[j].saturday_start,
@@ -5921,8 +6021,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].sunday_start,
-                Userinfo[i].private_appointments[j].sunday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].sunday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].private_appointments[j].sunday_start,
@@ -5944,8 +6044,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
             for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
               if (
                 (Userinfo[i].online_appointment[k].monday_start,
-                Userinfo[i].online_appointment[k].monday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].monday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].online_appointment[k].monday_start,
@@ -5955,8 +6055,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].tuesday_start,
-                Userinfo[i].online_appointment[k].tuesday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].tuesday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].online_appointment[k].tuesday_start,
@@ -5966,8 +6066,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].wednesday_start,
-                Userinfo[i].online_appointment[k].wednesday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].wednesday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].online_appointment[k].wednesday_start,
@@ -5977,8 +6077,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].thursday_start,
-                Userinfo[i].online_appointment[k].thursday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].thursday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].online_appointment[k].thursday_start,
@@ -5988,8 +6088,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].friday_start,
-                Userinfo[i].online_appointment[k].friday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].friday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].online_appointment[k].friday_start,
@@ -5999,8 +6099,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].saturday_start,
-                Userinfo[i].online_appointment[k].saturday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].saturday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].online_appointment[k].saturday_start,
@@ -6010,8 +6110,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].sunday_start,
-                Userinfo[i].online_appointment[k].sunday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].sunday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].online_appointment[k].sunday_start,
@@ -6032,8 +6132,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
             for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
               if (
                 (Userinfo[i].days_for_practices[l].monday_start,
-                Userinfo[i].days_for_practices[l].monday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].monday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].days_for_practices[l].monday_start,
@@ -6043,8 +6143,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].tuesday_start,
-                Userinfo[i].days_for_practices[l].tuesday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].tuesday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].days_for_practices[l].tuesday_start,
@@ -6054,8 +6154,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].wednesday_start,
-                Userinfo[i].days_for_practices[l].wednesday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].wednesday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].days_for_practices[l].wednesday_start,
@@ -6065,8 +6165,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].thursday_start,
-                Userinfo[i].days_for_practices[l].thursday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].thursday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].days_for_practices[l].thursday_start,
@@ -6076,8 +6176,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].friday_start,
-                Userinfo[i].days_for_practices[l].friday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].friday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].days_for_practices[l].friday_start,
@@ -6087,8 +6187,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].saturday_start,
-                Userinfo[i].days_for_practices[l].saturday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].saturday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].days_for_practices[l].saturday_start,
@@ -6098,8 +6198,8 @@ router.get("/DoctorAppointments", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].sunday_start,
-                Userinfo[i].days_for_practices[l].sunday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].sunday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].days_for_practices[l].sunday_start,
@@ -6198,8 +6298,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.private_appointments[j].monday_start,
-                Userinfo.private_appointments[j].monday_end,
-                Userinfo.private_appointments[j].duration_of_timeslots)
+                  Userinfo.private_appointments[j].monday_end,
+                  Userinfo.private_appointments[j].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo.private_appointments[j].monday_start,
@@ -6209,8 +6309,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.private_appointments[j].tuesday_start,
-                Userinfo.private_appointments[j].tuesday_end,
-                Userinfo.private_appointments[j].duration_of_timeslots)
+                  Userinfo.private_appointments[j].tuesday_end,
+                  Userinfo.private_appointments[j].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo.private_appointments[j].tuesday_start,
@@ -6220,8 +6320,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.private_appointments[j].wednesday_start,
-                Userinfo.private_appointments[j].wednesday_end,
-                Userinfo.private_appointments[j].duration_of_timeslots)
+                  Userinfo.private_appointments[j].wednesday_end,
+                  Userinfo.private_appointments[j].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo.private_appointments[j].wednesday_start,
@@ -6231,8 +6331,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.private_appointments[j].thursday_start,
-                Userinfo.private_appointments[j].thursday_end,
-                Userinfo.private_appointments[j].duration_of_timeslots)
+                  Userinfo.private_appointments[j].thursday_end,
+                  Userinfo.private_appointments[j].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo.private_appointments[j].thursday_start,
@@ -6242,8 +6342,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.private_appointments[j].friday_start,
-                Userinfo.private_appointments[j].friday_end,
-                Userinfo.private_appointments[j].duration_of_timeslots)
+                  Userinfo.private_appointments[j].friday_end,
+                  Userinfo.private_appointments[j].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo.private_appointments[j].friday_start,
@@ -6253,8 +6353,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.private_appointments[j].saturday_start,
-                Userinfo.private_appointments[j].saturday_end,
-                Userinfo.private_appointments[j].duration_of_timeslots)
+                  Userinfo.private_appointments[j].saturday_end,
+                  Userinfo.private_appointments[j].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo.private_appointments[j].saturday_start,
@@ -6264,8 +6364,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.private_appointments[j].sunday_start,
-                Userinfo.private_appointments[j].sunday_end,
-                Userinfo.private_appointments[j].duration_of_timeslots)
+                  Userinfo.private_appointments[j].sunday_end,
+                  Userinfo.private_appointments[j].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo.private_appointments[j].sunday_start,
@@ -6328,8 +6428,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.online_appointment[k].monday_start,
-                Userinfo.online_appointment[k].monday_end,
-                Userinfo.online_appointment[k].duration_of_timeslots)
+                  Userinfo.online_appointment[k].monday_end,
+                  Userinfo.online_appointment[k].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo.online_appointment[k].monday_start,
@@ -6339,8 +6439,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.online_appointment[k].tuesday_start,
-                Userinfo.online_appointment[k].tuesday_end,
-                Userinfo.online_appointment[k].duration_of_timeslots)
+                  Userinfo.online_appointment[k].tuesday_end,
+                  Userinfo.online_appointment[k].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo.online_appointment[k].tuesday_start,
@@ -6350,8 +6450,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.online_appointment[k].wednesday_start,
-                Userinfo.online_appointment[k].wednesday_end,
-                Userinfo.online_appointment[k].duration_of_timeslots)
+                  Userinfo.online_appointment[k].wednesday_end,
+                  Userinfo.online_appointment[k].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo.online_appointment[k].wednesday_start,
@@ -6361,8 +6461,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.online_appointment[k].thursday_start,
-                Userinfo.online_appointment[k].thursday_end,
-                Userinfo.online_appointment[k].duration_of_timeslots)
+                  Userinfo.online_appointment[k].thursday_end,
+                  Userinfo.online_appointment[k].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo.online_appointment[k].thursday_start,
@@ -6372,8 +6472,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.online_appointment[k].friday_start,
-                Userinfo.online_appointment[k].friday_end,
-                Userinfo.online_appointment[k].duration_of_timeslots)
+                  Userinfo.online_appointment[k].friday_end,
+                  Userinfo.online_appointment[k].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo.online_appointment[k].friday_start,
@@ -6383,8 +6483,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.online_appointment[k].saturday_start,
-                Userinfo.online_appointment[k].saturday_end,
-                Userinfo.online_appointment[k].duration_of_timeslots)
+                  Userinfo.online_appointment[k].saturday_end,
+                  Userinfo.online_appointment[k].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo.online_appointment[k].saturday_start,
@@ -6394,8 +6494,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.online_appointment[k].sunday_start,
-                Userinfo.online_appointment[k].sunday_end,
-                Userinfo.online_appointment[k].duration_of_timeslots)
+                  Userinfo.online_appointment[k].sunday_end,
+                  Userinfo.online_appointment[k].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo.online_appointment[k].sunday_start,
@@ -6456,8 +6556,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.days_for_practices[l].monday_start,
-                Userinfo.days_for_practices[l].monday_end,
-                Userinfo.days_for_practices[l].duration_of_timeslots)
+                  Userinfo.days_for_practices[l].monday_end,
+                  Userinfo.days_for_practices[l].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo.days_for_practices[l].monday_start,
@@ -6467,8 +6567,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.days_for_practices[l].tuesday_start,
-                Userinfo.days_for_practices[l].tuesday_end,
-                Userinfo.days_for_practices[l].duration_of_timeslots)
+                  Userinfo.days_for_practices[l].tuesday_end,
+                  Userinfo.days_for_practices[l].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo.days_for_practices[l].tuesday_start,
@@ -6478,8 +6578,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.days_for_practices[l].wednesday_start,
-                Userinfo.days_for_practices[l].wednesday_end,
-                Userinfo.days_for_practices[l].duration_of_timeslots)
+                  Userinfo.days_for_practices[l].wednesday_end,
+                  Userinfo.days_for_practices[l].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo.days_for_practices[l].wednesday_start,
@@ -6489,8 +6589,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.days_for_practices[l].thursday_start,
-                Userinfo.days_for_practices[l].thursday_end,
-                Userinfo.days_for_practices[l].duration_of_timeslots)
+                  Userinfo.days_for_practices[l].thursday_end,
+                  Userinfo.days_for_practices[l].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo.days_for_practices[l].thursday_start,
@@ -6500,8 +6600,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.days_for_practices[l].friday_start,
-                Userinfo.days_for_practices[l].friday_end,
-                Userinfo.days_for_practices[l].duration_of_timeslots)
+                  Userinfo.days_for_practices[l].friday_end,
+                  Userinfo.days_for_practices[l].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo.days_for_practices[l].friday_start,
@@ -6511,8 +6611,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.days_for_practices[l].saturday_start,
-                Userinfo.days_for_practices[l].saturday_end,
-                Userinfo.days_for_practices[l].duration_of_timeslots)
+                  Userinfo.days_for_practices[l].saturday_end,
+                  Userinfo.days_for_practices[l].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo.days_for_practices[l].saturday_start,
@@ -6522,8 +6622,8 @@ router.get("/timeSuggest", function (req, res, next) {
               }
               if (
                 (Userinfo.days_for_practices[l].sunday_start,
-                Userinfo.days_for_practices[l].sunday_end,
-                Userinfo.days_for_practices[l].duration_of_timeslots)
+                  Userinfo.days_for_practices[l].sunday_end,
+                  Userinfo.days_for_practices[l].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo.days_for_practices[l].sunday_start,
@@ -6637,8 +6737,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].monday_start,
-                Userinfo[i].private_appointments[j].monday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].monday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].private_appointments[j].monday_start,
@@ -6648,8 +6748,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].tuesday_start,
-                Userinfo[i].private_appointments[j].tuesday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].tuesday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].private_appointments[j].tuesday_start,
@@ -6659,8 +6759,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].wednesday_start,
-                Userinfo[i].private_appointments[j].wednesday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].wednesday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].private_appointments[j].wednesday_start,
@@ -6670,8 +6770,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].thursday_start,
-                Userinfo[i].private_appointments[j].thursday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].thursday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].private_appointments[j].thursday_start,
@@ -6681,8 +6781,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].friday_start,
-                Userinfo[i].private_appointments[j].friday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].friday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].private_appointments[j].friday_start,
@@ -6692,8 +6792,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].saturday_start,
-                Userinfo[i].private_appointments[j].saturday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].saturday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].private_appointments[j].saturday_start,
@@ -6703,8 +6803,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].sunday_start,
-                Userinfo[i].private_appointments[j].sunday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].sunday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].private_appointments[j].sunday_start,
@@ -6768,8 +6868,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].monday_start,
-                Userinfo[i].online_appointment[k].monday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].monday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].online_appointment[k].monday_start,
@@ -6779,8 +6879,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].tuesday_start,
-                Userinfo[i].online_appointment[k].tuesday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].tuesday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].online_appointment[k].tuesday_start,
@@ -6790,8 +6890,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].wednesday_start,
-                Userinfo[i].online_appointment[k].wednesday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].wednesday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].online_appointment[k].wednesday_start,
@@ -6801,8 +6901,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].thursday_start,
-                Userinfo[i].online_appointment[k].thursday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].thursday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].online_appointment[k].thursday_start,
@@ -6812,8 +6912,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].friday_start,
-                Userinfo[i].online_appointment[k].friday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].friday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].online_appointment[k].friday_start,
@@ -6823,8 +6923,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].saturday_start,
-                Userinfo[i].online_appointment[k].saturday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].saturday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].online_appointment[k].saturday_start,
@@ -6834,8 +6934,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].sunday_start,
-                Userinfo[i].online_appointment[k].sunday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].sunday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].online_appointment[k].sunday_start,
@@ -6897,8 +6997,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].monday_start,
-                Userinfo[i].days_for_practices[l].monday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].monday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].days_for_practices[l].monday_start,
@@ -6908,8 +7008,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].tuesday_start,
-                Userinfo[i].days_for_practices[l].tuesday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].tuesday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].days_for_practices[l].tuesday_start,
@@ -6919,8 +7019,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].wednesday_start,
-                Userinfo[i].days_for_practices[l].wednesday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].wednesday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].days_for_practices[l].wednesday_start,
@@ -6930,8 +7030,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].thursday_start,
-                Userinfo[i].days_for_practices[l].thursday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].thursday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].days_for_practices[l].thursday_start,
@@ -6941,8 +7041,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].friday_start,
-                Userinfo[i].days_for_practices[l].friday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].friday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].days_for_practices[l].friday_start,
@@ -6952,8 +7052,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].saturday_start,
-                Userinfo[i].days_for_practices[l].saturday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].saturday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].days_for_practices[l].saturday_start,
@@ -6963,8 +7063,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].sunday_start,
-                Userinfo[i].days_for_practices[l].sunday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].sunday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].days_for_practices[l].sunday_start,
@@ -7072,8 +7172,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].private_appointments[j].monday_start,
-                  Userinfo[i].private_appointments[j].monday_end,
-                  Userinfo[i].private_appointments[j].duration_of_timeslots)
+                    Userinfo[i].private_appointments[j].monday_end,
+                    Userinfo[i].private_appointments[j].duration_of_timeslots)
                 ) {
                   monday = getTimeStops(
                     Userinfo[i].private_appointments[j].monday_start,
@@ -7083,8 +7183,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].private_appointments[j].tuesday_start,
-                  Userinfo[i].private_appointments[j].tuesday_end,
-                  Userinfo[i].private_appointments[j].duration_of_timeslots)
+                    Userinfo[i].private_appointments[j].tuesday_end,
+                    Userinfo[i].private_appointments[j].duration_of_timeslots)
                 ) {
                   tuesday = getTimeStops(
                     Userinfo[i].private_appointments[j].tuesday_start,
@@ -7094,8 +7194,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].private_appointments[j].wednesday_start,
-                  Userinfo[i].private_appointments[j].wednesday_end,
-                  Userinfo[i].private_appointments[j].duration_of_timeslots)
+                    Userinfo[i].private_appointments[j].wednesday_end,
+                    Userinfo[i].private_appointments[j].duration_of_timeslots)
                 ) {
                   wednesday = getTimeStops(
                     Userinfo[i].private_appointments[j].wednesday_start,
@@ -7105,8 +7205,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].private_appointments[j].thursday_start,
-                  Userinfo[i].private_appointments[j].thursday_end,
-                  Userinfo[i].private_appointments[j].duration_of_timeslots)
+                    Userinfo[i].private_appointments[j].thursday_end,
+                    Userinfo[i].private_appointments[j].duration_of_timeslots)
                 ) {
                   thursday = getTimeStops(
                     Userinfo[i].private_appointments[j].thursday_start,
@@ -7116,8 +7216,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].private_appointments[j].friday_start,
-                  Userinfo[i].private_appointments[j].friday_end,
-                  Userinfo[i].private_appointments[j].duration_of_timeslots)
+                    Userinfo[i].private_appointments[j].friday_end,
+                    Userinfo[i].private_appointments[j].duration_of_timeslots)
                 ) {
                   friday = getTimeStops(
                     Userinfo[i].private_appointments[j].friday_start,
@@ -7127,8 +7227,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].private_appointments[j].saturday_start,
-                  Userinfo[i].private_appointments[j].saturday_end,
-                  Userinfo[i].private_appointments[j].duration_of_timeslots)
+                    Userinfo[i].private_appointments[j].saturday_end,
+                    Userinfo[i].private_appointments[j].duration_of_timeslots)
                 ) {
                   saturday = getTimeStops(
                     Userinfo[i].private_appointments[j].saturday_start,
@@ -7138,8 +7238,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].private_appointments[j].sunday_start,
-                  Userinfo[i].private_appointments[j].sunday_end,
-                  Userinfo[i].private_appointments[j].duration_of_timeslots)
+                    Userinfo[i].private_appointments[j].sunday_end,
+                    Userinfo[i].private_appointments[j].duration_of_timeslots)
                 ) {
                   sunday = getTimeStops(
                     Userinfo[i].private_appointments[j].sunday_start,
@@ -7204,8 +7304,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].online_appointment[k].monday_start,
-                  Userinfo[i].online_appointment[k].monday_end,
-                  Userinfo[i].online_appointment[k].duration_of_timeslots)
+                    Userinfo[i].online_appointment[k].monday_end,
+                    Userinfo[i].online_appointment[k].duration_of_timeslots)
                 ) {
                   monday = getTimeStops(
                     Userinfo[i].online_appointment[k].monday_start,
@@ -7215,8 +7315,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].online_appointment[k].tuesday_start,
-                  Userinfo[i].online_appointment[k].tuesday_end,
-                  Userinfo[i].online_appointment[k].duration_of_timeslots)
+                    Userinfo[i].online_appointment[k].tuesday_end,
+                    Userinfo[i].online_appointment[k].duration_of_timeslots)
                 ) {
                   tuesday = getTimeStops(
                     Userinfo[i].online_appointment[k].tuesday_start,
@@ -7226,8 +7326,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].online_appointment[k].wednesday_start,
-                  Userinfo[i].online_appointment[k].wednesday_end,
-                  Userinfo[i].online_appointment[k].duration_of_timeslots)
+                    Userinfo[i].online_appointment[k].wednesday_end,
+                    Userinfo[i].online_appointment[k].duration_of_timeslots)
                 ) {
                   wednesday = getTimeStops(
                     Userinfo[i].online_appointment[k].wednesday_start,
@@ -7237,8 +7337,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].online_appointment[k].thursday_start,
-                  Userinfo[i].online_appointment[k].thursday_end,
-                  Userinfo[i].online_appointment[k].duration_of_timeslots)
+                    Userinfo[i].online_appointment[k].thursday_end,
+                    Userinfo[i].online_appointment[k].duration_of_timeslots)
                 ) {
                   thursday = getTimeStops(
                     Userinfo[i].online_appointment[k].thursday_start,
@@ -7248,8 +7348,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].online_appointment[k].friday_start,
-                  Userinfo[i].online_appointment[k].friday_end,
-                  Userinfo[i].online_appointment[k].duration_of_timeslots)
+                    Userinfo[i].online_appointment[k].friday_end,
+                    Userinfo[i].online_appointment[k].duration_of_timeslots)
                 ) {
                   friday = getTimeStops(
                     Userinfo[i].online_appointment[k].friday_start,
@@ -7259,8 +7359,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].online_appointment[k].saturday_start,
-                  Userinfo[i].online_appointment[k].saturday_end,
-                  Userinfo[i].online_appointment[k].duration_of_timeslots)
+                    Userinfo[i].online_appointment[k].saturday_end,
+                    Userinfo[i].online_appointment[k].duration_of_timeslots)
                 ) {
                   saturday = getTimeStops(
                     Userinfo[i].online_appointment[k].saturday_start,
@@ -7270,8 +7370,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].online_appointment[k].sunday_start,
-                  Userinfo[i].online_appointment[k].sunday_end,
-                  Userinfo[i].online_appointment[k].duration_of_timeslots)
+                    Userinfo[i].online_appointment[k].sunday_end,
+                    Userinfo[i].online_appointment[k].duration_of_timeslots)
                 ) {
                   sunday = getTimeStops(
                     Userinfo[i].online_appointment[k].sunday_start,
@@ -7334,8 +7434,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].days_for_practices[l].monday_start,
-                  Userinfo[i].days_for_practices[l].monday_end,
-                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                    Userinfo[i].days_for_practices[l].monday_end,
+                    Userinfo[i].days_for_practices[l].duration_of_timeslots)
                 ) {
                   monday = getTimeStops(
                     Userinfo[i].days_for_practices[l].monday_start,
@@ -7345,8 +7445,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].days_for_practices[l].tuesday_start,
-                  Userinfo[i].days_for_practices[l].tuesday_end,
-                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                    Userinfo[i].days_for_practices[l].tuesday_end,
+                    Userinfo[i].days_for_practices[l].duration_of_timeslots)
                 ) {
                   tuesday = getTimeStops(
                     Userinfo[i].days_for_practices[l].tuesday_start,
@@ -7356,8 +7456,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].days_for_practices[l].wednesday_start,
-                  Userinfo[i].days_for_practices[l].wednesday_end,
-                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                    Userinfo[i].days_for_practices[l].wednesday_end,
+                    Userinfo[i].days_for_practices[l].duration_of_timeslots)
                 ) {
                   wednesday = getTimeStops(
                     Userinfo[i].days_for_practices[l].wednesday_start,
@@ -7367,8 +7467,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].days_for_practices[l].thursday_start,
-                  Userinfo[i].days_for_practices[l].thursday_end,
-                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                    Userinfo[i].days_for_practices[l].thursday_end,
+                    Userinfo[i].days_for_practices[l].duration_of_timeslots)
                 ) {
                   thursday = getTimeStops(
                     Userinfo[i].days_for_practices[l].thursday_start,
@@ -7378,8 +7478,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].days_for_practices[l].friday_start,
-                  Userinfo[i].days_for_practices[l].friday_end,
-                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                    Userinfo[i].days_for_practices[l].friday_end,
+                    Userinfo[i].days_for_practices[l].duration_of_timeslots)
                 ) {
                   friday = getTimeStops(
                     Userinfo[i].days_for_practices[l].friday_start,
@@ -7389,8 +7489,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].days_for_practices[l].saturday_start,
-                  Userinfo[i].days_for_practices[l].saturday_end,
-                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                    Userinfo[i].days_for_practices[l].saturday_end,
+                    Userinfo[i].days_for_practices[l].duration_of_timeslots)
                 ) {
                   saturday = getTimeStops(
                     Userinfo[i].days_for_practices[l].saturday_start,
@@ -7400,8 +7500,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
                 }
                 if (
                   (Userinfo[i].days_for_practices[l].sunday_start,
-                  Userinfo[i].days_for_practices[l].sunday_end,
-                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                    Userinfo[i].days_for_practices[l].sunday_end,
+                    Userinfo[i].days_for_practices[l].duration_of_timeslots)
                 ) {
                   sunday = getTimeStops(
                     Userinfo[i].days_for_practices[l].sunday_start,
@@ -7500,8 +7600,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].monday_start,
-                Userinfo[i].private_appointments[j].monday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].monday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].private_appointments[j].monday_start,
@@ -7511,8 +7611,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].tuesday_start,
-                Userinfo[i].private_appointments[j].tuesday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].tuesday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].private_appointments[j].tuesday_start,
@@ -7522,8 +7622,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].wednesday_start,
-                Userinfo[i].private_appointments[j].wednesday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].wednesday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].private_appointments[j].wednesday_start,
@@ -7533,8 +7633,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].thursday_start,
-                Userinfo[i].private_appointments[j].thursday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].thursday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].private_appointments[j].thursday_start,
@@ -7544,8 +7644,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].friday_start,
-                Userinfo[i].private_appointments[j].friday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].friday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].private_appointments[j].friday_start,
@@ -7555,8 +7655,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].saturday_start,
-                Userinfo[i].private_appointments[j].saturday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].saturday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].private_appointments[j].saturday_start,
@@ -7566,8 +7666,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].private_appointments[j].sunday_start,
-                Userinfo[i].private_appointments[j].sunday_end,
-                Userinfo[i].private_appointments[j].duration_of_timeslots)
+                  Userinfo[i].private_appointments[j].sunday_end,
+                  Userinfo[i].private_appointments[j].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].private_appointments[j].sunday_start,
@@ -7624,8 +7724,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].monday_start,
-                Userinfo[i].online_appointment[k].monday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].monday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].online_appointment[k].monday_start,
@@ -7635,8 +7735,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].tuesday_start,
-                Userinfo[i].online_appointment[k].tuesday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].tuesday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].online_appointment[k].tuesday_start,
@@ -7646,8 +7746,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].wednesday_start,
-                Userinfo[i].online_appointment[k].wednesday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].wednesday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].online_appointment[k].wednesday_start,
@@ -7657,8 +7757,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].thursday_start,
-                Userinfo[i].online_appointment[k].thursday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].thursday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].online_appointment[k].thursday_start,
@@ -7668,8 +7768,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].friday_start,
-                Userinfo[i].online_appointment[k].friday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].friday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].online_appointment[k].friday_start,
@@ -7679,8 +7779,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].saturday_start,
-                Userinfo[i].online_appointment[k].saturday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].saturday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].online_appointment[k].saturday_start,
@@ -7690,8 +7790,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].online_appointment[k].sunday_start,
-                Userinfo[i].online_appointment[k].sunday_end,
-                Userinfo[i].online_appointment[k].duration_of_timeslots)
+                  Userinfo[i].online_appointment[k].sunday_end,
+                  Userinfo[i].online_appointment[k].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].online_appointment[k].sunday_start,
@@ -7747,8 +7847,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].monday_start,
-                Userinfo[i].days_for_practices[l].monday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].monday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
                   Userinfo[i].days_for_practices[l].monday_start,
@@ -7758,8 +7858,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].tuesday_start,
-                Userinfo[i].days_for_practices[l].tuesday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].tuesday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
                   Userinfo[i].days_for_practices[l].tuesday_start,
@@ -7769,8 +7869,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].wednesday_start,
-                Userinfo[i].days_for_practices[l].wednesday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].wednesday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
                   Userinfo[i].days_for_practices[l].wednesday_start,
@@ -7780,8 +7880,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].thursday_start,
-                Userinfo[i].days_for_practices[l].thursday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].thursday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
                   Userinfo[i].days_for_practices[l].thursday_start,
@@ -7791,8 +7891,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].friday_start,
-                Userinfo[i].days_for_practices[l].friday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].friday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
                   Userinfo[i].days_for_practices[l].friday_start,
@@ -7802,8 +7902,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].saturday_start,
-                Userinfo[i].days_for_practices[l].saturday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].saturday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
                   Userinfo[i].days_for_practices[l].saturday_start,
@@ -7813,8 +7913,8 @@ router.get("/getLocation/:radius", function (req, res, next) {
               }
               if (
                 (Userinfo[i].days_for_practices[l].sunday_start,
-                Userinfo[i].days_for_practices[l].sunday_end,
-                Userinfo[i].days_for_practices[l].duration_of_timeslots)
+                  Userinfo[i].days_for_practices[l].sunday_end,
+                  Userinfo[i].days_for_practices[l].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
                   Userinfo[i].days_for_practices[l].sunday_start,
@@ -7967,10 +8067,10 @@ router.post("/GetUserInfo/:UserId", function (req, res, next) {
               result === "ch"
                 ? "zh"
                 : result === "sp"
-                ? "es"
-                : result === "rs"
-                ? "ru"
-                : result;
+                  ? "es"
+                  : result === "rs"
+                    ? "ru"
+                    : result;
             var sms1 =
               "There was an emergency an access to the data in your Aimedis profile ( " +
               doc.profile_id +
@@ -7984,7 +8084,7 @@ router.post("/GetUserInfo/:UserId", function (req, res, next) {
               dateString;
             trans(sms1, { source: "en", target: result }).then((res1) => {
               sendSms(doc.mobile, res1)
-                .then((result) => {})
+                .then((result) => { })
                 .catch((e) => {
                   console.log("Message is not sent", e);
                 });
@@ -8008,7 +8108,7 @@ router.post("/GetUserInfo/:UserId", function (req, res, next) {
                 dateString;
               trans(sms2, { source: "en", target: result }).then((res1) => {
                 sendSms(doc.emergency_number, res1)
-                  .then((result) => {})
+                  .then((result) => { })
                   .catch((e) => {
                     console.log("Message is not sent", e);
                   });
@@ -8323,10 +8423,10 @@ router.post("/AskPatient/:id", function (req, res, next) {
               result === "ch"
                 ? "zh"
                 : result === "sp"
-                ? "es"
-                : result === "rs"
-                ? "ru"
-                : result;
+                  ? "es"
+                  : result === "rs"
+                    ? "ru"
+                    : result;
 
             trans(sendData, { source: "en", target: result }).then((res1) => {
               res1 =
@@ -8879,19 +8979,19 @@ function getTime(date, timeFormat) {
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
-      "01",
-      "02",
-      "03",
-      "04",
-      "05",
-      "06",
-      "07",
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-    ],
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ],
     month = monthNames[d.getMonth()],
     day = d.getDate(),
     year = d.getFullYear();
@@ -8911,13 +9011,12 @@ router.post("/MailSendToDr", function (req, res) {
   let email = req.body.email;
   var patient_infos = req.body.patient_infos;
   var sendData = `<div> Dear Doctor,
-  </div><br/><div>Here is new Picture evaluation for patient -  ${
-    patient_infos.first_name +
+  </div><br/><div>Here is new Picture evaluation for patient -  ${patient_infos.first_name +
     " " +
     patient_infos.last_name +
     "-" +
     patient_infos.patient_id
-  }  added please check and give your explanation on that.</div>`;
+    }  added please check and give your explanation on that.</div>`;
 
   const profile_id = patient_infos.patient_id;
   const messageToSearchWith = new User({ profile_id });
@@ -8943,9 +9042,8 @@ router.post("/MailSendToDr", function (req, res) {
           hassuccessed: false,
         });
       } else {
-        var sendData1 = `<div> Dear ${
-          patient_infos.first_name + " " + patient_infos.last_name
-        },
+        var sendData1 = `<div> Dear ${patient_infos.first_name + " " + patient_infos.last_name
+          },
   </div><br/><div>Your Picture evaluation is assigned to the doctor by hospital, And it is in under process please wait for the reply from the doctor.</div>`;
         if (data) {
           generateTemplate(
@@ -9053,9 +9151,8 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
       .then((chnageData) => {
         var lan1 = getMsgLang(req.body.patient_id);
         lan1.then((result) => {
-          var sendData = `<div>The appoinment with Dr. ${
-            doctorProfile.first_name + " " + doctorProfile.last_name
-          } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
+          var sendData = `<div>The appoinment with Dr. ${doctorProfile.first_name + " " + doctorProfile.last_name
+            } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
 
           generateTemplate(
             EMAIL.generalEmail.createTemplate(result, {
@@ -9178,7 +9275,7 @@ router.delete("/marketing_user/:email", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-var email = req.params.email && req.params.email.toLowerCase();
+    var email = req.params.email && req.params.email.toLowerCase();
     const messageToSearchWith = new marketing_user({ email: email });
     messageToSearchWith.encryptFieldsSync();
     marketing_user.deleteOne(
