@@ -237,7 +237,7 @@ router.post("/AddTask", function (req, res, next) {
           else {
             User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
               if (err && !doc) {
-                console.log("err", err)
+
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -348,7 +348,7 @@ router.post("/AddTask", function (req, res, next) {
 function ApproveReq(doc, start, end, date) {
   return new Promise((resolve, reject) => {
     try {
-      console.log("user_data", date)
+
       let date_fn = moment(date).format("YYYY-MM-DD")
       sendData = `Dear Patient<br/>
       Your request for the sick leave certificate is accepted by the doctor on 
@@ -2109,7 +2109,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           req.body.patient_name +
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
-          "https://aimedix.com/approveHospital/" +
+          "https://virtualhospital.aimedis.io/approveHospital/" +
           req.body.case_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
@@ -2152,7 +2152,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://aimedix.com/approveHospital/" +
+          " https://virtualhospital.aimedis.io/approveHospital/" +
           req.body.case_id;
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
@@ -2549,12 +2549,9 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
                   if (err & !room) {
                     res.json({ status: 200, hassuccessed: true, error: err });
                   } else {
-                    // console.log("rooms", room[0].rooms)
                     // wards.rooms.forEach((element) => {
                     //   if (room[0].rooms._id == element._id) {
-                    //     console.log("element.room",element.room)
                     //     wards.cases = element.room
-                    //     console.log("wards",wards)
                     //     res.json({ status: 200, hassuccessed: true, data: wards })
                     //   }
 
@@ -3005,7 +3002,6 @@ router.post("/downloadPEBill", function (req, res, next) {
           bill2.push({ k: "bill_date", v: getDate(value, "YYYY/MM/DD") });
         }
       });
-      // console.log("data",Data)
     }
     let task_id = req.body.task_id;
     var VirtualtToSearchWith = new virtual_Task({ _id: task_id });
@@ -3040,7 +3036,6 @@ router.post("/downloadPEBill", function (req, res, next) {
           }
           else {
             var template = handlebars.compile(bill);
-
             var htmlToSend = template({
               bill2: bill2,
               admit: admit,
@@ -3058,6 +3053,7 @@ router.post("/downloadPEBill", function (req, res, next) {
               margin: { top: 80, bottom: 80, left: 60, right: 60 },
             };
 
+
             let file = [{ content: htmlToSend }];
             html_to_pdf.generatePdfs(file, options).then((output) => {
               const file = `${__dirname}/${filename}`;
@@ -3065,7 +3061,6 @@ router.post("/downloadPEBill", function (req, res, next) {
             });
           }
           else if (htmlToSend2) {
-            console.log(htmlToSend2)
             var options = {
               args: ["--no-sandbox", "--disable-setuid-sandbox"],
               format: "A4",
@@ -3102,7 +3097,7 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     newcf = [];
-    var patient_id = req.body.patient_id;
+    var patient_id = req.params.patient_id;
     const VirtualtToSearchWith = new virtual_Case({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
 
@@ -3194,7 +3189,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
     flatArraya = [];
     Inhospital = [];
     InhopspitalInvoice = [];
-    var patient_id = req.body.patient_id;
+    var patient_id = req.params.patient_id;
     const VirtualtToSearchWith = new virtual_Case({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
 
@@ -3313,7 +3308,6 @@ router.post("/TaskFilter", function (req, res) {
       });
 
       statuscheck = [...status, ...statuscheck];
-      console.log('statuscheck', statuscheck)
       condition.status = { $in: statuscheck };
     }
     if (req.body.speciality_id) {
@@ -3335,10 +3329,9 @@ router.post("/TaskFilter", function (req, res) {
 
     virtual_Task.find(condition, function (err, data) {
       if (err & !data) {
-        console.log("errr", err)
         res.json({ status: 200, hassuccessed: true, error: err });
       } else {
-        console.log("data", data)
+
         let condition3 = {
           house_id: {
             $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
@@ -3354,11 +3347,9 @@ router.post("/TaskFilter", function (req, res) {
 
           virtual_Case.find(condition3, function (err, data1) {
             if (err) {
-              console.log("err", err)
               res.json({ status: 200, hassuccessed: true, error: err });
             } else {
               var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id);
-              console.log("equals", equals)
               if (equals) {
                 res.json({ status: 200, hassuccessed: true, data: data1 });
               } else {
@@ -3768,7 +3759,6 @@ router.post("/LeftInfoPatient", function (req, res) {
                     },
                   ],
                   function (err, results) {
-                    console.log('results', results)
                     if (results && results.length > 0) {
                       leftdataPatient.done_task = results[0].done_task;
                       leftdataPatient.total_task = results[0].total_task;
@@ -4351,12 +4341,10 @@ router.post("/virtualstep2", function (req, res, next) {
 // router.get("/trackrecords", function (req, res) {
 //   const token = (req.headers.token)
 //   let legit = jwtconfig.verify(token)
-//   console.log("legit", legit)
 //   finaldata = []
 //   if (legit) {
 //     User.find().exec(function (err, data) {
 //       if (err) {
-//         console.log("err", err)
 //         res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
 
 //       }
@@ -4364,7 +4352,6 @@ router.post("/virtualstep2", function (req, res, next) {
 //         trackrecords = data.map((element) => {
 //           return element.track_record
 //         })
-//         // console.log("track", trackrecords)
 //         if (trackrecords.length > 0) {
 
 // //       }
@@ -4372,7 +4359,6 @@ router.post("/virtualstep2", function (req, res, next) {
 // //         trackrecords = data.map((element) => {
 // //           return element.track_record
 // //         })
-// //         // console.log("track", trackrecords)
 // //         if (trackrecords.length > 0) {
 
 // //           trackrecords.forEach((element2) => {
@@ -4383,9 +4369,7 @@ router.post("/virtualstep2", function (req, res, next) {
 // //               finaldata.push(lastdata[0].datetime_on)
 // //             }
 // //           })
-// //           console.log("finaldata", finaldata)
 // //           let finaldata1 = finaldata.length
-// //           console.log("finaldata123", finaldata1)
 // //           res.json({ status: 200, hassuccessed: true, data: finaldata1 })
 // //         }
 // //         else {
@@ -5350,14 +5334,17 @@ function taskfromhouseid(item) {
         VirtualtToSearchWith1.encryptFieldsSync();
         virtual_Task
           .find({
-            $or: [
-              { house_id: item.house_id },
-              { house_id: VirtualtToSearchWith.house_id },
-            ],
-            $or: [
-              { task_type: { $ne: "picture_evaluation" } },
-              { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-            ],
+            $and: [{
+              $or: [
+                { house_id: item.house_id },
+                { house_id: VirtualtToSearchWith.house_id },
+              ]
+            }, {
+              $or: [
+                { task_type: { $ne: "picture_evaluation" } },
+                { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+              ]
+            }]
           })
           .exec(function (err, task) {
             if (err) {
@@ -5535,8 +5522,7 @@ function virtualCase(House_id) {
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Case.countDocuments(
         {
-          house_id: { $in: [House_id, VirtualtToSearchWith.house_id] },
-          inhospital: true,
+          house_id: { $in: [House_id, VirtualtToSearchWith.house_id] }
         },
         function (err, count) {
           if (err) {

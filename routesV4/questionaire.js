@@ -181,7 +181,6 @@ router.put("/Question/:questionaire_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("userdata",userdata)
           res.json({
             status: 200,
             hassuccessed: true,

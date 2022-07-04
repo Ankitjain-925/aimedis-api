@@ -38,18 +38,15 @@ router.post("/MarketingMail", function (req, res) {
 
     let sendmail = transporter.sendMail(mailOptions);
     if (sendmail) {
-      console.log("emailsend")
       res.json({
         status: 200,
         message: "Mail sent Successfully",
         hassuccessed: true,
       });
     } else {
-      console.log("err")
       res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
   } else {
-    console.log("no email")
     res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
 
   }
@@ -86,7 +83,6 @@ router.post("/MarketingMail2", function (req, res) {
       res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
   } else {
-    console.log("no email")
     res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
   }
 });
@@ -118,7 +114,6 @@ router.post("/MarketingMail3", function (req, res) {
       res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
   } else {
-    console.log("no email")
     res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
   }
 });

@@ -383,7 +383,7 @@ router.post("/UserLogin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://aimedix.com/change-password";
+                      let link = "https://virtualhospital.aimedis.io/change-password";
                       var sendData =
                         "<div>Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -666,7 +666,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://aimedix.com/admin/change-password";
+                      let link = "https://virtualhospital.aimedis.io/admin/change-password";
                       var sendData =
                         "<div>Admin Aimedis Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -842,8 +842,8 @@ router.post("/UserntfCheck", function (req, res, next) {
 //   // Making POST request to verify captcha
 
 //       let token= "abchere"
-//       let link = "https://aimedix.com/";
-//       var verifylink = `https://aimedix.com/?token=${token}`
+//       let link = "https://virtualhospital.aimedis.io/";
+//       var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`
 //       let datacomposer = (lang, {verifylink}) => {
 //         return {};
 //       };
@@ -1047,8 +1047,8 @@ router.post("/AddUser", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-                            let link = "https://aimedix.com/";
-                            var verifylink = `https://aimedix.com/?token=${token}`;
+                            let link = "https://virtualhospital.aimedis.io/";
+                            var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`;
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1110,7 +1110,6 @@ router.post("/AddUser", function (req, res, next) {
                                   error: err,
                                 });
                               } else {
-                                console.log("doc", doc);
                                 res.json({
                                   status: 200,
                                   message: "User is added Successfully",
@@ -1284,7 +1283,6 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                 new Date(req.body.birthday).setHours(0, 0, 0, 0) ===
                 new Date(data2 && data2.birthday).setHours(0, 0, 0, 0)
               ) {
-                console.log("for birthday");
                 res.json({
                   status: 200,
                   message: "User is Already exist",
@@ -1332,8 +1330,6 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                 req.body.password = enpassword;
 
                 var user_id;
-                console.log("I am heereee");
-
                 if (req.body.country_code && req.body.mobile) {
                   authy
                     .registerUser({
@@ -1379,8 +1375,8 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-                            let link = "https://aimedix.com/";
-                            var verifylink = `https://aimedix.com/?token=${token}`;
+                            let link = "https://virtualhospital.aimedis.io/";
+                            var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`;
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1442,7 +1438,6 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                                   error: err,
                                 });
                               } else {
-                                console.log("doc", doc);
                                 res.json({
                                   status: 200,
                                   message: "User is added Successfully",
@@ -1485,8 +1480,8 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                       user_id = user_data._id;
                       let token = user_data.usertoken;
                       //let link = 'http://localhost:3000/';
-                      let link = "https://aimedix.com/";
-                      var verifylink = `https://aimedix.com/?token=${token}`;
+                      let link = "https://virtualhospital.aimedis.io/";
+                      var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`;
                       let datacomposer = (lang, { verifylink }) => {
                         return {};
                       };
@@ -1543,7 +1538,6 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                             error: err,
                           });
                         } else {
-                          console.log("doc", doc);
                           res.json({
                             status: 200,
                             message: "User is added Successfully",
@@ -1561,7 +1555,6 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
       });
   }
   // } else {
-  //   console.log("1")
   //   res.json({
   //     status: 200,
   //     hassuccessed: false,
@@ -1570,7 +1563,6 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
   // }
   // })
   //   .catch(function (error) {
-  //     console.log("err", error)
   //     res.json({
   //       status: 200,
   //       hassuccessed: false,
@@ -1673,7 +1665,6 @@ function emptyBucket(bucketName, foldername) {
     if (err) return err;
 
     if (data.Contents.length == 0) {
-      console.log("Bucket is empty!");
     } else {
       params = { Bucket: bucketName };
       params.Delete = { Objects: [] };
@@ -3154,7 +3145,6 @@ router.put("/GetPrescription/:Prescription_id", function (req, res, next) {
                                 }
                               );
                             } else {
-                              console.log("I am hereeee");
                               res.json({
                                 status: 200,
                                 hassuccessed: true,
@@ -4216,7 +4206,6 @@ router.get("/PastAppintmentPat", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     const patient = legit.id;
-    console.log("patient", patient);
     const messageToSearchWith = new Appointment({ patient });
     messageToSearchWith.encryptFieldsSync();
     Appointment.find(
@@ -4242,7 +4231,6 @@ router.get("/PastAppintmentPat", function (req, res, next) {
             msg: "Something went wrong",
           });
         } else {
-          console.log("results", results);
           forEachPromise(results, GetPastAppoint).then((result) => {
             res.json({
               status: 200,
@@ -4480,7 +4468,6 @@ function GetUpcomingAppoint(item) {
                 docProfile.mobile = doc3.mobile;
               }
             }
-            console.log("sdfsdfsf", new_data);
             new_data.docProfile = {
               patient_id: doc3 && doc3.profile_id,
               first_name: doc3 && doc3.first_name,
@@ -4504,7 +4491,6 @@ function GetUpcomingAppoint(item) {
           resolve(GetUpcomingAppoint1);
         });
       // } else {
-      //   console.log("I am here36", item.appointment_type);
       //   GetUpcomingAppoint1.push(item);
       //   resolve(GetUpcomingAppoint1);
       // }
@@ -4519,7 +4505,6 @@ function GetPastAppoint(item) {
       User.findOne({ type: "doctor", _id: item.doctor_id })
         .exec()
         .then(function (doc3) {
-          console.log("doc3", doc3);
           if (doc3) {
             if (item.appointment_type === "appointments") {
               if (
@@ -4530,7 +4515,6 @@ function GetPastAppoint(item) {
                 new_data.custom_text = custom_text;
               }
             }
-            console.log("sdfsdfsf", new_data);
             new_data.docProfile = {
               patient_id: doc3 && doc3.profile_id,
               first_name: doc3 && doc3.first_name,
@@ -4543,11 +4527,9 @@ function GetPastAppoint(item) {
               phone: doc3 && doc3.phone,
             };
           }
-          console.log("3");
           return new_data;
         })
         .then(function (new_data) {
-          console.log("final_data", new_data);
           GetPastAppoint1.push(new_data);
           resolve(GetPastAppoint1);
         })
@@ -5870,7 +5852,7 @@ router.post("/abletocancel/:doctor_id", function (req, res, next) {
             : req.body.appointment_type === "online_apointment"
               ? Userinfo.online_appointment
               : Userinfo.days_for_practices;
-        console.log("appot[0].appointment_hours", appot[0].appointment_hours);
+
         if (appot && appot.length > 0 && appot[0].appointment_hours) {
           if (req.body.timedifference >= appot[0].appointment_hours) {
             res.json({
@@ -8227,13 +8209,12 @@ router.post("/forgotPassword", function (req, res, next) {
           token = jwtconfig.sign(payload);
           setTimeout(() => resolve(user_data1, token), 500);
           promise.then((user_data1) => {
-            console.log("userdata1", user_data1);
             if (token !== "") {
-              var link = "https://aimedix.com/change-password?token=" + token;
+              var link = "https://virtualhospital.aimedis.io/change-password?token=" + token;
               if (req.body.passFrom === "landing") {
                 // link = '/change-password';
-                // link = 'https://aimedix.com/change-password'
-                link = "https://aimedix.com/change-password?token=" + token;
+                // link = 'https://virtualhospital.aimedis.io/change-password'
+                link = "https://virtualhospital.aimedis.io/change-password?token=" + token;
               }
               // link = 'http://localhost:3000/change-password';
               var lan1 = getMsgLang(user_data1._id);
@@ -8403,8 +8384,8 @@ router.post("/AskPatient/:id", function (req, res, next) {
       .exec()
       .then((user_data1) => {
         if (user_data1) {
-          // var Link1 = 'https://aimedix.com/patient'
-          var Link1 = "https://aimedix.com/patient";
+          // var Link1 = 'https://virtualhospital.aimedis.io/patient'
+          var Link1 = "https://virtualhospital.aimedis.io/patient";
 
           var lan1 = getMsgLang(user_data1._id);
           lan1.then((result) => {
@@ -9060,7 +9041,6 @@ router.post("/MailSendToDr", function (req, res) {
                   html: html,
                 };
                 let sendmail1 = transporter.sendMail(mailOptions1);
-                console.log("sendmail1", sendmail1);
                 if (sendmail1) {
                   console.log("Mail sents");
                 }
@@ -9084,7 +9064,6 @@ router.post("/MailSendToDr", function (req, res) {
               };
 
               let sendmail = transporter.sendMail(mailOptions);
-              console.log("sendmail", sendmail);
               if (sendmail) {
                 res.json({
                   status: 200,
@@ -9260,7 +9239,6 @@ router.post("/verifyStripe", (req, res) => {
           res.json({ success: false, product: [], error: error, message: "" });
         });
     } catch (error) {
-      console.log(error, "eeror");
       res.json({
         success: false,
         product: [],
@@ -9287,7 +9265,6 @@ router.delete("/marketing_user/:email", function (req, res) {
       },
       function (err, data) {
         if (err) {
-          console.log("err", err);
           res.json({
             status: 200,
             message: "Something went wrong.",
@@ -9318,7 +9295,6 @@ router.post("/marketing_user", function (req, res, next) {
   var email = req.body.email.toLowerCase();
   req.body.email = email;
   datas = { ...req.body };
-  console.log(req.body.email);
   var marketing_users = new marketing_user(datas);
 
   marketing_users.save(function (err, user_data) {

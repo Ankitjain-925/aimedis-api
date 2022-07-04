@@ -147,6 +147,8 @@ router.get("/patient", function (req, res, next) {
                     first_name: doc[0].first_name,
                     image: doc[0].image,
                     profile_id: doc[0].profile_id,
+                    blood_group:doc[0].blood_group,
+                    rhesus:doc[0].rhesus
                   };
                   res.json({
                     status: 200,
@@ -174,6 +176,8 @@ router.get("/patient", function (req, res, next) {
                   first_name: doc[0].first_name,
                   image: doc[0].image,
                   profile_id: doc[0].profile_id,
+                  blood_group:doc[0].blood_group,
+                  rhesus:doc[0].rhesus
                 };
                 res.json({
                   status: 200,
@@ -356,6 +360,8 @@ router.get("/patient/:patient_id", function (req, res, next) {
                     first_name: doc[0].first_name,
                     image: doc[0].image,
                     profile_id: doc[0].profile_id,
+                    blood_group:doc[0].blood_group,
+                    rhesus:doc[0].rhesus
                   };
                   res.json({
                     status: 200,
@@ -383,6 +389,8 @@ router.get("/patient/:patient_id", function (req, res, next) {
                   first_name: doc[0].first_name,
                   image: doc[0].image,
                   profile_id: doc[0].profile_id,
+                  blood_group:doc[0].blood_group,
+                  rhesus:doc[0].rhesus
                 };
                 res.json({
                   status: 200,

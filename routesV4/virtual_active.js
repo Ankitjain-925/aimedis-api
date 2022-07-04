@@ -1,10 +1,6 @@
 require("dotenv").config();
-var aws = require("aws-sdk");
-
 var re = require("../regions.json");
-
 const axios = require("axios");
-
 var express = require("express");
 let router = express.Router();
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
@@ -168,7 +164,6 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
     User.find({ current_available: true, institute_id: institute_id })
       .countDocuments()
       .exec(function (err, total) {
-        console.log("total", total);
         var random = Math.floor(Math.random() * total);
         if (total > 1) {
           User.find({ current_available: true, institute_id: institute_id })
@@ -204,21 +199,19 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                       custom_text =
                         Userinfo[i].sickleave_appointment[j].custom_text;
                     }
-                    console.log("qwwer", userdata[i].sickleave_appointment[j]);
+
                     if (
                       (userdata[i].sickleave_appointment[j].monday_start,
                         userdata[i].sickleave_appointment[j].monday_end,
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots)
                     ) {
-                      console.log("1");
                       monday = getTimeStops(
                         userdata[i].sickleave_appointment[j].monday_start,
                         userdata[i].sickleave_appointment[j].monday_end,
                         userdata[i].sickleave_appointment[j]
                           .duration_of_timeslots
                       );
-                      console.log("w", monday);
                     }
                     if (
                       (userdata[i].sickleave_appointment[j].tuesday_start,
@@ -308,7 +301,6 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                       sunday,
                       custom_text,
                     });
-                    console.log("user", user);
                   }
                   finalArray.push({
                     data: userdata[i],
@@ -380,15 +372,12 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
     virtual_Task.find(
       {
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+        archived: { $ne: true },
         $or: [
           { task_type: { $eq: "sick_leave" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
-        $or: [
-          { archived: { $ne: true } },
-          { archived: { $exists: false } }
-        ]
-
+     
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -399,7 +388,6 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("user", userdata)
           if (userdata.length > 0) {
             res.json({ status: 200, hassuccessed: true, data: userdata });
           } else {
@@ -772,16 +760,13 @@ router.post("/AddMeeting", function (req, res, next) {
 
 //     {
 
-//       console.log("file", req.body.fileattach[0].filename.split("&")[0]);
+//     
 //       var work=req.body.fileattach[0].filename.split("&")[0];
 //       work_f = work.split(".com/")[1]
-//       console.log("birthday", work_f);
-//       console.log("file", req.body.fileattach[1].filename.split("&")[0]);
+
 //       var work1 = req.body.fileattach[1].filename.split("&")[0];
 //       work_f1 = work1.split(".com/")[1]
-//       console.log("b", work_f1);
 //       // GetDatafromAws(work-f, work_f1).then((result) => {
-//       //   console.log("result", result)
 //       //   new_link.push(result)
 
 
@@ -825,7 +810,7 @@ router.post("/AddMeeting", function (req, res, next) {
 //           });
 //           //return err;
 //         } else {
-//           console.log("url", url);
+
 
 //       s3.getSignedUrl("getObject", params1, function (err, url1) {
 //         if (err) {
@@ -837,8 +822,7 @@ router.post("/AddMeeting", function (req, res, next) {
 //           //return err;
 //         } else {
 //           image.push({v:url1})
-//           console.log("url", url1);
-//           console.log("url", image);
+
 
 //       Object.entries(req.body).map(([key, value]) => {
 //         if (key === "info") {
@@ -870,22 +854,18 @@ router.post("/AddMeeting", function (req, res, next) {
 //           });
 //         }
 
-//         console.log("work_since", work_since);
 //       });
-//       // console.log("work_since", req.body);
 //       let newperson = {
 //         ...req.body,
 //         img: url,
 //         img1: url1
 //       }
-//       console.log(newperson);
 //       let data1 = date1.map((element) => {
 //         return element.v;
 //       });
 
 //       var template = handlebars.compile(sick);
 //       let house_name = "";
-//       console.log("work_sinc",image);
 
 //       var htmlToSend = template({
 
@@ -942,9 +922,7 @@ router.post("/AddMeeting", function (req, res, next) {
 //                   };
 
 //                   let sendmail = transporter.sendMail(mailOptions);
-//                   console.log("mail", mailOptions);
 //                   if (sendmail) {
-//                     console.log("Mail is sent ");
 
 //                     res.json({
 //                       status: 200,
@@ -952,7 +930,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //                       hassuccessed: true,
 //                     });
 //                   } else {
-//                     console.log("err");
 //                     res.json({
 //                       status: 200,
 //                       msg: "Mail is not sent",
@@ -960,7 +937,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //                     });
 //                   }
 //                 } else {
-//                   console.log("no email");
 //                   res.json({
 //                     status: 200,
 //                     msg: "Mail is not sent",
@@ -982,7 +958,6 @@ router.post("/AddMeeting", function (req, res, next) {
 // });
 //     }
 //   } catch (e) {
-//     console.log("e", e);
 //     res.json({
 //       status: 200,
 //       hassuccessed: false,
@@ -1036,7 +1011,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //             });
 //             //return err;
 //           } else {
-//             console.log("url", url);
 
 //           }
 //         });
@@ -1049,7 +1023,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //             });
 //             //return err;
 //           } else {
-//             console.log("url", url1);
 
 //           }
 //         });
@@ -1083,7 +1056,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
 
     GetDatafromAws(comming, comming2).then((result) => {
-      console.log(result)
       new_link.push(result)
 
 
@@ -1199,7 +1171,6 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     })
   }
   catch (e) {
-    console.log("e", e)
     res.json({
       status: 200,
       hassuccessed: false,
@@ -1227,7 +1198,6 @@ function GetDatafromAws(comming, comming2) {
               Data.forEach((element) => {
 
                 GetDatafromAws1(element, comming2).then((result) => {
-                  console.log("result", result)
                   new_link.push({ v: result })
                   resolve(new_link)
                 })
@@ -1274,7 +1244,6 @@ function GetDatafromAws1(element, comming2) {
         Bucket: bucket, // your bucket name,
         Key: file2, // path to the object you're looking for
       };
-      console.log("params", params)
       aws.config.update({
         region: data[0].region,
         accessKeyId: process.env.S3_ACCESS_KEY,
@@ -1284,11 +1253,6 @@ function GetDatafromAws1(element, comming2) {
       var s3 = new aws.S3({ apiVersion: "2006-03-01" });
 
       s3.getSignedUrl("getObject", params, function (err, url) {
-
-        // console.log("url",url)
-        // new_link.push({ v: url })
-        // console.log("data", new_link)
-
         resolve(url)
       });
     } catch (e) {
@@ -1397,12 +1361,29 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       if (userdata !== null) {
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          message: "link active",
-                          data: { Task: userdata, Session: data },
-                        });
+                        User.findOne({ _id: data.patient_id }, function (err, result) {
+                          if(err && !result){
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "link active",
+                              data: { Task: userdata, Session: data },
+                            });
+                          }
+                          else{
+                            var patient_info = userdata.patient;
+                            patient_info['image'] = result.image;
+                            userdata.patient = patient_info
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "link active",
+                              data: { Task: userdata, Session: data },
+                            });
+                          }
+                        })
+
+                        
                       }
                       else {
                         const VirtualtToSearchWith = new sick_meeting({
@@ -1475,8 +1456,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   //   });
   // }
 });
-
-
 
 
 router.post("/AddMeeting/:user_id", function (req, res, next) {
@@ -1625,54 +1604,51 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
 });
 
 
-var cron = require('node-cron');
-router.put("/linkarchive", function (req, res, next) {
-  cron.schedule('1 * * * * *', () => {
-    sick_meeting.find()
-      .exec(function (err, doc1) {
-        if (err && !doc1) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "update data failed",
-            error: err,
-          });
-        } else {
-          console.log("doc1", doc1)
-          let ttime = moment(Date.now()).format("YYYY-MM-DD")
-          // let final= doc1.map((element)=>{
-          //   return element.endtime
-          // })
+// var cron = require('node-cron');
+// router.put("/linkarchive", function (req, res, next) {
+//   cron.schedule('1 * * * * *', () => {
+//     sick_meeting.find()
+//       .exec(function (err, doc1) {
+//         if (err && !doc1) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "update data failed",
+//             error: err,
+//           });
+//         } else {
+//           let ttime = moment(Date.now()).format("YYYY-MM-DD")
+//           // let final= doc1.map((element)=>{
+//           //   return element.endtime
+//           // })
 
-          doc1.forEach((element) => {
+//           doc1.forEach((element) => {
 
-            var enddate = moment(element.date).format("YYYY-MM-DD");
-
-
-            if (moment(ttime).diff(enddate, 'days') > 2) {
-              virtual_Task.updateMany({
-                _id: element.task_id, $or: [
-                  { meetingjoined: { $ne: true } },
-                  { meetingjoined: { $exists: false } }
-                ]
-              }, { archived: true }, function (err, data) {
-                if (err) {
-                  console.log("err", err)
-                }
-                else {
-                  console.log("data", data)
-                }
-              })
+//             var enddate = moment(element.date).format("YYYY-MM-DD");
 
 
-            }
+//             if (moment(ttime).diff(enddate, 'days') > 2) {
+//               virtual_Task.updateMany({
+//                 _id: element.task_id, $or: [
+//                   { meetingjoined: { $ne: true } },
+//                   { meetingjoined: { $exists: false } }
+//                 ]
+//               }, { archived: true }, function (err, data) {
+//                 if (err) {
+//                 }
+//                 else {
+//                 }
+//               })
 
-          })
-        }
-      }
-      );
-  })
-});
+
+//             }
+
+//           })
+//         }
+//       }
+//       );
+//   })
+// });
 
 
 router.post("/sickarchive", function (req, res) {
@@ -1680,7 +1656,6 @@ router.post("/sickarchive", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    console.log("1")
     task_type = "sick_leave"
     const VirtualtToSearchWith = new virtual_Task({
       task_type
@@ -1695,7 +1670,6 @@ router.post("/sickarchive", function (req, res) {
 
     virtual_Task.findOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith2.patient_id] }, archived: true, task_type: { $in: [task_type, VirtualtToSearchWith.task_type] } }, function (err, data) {
       if (err) {
-        console.log("err", err)
         res.json({
           status: 200,
           hassuccessed: false,
@@ -1703,7 +1677,6 @@ router.post("/sickarchive", function (req, res) {
         });
 
       } else {
-        console.log("data", data)
         if (data != null) {
           res.json({
             status: 200,
@@ -1748,27 +1721,20 @@ router.get("/GetAmount/:house_id", function (req, res) {
           message: "Something went wrong",
         });
       } else {
-        // console.log("data", data);
         if (data) {
           data.institute_groups.map((item) => {
-            // console.log("item", item);
+           
             item.houses.map((item2) => {
-              // console.log("item", item2);
-
+ 
               if (item2.house_id == req.params.house_id) {
 
 
                 if (item2.sickleave_certificate_amount !== "") {
 
                   userdata = item2.sickleave_certificate_amount;
-                  console.log("item1");
                 }
                 else {
                   userdata = item2.sickleave_certificate_amount = "20";
-
-                  console.log("item2");
-
-
                 }
               }
             });
@@ -1821,7 +1787,6 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
 
       // 
       function (err, data) {
-        console.log('data', err)
         if (err && !data) {
           res.json({
             status: 200,

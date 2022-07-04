@@ -147,7 +147,6 @@ router.get('/GetStep/:house_id',function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
       } else {
         if (userdata) {
-          console.log("userdata", userdata)
           if (userdata.steps && userdata.steps.length > 0) {
             forEachPromise(userdata.steps, getCaes).then((data) => {
               res.json({
@@ -460,14 +459,11 @@ router.get('/GetStep/:house_id',function (req, res, next) {
 // })
 
 function getCaes(data1) {
-  console.log('dataaaaa', data1)
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       fullinfo = [];
       if (data1.case_numbers && data1.case_numbers.length > 0) {
-        console.log("case1", data1.case_numbers)
         forEachPromise(data1.case_numbers, getfullInfo).then((data) => {
-          console.log("data", data)
           var finald = data1;
           finald.case_numbers = data;
           newDatafull.push(finald);
@@ -486,11 +482,9 @@ function getfullInfo(data) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       if (data.case_id) {
-        console.log("data1", data)
         virtual_cases.findOne({ _id: data.case_id.toString() })
           .exec()
           .then(function (doc3) {
-            console.log("doc3", doc3)
             if (doc3) {
               User.findOne({ _id: doc3.patient_id })
                 .exec()
@@ -564,7 +558,6 @@ function getfullInfo(data) {
           });
       }
       else {
-        console.log("fullinfo", fullinfo)
         resolve(fullinfo);
       }
     });
