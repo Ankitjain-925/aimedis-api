@@ -3433,6 +3433,10 @@ router.post("/CalenderFilter", function (req, res) {
       var condition = {
         house_id: { $in: [req.body.house_id, VirtualtToSearchWith1.house_id] },
       };
+      var condition = {
+        task_type: { $exists: false },
+      };
+
 
       if (req.body.speciality_id) {
         condition["speciality._id"] = req.body.speciality_id;
@@ -5558,7 +5562,11 @@ function virtualTask(house_id) {
       const VirtualtToSearchWith = new virtual_Task({ house_id: house_id });
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Task.find(
-        { house_id: { $in: [house_id, VirtualtToSearchWith.house_id] } },
+        {
+          house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
+          task_type: { $exists: false },
+        },
+
         function (err, list) {
           if (err) {
             reject(err);
