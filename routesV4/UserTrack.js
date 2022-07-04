@@ -297,7 +297,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
               msg: "User is not found",
             });
           } else {
-            console.log("created_by", created_by);
             user.findOne({ _id: created_by }).then((docUser) => {
               if (docUser) {
                 var data = req.body.data;
@@ -355,7 +354,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
                   //      pharmacy_phone : data.pharma.mobile || ''
                   //     }),
                   //     (err, data) => {
-                  //         console.log('I am here22')
                   //       if (!err) {
                   //         var mailOptions = {
                   //                     from: "contact@aimedis.com",
@@ -365,7 +363,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
                   //                 };
                   //                 var sendmail = transporter.sendMail(mailOptions)
                   //                 if (sendmail) {
-                  //                     console.log('Mail is sent')
                   //                 }
                   //       }
                   //     }
@@ -381,7 +378,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
                   //     };
                   //     var sendmail = transporter.sendMail(mailOptions)
                   //     if (sendmail) {
-                  //         console.log('Mail is sent')
                   //     }
                   // });
                   var sendData2 =
@@ -415,7 +411,6 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
                 //     };
                 //     let sendmail = transporter.sendMail(mailOptions)
                 //     if(sendmail){
-                //         console.log('Mail is sent')
                 //     }
               }
             });
@@ -813,7 +808,6 @@ router.post("/appointment", function (req, res) {
             doctor_phone: req.body.patient_info.phone,
           }),
           (error, html2) => {
-            console.log("html2", html2);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -824,7 +818,6 @@ router.post("/appointment", function (req, res) {
                 ),
                 html: html2,
               };
-              console.log("mailOptions1",mailOptions)
               let sendmail = transporter.sendMail(mailOptions);
               if (sendmail) {
                 console.log("Mail is sent ");
@@ -886,7 +879,6 @@ router.post("/appointment", function (req, res) {
             patient_phone: req.body.patient_info.phone,
           }),
           (error, html3) => {
-            console.log("html3", html3);
             if (!error) {
               let mailOptions = {
                 from: "contact@aimedis.com",
@@ -1113,7 +1105,6 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
   trackrecord1 = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  console.log('legit45', legit)
   if (legit) {
     if (req.params.UserId === legit.id) {
       user.find({ _id: req.params.UserId }, function (err, doc) {
@@ -1171,7 +1162,6 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
                   doc[0].track_record.sort(mySorter);
                   if (doc[0].track_record.length > 0) {
                     if (doc[0].track_record.length > 0) {
-                      console.log('doc34', doc34.profile_id)
                       forEachPromises(
                         doc[0].track_record,
                         doc[0].Rigt_management[0],
@@ -1561,7 +1551,6 @@ function getAlltrack1(data, right_management, trusted_doctor, current_user) {
                   end_date = end_date.setDate(end_date.getDate() + 1);
                   var d2 = new Date(end_date).setHours(0, 0, 0, 0);
                   if (d1 >= d2) {
-                    console.log("rrr45r");
                     trackrecord1.push(new_data);
                   }
                 }
@@ -1602,7 +1591,6 @@ function getAlltrack1(data, right_management, trusted_doctor, current_user) {
                   let end_date = new Date(right_management.opt_until);
                   end_date = end_date.setDate(end_date.getDate() + 1);
                   var d2 = new Date(end_date).setHours(0, 0, 0, 0);
-                  console.log("rrrr");
                   if (d1 >= d2) {
                     trackrecord1.push(new_data);
                   }

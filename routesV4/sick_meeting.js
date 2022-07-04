@@ -137,17 +137,13 @@ router.post("/DoctorMail", function (req, res) {
           html: html,
         };
         let sendmail = transporter.sendMail(mailOptions);
-        console.log("mail", mailOptions);
         if (sendmail) {
-          console.log("Mail is sent ");
-
           res.json({
             status: 200,
             message: "Mail sent Successfully",
             hassuccessed: true,
           });
         } else {
-          console.log("err");
           res.json({
             status: 200,
             msg: "Mail is not sent",
@@ -155,7 +151,6 @@ router.post("/DoctorMail", function (req, res) {
           });
         }
       } else {
-        console.log("no email");
         res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
       }
     }
@@ -198,17 +193,13 @@ router.post("/approvedrequest/:task_id", function (req, res) {
                   html: html,
                 };
                 let sendmail = transporter.sendMail(mailOptions);
-                console.log("mail", mailOptions);
                 if (sendmail) {
-                  console.log("Mail is sent ");
-
                   res.json({
                     status: 200,
                     message: "Mail sent Successfully",
                     hassuccessed: true,
                   });
                 } else {
-                  console.log("err");
                   res.json({
                     status: 200,
                     msg: "Mail is not sent",
@@ -216,7 +207,6 @@ router.post("/approvedrequest/:task_id", function (req, res) {
                   });
                 }
               } else {
-                console.log("no email");
                 res.json({
                   status: 200,
                   msg: "Mail is not sent",
@@ -266,7 +256,6 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
   if (legit) {
     var sick_meetings = new sick_meeting(req.body);
     sick_meetings.save(function (err, user_data) {
-      console.log("err", err);
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
