@@ -1574,7 +1574,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
 router.put("/joinmeeting/:task_id", function (req, res, next) {
   virtual_Task.findOneAndUpdate(
     { _id: req.params.task_id },
-    { meetingjoined: true },
+    { $set: { meetingjoined: true } },
     (err, doc1) => {
       if (err && !doc1) {
         res.json({
