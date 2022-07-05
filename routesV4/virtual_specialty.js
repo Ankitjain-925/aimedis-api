@@ -5523,7 +5523,8 @@ function virtualCase(House_id) {
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Case.countDocuments(
         {
-          house_id: { $in: [House_id, VirtualtToSearchWith.house_id] }
+          house_id: { $in: [House_id, VirtualtToSearchWith.house_id] },
+          inhospital: true,
         },
         function (err, count) {
           if (err) {
