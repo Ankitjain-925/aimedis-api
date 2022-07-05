@@ -120,7 +120,7 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
   
   if (legit) {
     virtual_Task.find(
-      { approved_date: req.body.date, task_type: "sick_leave"},
+      { date: req.body.date, task_type: "sick_leave"},
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -1348,7 +1348,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                 message: "Link will active soon",
               });
             } else if (moment(today).isSame(data_d)) {
-              if (data_start <= ttime && data_end >= ttime) {
+              if (data_start > ttime) {
                 virtual_Task.findOne(
                   { _id: data.task_id, is_payment: true },
                   function (err, userdata) {
@@ -1371,6 +1371,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                             });
                           }
                           else{
+                            console.log(userdata.patient)
                             var patient_info = userdata.patient;
                             patient_info['image'] = result.image;
                             userdata.patient = patient_info
@@ -1417,7 +1418,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     }
                   }
                 );
-              } else if (data_start > ttime) {
+              } else if (data_start <= ttime && data_end >= ttime) {
                 res.json({
                   status: 200,
                   hassuccessed: false,
