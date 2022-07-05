@@ -120,7 +120,7 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
   
   if (legit) {
     virtual_Task.find(
-      { approved_date: req.body.date, task_type: "sick_leave"},
+      { date: req.body.date, task_type: "sick_leave"},
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
