@@ -99,6 +99,21 @@ var CaseSchema = new Schema({
         required: false,
         unique: false
     },
+    entries:  {    
+        type: String,
+        required: false,
+        unique: false
+    },
+    step: {
+        type: Object,
+        required: false,
+        unique: false
+    },
+    document_file: {
+        type: String,
+        required: false,
+        unique: false
+    },
     status:{
         type: Number,
         required: false,
