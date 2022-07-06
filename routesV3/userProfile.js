@@ -507,7 +507,7 @@ router.post('/AddUser', function (req, res, next) {
                                         user_id = user_data._id;
                                         let token = user_data.usertoken;
                                         //let link = 'http://localhost:3000/';
-                                        let link = 'https://aimedix.com/';
+                                        let link = 'https://aidoc.io/';
                                         let mailOptions = {
                                             from: "contact@aimedis.com",
                                             to: req.body.email,
@@ -3637,11 +3637,11 @@ router.post('/forgotPassword', function (req, res, next) {
     });
     promise.then((token) => {
         if (token !== '') {
-            var link = 'https://aimedix.com/change-password';
+            var link = 'https://aidoc.io/change-password';
             if (req.body.passFrom === 'landing') {
                 link = '/change-password';
                 // link = 'https://aidoc.io/change-password'
-                link = 'https://aimedix.com/change-password';
+                link = 'https://aidoc.io/change-password';
             }
             // var link = 'http://localhost:3000/change-password';
            
@@ -3758,7 +3758,7 @@ router.post('/AskPatient/:id', function (req, res, next) {
             .then((user_data1) => {
                 if (user_data1) {
                     // var Link1 = 'https://aidoc.io/patient'
-                    var Link1 = 'https://aimedix.com/patient'
+                    var Link1 = 'https://aidoc.io/patient'
                     if (req.body.lan === 'de') {
                         var dhtml = 'Sie haben die Anfrage erhalten, einen neuen DOKTOR (' + req.body.first_name + ' ' + req.body.last_name + ')' +
                             ' zu Ihrer Liste vertrauenswürdiger privater Ärzte hinzuzufügen. Um diese Anfrage anzunehmen / abzulehnen / zu verschieben, folgen Sie bitte dem <a target="_blank" href="' + Link1 + '">LINK</a>.<br/><br/><br/> ' +

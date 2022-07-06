@@ -405,7 +405,7 @@ router.post('/AddUser', function (req, res, next) {
                                         user_id = user_data._id;
                                         let token = user_data.usertoken;
                                         //let link = 'http://localhost:3000/';
-                                        let link = 'https://aimedix.com/';
+                                        let link = 'https://aidoc.io/';
                                         let mailOptions = {
                                             from: "contact@aimedis.com",
                                             to: req.body.email,
@@ -2562,7 +2562,7 @@ router.post('/forgotPassword', function (req, res, next) {
     });
     promise.then((token) => {
         if (token !== '') {
-            var link = 'https://aimedix.com/change-password';
+            var link = 'https://aidoc.io/change-password';
             // var link = 'http://localhost:3000/change-password';
             console.log('sdfsdf', req.body.lan)
             if (req.body.lan === 'de') {
