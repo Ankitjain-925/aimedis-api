@@ -119,8 +119,15 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   
   if (legit) {
+    
+    const VirtualtToSearchWith = new virtual_Task({ task_type: "sick_leave" });
+     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find(
-      { date: req.body.date, task_type: "sick_leave"},
+      {
+        $or: [
+       { task_type: { $eq: "sick_leave" } },
+       { task_type: { $eq: VirtualtToSearchWith.task_type } },
+     ],},
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -131,9 +138,14 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
           });
         } else {
           var arr = [];
-          for (i = 0; i < user_data.length; i++) {
-            start = user_data[i].start
-            end = user_data[i].end
+          var newData = user_data.filter(
+            (item) =>
+              moment(item.date).format("MM/DD/YYYY") ===
+              moment(req.body.date).format("MM/DD/YYYY")
+          );
+          for (i = 0; i < newData.length; i++) {
+            start = newData[i].start
+            end = newData[i].end
             arr.push({ start: start, end: end })
           }
           res.json({
@@ -1361,7 +1373,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       if (userdata !== null) {
-                        User.findOne({ _id: data.patient_id }, function (err, result) {
+                        User.findOne({ _id: userdata.patient_id }, function (err, result) {
                           if(err && !result){
                             res.json({
                               status: 200,
@@ -1371,15 +1383,29 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                             });
                           }
                           else{
-                            var patient_info = userdata.patient;
-                            patient_info['image'] = result.image;
-                            userdata.patient = patient_info
-                            res.json({
-                              status: 200,
-                              hassuccessed: true,
-                              message: "link active",
-                              data: { Task: userdata, Session: data },
-                            });
+                            if(result !== null){
+                              var patient_info = userdata.patient;
+                              patient_info['image'] = result.image;
+                              userdata.patient = patient_info
+                              res.json({
+                                status: 200,
+                                hassuccessed: true,
+                                message: "link active",
+                                data: { Task: userdata, Session: data },
+                              });
+                            }
+                            else{
+                              var patient_info = userdata.patient;
+                              patient_info['image'] = 'insidenull.jpg';
+                              userdata.patient = patient_info
+                              res.json({
+                                status: 200,
+                                hassuccessed: true,
+                                message: "link active",
+                                data: { Task: userdata, Session: data },
+                              });
+                            }
+                         
                           }
                         })
 

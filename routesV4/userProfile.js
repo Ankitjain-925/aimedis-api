@@ -383,7 +383,7 @@ router.post("/UserLogin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://virtualhospital.aimedis.io/change-password";
+                      let link = "https://virtualhospital.aidoc.io/change-password";
                       var sendData =
                         "<div>Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -666,7 +666,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://virtualhospital.aimedis.io/admin/change-password";
+                      let link = "https://virtualhospital.aidoc.io/admin/change-password";
                       var sendData =
                         "<div>Admin Aimedis Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -842,8 +842,8 @@ router.post("/UserntfCheck", function (req, res, next) {
 //   // Making POST request to verify captcha
 
 //       let token= "abchere"
-//       let link = "https://virtualhospital.aimedis.io/";
-//       var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`
+//       let link = "https://virtualhospital.aidoc.io/";
+//       var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`
 //       let datacomposer = (lang, {verifylink}) => {
 //         return {};
 //       };
@@ -1047,8 +1047,8 @@ router.post("/AddUser", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-                            let link = "https://virtualhospital.aimedis.io/";
-                            var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`;
+                            let link = "https://virtualhospital.aidoc.io/";
+                            var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`;
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1375,8 +1375,8 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-                            let link = "https://virtualhospital.aimedis.io/";
-                            var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`;
+                            let link = "https://virtualhospital.aidoc.io/";
+                            var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`;
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1480,8 +1480,8 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                       user_id = user_data._id;
                       let token = user_data.usertoken;
                       //let link = 'http://localhost:3000/';
-                      let link = "https://virtualhospital.aimedis.io/";
-                      var verifylink = `https://virtualhospital.aimedis.io/?token=${token}`;
+                      let link = "https://virtualhospital.aidoc.io/";
+                      var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`;
                       let datacomposer = (lang, { verifylink }) => {
                         return {};
                       };
@@ -2050,15 +2050,15 @@ router.put("/Users/update", function (req, res, next) {
                       });
                     } else {
                       UpdateData(comming, legit.id).then((result) => {
-                        
-                        if (result) {
-                          res.json({
-                            status: 200,
-                            hassuccessed: true,
-                            message: "Updated",
-                          });
-                        }
+                          console.log('other things will update');
                       })
+                      
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "Updated",
+                        });
+                      
                     }
                   }
                 );
@@ -2078,16 +2078,14 @@ router.put("/Users/update", function (req, res, next) {
                 });
               } else {
                 UpdateData(comming, legit.id).then((result) => {
-                  if (result) {
-                    res.json({
-                      status: 200,
-                      hassuccessed: true,
-                      message: "Updated",
-                    });
-                  }
+                  console.log('will update')
 
                 })
-
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Updated",
+                  });
               }
             }
           );
@@ -7934,6 +7932,328 @@ router.get("/getLocation/:radius", function (req, res, next) {
   }
 });
 
+// router.get('/getLocation/:radius', function (req, res, next) {
+//   if (!req.query.speciality) {
+//       User.find({
+//           area: {
+//               $near: {
+//                   $maxDistance: Number(req.params.radius),
+//                   $geometry: {
+//                       type: "Point",
+//                       coordinates: [Number(req.query.longitude), Number(req.query.Latitude)]
+//                   }
+//               }
+//           }, type: 'doctor', 'paid_services.description': "appointment"
+//       }).find((error, Userinfo) => {
+//           if (error) {
+//               res.json({ status: 200, hassuccessed: false, error: error })
+//           } else {
+//               var finalArray = [];
+//               for (let i = 0; i < Userinfo.length; i++) {
+//                   var user = [];
+//                   var online_users = [];
+//                   var Practices = [];
+//                   var monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], custom_text = "", breakslot_start = "", breakslot_end = "", holidays_end = "", holidays_start = "", appointment_days = "";
+//                   if (Userinfo[i].we_offer && Userinfo[i].we_offer.Offer_office_prescription) {
+//                       for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
+//                           if (Userinfo[i].private_appointments[j].custom_text) {
+//                               custom_text = Userinfo[i].private_appointments[j].custom_text;
+//                           }
+//                           if (Userinfo[i].private_appointments[j].appointment_days) {
+//                               appointment_days = Userinfo[i].private_appointments[j].appointment_days;
+//                           }
+//                           if (Userinfo[i].private_appointments[j].holidays_start) {
+//                               holidays_start = Userinfo[i].private_appointments[j].holidays_start;
+//                           }
+//                           if (Userinfo[i].private_appointments[j].holidays_end) {
+//                               holidays_end = Userinfo[i].private_appointments[j].holidays_end;
+//                           }
+//                           if (Userinfo[i].private_appointments[j].breakslot_start) {
+//                               breakslot_start = Userinfo[i].private_appointments[j].breakslot_start;
+//                           }
+//                           if (Userinfo[i].private_appointments[j].breakslot_end) {
+//                               breakslot_end = Userinfo[i].private_appointments[j].breakslot_end;
+//                           }
+//                           if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                               monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].private_appointments[j].tuesday_start, Userinfo[i].private_appointments[j].tuesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                               tuesday = getTimeStops(Userinfo[i].private_appointments[j].tuesday_start, Userinfo[i].private_appointments[j].tuesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].private_appointments[j].wednesday_start, Userinfo[i].private_appointments[j].wednesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                               wednesday = getTimeStops(Userinfo[i].private_appointments[j].wednesday_start, Userinfo[i].private_appointments[j].wednesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].private_appointments[j].thursday_start, Userinfo[i].private_appointments[j].thursday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                               thursday = getTimeStops(Userinfo[i].private_appointments[j].thursday_start, Userinfo[i].private_appointments[j].thursday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].private_appointments[j].friday_start, Userinfo[i].private_appointments[j].friday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                               friday = getTimeStops(Userinfo[i].private_appointments[j].friday_start, Userinfo[i].private_appointments[j].friday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].private_appointments[j].saturday_start, Userinfo[i].private_appointments[j].saturday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                               saturday = getTimeStops(Userinfo[i].private_appointments[j].saturday_start, Userinfo[i].private_appointments[j].saturday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                               sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                           }
+
+//                           user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start, holidays_start, holidays_end, appointment_days })
+//                       }
+//                   }
+//                   monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], custom_text = "", breakslot_start = "", breakslot_end = "", holidays_start = "", holidays_end = "", appointment_days = "";
+//                   if (Userinfo[i].we_offer && Userinfo[i].we_offer.Offre_online_appointments) {
+//                       for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
+//                           if (Userinfo[i].online_appointment[k].appointment_days) {
+//                               appointment_days = Userinfo[i].online_appointment[k].appointment_days;
+//                           }
+//                           if (Userinfo[i].online_appointment[k].holidays_start) {
+//                               holidays_start = Userinfo[i].online_appointment[k].holidays_start;
+//                           }
+//                           if (Userinfo[i].online_appointment[k].holidays_end) {
+//                               holidays_end = Userinfo[i].online_appointment[k].holidays_end;
+//                           }
+//                           if (Userinfo[i].online_appointment[k].breakslot_start) {
+//                               breakslot_start = Userinfo[i].online_appointment[k].breakslot_start;
+//                           }
+//                           if (Userinfo[i].online_appointment[k].breakslot_end) {
+//                               breakslot_end = Userinfo[i].online_appointment[k].breakslot_end;
+//                           }
+//                           if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                               monday = getTimeStops(Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].online_appointment[k].tuesday_start, Userinfo[i].online_appointment[k].tuesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                               tuesday = getTimeStops(Userinfo[i].online_appointment[k].tuesday_start, Userinfo[i].online_appointment[k].tuesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].online_appointment[k].wednesday_start, Userinfo[i].online_appointment[k].wednesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                               wednesday = getTimeStops(Userinfo[i].online_appointment[k].wednesday_start, Userinfo[i].online_appointment[k].wednesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].online_appointment[k].thursday_start, Userinfo[i].online_appointment[k].thursday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                               thursday = getTimeStops(Userinfo[i].online_appointment[k].thursday_start, Userinfo[i].online_appointment[k].thursday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].online_appointment[k].friday_start, Userinfo[i].online_appointment[k].friday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                               friday = getTimeStops(Userinfo[i].online_appointment[k].friday_start, Userinfo[i].online_appointment[k].friday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].online_appointment[k].saturday_start, Userinfo[i].online_appointment[k].saturday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                               saturday = getTimeStops(Userinfo[i].online_appointment[k].saturday_start, Userinfo[i].online_appointment[k].saturday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                               sunday = getTimeStops(Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                           }
+//                           online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end, holidays_start, holidays_end, appointment_days })
+//                       }
+//                   }
+//                   if (Userinfo[i].we_offer && Userinfo[i].we_offer.Offer_practice_appointment) {
+
+//                       monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], custom_text = "", breakslot_start = "", breakslot_end = "", holidays_start = "", holidays_end = "", appointment_days = "";
+//                       for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+//                           if (Userinfo[i].days_for_practices[l].appointment_days) {
+//                               appointment_days = Userinfo[i].days_for_practices[l].appointment_days;
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].holidays_start) {
+//                               holidays_start = Userinfo[i].days_for_practices[l].holidays_start;
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].holidays_end) {
+//                               holidays_end = Userinfo[i].days_for_practices[l].holidays_end;
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].breakslot_start) {
+//                               breakslot_start = Userinfo[i].days_for_practices[l].breakslot_start;
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].breakslot_end) {
+//                               breakslot_end = Userinfo[i].days_for_practices[l].breakslot_end;
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                               monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                               tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                               wednesday = getTimeStops(Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                               thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                               friday = getTimeStops(Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                               saturday = getTimeStops(Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                           }
+//                           if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                               sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                           }
+//                           Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end, holidays_end, holidays_start, appointment_days })
+//                       }
+//                   }
+
+//                   finalArray.push({
+//                       data: Userinfo[i],
+//                       appointments: user,
+//                       online_appointment: online_users,
+//                       practice_days: Practices
+//                   })
+//               }
+//               res.json({ status: 200, hassuccessed: true, data: finalArray });
+//           }
+//       })
+//   } else {
+
+//       User.find({
+//           area: {
+//               $near: {
+//                   $maxDistance: Number(req.params.radius),
+//                   $geometry: {
+//                       type: "Point",
+//                       coordinates: [Number(req.query.longitude), Number(req.query.Latitude)]
+//                   }
+//               }
+//           }, type: 'doctor', 'speciality.value': req.query.speciality
+//       }).find((error, Userinfo) => {
+//           if (error) {
+//               res.json({ status: 200, hassuccessed: false, error: error })
+//           } else {
+//               var finalArray = [];
+
+//               for (let i = 0; i < Userinfo.length; i++) {
+//                   var user = [];
+//                   var online_users = [];
+//                   var Practices = [];
+//                   var monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], custom_text = "", breakslot_start = "", breakslot_end = "", holidays_end = "", holidays_start = "", appointment_days = "";
+//                   for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
+//                       if (Userinfo[i].private_appointments[j].custom_text) {
+//                           custom_text = Userinfo[i].private_appointments[j].custom_text;
+//                       }
+//                       if (Userinfo[i].private_appointments[j].appointment_days) {
+//                           appointment_days = Userinfo[i].private_appointments[j].appointment_days;
+//                       }
+//                       if (Userinfo[i].private_appointments[j].holidays_start) {
+//                           holidays_start = Userinfo[i].private_appointments[j].holidays_start;
+//                       }
+//                       if (Userinfo[i].private_appointments[j].holidays_end) {
+//                           holidays_end = Userinfo[i].private_appointments[j].holidays_end;
+//                       }
+//                       if (Userinfo[i].private_appointments[j].breakslot_start) {
+//                           breakslot_start = Userinfo[i].private_appointments[j].breakslot_start;
+//                       }
+//                       if (Userinfo[i].private_appointments[j].breakslot_end) {
+//                           breakslot_end = Userinfo[i].private_appointments[j].breakslot_end;
+//                       }
+//                       if (Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                           monday = getTimeStops(Userinfo[i].private_appointments[j].monday_start, Userinfo[i].private_appointments[j].monday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].private_appointments[j].tuesday_start, Userinfo[i].private_appointments[j].tuesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                           tuesday = getTimeStops(Userinfo[i].private_appointments[j].tuesday_start, Userinfo[i].private_appointments[j].tuesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].private_appointments[j].wednesday_start, Userinfo[i].private_appointments[j].wednesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                           wednesday = getTimeStops(Userinfo[i].private_appointments[j].wednesday_start, Userinfo[i].private_appointments[j].wednesday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].private_appointments[j].thursday_start, Userinfo[i].private_appointments[j].thursday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                           thursday = getTimeStops(Userinfo[i].private_appointments[j].thursday_start, Userinfo[i].private_appointments[j].thursday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].private_appointments[j].friday_start, Userinfo[i].private_appointments[j].friday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                           friday = getTimeStops(Userinfo[i].private_appointments[j].friday_start, Userinfo[i].private_appointments[j].friday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].private_appointments[j].saturday_start, Userinfo[i].private_appointments[j].saturday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                           saturday = getTimeStops(Userinfo[i].private_appointments[j].saturday_start, Userinfo[i].private_appointments[j].saturday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots) {
+//                           sunday = getTimeStops(Userinfo[i].private_appointments[j].sunday_start, Userinfo[i].private_appointments[j].sunday_end, Userinfo[i].private_appointments[j].duration_of_timeslots)
+//                       }
+//                       user.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, custom_text, breakslot_end, breakslot_start, holidays_end, holidays_start, appointment_days })
+//                   }
+//                   monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], breakslot_start = "", breakslot_end = "", holidays_end = "", holidays_start = "", appointment_days = "";
+//                   for (let k = 0; k < Userinfo[i].online_appointment.length; k++) {
+//                       if (Userinfo[i].private_appointments[k].appointment_days) {
+//                           appointment_days = Userinfo[i].online_appointment[k].appointment_days;
+//                       }
+//                       if (Userinfo[i].private_appointments[k].holidays_start) {
+//                           holidays_start = Userinfo[i].online_appointment[k].holidays_start;
+//                       }
+//                       if (Userinfo[i].private_appointments[k].holidays_end) {
+//                           holidays_end = Userinfo[i].online_appointment[k].holidays_end;
+//                       }
+//                       if (Userinfo[i].online_appointment[k].breakslot_start) {
+//                           breakslot_start = Userinfo[i].online_appointment[k].breakslot_start;
+//                       }
+//                       if (Userinfo[i].online_appointment[k].breakslot_end) {
+//                           breakslot_end = Userinfo[i].online_appointment[k].breakslot_end;
+//                       }
+//                       if (Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                           monday = getTimeStops(Userinfo[i].online_appointment[k].monday_start, Userinfo[i].online_appointment[k].monday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].online_appointment[k].tuesday_start, Userinfo[i].online_appointment[k].tuesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                           tuesday = getTimeStops(Userinfo[i].online_appointment[k].tuesday_start, Userinfo[i].online_appointment[k].tuesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].online_appointment[k].wednesday_start, Userinfo[i].online_appointment[k].wednesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                           wednesday = getTimeStops(Userinfo[i].online_appointment[k].wednesday_start, Userinfo[i].online_appointment[k].wednesday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].online_appointment[k].thursday_start, Userinfo[i].online_appointment[k].thursday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                           thursday = getTimeStops(Userinfo[i].online_appointment[k].thursday_start, Userinfo[i].online_appointment[k].thursday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].online_appointment[k].friday_start, Userinfo[i].online_appointment[k].friday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                           friday = getTimeStops(Userinfo[i].online_appointment[k].friday_start, Userinfo[i].online_appointment[k].friday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].online_appointment[k].saturday_start, Userinfo[i].online_appointment[k].saturday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                           saturday = getTimeStops(Userinfo[i].online_appointment[k].saturday_start, Userinfo[i].online_appointment[k].saturday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots) {
+//                           sunday = getTimeStops(Userinfo[i].online_appointment[k].sunday_start, Userinfo[i].online_appointment[k].sunday_end, Userinfo[i].online_appointment[k].duration_of_timeslots)
+//                       }
+//                       online_users.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start, holidays_end, holidays_start, appointment_days })
+//                   }
+//                   monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], breakslot_start = "", breakslot_end = "", holidays_end = "", holidays_start = "", appointment_days = "";
+//                   for (let l = 0; l < Userinfo[i].days_for_practices.length; l++) {
+//                       if (Userinfo[i].private_appointments[l].appointment_days) {
+//                           appointment_days = Userinfo[i].online_appointment[l].appointment_days;
+//                       }
+//                       if (Userinfo[i].private_appointments[l].holidays_start) {
+//                           holidays_start = Userinfo[i].online_appointment[l].holidays_start;
+//                       }
+//                       if (Userinfo[i].private_appointments[l].holidays_end) {
+//                           holidays_end = Userinfo[i].online_appointment[l].holidays_end;
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].breakslot_start) {
+//                           breakslot_start = Userinfo[i].days_for_practices[l].breakslot_start;
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].breakslot_end) {
+//                           breakslot_end = Userinfo[i].days_for_practices[l].breakslot_end;
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                           monday = getTimeStops(Userinfo[i].days_for_practices[l].monday_start, Userinfo[i].days_for_practices[l].monday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                           tuesday = getTimeStops(Userinfo[i].days_for_practices[l].tuesday_start, Userinfo[i].days_for_practices[l].tuesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                           wednesday = getTimeStops(Userinfo[i].days_for_practices[l].wednesday_start, Userinfo[i].days_for_practices[l].wednesday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                           thursday = getTimeStops(Userinfo[i].days_for_practices[l].thursday_start, Userinfo[i].days_for_practices[l].thursday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                           friday = getTimeStops(Userinfo[i].days_for_practices[l].friday_start, Userinfo[i].days_for_practices[l].friday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                           saturday = getTimeStops(Userinfo[i].days_for_practices[l].saturday_start, Userinfo[i].days_for_practices[l].saturday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                       }
+//                       if (Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots) {
+//                           sunday = getTimeStops(Userinfo[i].days_for_practices[l].sunday_start, Userinfo[i].days_for_practices[l].sunday_end, Userinfo[i].days_for_practices[l].duration_of_timeslots)
+//                       }
+//                       Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start, holidays_end, holidays_start, appointment_days })
+//                   }
+//                   finalArray.push({
+//                       data: Userinfo[i],
+//                       appointments: user,
+//                       online_appointment: online_users,
+//                       practice_days: Practices
+//                   })
+//               }
+
+//               res.json({ status: 200, hassuccessed: true, data: finalArray });
+//           }
+//       })
+//   }
+// });
+
 router.get("/allusers", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -8210,11 +8530,11 @@ router.post("/forgotPassword", function (req, res, next) {
           setTimeout(() => resolve(user_data1, token), 500);
           promise.then((user_data1) => {
             if (token !== "") {
-              var link = "https://virtualhospital.aimedis.io/change-password?token=" + token;
+              var link = "https://virtualhospital.aidoc.io/change-password?token=" + token;
               if (req.body.passFrom === "landing") {
                 // link = '/change-password';
-                // link = 'https://virtualhospital.aimedis.io/change-password'
-                link = "https://virtualhospital.aimedis.io/change-password?token=" + token;
+                // link = 'https://virtualhospital.aidoc.io/change-password'
+                link = "https://virtualhospital.aidoc.io/change-password?token=" + token;
               }
               // link = 'http://localhost:3000/change-password';
               var lan1 = getMsgLang(user_data1._id);
@@ -8384,8 +8704,8 @@ router.post("/AskPatient/:id", function (req, res, next) {
       .exec()
       .then((user_data1) => {
         if (user_data1) {
-          // var Link1 = 'https://virtualhospital.aimedis.io/patient'
-          var Link1 = "https://virtualhospital.aimedis.io/patient";
+          // var Link1 = 'https://virtualhospital.aidoc.io/patient'
+          var Link1 = "https://virtualhospital.aidoc.io/patient";
 
           var lan1 = getMsgLang(user_data1._id);
           lan1.then((result) => {
