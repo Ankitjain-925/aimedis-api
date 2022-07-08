@@ -588,6 +588,7 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
       {
         house_id: { $in: [house_id, messageToSearchWith.house_id] },
         archived: { $eq: true },
+        task_type: { $exists: false },
       },
       function (err, userdata) {
         if (err && !userdata) {
