@@ -584,11 +584,19 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
       house_id,
     });
     messageToSearchWith.encryptFieldsSync();
+
+    const messageToSearchWith1 = new virtual_Task({
+      task_type: "picture_evaluation",
+    });
+    messageToSearchWith1.encryptFieldsSync();
+    
     virtual_Task.find(
       {
         house_id: { $in: [house_id, messageToSearchWith.house_id] },
         archived: { $eq: true },
-        task_type: { $exists: false },
+        task_type: {
+          $in: ["picture_evaluation", messageToSearchWith1.task_type],
+        },
       },
       function (err, userdata) {
         if (err && !userdata) {
