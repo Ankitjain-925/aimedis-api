@@ -354,11 +354,13 @@ router.delete("/AddTask/:task_id", function (req, res, next) {
 });
 
 router.put("/AddTask/:task_id", function (req, res, next) {
+  console.log('api CALLING')
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    if (req.body.payment_data && req.body.payment_data !== null) {
+    if (req.body.payment_data && req.body.payment_data !== null && !req.body._enc_payment_data) {
       req.body.payment_data = encrypt(JSON.stringify(req.body.payment_data))
+      req.body._enc_payment_data = true
     }
     virtual_Task.updateOne(
       { _id: req.params.task_id },
@@ -440,6 +442,7 @@ router.put("/AddTask/:task_id", function (req, res, next) {
               }
             );
           } else {
+            console.log('Also here')
             res.json({
               status: 200,
               hassuccessed: true,
