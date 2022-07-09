@@ -2238,73 +2238,7 @@ function Apointment(data, id) {
   });
 }
 
-function virtualInvoice(data, id) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
-        var arr = [];
-        const patient_id = id;
-        const messageToSearchWith2 = new virtual_Case({ patient_id });
-        messageToSearchWith2.encryptFieldsSync();
-        var full_record = { alies_id: data.alies_id, case: data.case, image: data.image, first_name: data.first_name, last_name: data.last_name, patient_id: data.patient_id, profile_id: data.profile_id };
-        virtual_Case.find(
-          {
-            $or: [
-              { patient_id: id },
-              { patient_id: messageToSearchWith2.patient_id },
-            ],
-          },
-          function (err, user_data) {
-            if (err && !user_data) {
-              res.json({
-                status: 200,
-                message: "Something went wrong.",
-                error: err,
-              });
-            } else {
-              var arra = [];
-              var final_array = [];
-              
-              for (i = 0; i < user_data.length; i++) {
 
-                arr.push(user_data[i]._id)
-              }
-
-
-              for (i = 0; i < arr.length; i++) {
-                const case_id = arr[i];
-
-                const messageToSearchWith4 = new virtual_Invoice({ case_id });
-                messageToSearchWith4.encryptFieldsSync();
-
-                arra.push(messageToSearchWith4.case_id);
-
-              }
-
-              final_array = [...arr, ...arra]
-
-
-              virtual_Invoice.updateMany
-                ({
-                  case_id: { $in: final_array }
-                },
-                  { $set: { patient: full_record } },
-                ).exec()
-                .then(function (doc3) {
-                  if (doc3) {
-                    Mypat.push(doc3)
-                    resolve(Mypat);
-                  } else {
-                    resolve(Mypat);
-                  }
-                })
-            }
-          }
-        );
-      }
-    });
-  });
-}
 
 
 router.put("/Users/update/:user_id", function (req, res, next) {
