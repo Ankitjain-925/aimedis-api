@@ -1987,6 +1987,287 @@ router.post("/Users/checkPass", function (req, res, next) {
 
 /*------U-P-D-A-T-E---U-S-E-R------*/
 
+router.put("/Users/update", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    User.findOne({ _id: legit.id }, function (err, changeStatus) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+          error: err,
+        });
+      }
+      if (changeStatus) {
+        let comming = req.body
+        // if (req.body.password) {
+        //     var enpassword = base64.encode(req.body.password);
+        //     req.body.password = enpassword;
+        // }
+        if (req.body.mobile) {
+          var country_code = "";
+          var mob = req.body.mobile && req.body.mobile.split("-");
+          var mob1 = mob.pop();
+          if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
+            country_code = mob[0];
+            if (country_code && country_code === "") {
+              let tt = changeStatus.mobile.split("-");
+              if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
+                country_code === tt[0];
+              }
+            }
+          }
+
+          authy
+            .registerUser({
+              countryCode: country_code,
+              email: changeStatus.email,
+              phone: mob1,
+            })
+            .catch((err) =>
+              res.json({
+                status: 200,
+                message: "Phone is not verified",
+                error: err,
+                hassuccessed: false,
+              })
+            )
+            .then((regRes) => {
+              if (regRes && regRes.success) {
+                var authyId = { authyId: regRes.user.id };
+                datas = { ...authyId, ...req.body };
+                User.findByIdAndUpdate(
+                  { _id: changeStatus._id },
+                  datas,
+                  function (err, doc) {
+                    if (err && !doc) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "update data failed",
+                        error: err,
+                      });
+                    } else {
+                      virtualTask(comming, legit.id).then((result1) => {
+
+                        if (result1) {
+                          console.log("1")
+                        }
+                      })
+                      virtualCase(comming, legit.id).then((result2) => {
+
+                        if (result2) {
+                          console.log("2")
+                        }
+                      })
+                      Apointment(comming, legit.id).then((result3) => {
+
+                        if (result3) {
+                          console.log("3")
+                        }
+                      })
+                      virtualInvoice(comming, legit.id).then((result4) => {
+
+                        if (result4) {
+                          console.log("4")
+                        }
+                      })
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "updated",
+                        
+                      });
+                    }
+                  }
+                );
+              }
+            });
+        } else {
+          User.findByIdAndUpdate(
+            { _id: changeStatus._id },
+            req.body,
+            function (err, doc) {
+              if (err && !doc) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "update data failed",
+                  error: err,
+                });
+              } else {
+
+                virtualTask(comming, legit.id).then((result1) => {
+
+                  if (result1) {
+                    console.log("1")
+                  }
+                })
+                virtualCase(comming, legit.id).then((result2) => {
+
+                  if (result2) {
+                    console.log("2")
+                  }
+                })
+                Apointment(comming, legit.id).then((result3) => {
+
+                  if (result3) {
+                    console.log("3")
+                  }
+                })
+                virtualInvoice(comming, legit.id).then((result4) => {
+
+                  if (result4) {
+                    console.log("4")
+                  }
+                })
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "updated",
+                  
+                });
+              }
+            }
+          );
+        }
+      }
+    });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
+function virtualTask(data, id) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
+        const patient_id = id;
+        const messageToSearchWith1 = new virtual_Task({ patient_id });
+        messageToSearchWith1.encryptFieldsSync();
+        var full_record = { case_id: data.case_id, image: data.image, first_name: data.first_name,last_name: data.last_name, patient_id: data.patient_id};
+        virtual_Task.updateMany
+          ({
+            $or: [
+              { patient_id: id },
+              { patient_id: messageToSearchWith1.patient_id },
+            ],
+          },
+          { $set: { patient: full_record } },
+            data).exec()
+          .then(function (doc3) {
+            if (doc3) {
+              Mypat.push(doc3)
+              resolve(Mypat);
+            } else {
+              resolve(Mypat);
+            }
+          })
+      }
+    });
+  });
+}
+
+function virtualCase(data, id) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
+        const patient_id = id;
+        const messageToSearchWith2 = new virtual_Case({ patient_id });
+        messageToSearchWith2.encryptFieldsSync();
+
+        var full_record = { alies_id: data.alies_id, image: data.image, first_name: data.first_name,last_name: data.last_name, profile_id: data.profile_id};
+        virtual_Case.updateMany
+          ({
+            $or: [
+              { patient_id: id },
+              { patient_id: messageToSearchWith2.patient_id },
+            ],
+          },
+          { $set: { patient: full_record } },
+            data).exec()
+          .then(function (doc3) {
+            if (doc3) {
+              Mypat.push(doc3)
+              resolve(Mypat);
+            } else {
+              resolve(Mypat);
+            }
+          })
+      }
+    });
+  });
+}
+
+function Apointment(data, id) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
+        const patient = id;
+        const messageToSearchWith3 = new Appointment({ patient });
+        messageToSearchWith3.encryptFieldsSync();
+        var full_record = { birthday_id: data.birthday_id, bucket: data.bucket, email: data.email, first_name: data.first_name,last_name: data.last_name, patient_id: data.patient_id,profile_image: data.profile_image};
+        Appointment.updateMany
+          ({
+            $or: [
+              { patient: id },
+              { patient: messageToSearchWith3.patient },
+            ],
+          },
+            { $set: { patient_info: full_record } },
+        
+          ).exec()
+          .then(function (doc3) {
+            if (doc3) {
+              console.log(doc3)
+              Mypat.push(doc3)
+              resolve(Mypat);
+            } else {
+              resolve(Mypat);
+            }
+          })
+      }
+    });
+  });
+}
+
+function virtualInvoice(data, id) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
+        const case_id = id;
+        const messageToSearchWith4 = new virtual_Invoice({ case_id });
+        messageToSearchWith4.encryptFieldsSync();
+        var full_record = { alies_id: data.alies_id, case: data.case, image: data.image, first_name: data.first_name,last_name: data.last_name, patient_id: data.patient_id,profile_id: data.profile_id};
+        virtual_Invoice.updateMany
+          ({
+            $or: [
+              { case_id: id },
+              { case_id: messageToSearchWith4.case_id },
+            ],
+          },
+          { $set: { patient: full_record } },
+            ).exec()
+          .then(function (doc3) {
+            if (doc3) {
+              Mypat.push(doc3)
+              resolve(Mypat);
+            } else {
+              resolve(Mypat);
+            }
+          })
+      }
+    });
+  });
+}
+
 
 
 router.put("/Users/update/:user_id", function (req, res, next) {

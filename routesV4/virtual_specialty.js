@@ -575,6 +575,51 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
   }
 });
 
+router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    let house_id = req.params.house_id;
+    const messageToSearchWith = new virtual_Task({
+      house_id,
+    });
+    messageToSearchWith.encryptFieldsSync();
+
+    const messageToSearchWith1 = new virtual_Task({
+      task_type: "sick_leave",
+    });
+    messageToSearchWith1.encryptFieldsSync();
+    
+    virtual_Task.find(
+      {
+        house_id: { $in: [house_id, messageToSearchWith.house_id] },
+        archived: { $eq: true },
+        $or: [
+          { task_type: { $ne: "sick_leave" } },
+          { task_type: { $ne: messageToSearchWith1.task_type } }]
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 router.get("/AddTask/:task_ids", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
