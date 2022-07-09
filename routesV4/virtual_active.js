@@ -119,7 +119,6 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   
   if (legit) {
-
     
     const VirtualtToSearchWith = new virtual_Task({ task_type: "sick_leave" });
      VirtualtToSearchWith.encryptFieldsSync();
@@ -138,7 +137,6 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log(user_data)
           var arr = [];
           var newData = user_data.filter(
             (item) =>
