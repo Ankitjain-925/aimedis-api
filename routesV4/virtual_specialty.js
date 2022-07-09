@@ -586,7 +586,7 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
     messageToSearchWith.encryptFieldsSync();
 
     const messageToSearchWith1 = new virtual_Task({
-      task_type: "picture_evaluation",
+      task_type: "sick_leave",
     });
     messageToSearchWith1.encryptFieldsSync();
     
@@ -594,9 +594,9 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
       {
         house_id: { $in: [house_id, messageToSearchWith.house_id] },
         archived: { $eq: true },
-        task_type: {
-          $in: ["picture_evaluation", messageToSearchWith1.task_type],
-        },
+        $or: [
+          { task_type: { $ne: "sick_leave" } },
+          { task_type: { $ne: messageToSearchWith1.task_type } }]
       },
       function (err, userdata) {
         if (err && !userdata) {
