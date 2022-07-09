@@ -1986,6 +1986,7 @@ router.post("/Users/checkPass", function (req, res, next) {
 });
 
 /*------U-P-D-A-T-E---U-S-E-R------*/
+
 router.put("/Users/update", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -2049,7 +2050,6 @@ router.put("/Users/update", function (req, res, next) {
                         error: err,
                       });
                     } else {
-<<<<<<< HEAD
                       virtualTask(comming, legit.id).then((result1) => {
 
                         if (result1) {
@@ -2080,18 +2080,6 @@ router.put("/Users/update", function (req, res, next) {
                         message: "updated",
                         
                       });
-=======
-                      UpdateData(comming, legit.id).then((result) => {
-                          console.log('other things will update');
-                      })
-                      
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          message: "Updated",
-                        });
-                      
->>>>>>> 5e74424dae99d33f625fed13aefd37a9a4782703
                     }
                   }
                 );
@@ -2110,7 +2098,6 @@ router.put("/Users/update", function (req, res, next) {
                   error: err,
                 });
               } else {
-<<<<<<< HEAD
 
                 virtualTask(comming, legit.id).then((result1) => {
 
@@ -2142,17 +2129,6 @@ router.put("/Users/update", function (req, res, next) {
                   message: "updated",
                   
                 });
-=======
-                UpdateData(comming, legit.id).then((result) => {
-                  console.log('will update')
-
-                })
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "Updated",
-                  });
->>>>>>> 5e74424dae99d33f625fed13aefd37a9a4782703
               }
             }
           );

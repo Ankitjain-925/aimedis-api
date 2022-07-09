@@ -575,6 +575,34 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
   }
 });
 
+router.get("/AddTask/:task_ids", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_Task.findOne(
+      { _id: req.params.task_ids },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -598,34 +626,6 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
           { task_type: { $ne: "sick_leave" } },
           { task_type: { $ne: messageToSearchWith1.task_type } }]
       },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/AddTask/:task_ids", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Task.findOne(
-      { _id: req.params.task_ids },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
