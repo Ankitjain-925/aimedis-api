@@ -618,8 +618,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-// app.listen(5001, () => {
-//   console.log("Server started on port 5000");
-// });
+app.listen(5001, () => {
+  console.log("Server started on port 5000");
+});
 
-module.exports = app;
+// module.exports = app;
