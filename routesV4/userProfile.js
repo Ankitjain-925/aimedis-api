@@ -2050,30 +2050,28 @@ router.put("/Users/update", function (req, res, next) {
                         error: err,
                       });
                     } else {
-                      virtualTask(comming, legit.id).then((result1) => {
-
-                        if (result1) {
-                          console.log("1")
-                        }
-                      })
-                      virtualCase(comming, legit.id).then((result2) => {
-
-                        if (result2) {
-                          console.log("2")
-                        }
-                      })
-                      Apointment(comming, legit.id).then((result3) => {
-
-                        if (result3) {
-                          console.log("3")
-                        }
-                      })
-                      virtualInvoice(comming, legit.id).then((result4) => {
-
-                        if (result4) {
-                          console.log("4")
-                        }
-                      })
+                      // if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
+                      //   virtualTask(comming, legit.id).then((result1) => {
+                      //     if (result1) {
+                      //       console.log("1")
+                      //     }
+                      //   })
+                      //   virtualCase(comming, legit.id).then((result2) => {
+                      //     if (result2) {
+                      //       console.log("2")
+                      //     }
+                      //   })
+                      //   Apointment(comming, legit.id).then((result3) => {
+                      //     if (result3) {
+                      //       console.log("3")
+                      //     }
+                      //   })
+                      //   virtualInvoice(comming, legit.id).then((result4) => {
+                      //     if (result4) {
+                      //       console.log("4")
+                      //     }
+                      //   })
+                      // }
                       res.json({
                         status: 200,
                         hassuccessed: true,
@@ -2100,25 +2098,21 @@ router.put("/Users/update", function (req, res, next) {
               } else {
 
                 virtualTask(comming, legit.id).then((result1) => {
-
                   if (result1) {
                     console.log("1")
                   }
                 })
                 virtualCase(comming, legit.id).then((result2) => {
-
                   if (result2) {
                     console.log("2")
                   }
                 })
                 Apointment(comming, legit.id).then((result3) => {
-
                   if (result3) {
                     console.log("3")
                   }
                 })
                 virtualInvoice(comming, legit.id).then((result4) => {
-
                   if (result4) {
                     console.log("4")
                   }
@@ -2146,39 +2140,30 @@ router.put("/Users/update", function (req, res, next) {
 
 
 function virtualTask(data, id) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
-        const patient_id = id;
-        const messageToSearchWith1 = new virtual_Task({ patient_id });
-        messageToSearchWith1.encryptFieldsSync();
-        var full_record = { case_id: data.case_id, image: data.image, first_name: data.first_name, last_name: data.last_name, patient_id: data.patient_id };
-        virtual_Task.updateMany
-          ({
-            $or: [
-              { patient_id: id },
-              { patient_id: messageToSearchWith1.patient_id },
-            ],
-          },
-            { $set: { patient: full_record } },
-            data).exec()
-          .then(function (doc3) {
-            if (doc3) {
-              Mypat.push(doc3)
-              resolve(Mypat);
-            } else {
-              resolve(Mypat);
-            }
-          })
-      }
-    });
-  });
+      const patient_id = id;
+      const messageToSearchWith1 = new virtual_Task({ patient_id });
+      messageToSearchWith1.encryptFieldsSync();
+      var full_record = { case_id: data.case_id, image: data.image, first_name: data.first_name, last_name: data.last_name, patient_id: data.patient_id };
+      virtual_Task.updateMany
+        ({
+          $or: [
+            { patient_id: id },
+            { patient_id: messageToSearchWith1.patient_id },
+          ],
+        },
+          { $set: { patient: full_record } },
+          data).exec()
+        .then(function (doc3) {
+          if (doc3) {
+            return doc3;
+          } else {
+            return 0;
+          }
+        })
+    
 }
 
 function virtualCase(data, id) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
         const patient_id = id;
         const messageToSearchWith2 = new virtual_Case({ patient_id });
         messageToSearchWith2.encryptFieldsSync();
@@ -2195,115 +2180,98 @@ function virtualCase(data, id) {
             data).exec()
           .then(function (doc3) {
             if (doc3) {
-              Mypat.push(doc3)
-              resolve(Mypat);
+              return doc3;
             } else {
-              resolve(Mypat);
+              return 0;
             }
           })
-      }
-    });
-  });
+      
 }
 
 function Apointment(data, id) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
-        const patient = id;
-        const messageToSearchWith3 = new Appointment({ patient });
-        messageToSearchWith3.encryptFieldsSync();
-        var full_record = { birthday: data.birthday, bucket: data.bucket, email: data.email, first_name: data.first_name, last_name: data.last_name, patient_id: data.patient_id, profile_image: data.profile_image };
-        Appointment.updateMany
-          ({
-            $or: [
-              { patient: id },
-              { patient: messageToSearchWith3.patient },
-            ],
-          },
-            { $set: { patient_info: full_record } },
+      const patient = id;
+      const messageToSearchWith3 = new Appointment({ patient });
+      messageToSearchWith3.encryptFieldsSync();
+      var full_record = { birthday: data.birthday, bucket: data.bucket, email: data.email, first_name: data.first_name, last_name: data.last_name, patient_id: data.patient_id, profile_image: data.profile_image };
+      Appointment.updateMany
+        ({
+          $or: [
+            { patient: id },
+            { patient: messageToSearchWith3.patient },
+          ],
+        },
+          { $set: { patient_info: full_record } },
 
-          ).exec()
-          .then(function (doc3) {
-            if (doc3) {
-              console.log(doc3)
-              Mypat.push(doc3)
-              resolve(Mypat);
-            } else {
-              resolve(Mypat);
-            }
-          })
-      }
-    });
-  });
+        ).exec()
+        .then(function (doc3) {
+          if (doc3) {
+            return doc3;
+          } else {
+            return 0;
+          }
+        })
+    
 }
 
 function virtualInvoice(data, id) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      if (data.image || data.first_name || data.last_name || data.alies_id || data.email || data.birthday || data.profile_image || data.bucket || data.patient_id || data.profile_id || data.case_id) {
-        var arr = [];
-        const patient_id = id;
-        const messageToSearchWith2 = new virtual_Case({ patient_id });
-        messageToSearchWith2.encryptFieldsSync();
-        var full_record = { alies_id: data.alies_id, case: data.case, image: data.image, first_name: data.first_name, last_name: data.last_name, patient_id: data.patient_id, profile_id: data.profile_id };
-        virtual_Case.find(
-          {
-            $or: [
-              { patient_id: id },
-              { patient_id: messageToSearchWith2.patient_id },
-            ],
-          },
-          function (err, user_data) {
-            if (err && !user_data) {
-              res.json({
-                status: 200,
-                message: "Something went wrong.",
-                error: err,
-              });
-            } else {
-              var arra = [];
-              var final_array = [];
-              
-              for (i = 0; i < user_data.length; i++) {
+      var arr = [];
+      const patient_id = id;
+      const messageToSearchWith2 = new virtual_Case({ patient_id });
+      messageToSearchWith2.encryptFieldsSync();
+      var full_record = { alies_id: data.alies_id, case: data.case, image: data.image, first_name: data.first_name, last_name: data.last_name, patient_id: data.patient_id, profile_id: data.profile_id };
+      virtual_Case.find(
+        {
+          $or: [
+            { patient_id: id },
+            { patient_id: messageToSearchWith2.patient_id },
+          ],
+        },
+        function (err, user_data) {
+          if (err && !user_data) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            var arra = [];
+            var final_array = [];
+            
+            for (i = 0; i < user_data.length; i++) {
 
-                arr.push(user_data[i]._id)
-              }
-
-
-              for (i = 0; i < arr.length; i++) {
-                const case_id = arr[i];
-
-                const messageToSearchWith4 = new virtual_Invoice({ case_id });
-                messageToSearchWith4.encryptFieldsSync();
-
-                arra.push(messageToSearchWith4.case_id);
-
-              }
-
-              final_array = [...arr, ...arra]
-
-
-              virtual_Invoice.updateMany
-                ({
-                  case_id: { $in: final_array }
-                },
-                  { $set: { patient: full_record } },
-                ).exec()
-                .then(function (doc3) {
-                  if (doc3) {
-                    Mypat.push(doc3)
-                    resolve(Mypat);
-                  } else {
-                    resolve(Mypat);
-                  }
-                })
+              arr.push(user_data[i]._id)
             }
+
+
+            for (i = 0; i < arr.length; i++) {
+              const case_id = arr[i];
+
+              const messageToSearchWith4 = new virtual_Invoice({ case_id });
+              messageToSearchWith4.encryptFieldsSync();
+
+              arra.push(messageToSearchWith4.case_id);
+
+            }
+
+            final_array = [...arr, ...arra]
+
+
+            virtual_Invoice.updateMany
+              ({
+                case_id: { $in: final_array }
+              },
+                { $set: { patient: full_record } },
+              ).exec()
+              .then(function (doc3) {
+                if (doc3) {
+                  return doc3;
+                } else {
+                  return 0;
+                }
+              })
           }
-        );
-      }
-    });
-  });
+        }
+      );
 }
 
 

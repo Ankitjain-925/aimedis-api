@@ -205,7 +205,7 @@ function SetArchiveUnuseMeeting() {
         doc1.forEach((element) => {
           var enddate = moment(element.date);
           var diff1 = ttime.diff(enddate, 'hours')
-          if (diff1 > 6) {
+          if (diff1 > 1) {
             virtual_Task.updateMany({
               _id: element.task_id, $or: [
                 { meetingjoined: { $ne: true } },
@@ -372,7 +372,7 @@ function SetArchivePayment() {
         doc1.forEach((element) => {
           var enddate = moment(element.date)
           var diff1 = ttime.diff(enddate, 'hours')
-          if (diff1 > 6) {
+          if (diff1 > 1) {
             virtual_Task.updateMany({
               _id: element._id, $or: [
                 { is_payment: { $ne: true } },

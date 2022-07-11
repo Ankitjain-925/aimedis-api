@@ -489,12 +489,12 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         error: err,
       });
     } else {
-      // if (req.query.bucket) {
-      //   var buck = req.query.bucket;
-      // } else {
-      //   var buck = "aimedisfirstbucket";
-      // }
-      // emptyBucket(buck, data12.profile_id);
+      if (req.query.bucket) {
+        var buck = req.query.bucket;
+      } else {
+        var buck = "aimedisfirstbucket";
+      }
+      emptyBucket(buck, data12.profile_id);
       var patient_id = req.params.UserId
       const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
       VirtualtToSearchWith1.encryptFieldsSync();
