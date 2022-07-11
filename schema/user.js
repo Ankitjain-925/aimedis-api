@@ -402,11 +402,9 @@ var UserSchema = new Schema(
     },
   },
   { strict: false },
-  { timestamps: true }
+  { timestamps: true },
+  { autoIndex: false }
 );
-
-
-UserSchema.index({ area: '2dsphere' });
 
 
 UserSchema.plugin(mongooseFieldEncryption, {
@@ -439,5 +437,7 @@ UserSchema.plugin(mongooseFieldEncryption, {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
   },
 });
+
+UserSchema.index({ area: '2dsphere' });
 var User = mongoose.model("User", UserSchema);
 module.exports = User;
