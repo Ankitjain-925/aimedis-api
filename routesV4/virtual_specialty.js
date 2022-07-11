@@ -589,15 +589,15 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
     const messageToSearchWith1 = new virtual_Task({
       task_type: "sick_leave",
     });
-
     messageToSearchWith1.encryptFieldsSync();
+    
     virtual_Task.find(
       {
         house_id: { $in: [house_id, messageToSearchWith.house_id] },
-         archived: { $eq: true },
-         $or: [
-           { task_type: { $ne: "sick_leave" } },
-           { task_type: { $ne: messageToSearchWith1.task_type } }]
+        archived: { $eq: true },
+        $or: [
+          { task_type: { $ne: "sick_leave" } },
+          { task_type: { $ne: messageToSearchWith1.task_type } }]
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -648,6 +648,7 @@ router.get("/AddTask/:task_ids", function (req, res, next) {
     });
   }
 });
+
 
 router.get("/PatientsTask/:patient_id", function (req, res, next) {
   const token = req.headers.token;
