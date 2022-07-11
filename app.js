@@ -393,7 +393,6 @@ function SetArchivePayment() {
     );
 }
 
-
 var UserData = require("./routes/UserTrack");
 var UserProfile = require("./routes/userProfile");
 var SaveCSV = require("./routes/saveCsv");
@@ -603,8 +602,8 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  // return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
-  console.log("err", err);
+  return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
+  // console.log("err", err);
 });
 
 // app.listen(5001, () => {

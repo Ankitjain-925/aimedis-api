@@ -63,8 +63,6 @@ var SickSchema = new Schema(
   { strict: false }
 );
 
-SickSchema.index({ area: "2dsphere" });
-
 SickSchema.plugin(mongooseFieldEncryption, {
 
   fields: ["patient_profile_id","patient_id","doctor_profile_id","doctor_id","link","sesion_id"

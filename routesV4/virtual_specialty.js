@@ -418,8 +418,9 @@ router.put("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    if (req.body.payment_data && req.body.payment_data !== null) {
+    if (req.body.payment_data && req.body.payment_data !== null && !req.body._enc_payment_data) {
       req.body.payment_data = encrypt(JSON.stringify(req.body.payment_data))
+      req.body._enc_payment_data = true
     }
     virtual_Task.updateOne(
       { _id: req.params.task_id },
@@ -584,10 +585,19 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
       house_id,
     });
     messageToSearchWith.encryptFieldsSync();
+
+    const messageToSearchWith1 = new virtual_Task({
+      task_type: "sick_leave",
+    });
+
+    messageToSearchWith1.encryptFieldsSync();
     virtual_Task.find(
       {
         house_id: { $in: [house_id, messageToSearchWith.house_id] },
-        archived: { $eq: true },
+         archived: { $eq: true },
+         $or: [
+           { task_type: { $ne: "sick_leave" } },
+           { task_type: { $ne: messageToSearchWith1.task_type } }]
       },
       function (err, userdata) {
         if (err && !userdata) {

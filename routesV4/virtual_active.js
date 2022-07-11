@@ -124,10 +124,19 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
      VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find(
       {
-        $or: [
-       { task_type: { $eq: "sick_leave" } },
-       { task_type: { $eq: VirtualtToSearchWith.task_type } },
-     ],},
+        "assinged_to.user_id" : req.body.doctor_id ,
+        $and: [
+        { $or: [ {is_decline: {$exists: false}}, 
+          {is_decline: {$eq : false}}
+        ]},
+        {
+          $or: [
+            { task_type: { $eq: "sick_leave" } },
+            { task_type: { $eq: VirtualtToSearchWith.task_type } },
+          ]
+        }
+        ]
+        },
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -138,10 +147,11 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
           });
         } else {
           var arr = [];
+          let comingdate = moment(req.body.date).format("MM-DD-YYYY");
           var newData = user_data.filter(
-            (item) =>
-              moment(item.date).format("MM/DD/YYYY") ===
-              moment(req.body.date).format("MM/DD/YYYY")
+            (item) => {
+              let itemdate = moment(item.date).format("MM-DD-YYYY")
+              return moment(comingdate).isSame(itemdate)}
           );
           for (i = 0; i < newData.length; i++) {
             start = newData[i].start
