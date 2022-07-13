@@ -602,12 +602,12 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
-  // console.log("err", err);
+  // return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
+  console.log("err", err);
 });
 
-// app.listen(5001, () => {
-//   console.log("Server started on port 5000");
-// });
+app.listen(5001, () => {
+  console.log("Server started on port 5000");
+});
 
-module.exports = app;
+// module.exports = app;

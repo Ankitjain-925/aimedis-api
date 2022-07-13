@@ -2424,6 +2424,11 @@ router.put("/Users/updateImage", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    var patient={}
+    if (req.body.image) {
+      patient['patient.image'] = req.body.image
+      patient['patient._enc_image'] = false
+    }
     User.findOneAndUpdate(
       { _id: legit.id },
       { $set: { image: req.body.image } },
@@ -2437,6 +2442,7 @@ router.put("/Users/updateImage", function (req, res, next) {
             error: err,
           });
         } else {
+          AllUpdate(legit.id,patient)
           res.json({
             status: 200,
             hassuccessed: true,
