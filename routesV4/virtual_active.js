@@ -117,26 +117,28 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
 router.post("/SelectDocforSickleave2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  
+
   if (legit) {
-    
+
     const VirtualtToSearchWith = new virtual_Task({ task_type: "sick_leave" });
-     VirtualtToSearchWith.encryptFieldsSync();
+    VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find(
       {
-        "assinged_to.user_id" : req.body.doctor_id ,
+        "assinged_to.user_id": req.body.doctor_id,
         $and: [
-        { $or: [ {is_decline: {$exists: false}}, 
-          {is_decline: {$eq : false}}
-        ]},
-        {
-          $or: [
-            { task_type: { $eq: "sick_leave" } },
-            { task_type: { $eq: VirtualtToSearchWith.task_type } },
-          ]
-        }
+          {
+            $or: [{ is_decline: { $exists: false } },
+            { is_decline: { $eq: false } }
+            ]
+          },
+          {
+            $or: [
+              { task_type: { $eq: "sick_leave" } },
+              { task_type: { $eq: VirtualtToSearchWith.task_type } },
+            ]
+          }
         ]
-        },
+      },
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -147,12 +149,66 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
           });
         } else {
           var arr = [];
-          let comingdate = moment(req.body.date).format("MM-DD-YYYY");
+          let comingdate = new Date(req.body.date);
+          console.log("comingdate", comingdate)
           var newData = user_data.filter(
             (item) => {
-              let itemdate = moment(item.date).format("MM-DD-YYYY")
-              return moment(comingdate).isSame(itemdate)}
+              let itemdate = moment(item.date).format("DD-MM-YYYY")
+              console.log("itemdate", itemdate)
+
+              // return comingdate === final
+              return moment(comingdate).isSame(itemdate)
+            }
           );
+
+          // var arr = [];
+          // let comingdate =moment(req.body.date).format("YYYY-DD-MM");
+          //   console.log("comingdate",comingdate)
+          // var newData = user_data.filter(
+          //   (item) => {
+          //     let itemdate = new Date(item.date)
+          //     let final =itemdate.getFullYear()+ "-" + ("0" + (itemdate.getDate())).slice(-2) + "-" + ("0" + (itemdate.getMonth() + 1)).slice(-2) 
+          //     console.log("itemdate",itemdate)
+          //     console.log("final",final)
+          //     // return comingdate === final
+          //     return moment(comingdate).isSame(final)
+          //   }
+          // );
+
+          // var arr = [];
+          // let comingdate =moment(req.body.date).format("MM-DD-YYYY");
+          //   console.log("comingdate",comingdate)
+          // var newData = user_data.filter(
+          //   (item) => {
+          //     let itemdate = moment(item.date).format("MM-DD-YYYY")
+          //     console.log("itemdate",itemdate)
+          //     return comingdate === itemdate
+          //     // return moment(comingdate).isSame(itemdate)
+          //   }
+          // );
+          // var arr = [];
+          // let comingdate =new Date(req.body.date).setHours(0,0,0,0);
+          //   console.log("comingdate",comingdate)
+          // var newData = user_data.filter(
+          //   (item) => {
+          //     let itemdate = new Date(item.date).setHours(0,0,0,0)
+          //     console.log("itemdate",itemdate)
+          //     return comingdate === itemdate
+          //     // return moment(comingdate).isSame(itemdate)
+          //   }
+          // );
+          // var arr = [];
+          // const format = 'Www, dd Mmm yyyy';
+          // let comingdate = new Date(req.body.date)
+          // console.log("comingdate",comingdate.toUTCString())
+          // var newData = user_data.filter(
+          //   (item) => {
+          //     let itemdate = new Date(item.date)
+          //     console.log('comingdate', itemdate.toUTCString().slice(0, format.length) === comingdate.toUTCString().slice(0, format.length))
+          //     // console.log('fsdfsdf', itemdate, comingdate)
+          //     return itemdate.toUTCString().slice(0, format.length) === comingdate.toUTCString().slice(0, format.length);
+          //   }
+          // );
           for (i = 0; i < newData.length; i++) {
             start = newData[i].start
             end = newData[i].end
@@ -163,12 +219,12 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
             hassuccessed: true,
             data: arr,
           });
-    
+
         }
-    
+
       }
     );
-    
+
   } else {
     res.json({
       status: 200,
@@ -178,7 +234,7 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
   }
 });
 
-router.get("/SelectDocforSickleave", function (req, res, next) { 
+router.get("/SelectDocforSickleave", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = process.env.institute_id;
@@ -399,7 +455,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
           { task_type: { $eq: "sick_leave" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
-     
+
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -1070,31 +1126,43 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
 
     var birthday = [];
-
-
-
+    var date1 = [];
+    var detected_at = [];
+    var work_until = [];
+    var most_likely = [];
+    Object.entries(req.body).map(([key, value]) => {
+        if (key === "birthday") {
+          birthday.push({ k: "birthday", v: getDate(value, "YYYY/MM/DD") });
+        }else if (key === "date") {
+        date1.push({ k: "date", v: getDate(value, "YYYY/MM/DD") });
+      } else if (key === "detected_at") {
+        detected_at.push({ k: "work_since", v: getDate(value, "YYYY/MM/DD") });
+      } else if (key === "work_until") {
+        work_until.push({ k: "work_until", v: getDate(value, "YYYY/MM/DD") });
+      } else if (key === "most_likely") {
+        most_likely.push({
+          k: "detected_at",
+          v: getDate(value, "YYYY/MM/DD"),
+        });
+      }
+    });
     let comming = req.body
     let comming2 = req.query
-
-
     GetDatafromAws(comming, comming2).then((result) => {
       new_link.push(result)
-
-
       var template = handlebars.compile(sick);
-
       let newperson = {
         ...req.body,
         img: result
 
       }
       htmlToSend1 = template({
-
-
+        date1: date1,
+        detected_at: detected_at,
+        work_until: work_until,
+        most_likely: most_likely,
         birthday: birthday,
         pat_info: newperson,
-
-
       });
 
       var htmlToSend = htmlToSend1
@@ -1384,7 +1452,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                     } else {
                       if (userdata !== null) {
                         User.findOne({ _id: userdata.patient_id }, function (err, result) {
-                          if(err && !result){
+                          if (err && !result) {
                             res.json({
                               status: 200,
                               hassuccessed: true,
@@ -1392,8 +1460,8 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               data: { Task: userdata, Session: data },
                             });
                           }
-                          else{
-                            if(result !== null){
+                          else {
+                            if (result !== null) {
                               var patient_info = userdata.patient;
                               patient_info['image'] = result.image;
                               userdata.patient = patient_info
@@ -1404,7 +1472,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                                 data: { Task: userdata, Session: data },
                               });
                             }
-                            else{
+                            else {
                               var patient_info = userdata.patient;
                               patient_info['image'] = 'insidenull.jpg';
                               userdata.patient = patient_info
@@ -1415,11 +1483,11 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                                 data: { Task: userdata, Session: data },
                               });
                             }
-                         
+
                           }
                         })
 
-                        
+
                       }
                       else {
                         const VirtualtToSearchWith = new sick_meeting({
@@ -1506,7 +1574,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
         } else {
           var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
           var start_time = moment(req.body.start_time).format("HH:mm");
-            var end_time = moment(req.body.end_time).format("HH:mm");
+          var end_time = moment(req.body.end_time).format("HH:mm");
           var sendData = `<div>Dear Patient,<br/>
         Your payment process for sick leave certificate application is completed successfully.
           "<br/>";
@@ -1759,9 +1827,9 @@ router.get("/GetAmount/:house_id", function (req, res) {
       } else {
         if (data) {
           data.institute_groups.map((item) => {
-           
+
             item.houses.map((item2) => {
- 
+
               if (item2.house_id == req.params.house_id) {
 
 

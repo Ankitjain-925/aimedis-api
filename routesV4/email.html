@@ -61,9 +61,11 @@
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #a12f21; margin-bottom: 4px;">
                                         DOB</label>
                                     <div>
+                                        {{#each birthday}}
                                         <input type="text"
                                             style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"
-                                            value="{{pat_info.birthday}}" />
+                                            value="{{v}}" />
+                                        {{/each}}
 
                                     </div>
                                 </td>
@@ -142,9 +144,12 @@
                                     <!-- <label
                                         style="display: block; font-style: normal; font-weight: 600; font-size: 13px; color: #404646; margin-bottom: 4px;">
                                         Status</label> -->
-                                    <div><input type="text"
+                                    <div>
+                                        {{#each most_likely}}
+                                        <input type="text"
                                             style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"
-                                            value="{{pat_info.date}}" />
+                                            value="{{v}}" />
+                                        {{/each}}
                                     </div>
                                 </td>
                             </tr>
@@ -243,9 +248,12 @@
                                 <input
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input> -->
 
-                                <div><input type="text"
+                                <div>
+                                    {{#each most_likely}}
+                                    <input type="text"
                                         style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"
-                                        value="{{pat_info.imposible}}" />
+                                        value="{{v}}" />
+                                    {{/each}}
                                 </div>
                             </td>
                         </tr>
@@ -269,9 +277,12 @@
                                 <input
                                     style="width: 20px;height: 20px;border: 1.5px solid #a12f21;border-right: none;outline: none;padding: 6px;text-align: center; border-right: 1.5px solid #a12f21; border-radius: 0px 4px 4px 0px; " ></input>
                            -->
-                                <div><input type="text"
+                                <div>
+                                    {{#each most_likely}}
+                                    <input type="text"
                                         style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"
-                                        value="{{pat_info.most_likely}}" />
+                                        value="{{v}}" />
+                                    {{/each}}
                                 </div>
                             </td>
 
@@ -300,9 +311,12 @@
                                 <!-- {{#each detected_at}}
                                     <input value="{{v}}" />
                                     {{/each}} -->
-                                <div><input type="text"
+                                <div>
+                                    {{#each most_likely}}
+                                    <input type="text"
                                         style="box-sizing: border-box;outline: none;font-style: normal;font-weight: 600;font-size: 16px;color: #7F8383;border-radius: 4px;width: 100%;border: 1px solid #bebebe;padding: 6px 8px;"
-                                        value="{{pat_info.detected_at}}" />
+                                        value="{{v}}" />
+                                    {{/each}}
                                 </div>
                             </td>
                         </tr>
@@ -337,7 +351,7 @@
 
 
                                 <div style="text-align: center; width: 100%; font-size: 30px; margin-top: 10%;"><img
-                                        src="{{v}}" alt="Girl in a jacket" height="50"></div>
+                                        src="{{v}}" alt="" height="50"></div>
                                 {{/each}}
                                 <!-- <div style="text-align: center; width: 100%; font-size: 30px; position: relative;
                                     top: -50px;"><img src="{{pat_info.img1}}" alt="Girl in a jacket" height="50"></div> -->
