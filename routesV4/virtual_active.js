@@ -1072,7 +1072,13 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
 
       var template = handlebars.compile(sick);
-
+      
+      req.body.birthday = getDate(req.body.birthday, "YYYY/MM/DD");
+      req.body.date = getDate(req.body.date, "YYYY/MM/DD");
+      req.body.imposible = getDate(req.body.imposible, "YYYY/MM/DD");
+      req.body.most_likely = getDate(req.body.most_likely, "YYYY/MM/DD");
+      req.body.detected_at = getDate(req.body.detected_at, "YYYY/MM/DD");
+      
       let newperson = {
         ...req.body,
         img: result
