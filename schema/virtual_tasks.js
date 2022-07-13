@@ -11,7 +11,7 @@ const ProfessionalInfo = new mongoose.Schema(
       required: false,
       unique: false,
     },
-    name: {
+    first_name: {
       type: String,
       required: false,
       unique: false,
@@ -31,12 +31,17 @@ const ProfessionalInfo = new mongoose.Schema(
       required: false,
       unique: false,
     },
+    last_name:{
+      type: String,
+      required: false,
+      unique: false,
+    }
   },
   { strict: false }
 );
 
 ProfessionalInfo.plugin(mongooseFieldEncryption, {
-  fields: ["name", "image", "alies_id"],
+  fields: ["last_name","first_name","image", "alies_id"],
   secret: process.env.SOME_32BYTE_BASE64_STRING,
   saltGenerator: function (secret) {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
