@@ -2009,19 +2009,19 @@ router.put("/Users/update", function (req, res, next) {
 
         if (req.body.first_name && req.body.first_name !== changeStatus.first_name) {
           patient['patient.first_name'] = req.body.first_name
-          patient['patient._enc_first_name'] = false
+          patient['patient.__enc_first_name'] = false
         }
         if (req.body.last_name && req.body.last_name !== changeStatus.last_name) {
           patient['patient.last_name'] = req.body.last_name
-          patient['patient._enc_last_name'] = false
+          patient['patient.__enc_last_name'] = false
         }
         if (req.body.image && req.body.image !== changeStatus.image) {
           patient['patient.image'] = req.body.image
-          patient['patient._enc_image'] = false
+          patient['patient.__enc_image'] = false
         }
         if (req.body.alies_id && req.body.alies_id !== changeStatus.alies_id) {
           patient['patient.alies_id'] = req.body.alies_id
-          patient['patient._enc_alies_id'] = false
+          patient['patient.__enc_alies_id'] = false
         }
         
 
@@ -2068,7 +2068,7 @@ router.put("/Users/update", function (req, res, next) {
                         error: err,
                       });
                     } else {
-                      if (typeof patient == 'object' && Object.keys(patient).length !== 0) {
+                      if (typeof patient == 'object' && Object.keys(patient).length > 0) {
                         AllUpdate(legit.id,patient)
                       }
                       res.json({
@@ -2096,7 +2096,7 @@ router.put("/Users/update", function (req, res, next) {
                 });
               } else {
                 console.log("test", Object.keys(patient).length)
-                if (typeof patient == 'object' && Object.keys(patient).length !== 0) {
+                if (typeof patient == 'object' && Object.keys(patient).length > 0) {
                   AllUpdate(legit.id,patient)
                 }
                 res.json({
@@ -2427,7 +2427,7 @@ router.put("/Users/updateImage", function (req, res, next) {
     var patient={}
     if (req.body.image) {
       patient['patient.image'] = req.body.image
-      patient['patient._enc_image'] = false
+      patient['patient.__enc_image'] = false
     }
     User.findOneAndUpdate(
       { _id: legit.id },

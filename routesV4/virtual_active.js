@@ -124,7 +124,8 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Task.find(
       {
-        "assinged_to.user_id": req.body.doctor_id,
+        "assinged_to.user_id" : req.body.doctor_id ,
+        archived: { $ne: true },
         $and: [
           {
             $or: [{ is_decline: { $exists: false } },
@@ -149,75 +150,34 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
           });
         } else {
           var arr = [];
-          let comingdate = new Date(req.body.date);
-          console.log("comingdate", comingdate)
-          var newData = user_data.filter(
+          let  comingdate = new Date(new Date(req.body.date).setHours(0, 0, 0, 0));
+          // let comingdate = new Date(req.body.date).setHours(0, 0, 0, 0);
+          var newData = user_data.map(
             (item) => {
-              let itemdate = moment(item.date).format("DD-MM-YYYY")
-              console.log("itemdate", itemdate)
+              let itemdate = new Date(new Date(new Date().setDate(new Date(item.date).getDate())).setHours(0, 0, 0, 0));
+              if( moment(itemdate).format("MM/DD/YYYY") ===
+              moment(comingdate).format("MM/DD/YYYY")){
 
-              // return comingdate === final
-              return moment(comingdate).isSame(itemdate)
+                let d2 = moment(new Date(item.approved_date));
+                let d1 = moment();
+                var diffMins = d1.diff(d2, 'minutes')
+                if(item.is_payment || diffMins < 20 ){
+                  return { start: item.start, end: item.end }
+                }
+                else{
+                  return 0;
+                }
+              }
+              else{
+                return 0;
+              }
             }
           );
-
-          // var arr = [];
-          // let comingdate =moment(req.body.date).format("YYYY-DD-MM");
-          //   console.log("comingdate",comingdate)
-          // var newData = user_data.filter(
-          //   (item) => {
-          //     let itemdate = new Date(item.date)
-          //     let final =itemdate.getFullYear()+ "-" + ("0" + (itemdate.getDate())).slice(-2) + "-" + ("0" + (itemdate.getMonth() + 1)).slice(-2) 
-          //     console.log("itemdate",itemdate)
-          //     console.log("final",final)
-          //     // return comingdate === final
-          //     return moment(comingdate).isSame(final)
-          //   }
-          // );
-
-          // var arr = [];
-          // let comingdate =moment(req.body.date).format("MM-DD-YYYY");
-          //   console.log("comingdate",comingdate)
-          // var newData = user_data.filter(
-          //   (item) => {
-          //     let itemdate = moment(item.date).format("MM-DD-YYYY")
-          //     console.log("itemdate",itemdate)
-          //     return comingdate === itemdate
-          //     // return moment(comingdate).isSame(itemdate)
-          //   }
-          // );
-          // var arr = [];
-          // let comingdate =new Date(req.body.date).setHours(0,0,0,0);
-          //   console.log("comingdate",comingdate)
-          // var newData = user_data.filter(
-          //   (item) => {
-          //     let itemdate = new Date(item.date).setHours(0,0,0,0)
-          //     console.log("itemdate",itemdate)
-          //     return comingdate === itemdate
-          //     // return moment(comingdate).isSame(itemdate)
-          //   }
-          // );
-          // var arr = [];
-          // const format = 'Www, dd Mmm yyyy';
-          // let comingdate = new Date(req.body.date)
-          // console.log("comingdate",comingdate.toUTCString())
-          // var newData = user_data.filter(
-          //   (item) => {
-          //     let itemdate = new Date(item.date)
-          //     console.log('comingdate', itemdate.toUTCString().slice(0, format.length) === comingdate.toUTCString().slice(0, format.length))
-          //     // console.log('fsdfsdf', itemdate, comingdate)
-          //     return itemdate.toUTCString().slice(0, format.length) === comingdate.toUTCString().slice(0, format.length);
-          //   }
-          // );
-          for (i = 0; i < newData.length; i++) {
-            start = newData[i].start
-            end = newData[i].end
-            arr.push({ start: start, end: end })
-          }
+          
           res.json({
             status: 200,
             hassuccessed: true,
-            data: arr,
+            data: newData,
           });
 
         }
@@ -713,7 +673,7 @@ router.post("/approvedrequest", function (req, res) {
   }
 });
 
-router.post("/AddMeeting", function (req, res, next) {
+router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -724,8 +684,13 @@ router.post("/AddMeeting", function (req, res, next) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
           var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-          var start_time = moment(req.body.start_time).format("HH:mm")
-          var end_time = moment(req.body.end_time).format("HH:mm")
+          // var start_date = new Date(req.body.start_time);
+          // var end_date = new Date(req.body.end_time);
+          // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
+          // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
+
+          var start_time = req.params.start_time;
+          var end_time = req.params.end_time;
           var sendData = `Dear Patient,
 
     Your payment process for sick leave certificate application is completed successfully.
@@ -1151,6 +1116,11 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
     GetDatafromAws(comming, comming2).then((result) => {
       new_link.push(result)
       var template = handlebars.compile(sick);
+      req.body.birthday = getDate(req.body.birthday, "YYYY/MM/DD");
+      req.body.date = getDate(req.body.date, "YYYY/MM/DD");
+      req.body.imposible = getDate(req.body.imposible, "YYYY/MM/DD");
+      req.body.most_likely = getDate(req.body.most_likely, "YYYY/MM/DD");
+      req.body.detected_at = getDate(req.body.detected_at, "YYYY/MM/DD");
       let newperson = {
         ...req.body,
         img: result
