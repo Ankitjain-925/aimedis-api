@@ -148,26 +148,34 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
           });
         } else {
           var arr = [];
-          const format = 'Www, dd Mmm yyyy';
-          let comingdate = new Date(req.body.date)
-          var newData = user_data.filter(
+          let  comingdate = new Date(new Date(req.body.date).setHours(0, 0, 0, 0));
+          // let comingdate = new Date(req.body.date).setHours(0, 0, 0, 0);
+          var newData = user_data.map(
             (item) => {
-              let itemdate = new Date(item.date)
-              console.log('comingdate', itemdate.toUTCString().slice(0, format.length), comingdate.toUTCString().slice(0, format.length), itemdate.toUTCString().slice(0, format.length) === comingdate.toUTCString().slice(0, format.length))
-              // console.log('fsdfsdf', itemdate, comingdate)
-              return itemdate.toUTCString().slice(0, format.length)  === comingdate.toUTCString().slice(0, format.length);
+              let itemdate = new Date(new Date(new Date().setDate(new Date(item.date).getDate())).setHours(0, 0, 0, 0));
+              if( moment(itemdate).format("MM/DD/YYYY") ===
+              moment(comingdate).format("MM/DD/YYYY")){
+
+                let d2 = moment(new Date(item.approved_date));
+                let d1 = moment();
+                var diffMins = d1.diff(d2, 'minutes')
+                if(item.is_payment || diffMins < 20 ){
+                  return { start: item.start, end: item.end }
+                }
+                else{
+                  return 0;
+                }
+              }
+              else{
+                return 0;
+              }
             }
           );
           
-          for (i = 0; i < newData.length; i++) {
-            start = newData[i].start
-            end = newData[i].end
-            arr.push({ start: start, end: end})
-          }
           res.json({
             status: 200,
             hassuccessed: true,
-            data: arr,
+            data: newData,
           });
     
         }
