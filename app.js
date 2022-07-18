@@ -629,17 +629,5 @@ app.use(function (err, req, res, next) {
  
 });
 
-app.listen(5002, () => {
-  console.log("Server started on port 5000");
-});
 
-//  module.exports = app;
-
-const LoggerMiddleware = (req,res,next) =>{
-  console.log(`Logged  ${req.url}  ${req.method} -- ${new Date()}`)
-  next();
-}
-
-
-// application level middleware
-app.use(LoggerMiddleware);
+module.exports = app;
