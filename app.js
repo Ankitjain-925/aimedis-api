@@ -455,6 +455,7 @@ var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
 var vactive = require("./routesV4/virtual_active");
 var market = require("./routesV4/marketing");
+var vcare4 = require("./routesV4/virtual_care");
 
 
 var UserData5 = require("./routesV5/UserTrack");
@@ -539,7 +540,7 @@ app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
 app.use("/api/v4/vactive", vactive);
-
+app.use("/api/v4/vc", vcare4);
 
 
 app.use("/api/v5/User", UserData5);
