@@ -468,6 +468,8 @@ var merketing = require("./routesV4/marketing");
 var vactive = require("./routesV4/virtual_active");
 var market = require("./routesV4/marketing");
 var cquestionnaire = require("./routesV4/care_questionnaires.js");
+var vcare4 = require("./routesV4/virtual_care");
+
 
 var UserData5 = require("./routesV5/UserTrack");
 var UserProfile5 = require("./routesV5/userProfile");
@@ -552,6 +554,7 @@ app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
 app.use("/api/v4/cquestionnaire", cquestionnaire);
 app.use("/api/v4/vactive", vactive);
+app.use("/api/v4/vc", vcare4);
 
 
 app.use("/api/v5/User", UserData5);
