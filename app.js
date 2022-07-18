@@ -52,31 +52,31 @@ appAdmin.use(express.static(path.join(__dirname, "build/admin")));
 appAdmin1.use(express.static(path.join(__dirname, "build/sickleave")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
-// const server = require("http").createServer(app);
-// const io = require("socket.io")(server, {
-//   transports: ["polling"],
-//   cors: {
-//     origin: "*",
-//   },
-// });
-// ////////////admin+main+end/////////////
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  transports: ["polling"],
+  cors: {
+    origin: "*",
+  },
+});
+////////////admin+main+end/////////////
 
-// io.on("connection", (socket) => {
-//   console.log("A user is connected");
+io.on("connection", (socket) => {
+  console.log("A user is connected");
 
-//   socket.on("update", (data) => {
-//     console.log("data", data);
-//     socket.broadcast.emit("data_shown", data);
-//   });
-//   socket.on("addpatient", (data) => {
-//     console.log("addpatient", data);
-//     socket.broadcast.emit("email_accept", data);
-//   });
-//   socket.on("decline", (data) => {
-//     console.log("decline", data);
-//     socket.broadcast.emit("email_decline", data);
-//   });
-// });
+  socket.on("update", (data) => {
+    console.log("data", data);
+    socket.broadcast.emit("data_shown", data);
+  });
+  socket.on("addpatient", (data) => {
+    console.log("addpatient", data);
+    socket.broadcast.emit("email_accept", data);
+  });
+  socket.on("decline", (data) => {
+    console.log("decline", data);
+    socket.broadcast.emit("email_decline", data);
+  });
+});
 
 
 // cron.schedule('0 0 */12 * * *', function(){
@@ -189,74 +189,81 @@ cron.schedule('0 0 */12 * * *', function(){
   SetArchivePayment()
 });
 
-function SetArchiveUnuseMeeting() {
+function SetArchiveUnuseMeeting(){
   sick_meeting.find()
-    .exec(function (err, doc1) {
-      if (err && !doc1) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "update data failed",
-          error: err,
-        });
-      } else {
-        console.log("doc1", doc1)
-        let ttime = moment()
-        doc1.forEach((element) => {
-          var enddate = moment(element.date);
-          var diff1 = ttime.diff(enddate, 'hours')
-          if (diff1 > 6) {
-            virtual_Task.updateMany({
-              _id: element.task_id, $or: [
-                { meetingjoined: { $ne: true } },
-                { meetingjoined: { $exists: false } }
-              ]
-            }, { archived: true }, function (err, data) {
-              if (err) {
-                console.log("err", err)
-              }
-              else {
-                console.log("data", data)
-              }
-            })
-          }
-        })
-      }
-    }
-    );
-}
-
-function removeOldBackups() {
-  const directoryPath = path.join(__dirname, "./DBbackups/")
-  fs.readdir(directoryPath, (err, files) => {
-    if (err) {
+  .exec(function (err, doc1) {
+    if (err && !doc1) {
       res.json({
         status: 200,
         hassuccessed: false,
-        msg: "Something went wrong",
+        message: "update data failed",
+        error: err,
       });
-    }
-    else {
-      files.forEach(file => {
-        fs.stat(directoryPath + `/${file}`, function (err, data) {
-          let ttime = moment(Date.now()).format("YYYY-MM-DD")
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Something went wrong",
-            });
-          } else {
-            var enddate = moment(data.birthtime).format("YYYY-MM-DD");
-            difference = moment(ttime).diff(enddate, 'days')
-            if (moment(ttime).diff(enddate, 'days') >= 10) {
-              fs.unlink(directoryPath + `/${file}`, function (err) { })
+    } else {
+      console.log("doc1", doc1)
+      let ttime = moment(Date.now()).format("YYYY-MM-DD")
+      // let final= doc1.map((element)=>{
+      //   return element.endtime
+      // })
+
+      doc1.forEach((element) => {
+
+        var enddate = moment(element.date).format("YYYY-MM-DD");
+        
+
+        if (moment(ttime).diff(enddate, 'days') > 2 ) {
+          virtual_Task.updateMany({ _id:element.task_id,  $or: [
+            {meetingjoined: { $ne: true } },
+            { meetingjoined: { $exists: false } }
+          ] }, { archived: true }, function (err, data) {
+            if (err) {
+              console.log("err", err)
             }
-          }
-        })
-      });
+            else {
+              console.log("data", data)
+            }
+          })
+
+
+        }
+
+      })
     }
-  });
+  }
+  );
+}
+
+function removeOldBackups() {
+  const directoryPath =path.join(__dirname, "./DBbackups/")
+fs.readdir(directoryPath, (err, files) => {
+  if (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Something went wrong",
+    });
+  }
+  else {
+    files.forEach(file => {
+      fs.stat(directoryPath + `/${file}`, function (err, data) {
+        let ttime = moment(Date.now()).format("YYYY-MM-DD")
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+          });
+        } else {
+          var enddate = moment(data.birthtime).format("YYYY-MM-DD");
+         difference= moment(ttime).diff(enddate, 'days')
+          if (moment(ttime).diff(enddate, 'days') >=10) {
+            fs.unlink(directoryPath + `/${file}`, function (err) {})
+          }
+        }
+      })
+    });
+  }
+});
 }
 
 function getData() {
@@ -268,49 +275,49 @@ function getData() {
     "include_non_downloadable_files": true,
     "path": "/backupdb",
     "recursive": false
-  }
-  var config = {
-    method: "POST",
-    url: `https://api.dropboxapi.com/2/files/list_folder`,
-    headers: {
-      authorization: `Bearer ${process.env.DBT}`,
-      'Content-Type': 'application/json',
-    },
-    data: data
-  };
-
-  axios(config).then(function (data) {
-    let final_data = data.data.entries.sort(mySorter)
-    if (final_data.length > 50) {
-      var tempArray = final_data.slice(0, 50);
-      var tempArray2 = final_data.slice(50);
-      tempArray2.forEach((item, index) => {
-        var data = JSON.stringify({
-          path: item.path_lower,
-        });
-
-        var config = {
-          method: "post",
-          url: "https://api.dropboxapi.com/2/files/delete_v2",
-          headers: {
-            Authorization:
-              `Bearer ${process.env.DBT}`,
-            "Content-Type": "application/json",
-          },
-          data: data,
-        };
-
-        axios(config)
-          .then(function (response) {
-            console.log("done index", JSON.stringify(response.data));
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      });
     }
-  }).catch(function (error) { })
+    var config = {
+      method: "POST",
+      url: `https://api.dropboxapi.com/2/files/list_folder`,
+      headers: {
+        authorization: `Bearer ${process.env.DBT}`,
+        'Content-Type': 'application/json',
+      },
+      data: data
+    };
+  
+    axios(config).then(function (data) {
+      let final_data = data.data.entries.sort(mySorter)
+     if (final_data.length > 50) {
+        var tempArray = final_data.slice(0,50);
+        var tempArray2 =final_data.slice(50);
+        tempArray2.forEach((item, index) => {
+            var data = JSON.stringify({
+              path: item.path_lower,
+            });
 
+            var config = {
+              method: "post",
+              url: "https://api.dropboxapi.com/2/files/delete_v2",
+              headers: {
+                Authorization:
+                  `Bearer ${process.env.DBT}`,
+                "Content-Type": "application/json",
+              },
+              data: data,
+            };
+
+            axios(config)
+              .then(function (response) {
+                console.log("done index", JSON.stringify(response.data));
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+          });
+      }
+    }).catch(function (error) {})
+  
 }
 
 function mySorter(a, b) {
@@ -323,24 +330,24 @@ function mySorter(a, b) {
   }
 }
 
-function CallingDropBox(localFile, SetUrl) {
-  var config = {
-    method: 'POST',
-    url: 'https://content.dropboxapi.com/2/files/upload',
-    headers: {
-      'Authorization': `Bearer ${process.env.DBT}`,
-      'Dropbox-API-Arg': JSON.stringify({
-        'path': SetUrl,
-        'mode': 'overwrite',
-        'autorename': true,
-        'mute': false,
-        'strict_conflict': false
-      }),
-      'Content-Type': 'application/octet-stream',
-    },
-    data: fs.readFileSync(path.resolve(__dirname, localFile))
-  }
-  axios(config)
+function CallingDropBox(localFile, SetUrl){
+     var config =  {
+      method: 'POST',
+      url: 'https://content.dropboxapi.com/2/files/upload',
+     headers: {
+       'Authorization': `Bearer ${process.env.DBT}`,
+       'Dropbox-API-Arg': JSON.stringify({
+         'path': SetUrl,
+         'mode': 'overwrite',
+         'autorename': true, 
+         'mute': false,
+         'strict_conflict': false
+       }),
+         'Content-Type': 'application/octet-stream',
+     },
+     data: fs.readFileSync(path.resolve(__dirname, localFile))
+   }
+    axios(config)
     .then(function (response) {
       console.log('sdfsdfsfsdfsd', response.data)
     })
@@ -356,23 +363,27 @@ function CallingDropBox(localFile, SetUrl) {
 // app.use("localhost:5000/api/v4/vactive/linkarchive");
 
 // console.log("enter second")
-
+  
 // });
 
 function SetArchivePayment() {
-  var task_type = "sick_leave"
-  const VirtualtToSearchWith1 = new virtual_Task({ task_type });
-  VirtualtToSearchWith1.encryptFieldsSync();
-  virtual_Task.find({ task_type: { $in: [task_type, VirtualtToSearchWith1.task_type] } })
+   var task_type= "sick_leave"
+        const VirtualtToSearchWith1 = new virtual_Task({task_type });
+        VirtualtToSearchWith1.encryptFieldsSync();
+  virtual_Task.find({task_type:{ $in: [task_type, VirtualtToSearchWith1.task_type] }})
     .exec(function (err, doc1) {
       if (err && !doc1) {
-        console.log("err", err)
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "update data failed",
+          error: err,
+        });
       } else {
-        let ttime = moment()
+        let ttime = moment(Date.now()).format("YYYY-MM-DD")
         doc1.forEach((element) => {
-          var enddate = moment(element.date)
-          var diff1 = ttime.diff(enddate, 'hours')
-          if (diff1 > 6) {
+          var enddate = moment(element.date).format("YYYY-MM-DD");
+          if (moment(ttime).diff(enddate, 'days') > 1) {
             virtual_Task.updateMany({
               _id: element._id, $or: [
                 { is_payment: { $ne: true } },
@@ -392,6 +403,7 @@ function SetArchivePayment() {
     }
     );
 }
+
 
 var UserData = require("./routes/UserTrack");
 var UserProfile = require("./routes/userProfile");
@@ -455,6 +467,7 @@ var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
 var vactive = require("./routesV4/virtual_active");
 var market = require("./routesV4/marketing");
+var cquestionnaire = require("./routesV4/care_questionnaires.js");
 var vcare4 = require("./routesV4/virtual_care");
 
 
@@ -518,7 +531,7 @@ app.use("/api/v3/admin", adminse3);
 app.use("/api/v3/aws", Uploadcerts3);
 app.use("/api/v3/blockchain", bloackchain3);
 app.use("/api/v3/cron", cronPrecess3);
-
+app.use("/api/v4/",UserData4)
 app.use("/api/v4/User", UserData4);
 app.use("/api/v4/UserProfile", UserProfile4);
 app.use("/api/v4/SaveCSV", SaveCSV4);
@@ -539,6 +552,7 @@ app.use("/api/v4/cases", vcases4);
 app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
+app.use("/api/v4/cquestionnaire", cquestionnaire);
 app.use("/api/v4/vactive", vactive);
 app.use("/api/v4/vc", vcare4);
 
@@ -562,6 +576,7 @@ app.use("/api/v5/questionaire", questionaire5);
 app.use("/api/v5/cases", vcases5);
 app.use("/api/v5/hospitaladmin", hadmin5);
 app.use("/api/v5/cometUserList", comet5);
+
 app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
 
@@ -571,6 +586,10 @@ app.use("/api/v5/vactive", vactive5);
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get("/s",(res,req)=>{
+  console.log("nnnnnnnnnnnnn")
+
+})
 
 ////////////admin+main/////////////
 appAdmin.use(function (req, res, next) {
@@ -579,7 +598,7 @@ appAdmin.use(function (req, res, next) {
   next(err);
 });
 appAdmin.use((err, req, res, next) => {
-  return res.sendFile(path.resolve(__dirname, 'build/admin', 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
 });
 
 app.use("/sys-n-admin", appAdmin);
@@ -590,7 +609,7 @@ appAdmin1.use(function (req, res, next) {
   next(err);
 });
 appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve(__dirname, 'build/sickleave', 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
 });
 
 app.use("/sys-n-sick", appAdmin1);
@@ -604,10 +623,11 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-// app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
-//   console.log("err", err);
-// });
+app.use(function (err, req, res, next) {
+  console.log("err", err);
+ return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
+ 
+});
 
 
- module.exports = app;
+module.exports = app;
