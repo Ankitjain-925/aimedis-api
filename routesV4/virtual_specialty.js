@@ -2970,7 +2970,7 @@ router.get("/Getinstitutename/:house_id", function (req, res) {
           data.institute_groups.map((item) => {
 
             item.houses.map((item2) => {
-              if (item2.house_id == req.body.house_id) {
+              if (item2.house_id == req.params.house_id) {
                 house_name = item2.house_name;
               }
             });
