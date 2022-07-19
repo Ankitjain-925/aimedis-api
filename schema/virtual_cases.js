@@ -140,6 +140,11 @@ var CaseSchema = new Schema({
     discharged_at: {
         type: Date,
     },
+    external_space:{
+        type: Boolean,
+        required: false,
+        unique: false
+    },
     assinged_to: [ProfessionalInfo],
 },{ strict: false });
 
