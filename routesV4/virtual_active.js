@@ -125,6 +125,7 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
     virtual_Task.find(
       {
         "assinged_to.user_id" : req.body.doctor_id ,
+        archived: { $ne: true },
         $and: [
         { $or: [ {is_decline: {$exists: false}}, 
           {is_decline: {$eq : false}}
@@ -147,21 +148,34 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
           });
         } else {
           var arr = [];
-          let comingdate = moment(req.body.date).format("MM-DD-YYYY");
-          var newData = user_data.filter(
+          let  comingdate = new Date(new Date(req.body.date).setHours(0, 0, 0, 0));
+          // let comingdate = new Date(req.body.date).setHours(0, 0, 0, 0);
+          var newData = user_data.map(
             (item) => {
-              let itemdate = moment(item.date).format("MM-DD-YYYY")
-              return moment(comingdate).isSame(itemdate)}
+              let itemdate = new Date(new Date(new Date().setDate(new Date(item.date).getDate())).setHours(0, 0, 0, 0));
+              if( moment(itemdate).format("MM/DD/YYYY") ===
+              moment(comingdate).format("MM/DD/YYYY")){
+
+                let d2 = moment(new Date(item.approved_date));
+                let d1 = moment();
+                var diffMins = d1.diff(d2, 'minutes')
+                if(item.is_payment || diffMins < 20 ){
+                  return { start: item.start, end: item.end }
+                }
+                else{
+                  return 0;
+                }
+              }
+              else{
+                return 0;
+              }
+            }
           );
-          for (i = 0; i < newData.length; i++) {
-            start = newData[i].start
-            end = newData[i].end
-            arr.push({ start: start, end: end })
-          }
+          
           res.json({
             status: 200,
             hassuccessed: true,
-            data: arr,
+            data: newData,
           });
     
         }
@@ -657,7 +671,7 @@ router.post("/approvedrequest", function (req, res) {
   }
 });
 
-router.post("/AddMeeting", function (req, res, next) {
+router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -668,8 +682,13 @@ router.post("/AddMeeting", function (req, res, next) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
           var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-          var start_time = moment(req.body.start_time).format("HH:mm")
-          var end_time = moment(req.body.end_time).format("HH:mm")
+          // var start_date = new Date(req.body.start_time);
+          // var end_date = new Date(req.body.end_time);
+          // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
+          // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
+
+          var start_time = req.params.start_time;
+          var end_time = req.params.end_time;
           var sendData = `Dear Patient,
 
     Your payment process for sick leave certificate application is completed successfully.

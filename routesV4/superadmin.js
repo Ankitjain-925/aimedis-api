@@ -506,76 +506,61 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         }, function (err, data) {
           if (err) {
             console.log("err", err)
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Something went wrong.",
-              error: err,
-            });
           } else {
-            var patient_id = req.params.UserId
-            const VirtualtToSearchWith = new virtual_tasks({ patient_id });
-            VirtualtToSearchWith.encryptFieldsSync();
-            virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
-              {
-                '$unset': {
-                  'patient.image': ""
-                }
-              }, function (err, data) {
-                if (err) {
-                  console.log("1", err)
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    msg: "Something went wrong.",
-                    error: err,
-                  });
-                } else {
-
-                  virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
-                    {
-                      '$unset': {
-                        'patient.image': ""
-                      }
-                    }, function (err, data) {
-                      if (err) {
-                        res.json({
-                          status: 200,
-                          hassuccessed: false,
-                          msg: "Something went wrong.",
-                          error: err,
-                        });
-                      } else {
-                        var patient = req.params.UserId
-                        const VirtualtToSearchWith2 = new Appointments({ patient });
-                        VirtualtToSearchWith2.encryptFieldsSync();
-                        Appointments.updateOne({
-                          patient: { $in: [patient, VirtualtToSearchWith2.patient] }
-                        }, {
-                          '$unset': {
-                            'patient_info.profile_image': ""
-                          }
-                        }, function (err, data) {
-                          if (err) {
-                            console.log("3", err)
-                            res.json({
-                              status: 200,
-                              hassuccessed: false,
-                              msg: "Something went wrong.",
-                              error: err,
-                            });
-                          } else {
-                            res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
-                          }
-
-                        })
-                      }
-                    })
-                }
-              })
+            console.log("data", data)
           }
         })
+      var patient_id = req.params.UserId
+      const VirtualtToSearchWith = new virtual_tasks({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
+        {
+          '$unset': {
+            'patient.image': ""
+          }
+        }, function (err, data2) {
+          if (err) {
+            console.log("err", err)
+
+          } else {
+            console.log("data", data2)
+          }
+        })
+
+      virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
+        {
+          '$unset': {
+            'patient.image': ""
+          }
+        }, function (err, data3) {
+          if (err) {
+            console.log("err3", err)
+          } else {
+            console.log("data", data3)
+          }
+        })
+      var patient = req.params.UserId
+      const VirtualtToSearchWith2 = new Appointments({ patient });
+      VirtualtToSearchWith2.encryptFieldsSync();
+      Appointments.updateOne({
+        patient: { $in: [patient, VirtualtToSearchWith2.patient] }
+      }, {
+        '$unset': {
+          'patient_info.profile_image': ""
+        }
+      }, function (err, data4) {
+        if (err) {
+          console.log("err", err)
+
+        } else {
+          console.log("data", data4)
+        }
+
+      })
+      res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
+
     }
+
   });
 });
 

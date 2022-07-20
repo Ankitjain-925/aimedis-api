@@ -357,7 +357,7 @@ function ApproveReq(doc, start, end, date) {
         ${start} 
         to
         ${end}
-        So, for the further process please complete your payment process from the request list page. The process of paymnet is 15 minutes process, So please do payment for this request within 15 minutes. Otherwise this request goes to at archive section automiatically.`;
+        So, for the further process please complete your payment process from the request list page. The process of payment is 15 minutes process, So please do payment for this request within 15 minutes. Otherwise this request goes to at archive section automiatically.`;
       generateTemplate(
         EMAIL.generalEmail.createTemplate("en", {
           title: "",
@@ -586,18 +586,19 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
     });
     messageToSearchWith.encryptFieldsSync();
 
-    const messageToSearchWith1 = new virtual_Task({
-      task_type: "sick_leave",
+    const VirtualtToSearchWith2 = new virtual_Task({
+      task_type: "picture_evaluation",
     });
-    messageToSearchWith1.encryptFieldsSync();
-    
+    VirtualtToSearchWith2.encryptFieldsSync();
     virtual_Task.find(
       {
         house_id: { $in: [house_id, messageToSearchWith.house_id] },
         archived: { $eq: true },
         $or: [
-          { task_type: { $ne: "sick_leave" } },
-          { task_type: { $ne: messageToSearchWith1.task_type } }]
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -658,11 +659,20 @@ router.get("/PatientsTask/:patient_id", function (req, res, next) {
       patient_id: req.params.patient_id,
     });
     messageToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith2 = new virtual_Task({
+      task_type: "picture_evaluation",
+    });
+    VirtualtToSearchWith2.encryptFieldsSync();
     virtual_Task.find(
       {
         patient_id: {
           $in: [messageToSearchWith.patient_id, req.params.patient_id],
         },
+        $or: [
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -2960,7 +2970,7 @@ router.get("/Getinstitutename/:house_id", function (req, res) {
           data.institute_groups.map((item) => {
 
             item.houses.map((item2) => {
-              if (item2.house_id == req.body.house_id) {
+              if (item2.house_id == req.params.house_id) {
                 house_name = item2.house_name;
               }
             });
