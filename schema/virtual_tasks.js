@@ -55,7 +55,9 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
 
 var TaskSchema = new Schema(
   {
-    
+    due_on: {
+      type: Object,
+    },
     assinged_to: [ProfessionalInfo],
     speciality: {
       type: Object,
