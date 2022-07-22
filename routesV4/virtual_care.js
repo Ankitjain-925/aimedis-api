@@ -140,11 +140,11 @@ router.post("/UpdateAddress", function (req, res) {
 });
 
 router.get(
-    "/PrFuTask/:patient_profile_id",
+    "/PresentFutureTask/:patient_profile_id",
     function (req, res, next) {
         const token = req.headers.token;
         let legit = jwtconfig.verify(token);
-        if (!legit) {
+        if (legit) {
             var arr = [];
 
             virtual_Task.find(
@@ -200,7 +200,7 @@ router.get(
     function (req, res, next) {
         const token = req.headers.token;
         let legit = jwtconfig.verify(token);
-        if (!legit) {
+        if (legit) {
             var arr1 = [];
 
             virtual_Task.find(
@@ -263,7 +263,7 @@ router.get("/infoOfPatients", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     arr = []
-    if (!legit) {
+    if (legit) {
         arr1 = [];
         virtual_Case.find({ $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
             if (err && !userdata) {
@@ -331,7 +331,7 @@ function forEachPromise(items, fn) {
     }, Promise.resolve());
 }
 
-router.post("/AisPaMail", function (req, res, next) {
+router.post("/NurseHomeVisitMail", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
