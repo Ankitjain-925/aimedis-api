@@ -257,4 +257,167 @@ router.get(
     }
 );
 
+var arr1 = [];
+
+router.get("/infoOfPatients", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    arr = []
+    if (!legit) {
+        arr1 = [];
+        virtual_Case.find({ $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
+            if (err && !userdata) {
+                res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "user not found",
+                    error: err,
+                });
+            } else {
+                userdata.forEach((element) => {
+                    arr1.push(element.patient_id)
+                })
+                forEachPromise(arr1, getfull).then((result) => {
+                    console.log("arr", arr.length)
+                    res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        data: arr
+                    });
+                })
+            }
+        });
+    } else {
+        res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Authentication required.",
+        });
+    }
+});
+
+
+
+function getfull(data) {
+    return new Promise((resolve, reject) => {
+        try {
+            if (data) {
+                console.log("1", data)
+                User.findOne({ _id: data },
+                    function (err, dataa) {
+                        if (err) {
+                            console.log("err", err)
+                        }
+                        else {
+                            arr.push(dataa)
+                            resolve(arr)
+                        }
+                    })
+
+            }
+        } catch (error) {
+            console.log(error)
+            resolve(data);
+        }
+    });
+
+}
+
+function forEachPromise(items, fn) {
+    return items.reduce(function (promise, item) {
+        return promise.then(function () {
+            return fn(item);
+        });
+    }, Promise.resolve());
+}
+
+router.post("/AisPaMail", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+        try {
+
+            User.findOne({ _id: req.body.nurse_id },
+                function (err, user_data1) {
+
+                    if (err && !user_data1) {
+                        res.json({ status: 200, message: "Something went wrong.", error: err });
+                    } else {
+                        var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+                        var time = new Date(req.body.time);
+                        // var end_date = new Date(req.body.end_time);
+                        var final_time = time.getHours() + ':' + time.getMinutes();
+                        // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
+
+
+
+                        User.findOne({ _id: req.body.patient_id },
+                            function (err, user_data2) {
+
+                                if (err && !user_data2) {
+                                    res.json({ status: 200, message: "Something went wrong.", error: err });
+                                } else {
+                                    user11 = user_data1.first_name.toUpperCase(),
+                                        user12 = user_data1.last_name.toUpperCase(),
+                                        user21 = user_data2.first_name.toUpperCase(),
+                                        user22 = user_data2.last_name.toUpperCase(),
+
+                                        sendData = `Dear ${user21 + " " + user22},
+  
+                                    As you routine checkup from AIS CARE - ${req.body.hospital_name} there a nurse ${user11 + " " + user12 + " " + user_data1.profile_id},
+                                    will come `;
+
+                                    sendData1 = `at your address ${user_data2.address} on date ${meetingDate} at ${final_time}. Please ${user21 + " " + user22 + " " + user_data2.profile_id}, must be available for same, when nurse will come at your place. And for any emergency patient is not available on that date/time please inform to the hospital admin.`;
+
+                                    generateTemplate(
+                                        EMAIL.generalEmail.createTemplate("en", {
+                                            title: "",
+                                            content: sendData + sendData1,
+                                        }),
+                                        (error, html) => {
+                                            if (!error) {
+
+                                                let mailOptions = {
+                                                    from: "contact@aimedis.com",
+                                                    to: user_data2.email,
+                                                    subject: "Link for the Sick leave certificate",
+                                                    html: html,
+                                                };
+
+                                                let sendmail = transporter.sendMail(mailOptions);
+                                                if (sendmail) {
+                                                }
+                                            }
+
+                                        }
+                                    );
+
+                                    res.json({
+                                        status: 200,
+                                        message: "Mail sent Successfully",
+                                        hassuccessed: true,
+                                    });
+
+                                }
+                            });
+
+                    }
+                });
+        } catch (err) {
+            res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+            });
+        }
+    } else {
+        res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Authentication required.",
+        });
+    }
+});
+
 module.exports = router;
