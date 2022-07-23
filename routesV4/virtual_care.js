@@ -27,6 +27,29 @@ var transporter = nodemailer.createTransport({
   },
 });
 
+var mongoose = require("mongoose");
+var arr=[]
+
+
+
+function getTimeStops(start, end, timeslots, breakstart, breakend) {
+  var startTime = moment(start, "HH:mm");
+  var endTime = moment(end, "HH:mm");
+
+  var timeslot = parseInt(timeslots, 10);
+
+  if (endTime.isBefore(startTime)) {
+    endTime.add(1, "day");
+  }
+  var timeStops = [];
+
+  while (startTime <= endTime) {
+    timeStops.push(new moment(startTime).format("HH:mm"));
+    startTime.add(timeslot, "minutes");
+  }
+  return timeStops;
+}
+
 
 router.post("/UpdateAddress", function (req, res) {
   const token = req.headers.token;
@@ -44,9 +67,9 @@ router.post("/UpdateAddress", function (req, res) {
           error: err,
         });
       } else {
-        if(data1){
+        if (data1) {
           User.findOne({ _id: data1.patient_id }, function (err, data) {
-            if (err){ 
+            if (err) {
               res.json({
                 status: 200,
                 hassuccessed: false,
@@ -55,12 +78,12 @@ router.post("/UpdateAddress", function (req, res) {
               });
             } else {
               if (data) {
-                console.log("data",data)
-                console.log("data",data.country,data.country_code)
+                console.log("data", data)
+                console.log("data", data.country, data.country_code)
                 if (data.address && data.city && data.street && data.country && data.pastal_code) {
                   virtual_Case.updateMany({ case_number: { $in: [case_number, VirtualtToSearchWith.case_number] } }, { external_space: true }, function (err, data2) {
                     if (err) {
-                      console.log("err2",err)
+                      console.log("err2", err)
                       res.json({
                         status: 200,
                         hassuccessed: false,
@@ -79,8 +102,8 @@ router.post("/UpdateAddress", function (req, res) {
                   var sendData =
                     `<div>Dear Patient,
                     Please fill your full address at your profile of Aimedis, The hospital- ${req.body.HospitalName} wants to add you in AIS Care, for that hospital admin staff needs your proper address, So hospital can add you as AIS Care. Please update full address immediately.</div>`;
-                    var sendMob=`Dear Patient,Please fill your full address at your profile of Aimedis, The hospital- ${req.body.HospitalName} wants to add you in AIS Care, for that hospital admin staff needs your proper address, So hospital can add you as AIS Care. Please update full address immediately.`
-  
+                  var sendMob = `Dear Patient,Please fill your full address at your profile of Aimedis, The hospital- ${req.body.HospitalName} wants to add you in AIS Care, for that hospital admin staff needs your proper address, So hospital can add you as AIS Care. Please update full address immediately.`
+
                   generateTemplate(
                     EMAIL.generalEmail.createTemplate("en", {
                       title: "",
@@ -120,7 +143,7 @@ router.post("/UpdateAddress", function (req, res) {
               }
             }
           })
-        }else{
+        } else {
           res.json({
             status: 200,
             hassuccessed: false,
@@ -139,8 +162,7 @@ router.post("/UpdateAddress", function (req, res) {
 
 });
 
-router.get(
-    "/PresentFutureTask/:patient_profile_id",
+router.get("/PresentFutureTask/:patient_profile_id",
     function (req, res, next) {
         const token = req.headers.token;
         let legit = jwtconfig.verify(token);
@@ -297,39 +319,39 @@ router.get("/infoOfPatients", function (req, res, next) {
 });
 
 
-
 function getfull(data) {
-    return new Promise((resolve, reject) => {
-        try {
-            if (data) {
-                console.log("1", data)
-                User.findOne({ _id: data },
-                    function (err, dataa) {
-                        if (err) {
-                            console.log("err", err)
-                        }
-                        else {
-                            arr.push(dataa)
-                            resolve(arr)
-                        }
-                    })
-
+  return new Promise((resolve, reject) => {
+    try {
+      if (data) {
+        console.log("1",data)
+        User.findOne({ _id: data },
+          function (err, dataa) {
+            if(err){
+              console.log("err",err)
             }
-        } catch (error) {
-            console.log(error)
-            resolve(data);
-        }
-    });
+            else {
+            arr.push(dataa)
+            resolve(arr)
+            }
+          })
+
+      }
+    } catch (error) {
+      console.log(error)
+      resolve(data);
+    }
+  });
 
 }
 
 function forEachPromise(items, fn) {
-    return items.reduce(function (promise, item) {
-        return promise.then(function () {
-            return fn(item);
-        });
-    }, Promise.resolve());
+  return items.reduce(function (promise, item) {
+    return promise.then(function () {
+      return fn(item);
+    });
+  }, Promise.resolve());
 }
+
 
 router.post("/NurseHomeVisitMail", function (req, res, next) {
     const token = req.headers.token;
