@@ -3006,7 +3006,7 @@
                 }
             }
         },
-        "/vcare4/PrFuTask/{patient_profile_id}": {
+        "/vc/PresentFutureTask/{patient_profile_id}": {
             "get": {
                     "parameters": [
                         {
@@ -3037,7 +3037,7 @@
                 }
             }
         },
-        "/vcare4/PastTask/{patient_profile_id}": {
+        "/vc/PastTask/{patient_profile_id}": {
             "get": {
                     "parameters": [
                         {
@@ -3068,7 +3068,7 @@
                 }
             }
         },
-        "/vcare4/infoOfPatients": {
+        "/vc/infoOfPatients": {
             "get": {
                     "parameters": [
                         {
@@ -3092,7 +3092,7 @@
                 }
             }
         },
-        "/vcare4/UpdateAddress": {
+        "/vc/UpdateAddress": {
             "parameters": [
                 {
                     "name": "token",
@@ -3127,7 +3127,7 @@
                 }
             }
         },
-        "/vcare4/NurseHomeVisitMail": {
+        "/vc/NurseHomeVisitMail": {
             "parameters": [
                 {
                     "name": "token",
