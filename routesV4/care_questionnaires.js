@@ -2,6 +2,8 @@ require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 var CareModel = require("../schema/care_questionnaire.js");
+var VirtualModel = require("../schema/virtual_cases.js")
+var User = require("../schema/user.js")
 var jwtconfig = require("../jwttoken");
 
 
@@ -22,9 +24,10 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     let legit = jwtconfig.verify(token);
     if (legit) {
       let house_id =req.params.house_id
-      const messageToSearchWith = new CareModel({house_id });
+      const messageToSearchWith = new VirtualModel({house_id });
+      console.log(messageToSearchWith)
       messageToSearchWith.encryptFieldsSync();
-      CareModel.find(
+      VirtualModel.find(
         {$or:[ {house_id: req.params.house_id},{house_id: messageToSearchWith.house_id}] },
         function (err, userdata) {
           if (err && !userdata) {
@@ -115,3 +118,5 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
 
 
   module.exports = router;
+
+  // external_space

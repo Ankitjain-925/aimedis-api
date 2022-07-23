@@ -468,8 +468,7 @@ var merketing = require("./routesV4/marketing");
 var vactive = require("./routesV4/virtual_active");
 var market = require("./routesV4/marketing");
 var cquestionnaire = require("./routesV4/care_questionnaires.js");
-var vcare4 = require("./routesV4/virtual_care");
-
+var assignservice = require("./routesV4/assign_services.js");
 
 var UserData5 = require("./routesV5/UserTrack");
 var UserProfile5 = require("./routesV5/userProfile");
@@ -553,8 +552,8 @@ app.use("/api/v4/hospitaladmin", hadmin4);
 app.use("/api/v4/cometUserList", comet4);
 app.use("/api/v4/marketing", merketing);
 app.use("/api/v4/cquestionnaire", cquestionnaire);
+app.use("/api/v4/assignservice", assignservice);
 app.use("/api/v4/vactive", vactive);
-app.use("/api/v4/vc", vcare4);
 
 
 app.use("/api/v5/User", UserData5);
@@ -625,12 +624,21 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
   console.log("err", err);
- return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
+  return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
  
 });
-// app.listen(5001, function(err){
-//   if (err) console.log(err);
-//   console.log("Server listening on PORT", 5001);
-// });
 
-module.exports = app;
+app.listen(5002, () => {
+  console.log("Server started on port 5000");
+});
+
+//  module.exports = app;
+
+const LoggerMiddleware = (req,res,next) =>{
+  console.log(`Logged  ${req.url}  ${req.method} -- ${new Date()}`)
+  next();
+}
+
+
+// application level middleware
+app.use(LoggerMiddleware);
