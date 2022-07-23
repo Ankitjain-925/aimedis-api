@@ -212,12 +212,8 @@ function SetArchiveUnuseMeeting() {
                 { meetingjoined: { $exists: false } }
               ]
             }, { archived: true }, function (err, data) {
-              if (err) {
-                console.log("err", err)
-              }
-              else {
-                console.log("data", data)
-              }
+              if (err) { console.log("err", err) }
+              else { console.log("data", data) }
             })
           }
         })
@@ -601,10 +597,10 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-// app.use(function (err, req, res, next) {
+app.use(function (err, req, res, next) {
    return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
 //   console.log("err", err);
-// });
+});
 
 
- module.exports = app;
+module.exports = app;
