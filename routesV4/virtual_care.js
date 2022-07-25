@@ -3,9 +3,10 @@ const axios = require("axios");
 var express = require("express");
 let router = express.Router();
 var virtual_Case = require("../schema/virtual_cases.js");
+var virtual_Task = require("../schema/virtual_tasks.js");
 var User = require("../schema/user.js");
 var Appointments = require("../schema/appointments");
-var assigned_Service = require("../schema/assigned_Service");
+var assigned_Service = require("../schema/assigned_service");
 var sick_meeting = require("../schema/sick_meeting");
 var answerspatient = require("../schema/answerspatient");
 var Prescription = require("../schema/prescription");
@@ -88,7 +89,7 @@ router.post("/UpdateAddress", function (req, res) {
               if (data) {
                 console.log("data", data)
                 console.log("data", data.country, data.country_code)
-                if (data.address && data.city && data.street && data.country && data.pastal_code) {
+                if (data.address && data.city && data.country && data.pastal_code) {
                   virtual_Case.updateMany({ case_number: { $in: [case_number, VirtualtToSearchWith.case_number] } }, { external_space: true }, function (err, data2) {
                     if (err) {
                       console.log("err2", err)
@@ -171,120 +172,120 @@ router.post("/UpdateAddress", function (req, res) {
 });
 
 router.get("/PresentFutureTask/:patient_profile_id",
-    function (req, res, next) {
-        const token = req.headers.token;
-        let legit = jwtconfig.verify(token);
-        if (legit) {
-            var arr = [];
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+      var arr = [];
 
-            virtual_Task.find(
-                {
-                    "assinged_to.profile_id": req.params.patient_profile_id,
-                    $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
-                },
-                function (err, userdata) {
-                    if (err && !userdata) {
-                        res.json({
-                            status: 200,
-                            hassuccessed: false,
-                            message: "Something went wrong",
-                            error: err,
-                        });
-                    } else {
-                        for (i = 0; i < userdata.length; i++) {
-                            if (userdata[i].task_type == "sick_leave") {
-                                let today = new Date().setHours(0, 0, 0, 0);
-                                let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
-                                if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-                                    // userdata.sort(mySorter);
-                                    arr.push(userdata[i])
-                                }
-                            }
-                            let today = new Date().setHours(0, 0, 0, 0);
-                            let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
-                            if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-
-                                arr.push(userdata[i])
-                            }
-                            if (moment(data_d).isBefore(today) && userdata[i].status !== "done") {
-
-                                arr.push(userdata[i])
-                            }
-                        }
-                        res.json({ status: 200, hassuccessed: true, data: arr });
-                    }
-                }
-            );
-        } else {
+      virtual_Task.find(
+        {
+          "assinged_to.profile_id": req.params.patient_profile_id,
+          $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+        },
+        function (err, userdata) {
+          if (err && !userdata) {
             res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Authentication required.",
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
             });
+          } else {
+            for (i = 0; i < userdata.length; i++) {
+              if (userdata[i].task_type == "sick_leave") {
+                let today = new Date().setHours(0, 0, 0, 0);
+                let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
+                if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+                  // userdata.sort(mySorter);
+                  arr.push(userdata[i])
+                }
+              }
+              let today = new Date().setHours(0, 0, 0, 0);
+              let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
+              if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+
+                arr.push(userdata[i])
+              }
+              if (moment(data_d).isBefore(today) && userdata[i].status !== "done") {
+
+                arr.push(userdata[i])
+              }
+            }
+            res.json({ status: 200, hassuccessed: true, data: arr });
+          }
         }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
     }
+  }
 );
 
 router.get(
-    "/PastTask/:patient_profile_id",
-    function (req, res, next) {
-        const token = req.headers.token;
-        let legit = jwtconfig.verify(token);
-        if (legit) {
-            var arr1 = [];
+  "/PastTask/:patient_profile_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+      var arr1 = [];
 
-            virtual_Task.find(
-                {
-                    "assinged_to.profile_id": req.params.patient_profile_id,
-                    $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
-                },
-                function (err, userdata) {
-                    if (err && !userdata) {
-                        res.json({
-                            status: 200,
-                            hassuccessed: false,
-                            message: "Something went wrong",
-                            error: err,
-                        });
-                    } else {
-
-
-
-                        for (i = 0; i < userdata.length; i++) {
-                            if (userdata[i].task_type == "sick_leave") {
-                                let today = new Date().setHours(0, 0, 0, 0);
-
-                                let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
-
-                                if (moment(data_d).isBefore(today)) {
-                                    // userdata.sort(mySorter);
-                                    arr1.push(userdata[i])
-                                }
-                            }
-
-                            let today = new Date().setHours(0, 0, 0, 0);
-
-                            let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
-
-                            if (moment(data_d).isBefore(today) && userdata[i].status == "done") {
-                                // userdata.sort(mySorter);
-                                arr1.push(userdata[i])
-                            }
-                        }
-
-
-                        res.json({ status: 200, hassuccessed: true, data: arr1 });
-                    }
-                }
-            );
-        } else {
+      virtual_Task.find(
+        {
+          "assinged_to.profile_id": req.params.patient_profile_id,
+          $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+        },
+        function (err, userdata) {
+          if (err && !userdata) {
             res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Authentication required.",
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
             });
+          } else {
+
+
+
+            for (i = 0; i < userdata.length; i++) {
+              if (userdata[i].task_type == "sick_leave") {
+                let today = new Date().setHours(0, 0, 0, 0);
+
+                let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
+
+                if (moment(data_d).isBefore(today)) {
+                  // userdata.sort(mySorter);
+                  arr1.push(userdata[i])
+                }
+              }
+
+              let today = new Date().setHours(0, 0, 0, 0);
+
+              let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
+
+              if (moment(data_d).isBefore(today) && userdata[i].status == "done") {
+                // userdata.sort(mySorter);
+                arr1.push(userdata[i])
+              }
+            }
+
+
+            res.json({ status: 200, hassuccessed: true, data: arr1 });
+          }
         }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
     }
+  }
 );
 
 var arr1 = [];
@@ -781,13 +782,13 @@ router.post("/nurseapp", function (req, res) {
 
 
 router.post("/nurseafter", function (req, res) {
-  doctor_id= req.body.nurse_id
+  doctor_id = req.body.nurse_id
   const AppointToSearchWith = new Appointments({ doctor_id });
   AppointToSearchWith.encryptFieldsSync();
-  sample={}
+  sample = {}
   Appointments.find({
     $or: [
-      { doctor_id:doctor_id },
+      { doctor_id: doctor_id },
       { doctor_id: AppointToSearchWith.doctor_id },
     ]
   }, function (err, data) {
@@ -893,92 +894,138 @@ function forEachPromise(items, fn) {
 
 
 router.post("/NurseHomeVisitMail", function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-        try {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    try {
 
-            User.findOne({ _id: req.body.nurse_id },
-                function (err, user_data1) {
+      User.findOne({ _id: req.body.nurse_id },
+        function (err, user_data1) {
 
-                    if (err && !user_data1) {
-                        res.json({ status: 200, message: "Something went wrong.", error: err });
-                    } else {
-                        var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-                        var time = new Date(req.body.time);
-                        // var end_date = new Date(req.body.end_time);
-                        var final_time = time.getHours() + ':' + time.getMinutes();
-                        // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
+          if (err && !user_data1) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+            var time = new Date(req.body.time);
+            // var end_date = new Date(req.body.end_time);
+            var final_time = time.getHours() + ':' + time.getMinutes();
+            // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
 
 
 
-                        User.findOne({ _id: req.body.patient_id },
-                            function (err, user_data2) {
+            User.findOne({ _id: req.body.patient_id },
+              function (err, user_data2) {
 
-                                if (err && !user_data2) {
-                                    res.json({ status: 200, message: "Something went wrong.", error: err });
-                                } else {
-                                    user11 = user_data1.first_name.toUpperCase(),
-                                        user12 = user_data1.last_name.toUpperCase(),
-                                        user21 = user_data2.first_name.toUpperCase(),
-                                        user22 = user_data2.last_name.toUpperCase(),
+                if (err && !user_data2) {
+                  res.json({ status: 200, message: "Something went wrong.", error: err });
+                } else {
+                  user11 = user_data1.first_name.toUpperCase(),
+                    user12 = user_data1.last_name.toUpperCase(),
+                    user21 = user_data2.first_name.toUpperCase(),
+                    user22 = user_data2.last_name.toUpperCase(),
 
-                                        sendData = `Dear ${user21 + " " + user22},
+                    sendData = `Dear ${user21 + " " + user22},
   
                                     As you routine checkup from AIS CARE - ${req.body.hospital_name} there a nurse ${user11 + " " + user12 + " " + user_data1.profile_id},
                                     will come `;
 
-                                    sendData1 = `at your address ${user_data2.address} on date ${meetingDate} at ${final_time}. Please ${user21 + " " + user22 + " " + user_data2.profile_id}, must be available for same, when nurse will come at your place. And for any emergency patient is not available on that date/time please inform to the hospital admin.`;
+                  sendData1 = `at your address ${user_data2.address} on date ${meetingDate} at ${final_time}. Please ${user21 + " " + user22 + " " + user_data2.profile_id}, must be available for same, when nurse will come at your place. And for any emergency patient is not available on that date/time please inform to the hospital admin.`;
 
-                                    generateTemplate(
-                                        EMAIL.generalEmail.createTemplate("en", {
-                                            title: "",
-                                            content: sendData + sendData1,
-                                        }),
-                                        (error, html) => {
-                                            if (!error) {
+                  generateTemplate(
+                    EMAIL.generalEmail.createTemplate("en", {
+                      title: "",
+                      content: sendData + sendData1,
+                    }),
+                    (error, html) => {
+                      if (!error) {
 
-                                                let mailOptions = {
-                                                    from: "contact@aimedis.com",
-                                                    to: user_data2.email,
-                                                    subject: "Link for the Sick leave certificate",
-                                                    html: html,
-                                                };
+                        let mailOptions = {
+                          from: "contact@aimedis.com",
+                          to: user_data2.email,
+                          subject: "Link for the Sick leave certificate",
+                          html: html,
+                        };
 
-                                                let sendmail = transporter.sendMail(mailOptions);
-                                                if (sendmail) {
-                                                }
-                                            }
-
-                                        }
-                                    );
-
-                                    res.json({
-                                        status: 200,
-                                        message: "Mail sent Successfully",
-                                        hassuccessed: true,
-                                    });
-
-                                }
-                            });
+                        let sendmail = transporter.sendMail(mailOptions);
+                        if (sendmail) {
+                        }
+                      }
 
                     }
-                });
-        } catch (err) {
-            res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Something went wrong",
-                error: err,
-            });
-        }
-    } else {
-        res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Authentication required.",
+                  );
+
+                  res.json({
+                    status: 200,
+                    message: "Mail sent Successfully",
+                    hassuccessed: true,
+                  });
+
+                }
+              });
+
+          }
         });
+    } catch (err) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong",
+        error: err,
+      });
     }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
 });
+
+
+router.post("/patientTaskandService", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  final_data = {}
+  if (legit) {
+    virtual_Task.find({ patient_id: req.body.patient_id }, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        assigned_Service.find({ patient_id: req.body.patient_id }, function (err, data2) {
+          if (err) {
+            console.log("err",err)
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            console.log("data",data2)
+            final_data.task = data
+            final_data.service = data2
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: final_data
+            })
+          }
+        })
+
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
+
 
 module.exports = router;
