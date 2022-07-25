@@ -3161,6 +3161,75 @@
                     }
                 }
             }
+        },
+        "/assignservice/Deleteassignservice/{_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of AS",
+                    "type": "string"
+                }
+                
+            ],
+            "delete": {
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "Delete with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete data"
+                    }
+                }
+            }
+        },
+        "/assignservice/Updateassignservice/{_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of AS",
+                    "type": "string"
+                }
+                
+            ],
+            "put": {
+                "tags": [
+                    "Ais Care"
+                ],
+                "parameters": [
+                    {
+                        "name": "Ais Care",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Updateassignservice"
+                        }
+                    }
+                ],
+                "summary": "update with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Update Data"
+                    }
+                }
+            }
         }
 
     },
@@ -3176,6 +3245,41 @@
                     "items": {
                         "type": "object"
                     },
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Updateassignservice": {
+            "required": [
+                "assign_service",
+                "house_id",
+                "status"
+            ],
+            "properties": {
+                "assign_service": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "status": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "assinged_to": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "patient": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "amount": {
+                    "type": "string",
                     "uniqueItems": false
                 }
             }
