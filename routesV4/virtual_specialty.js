@@ -3747,6 +3747,8 @@ router.post("/LeftInfoPatient", function (req, res) {
               if (data) {
                 const VirtualtToSearchWith2 = new virtual_Task({ case_id: data._id.toString() });
                 VirtualtToSearchWith2.encryptFieldsSync();
+                const VirtualtToSearchWith7 = new virtual_Task({ status: 'done' });
+                VirtualtToSearchWith7.encryptFieldsSync();
                 virtual_Task.aggregate(
                   [
                     {
@@ -3764,7 +3766,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                           {
                             $match: {
                               $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],
-                              status: "done",
+                              status: {$in : ["done", VirtualtToSearchWith7.status]}
                             },
                           },
                           { $count: "done_task" },

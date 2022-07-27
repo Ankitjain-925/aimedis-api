@@ -490,20 +490,34 @@ function getfullInfo(data) {
                 .exec()
                 .then(function (doc5) {
                   if (doc5) {
+                    const VirtualtToSearchWith9 = new virtual_tasks({ case_id: data.case_id.toString() });
+                    VirtualtToSearchWith9.encryptFieldsSync();
+                    const VirtualtToSearchWith7 = new virtual_tasks({ status: 'done' });
+                    VirtualtToSearchWith7.encryptFieldsSync();
                     if (doc3.inhospital == true) {
                       var data5 = {}
                       data5 = doc3;
                       var Tasks = new Promise((resolve, reject) => {
                         virtual_tasks.aggregate([
                           {
-                            "$facet": {
-                              "total_task": [
-                                { "$match": { "case_id": data.case_id, "status": { "$exists": true, } } },
-                                { "$count": "total_task" },
+                            $facet: {
+                              total_task: [
+                                {
+                                  $match: {
+                                    $or: [{ case_id: data.case_id.toString(), case_id: VirtualtToSearchWith9.case_id }],
+                                    status: { $exists: true },
+                                  },
+                                },
+                                { $count: "total_task" },
                               ],
-                              "done_task": [
-                                { "$match": { "case_id": data.case_id, "status": "done" } },
-                                { "$count": "done_task" }
+                              done_task: [
+                                {
+                                  $match: {
+                                    $or: [{ case_id: data.case_id.toString(), case_id: VirtualtToSearchWith9.case_id }],
+                                    status: {$in : ["done", VirtualtToSearchWith7.status]}
+                                  },
+                                },
+                                { $count: "done_task" },
                               ],
                               "total_comments": [
                                 { "$match": { "case_id": data.case_id, } },
@@ -513,7 +527,7 @@ function getfullInfo(data) {
                                     "total_count": { $sum: { $size: "$comments" } }
                                   }
                                 },]
-                            }
+                            },
                           },
                           {
                             "$project": {

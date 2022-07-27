@@ -496,21 +496,31 @@ router.get('/patient/:patient_id', function (req, res, next) {
         if(userdata){
      let tasks = new Promise((resolve, reject) => {
       var ids = userdata._id.toString();
+      const VirtualtToSearchWith2 = new virtual_Task({ case_id: data._id.toString() });
+      VirtualtToSearchWith2.encryptFieldsSync();
+      const VirtualtToSearchWith7 = new virtual_tasks({ status: 'done' });
+      VirtualtToSearchWith7.encryptFieldsSync();
       virtual_tasks.aggregate([
         { "$facet": {
           "total_task": [
-            { "$match" : {case_id: ids,  status: { "$exists": true,  }}},
+            { "$match" : {$or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }]},
+              status: { "$exists": true,  }},
             { "$count": "total_task" },
           ],
           "done_task": [
-            { "$match" : {case_id: ids,  status: "done"}},
+            { "$match" : {$or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],  status: {$in : ["done", VirtualtToSearchWith7.status]}}},
             { "$count": "done_task" }
-          ]
+          ],
+        
         }},
-        { "$project": {
-          "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
-          "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] }
-        }}
+        {
+          $project: {
+            total_task: {
+              $arrayElemAt: ["$total_task.total_task", 0],
+            },
+            done_task: { $arrayElemAt: ["$done_task.done_task", 0] },
+          },
+        },
       ], function (err, results) {
         resolve(results)
     })
