@@ -49,6 +49,11 @@ var CaseSchema = new Schema({
       required: true,
       unique: false
     },
+    case_id:{
+        type: String,
+        required: false,
+        unique: false
+      },
     patient:{
         type: Object,
         required: false,
@@ -148,7 +153,7 @@ var CaseSchema = new Schema({
     assinged_to: [ProfessionalInfo],
 },{ strict: false });
 
-CaseSchema.plugin(mongooseFieldEncryption, { fields: [ "case_number","house_id","patient_id","total_task","status","total_comments","bed","done_task" ], secret: process.env.SOME_32BYTE_BASE64_STRING,
+CaseSchema.plugin(mongooseFieldEncryption, { fields: [ "case_number","case_id","house_id","patient_id","total_task","status","total_comments","bed","done_task" ], secret: process.env.SOME_32BYTE_BASE64_STRING,
 saltGenerator: function (secret) {
     return "1234567890123456"; // should ideally use the secret to return a string of length 16
   } });
