@@ -49,11 +49,6 @@ var CaseSchema = new Schema({
       required: true,
       unique: false
     },
-    case_id:{
-        type: String,
-        required: false,
-        unique: false
-      },
     patient:{
         type: Object,
         required: false,
