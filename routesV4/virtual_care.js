@@ -353,8 +353,8 @@ function getfull(data) {
 
 }
 
-router.post("/nurseapp", function (req, res) {
-  User.find({ type: "nurse" }, function (err, Userinfo) {
+router.get("/nurseapp", function (req, res) {
+  User.findOne({ _id:req.body.nurse_id }, function (err, Userinfo) {
     if (err) {
       console.log("err", err)
       res.json({
@@ -780,12 +780,14 @@ router.post("/nurseapp", function (req, res) {
   })
 })
 
+var sample = {}
 
 router.post("/nurseafter", function (req, res) {
   doctor_id = req.body.nurse_id
   const AppointToSearchWith = new Appointments({ doctor_id });
   AppointToSearchWith.encryptFieldsSync();
   sample = {}
+  var sampl_1={}
   Appointments.find({
     $or: [
       { doctor_id: doctor_id },
@@ -800,29 +802,65 @@ router.post("/nurseafter", function (req, res) {
         error: err,
       });
     } else {
-      assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
-          sample.data1 = data
-          sample.data2 = data2
-          sample.data1.forEach((element) => {
-            coming_date = new Date(element.date).setHours(0, 0, 0, 0)
-            today_date = new Date().setHours(0, 0, 0, 0)
-            if (moment(today_date).isSameOrBefore(coming_date)) {
-              sample.data1.sort(mySorter1);
-            }
-          })
-          res.json({ status: 200, hassuccessed: true, data: sample })
-        }
+      // sample = [];
+      sample.data1 = data
+      sample.data1.forEach((element) => {
+      coming_date = new Date(element.date).setHours(0, 0, 0, 0)
+
+     var today_date = new Date().setHours(0, 0, 0, 0)
+
+
+        Service(today_date, coming_date, doctor_id).then(() => {
+
+          sampl_1=sample
+          console.log("sampl_1",sampl_1)
+        
+      res.json({ status: 200, hassuccessed: true, data: sampl_1 })
+
       })
+    })
     }
   })
 })
+
+function Service(today_date, coming_date, doctor_id) {
+  return new Promise((resolve, reject) => {
+    console.log("today_date",today_date,"coming_date",coming_date)
+    if (moment(today_date).isSameOrBefore(coming_date)) {
+      console.log("1")
+      Assign(doctor_id).then(()=>{
+         resolve(sample)
+      })
+     
+    } else {
+      console.log("2")
+      resolve(sample)
+    }
+  })
+}
+
+function Assign(doctor_id){
+  return new Promise((resolve, reject) => {
+    try{
+      assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
+        if (err) {
+          console.log("err", err)
+        } else {
+          sample.data2 = data2
+          sample.data1.sort(mySorter1);
+          resolve(sample)
+        }
+      })
+    }catch(error){
+      console.log("error",error)
+reject(error)
+    }
+    
+
+  })
+ 
+}
+
 
 function mySorter1(a, b) {
   if (a.date && b.date) {
@@ -846,7 +884,7 @@ router.post("/nursebefore", function (req, res) {
   const AppointToSearchWith = new Appointments({ doctor_id });
   AppointToSearchWith.encryptFieldsSync();
   final = []
-  sample = {}
+  sample_1 = {}
   Appointments.find({
     $or: [
       { doctor_id: doctor_id },
@@ -862,22 +900,31 @@ router.post("/nursebefore", function (req, res) {
     } else {
       assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
         if (err) {
+          console.log("err",err)
           res.json({
             status: 200,
             hassuccessed: false,
             message: "Something went wrong",
           });
         } else {
-          sample.data1 = data
-          sample.data2 = data2
-          sample.data1.forEach((element) => {
+          sample_1.data1 = data
+          sample_1.data2 = data2
+          sample_1.data1.forEach((element) => {
             coming_date = new Date(element.date).setHours(0, 0, 0, 0)
             today_date = new Date().setHours(0, 0, 0, 0)
             if (moment(today_date).isSameOrAfter(coming_date)) {
-              sample.data1.sort(mySorter);
+              console.log("1")
+              sample_1.data1.sort(mySorter);
+            }else{
+              console.log("2")
+              console.log("ss",sample_1)
+              // sample_1= sample_1.data1.filter(element => element._id != sample_1.data1._id );
+              // console.log("sample_1132",sample_1)
             }
           })
-          res.json({ status: 200, hassuccessed: true, data: sample })
+          console.log("sample",sample_1)
+
+          res.json({ status: 200, hassuccessed: true, data: sample_1 })
         }
       })
     }
@@ -988,7 +1035,10 @@ router.post("/patientTaskandService", function (req, res) {
   let legit = jwtconfig.verify(token);
   final_data = {}
   if (legit) {
-    virtual_Task.find({ patient_id: req.body.patient_id }, function (err, data) {
+    patient_id = req.body.patient_id
+    const AppointToSearchWith = new virtual_Task({ patient_id });
+    AppointToSearchWith.encryptFieldsSync();
+    virtual_Task.find({ patient_id: { $in: [req.body.patient_id, AppointToSearchWith.patient_id] } }, function (err, data) {
       if (err) {
         res.json({
           status: 200,
@@ -996,16 +1046,19 @@ router.post("/patientTaskandService", function (req, res) {
           message: "Something went wrong",
         });
       } else {
-        assigned_Service.find({ patient_id: req.body.patient_id }, function (err, data2) {
+        patient_id = req.body.patient_id
+        const AppointToSearchWith = new assigned_Service({ patient_id });
+        AppointToSearchWith.encryptFieldsSync();
+        assigned_Service.find({ patient_id: { $in: [req.body.patient_id, AppointToSearchWith.patient_id] } }, function (err, data2) {
           if (err) {
-            console.log("err",err)
+            console.log("err", err)
             res.json({
               status: 200,
               hassuccessed: false,
               message: "Something went wrong",
             });
           } else {
-            console.log("data",data2)
+            console.log("data", data2)
             final_data.task = data
             final_data.service = data2
             res.json({
