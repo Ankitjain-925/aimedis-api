@@ -191,8 +191,41 @@ cron.schedule('0 0 */12 * * *', function(){
 
 function SetArchiveUnuseMeeting(){
   sick_meeting.find()
-  .exec(function (err, doc1) {
-    if (err && !doc1) {
+    .exec(function (err, doc1) {
+      if (err && !doc1) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "update data failed",
+          error: err,
+        });
+      } else {
+        console.log("doc1", doc1)
+        let ttime = moment()
+        doc1.forEach((element) => {
+          var enddate = moment(element.date);
+          var diff1 = ttime.diff(enddate, 'hours')
+          if (diff1 > 6) {
+            virtual_Task.updateMany({
+              _id: element.task_id, $or: [
+                { meetingjoined: { $ne: true } },
+                { meetingjoined: { $exists: false } }
+              ]
+            }, { archived: true }, function (err, data) {
+              if (err) { console.log("err", err) }
+              else { console.log("data", data) }
+            })
+          }
+        })
+      }
+    }
+    );
+}
+
+function removeOldBackups() {
+  const directoryPath = path.join(__dirname, "./DBbackups/")
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
       res.json({
         status: 200,
         hassuccessed: false,
@@ -623,7 +656,7 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
   console.log("err", err);
-  return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
+  // return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
  
 });
 

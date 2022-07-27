@@ -3162,75 +3162,131 @@
                 }
             }
         },
-        "/assignservice/Deleteassignservice/{_id}": {
+        "/vc/patientTaskandService": {
             "parameters": [
                 {
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
-                },
-                {
-                    "name": "_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of AS",
-                    "type": "string"
                 }
-                
             ],
-            "delete": {
+            "post": {
+                "parameters": [
+                    {
+                        "name": "getAppointmentAndAssignedService",
+                        "in": "body",
+                        "description": "Get data",
+                        "schema": {
+                            "$ref": "#/definitions/appointment"
+                        }
+                    }
+                ],
                 "tags": [
                     "Ais Care"
                 ],
-                "summary": "Delete with given ID",
+                "summary": "get appointment and servies with  patient id",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Delete data"
+                        "description": "Get Data"
                     }
                 }
             }
         },
-        "/assignservice/Updateassignservice/{_id}": {
+        "/vc/nurseapp": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
+
+            "tags": [
+                "Ais Care"
+            ],
+            "summary": "get nurse appoints",
+            "produces": [
+                "application/json"
+            ],
+            "responses": {
+                "200": {
+                    "description": "Get Data"
+                }
+            }
+        }
+        },
+        "/vc/nurseafter": {
             "parameters": [
                 {
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
-                },
-                {
-                    "name": "_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of AS",
-                    "type": "string"
                 }
-                
             ],
-            "put": {
-                "tags": [
-                    "Ais Care"
-                ],
+            "post": {
                 "parameters": [
                     {
-                        "name": "Ais Care",
+                        "name": "getList",
                         "in": "body",
-                        "description": "",
+                        "description": "Get data",
                         "schema": {
-                            "$ref": "#/definitions/Updateassignservice"
+                            "$ref": "#/definitions/nurse"
                         }
                     }
                 ],
-                "summary": "update with given ID",
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "get appointment and servies with  patient id",
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
                     "200": {
-                        "description": "Update Data"
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vc/nursebefore": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "getList",
+                        "in": "body",
+                        "description": "Get data",
+                        "schema": {
+                            "$ref": "#/definitions/nurse"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "get appointment and servies with  patient id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
                     }
                 }
             }
         }
+
+
 
     },
     "definitions": {
@@ -3249,42 +3305,26 @@
                 }
             }
         },
-        "Updateassignservice": {
-            "required": [
-                "assign_service",
-                "house_id",
-                "status"
-            ],
+        "appointment": {
+            
             "properties": {
-                "assign_service": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "status": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "assinged_to": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    }
-                },
-                "patient": {
-                    "type": "object",
-                    "uniqueItems": false
-                },
-                "amount": {
+
+                "patient_id": {
                     "type": "string",
                     "uniqueItems": false
                 }
             }
         },
+        "nurse": {
+            
+            "properties": {
 
+                "nurse_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
         "NurseHomeVisitMail": {
             "required": [
                 

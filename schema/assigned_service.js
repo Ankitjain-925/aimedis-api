@@ -53,7 +53,7 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
 
 
 
-var ServiceSchema = new Schema(
+var AssignedSchema = new Schema(
   {
     assinged_to: [ProfessionalInfo],
     speciality: {
@@ -150,7 +150,7 @@ var ServiceSchema = new Schema(
   { strict: false }
 );
 
-ServiceSchema.plugin(mongooseFieldEncryption, {
+AssignedSchema.plugin(mongooseFieldEncryption, {
 
     fields: ["assign_service", "description","service_type","house_id","status",
 "priority","patient_id","case_id","done_on","created_at","place_of_birth"
@@ -160,5 +160,5 @@ ServiceSchema.plugin(mongooseFieldEncryption, {
         return "1234567890123456"; // should ideally use the secret to return a string of length 16
     }
 });
-var assigned_Service = mongoose.model("ServiceSchema", ServiceSchema);
+var assigned_Service = mongoose.model("Assigned_Service",AssignedSchema );
 module.exports = assigned_Service;
