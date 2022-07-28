@@ -290,14 +290,14 @@ router.get(
 
 var arr1 = [];
 
-router.get("/infoOfPatients", function (req, res, next) {
+router.get("/infoOfPatients/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     arr = []
     fullinfo = [];
     if (legit) {
         arr1 = [];
-        virtual_Case.find({ $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
+        virtual_Case.find({house_id: req.params.house_id, $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
             if (err && !userdata) {
                 res.json({
                     status: 200,
