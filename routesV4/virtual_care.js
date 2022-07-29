@@ -1138,4 +1138,133 @@ router.post("/patientTaskandService", function (req, res) {
 })
 
 
+router.get(
+  "/PastAppointmentServiceTask/:patient_profile_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    doctor_id = req.params.patient_profile_id;
+    const AppointToSearchWith = new Appointments({ doctor_id });
+    AppointToSearchWith.encryptFieldsSync();
+    if (legit) {
+      var arr1 = [];
+      var arr2 = [];
+      var arr3 = [];
+      var finalArray = [];
+
+      Appointments.find({
+        $or: [
+          { doctor_id: doctor_id },
+          { doctor_id: AppointToSearchWith.doctor_id },
+        ]
+      },
+        function (err, userdata1) {
+          if (err && !userdata1) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+
+
+            assigned_Service.find({ "assinged_to.user_id": doctor_id },
+              function (err, userdata2) {
+                if (err && !userdata2) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+
+                  virtual_Task.find(
+                    {
+                      "assinged_to.user_id": doctor_id,
+                      $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+                    },
+                    function (err, userdata3) {
+                      if (err && !userdata3) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "Something went wrong",
+                          error: err,
+                        });
+                      } else {
+                        for (i = 0; i < userdata1.length; i++) {
+
+                          let today = new Date().setHours(0, 0, 0, 0);
+
+                          let data_d = new Date(userdata1[i].date).setHours(0, 0, 0, 0);
+
+                          if (moment(data_d).isBefore(today)) {
+                            // userdata1.sort(mySorter);
+                            arr1.push(userdata1[i])
+                          }
+
+                        }
+
+                        for (i = 0; i < userdata2.length; i++) {
+
+                          let today2 = new Date().setHours(0, 0, 0, 0);
+
+                          let data_d2 = new Date(userdata2[i].date).setHours(0, 0, 0, 0);
+
+                          if (moment(data_d2).isBefore(today2)) {
+                            // userdata2.sort(mySorter);
+                            arr2.push(userdata2[i])
+                          }
+                        }
+
+
+                        for (i = 0; i < userdata3.length; i++) {
+                          if (userdata3[i].task_type == "sick_leave") {
+                            let today = new Date().setHours(0, 0, 0, 0);
+
+                            let data_d = new Date(userdata3[i].date).setHours(0, 0, 0, 0);
+
+                            if (moment(data_d).isBefore(today)) {
+                              // userdata3.sort(mySorter);
+                              arr3.push(userdata3[i])
+                            }
+                          }
+
+                          let today = new Date().setHours(0, 0, 0, 0);
+
+                          let data_d = new Date(userdata3[i].due_on.date).setHours(0, 0, 0, 0);
+
+                          if (moment(data_d).isBefore(today) && userdata3[i].status == "done") {
+                            // userdata3.sort(mySorter);
+                            arr3.push(userdata3[i])
+                          }
+                        }
+
+                        finalArray = [...arr1, ...arr2, ...arr3];
+
+
+                        res.json({ status: 200, hassuccessed: true, data: finalArray });
+                      }
+                    }
+                  );
+                }
+              }
+            );
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  }
+);
+
+
+
 module.exports = router;
