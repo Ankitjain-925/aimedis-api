@@ -19,6 +19,7 @@ router.post("/Addassignservice", async (req, res, next) => {
          msg: 'service assign successfully',
          data:result,
          hassuccessed: true
+         })
     })
     .catch(err => {
       console.log(err);
