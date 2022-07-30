@@ -3068,30 +3068,6 @@
                 }
             }
         },
-        "/vc/infoOfPatients": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get InfoOfPatients",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
         "/vc/UpdateAddress": {
             "parameters": [
                 {
@@ -3162,86 +3138,127 @@
                 }
             }
         },
-        "/vc/patientTaskandService": {
+        "/assignservice/Deleteassignservice/{_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of AS",
+                    "type": "string"
+                }
+                
+            ],
+            "delete": {
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "Delete with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete data"
+                    }
+                }
+            }
+        },
+        "/assignservice/Updateassignservice/{_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of AS",
+                    "type": "string"
+                }
+                
+            ],
+            "put": {
+                "tags": [
+                    "Ais Care"
+                ],
+                "parameters": [
+                    {
+                        "name": "Ais Care",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Updateassignservice"
+                        }
+                    }
+                ],
+                "summary": "update with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Update Data"
+                    }
+                }
+            }
+        },
+        "/assignservice/Addassignservice": {
             "parameters": [
                 {
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
                 }
+                
             ],
             "post": {
-                "parameters": [
-                    {
-                        "name": "getAppointmentAndAssignedService",
-                        "in": "body",
-                        "description": "Get data",
-                        "schema": {
-                            "$ref": "#/definitions/appointment"
-                        }
-                    }
-                ],
                 "tags": [
                     "Ais Care"
                 ],
-                "summary": "get appointment and servies with  patient id",
-                "produces": [
-                    "application/json"
+                "parameters": [
+                    {
+                        "name": "Ais Care",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Addassignservice"
+                        }
+                    }
                 ],
+                "summary": "Add Data",
                 "responses": {
                     "200": {
-                        "description": "Get Data"
+                        "description": "Add Data"
                     }
                 }
             }
         },
-        "/vc/nurseapp": {
+        "/assignservice/getAssignedServices/{house_id}": {
             "get": {
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
-
-            "tags": [
-                "Ais Care"
-            ],
-            "summary": "get nurse appoints",
-            "produces": [
-                "application/json"
-            ],
-            "responses": {
-                "200": {
-                    "description": "Get Data"
-                }
-            }
-        }
-        },
-        "/vc/nurseafter": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
-                "parameters": [
-                    {
-                        "name": "getList",
-                        "in": "body",
-                        "description": "Get data",
-                        "schema": {
-                            "$ref": "#/definitions/nurse"
+                    "parameters": [
+                        {
+                            "name": "house_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
                         }
-                    }
-                ],
+                    ],
+
                 "tags": [
                     "Ais Care"
                 ],
-                "summary": "get appointment and servies with  patient id",
+                "summary": "get AssignedServices",
                 "produces": [
                     "application/json"
                 ],
@@ -3252,29 +3269,120 @@
                 }
             }
         },
-        "/vc/nursebefore": {
+        "/cquestionnaire/AddQuestionnaire": {
             "parameters": [
                 {
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
                 }
+                
             ],
             "post": {
-                "parameters": [
-                    {
-                        "name": "getList",
-                        "in": "body",
-                        "description": "Get data",
-                        "schema": {
-                            "$ref": "#/definitions/nurse"
-                        }
-                    }
-                ],
                 "tags": [
                     "Ais Care"
                 ],
-                "summary": "get appointment and servies with  patient id",
+                "parameters": [
+                    {
+                        "name": "Ais Care",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/AddQuestionnaire"
+                        }
+                    }
+                ],
+                "summary": "Add Data",
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    }
+                }
+            }
+        },
+        "/vc/infoOfPatients/{house_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "house_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "get InfoOfPatients",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vc/PastAppointmentServiceTask/{patient_profile_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "patient_profile_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "get InfoOfPatients",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vc/patientTaskandService/{patient_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "get PatientTaskandService",
                 "produces": [
                     "application/json"
                 ],
@@ -3285,8 +3393,6 @@
                 }
             }
         }
-
-
 
     },
     "definitions": {
@@ -3305,21 +3411,119 @@
                 }
             }
         },
-        "appointment": {
-            
+        "Updateassignservice": {
+            "required": [
+                "assign_service",
+                "house_id",
+                "status"
+            ],
             "properties": {
-
-                "patient_id": {
+                "assign_service": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "status": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "assinged_to": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "patient": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "amount": {
                     "type": "string",
                     "uniqueItems": false
                 }
             }
         },
-        "nurse": {
-            
+        "AddQuestionnaire": {
+            "required": [
+               
+            ],
             "properties": {
-
-                "nurse_id": {
+                "submitDate": {
+                    "type": "date",
+                    "uniqueItems": false
+                  },
+                  "type": {
+                    "type": "string",
+                    "uniqueItems": false
+                  },
+                  "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                  },
+                  "case_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                  },
+                  "patient_info": {
+                      "type": "string",
+                      "uniqueItems": false
+                    },
+                  "nurse_info": {
+                      "type": "string",
+                      "uniqueItems": false
+                    },
+                  "nurse_id": {
+                      "type": "string",
+                      "uniqueItems": false
+                    },
+                  "house_id": {
+                      "type": "string",
+                      "uniqueItems": false
+                    },
+                  "service_id": {
+                      "type": "string",
+                      "uniqueItems": false
+                    },
+                  "questionnaire_answers": {
+                    "type": "object",
+                    "uniqueItems": false
+                   }
+                
+            }
+        },
+        "Addassignservice": {
+            "required": [
+                "assign_service",
+                "house_id",
+                "status"
+            ],
+            "properties": {
+                "assign_service": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "status": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "assinged_to": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "patient": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "amount": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -3355,10 +3559,10 @@
 
         "UpdateAddress": {
             "required": [
-                "case_number"
+                "case_id"
             ],
             "properties": {
-                "case_number": {
+                "case_id": {
                     "type": "string",
                     "uniqueItems": false
                 },
