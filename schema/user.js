@@ -127,21 +127,6 @@ Rigt_managementList.plugin(mongooseFieldEncryption, {
 
 var UserSchema = new Schema(
   {
-    total_task: {
-      type: String,
-      required: false,
-      unique: false
-  },
-  total_comments:{
-      type: String,
-      required: false,
-      unique: false
-  },
-  done_task: { 
-      type: String,
-      required: false,
-      unique: false
-  },
     type: {
       type: String,
       required: true,
