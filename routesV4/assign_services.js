@@ -12,9 +12,11 @@ router.post("/Addassignservice", async(req, res, next) => {
     const assigndata = new assigned_Service(req.body)
     assigndata.save()
     .then(result => {
-         res.status(200).json({
-         message: 'service assign successfully',
-         newBook:result
+         res.json({
+         status: 200,
+         msg: 'service assign successfully',
+         data:result,
+         hassuccessed: true
     })
   });
 }

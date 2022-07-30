@@ -1424,7 +1424,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                                 status: 200,
                                 hassuccessed: true,
                                 message: "link active",
-                                data: { Task: userdata, Session: data },
+                                data: { Task: userdata, Session: data, gender: result.sex},
                               });
                             }
                             else{
@@ -1435,7 +1435,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                                 status: 200,
                                 hassuccessed: true,
                                 message: "link active",
-                                data: { Task: userdata, Session: data },
+                                data: { Task: userdata, Session: data, },
                               });
                             }
                          
