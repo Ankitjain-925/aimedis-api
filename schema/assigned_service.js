@@ -68,7 +68,7 @@ var AssignedSchema = new Schema(
     },
     
     assign_service: { 
-      type: String,
+      type: Array,
       required: true,
       unique: false,
     },
