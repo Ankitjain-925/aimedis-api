@@ -13,6 +13,7 @@ var Prescription = require("../schema/prescription");
 var Cretificate = require("../schema/sick_certificate");
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
+let lodash = require("lodash");
 const moment = require("moment");
 const { getMsgLang, trans } = require("./GetsetLang");
 const sendSms = require("./sendSms");
@@ -1101,15 +1102,15 @@ router.post("/NurseHomeVisitMail", function (req, res, next) {
 });
 
 
-router.post("/patientTaskandService", function (req, res) {
+router.get("/patientTaskandService/:patient_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   final_data = {}
   if (legit) {
-    patient_id = req.body.patient_id
+    patient_id = req.params.patient_id
     const AppointToSearchWith = new virtual_Task({ patient_id });
     AppointToSearchWith.encryptFieldsSync();
-    virtual_Task.find({ patient_id: { $in: [req.body.patient_id, AppointToSearchWith.patient_id] } }, function (err, data) {
+    virtual_Task.find({ patient_id: { $in: [req.params.patient_id, AppointToSearchWith.patient_id] } }, function (err, data) {
       if (err) {
         res.json({
           status: 200,
@@ -1117,10 +1118,10 @@ router.post("/patientTaskandService", function (req, res) {
           message: "Something went wrong",
         });
       } else {
-        patient_id = req.body.patient_id
+        patient_id = req.params.patient_id
         const AppointToSearchWith = new assigned_Service({ patient_id });
         AppointToSearchWith.encryptFieldsSync();
-        assigned_Service.find({ patient_id: { $in: [req.body.patient_id, AppointToSearchWith.patient_id] } }, function (err, data2) {
+        assigned_Service.find({ patient_id: { $in: [req.params.patient_id, AppointToSearchWith.patient_id] } }, function (err, data2) {
           if (err) {
             console.log("err", err)
             res.json({
@@ -1129,13 +1130,15 @@ router.post("/patientTaskandService", function (req, res) {
               message: "Something went wrong",
             });
           } else {
-            console.log("data", data2)
-            final_data.task = data
-            final_data.service = data2
+            final_data = [...data, ...data2];
+            var final_data1 = lodash.sortBy(final_data, (e) => {
+              return e.due_on.date
+            });
             res.json({
               status: 200,
               hassuccessed: true,
-              message: final_data
+              data: final_data1,
+              msg: 'successfully fetched'
             })
           }
         })

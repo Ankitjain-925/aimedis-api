@@ -146,6 +146,9 @@ var AssignedSchema = new Schema(
       required: false,
       unique: false,
     },
+    due_on: {
+      type: Object,
+    },
   },
   { strict: false }
 );
