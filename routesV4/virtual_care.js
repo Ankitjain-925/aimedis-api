@@ -64,10 +64,8 @@ router.post("/UpdateAddress", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var case_number = req.body.case_number
-    const VirtualtToSearchWith = new virtual_Case({ case_number });
-    VirtualtToSearchWith.encryptFieldsSync();
-    virtual_Case.findOne({ case_number: { $in: [case_number, VirtualtToSearchWith.case_number] } }, function (err, data1) {
+    
+    virtual_Case.findOne({ _id: req.body.case_id  }, function (err, data1) {
       if (err) {
         res.json({
           status: 200,
@@ -353,7 +351,7 @@ function getfull(data) {
 
 }
 
-router.get("/nurseapp", function (req, res) {
+router.post("/nurseapp", function (req, res) {
   User.findOne({ _id:req.body.nurse_id }, function (err, Userinfo) {
     if (err) {
       console.log("err", err)
@@ -833,7 +831,14 @@ function Service(today_date, coming_date, doctor_id) {
       })
      
     } else {
+
       console.log("2")
+      sample_id=sample.data1.map((element)=>{
+             element
+      })
+      console.log("sample_id",sample_id)
+      sample= sample.data1.filter(element => ! sample_id.some((d)=>{d.id === element._id  }) );
+      console.log("sample",sample)
       resolve(sample)
     }
   })
@@ -911,15 +916,22 @@ router.post("/nursebefore", function (req, res) {
           sample_1.data2 = data2
           sample_1.data1.forEach((element) => {
             coming_date = new Date(element.date).setHours(0, 0, 0, 0)
+           console.log("coming_date",element.date)
             today_date = new Date().setHours(0, 0, 0, 0)
+            console.log("today_date",today_date)
             if (moment(today_date).isSameOrAfter(coming_date)) {
               console.log("1")
               sample_1.data1.sort(mySorter);
             }else{
               console.log("2")
               console.log("ss",sample_1)
-              // sample_1= sample_1.data1.filter(element => element._id != sample_1.data1._id );
-              // console.log("sample_1132",sample_1)
+              sample_id=sample_1.data1.map((element)=>{
+                return element._id
+              })
+              console.log("sample_id",sample_id)
+              // sample_1= sample_1.data1.filter(element => element._id != sample_id );
+              sample_1=sample_1.data1.filter(element => !sample_id.some((d)=>{d.id === element._id  }) );
+              console.log("sample_1132",sample_1)
             }
           })
           console.log("sample",sample_1)
