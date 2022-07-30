@@ -332,6 +332,7 @@ function getfull(data) {
     return new Promise((resolve, reject) => {
         try {
                 if (data) {
+                  console.log(data.case_id)
                   User.findOne({ _id: data.patient_id })
                     .exec()
                     .then(function (doc5) {
@@ -343,15 +344,15 @@ function getfull(data) {
                               {
                                 "$facet": {
                                   "total_task": [
-                                    { "$match": { "case_id": data.case_id.toString(), "status": { "$exists": true, } } },
+                                    { "$match": { "case_id": data._id.toString(), "status": { "$exists": true, } } },
                                     { "$count": "total_task" },
                                   ],
                                   "done_task": [
-                                    { "$match": { "case_id": data.case_id.toString(), "status": "done" } },
+                                    { "$match": { "case_id": data._id.toString(), "status": "done" } },
                                     { "$count": "done_task" }
                                   ],
                                   "total_comments": [
-                                    { "$match": { "case_id": data.case_id.toString(), } },
+                                    { "$match": { "case_id": data._id.toString(), } },
                                     {
                                       "$group": {
                                         "_id": null,
@@ -374,14 +375,15 @@ function getfull(data) {
                           }).then((data3) => {
                             // console.log(data3[0].done_task)
                             if (data3 && data3.length > 0) {
-                              data5.done_task = data3[0].done_task;
-                              data5.total_task = data3[0].total_task;
-                              data5.total_comments = data3[0].total_comments;
-                              fullinfo.push(data5);
+                              data.done_task = data3[0].done_task;
+                              data.total_task = data3[0].total_task;
+                              data.total_comments = data3[0].total_comments;
+                              data.full_address = {address: data5.address,email: data5.email,mobile: data5.mobile, city: data5.city, pastal_code: data5.pastal_code, country: data5.country }                           
+                              fullinfo.push(data)
                               resolve(fullinfo);
                             }
                             else {
-                              fullinfo.push(data5);
+                              fullinfo.push(data);
                               resolve(fullinfo);
                             }
                           })
