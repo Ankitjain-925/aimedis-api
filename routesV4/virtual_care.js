@@ -844,8 +844,8 @@ router.post("/nurseafter", function (req, res) {
   doctor_id = req.body.nurse_id
   const AppointToSearchWith = new Appointments({ doctor_id });
   AppointToSearchWith.encryptFieldsSync();
-  sample = {}
-  var sampl_1={}
+  sample = []
+  var sampl_1=[]
   Appointments.find({
     $or: [
       { doctor_id: doctor_id },
@@ -861,10 +861,9 @@ router.post("/nurseafter", function (req, res) {
       });
     } else {
       // sample = [];
-      sample.data1 = data
-      sample.data1.forEach((element) => {
-      coming_date = new Date(element.date).setHours(0, 0, 0, 0)
-
+      sample = data
+      sample.forEach((element) => {
+      coming_date = (element.task_name || element.title) ?  new Date(element.due_on.date).setHours(0, 0, 0, 0) : new Date(element.date).setHours(0, 0, 0, 0)
      var today_date = new Date().setHours(0, 0, 0, 0)
 
 
@@ -893,11 +892,11 @@ function Service(today_date, coming_date, doctor_id) {
     } else {
 
       console.log("2")
-      sample_id=sample.data1.map((element)=>{
+      sample_id=sample.map((element)=>{
              element
       })
       console.log("sample_id",sample_id)
-      sample= sample.data1.filter(element => ! sample_id.some((d)=>{d.id === element._id  }) );
+      sample= sample.filter(element => ! sample_id.some((d)=>{d.id === element._id  }) );
       console.log("sample",sample)
       resolve(sample)
     }
@@ -911,8 +910,8 @@ function Assign(doctor_id){
         if (err) {
           console.log("err", err)
         } else {
-          sample.data2 = data2
-          sample.data1.sort(mySorter1);
+          sample = data2
+          sample.sort(mySorter1);
           resolve(sample)
         }
       })
@@ -949,7 +948,7 @@ router.post("/nursebefore", function (req, res) {
   const AppointToSearchWith = new Appointments({ doctor_id });
   AppointToSearchWith.encryptFieldsSync();
   final = []
-  sample_1 = {}
+  sample_1 = [];
   Appointments.find({
     $or: [
       { doctor_id: doctor_id },
@@ -972,25 +971,22 @@ router.post("/nursebefore", function (req, res) {
             message: "Something went wrong",
           });
         } else {
-          sample_1.data1 = data
-          sample_1.data2 = data2
-          sample_1.data1.forEach((element) => {
-            coming_date = new Date(element.date).setHours(0, 0, 0, 0)
-           console.log("coming_date",element.date)
+          sample_1 = [...data, ...data2];
+        
+          sample_1.forEach((element) => {
+            coming_date = (element.task_name || element.title) ?  new Date(element.due_on.date).setHours(0, 0, 0, 0) : new Date(element.date).setHours(0, 0, 0, 0)
+            console.log('coming_date', coming_date)
             today_date = new Date().setHours(0, 0, 0, 0)
             console.log("today_date",today_date)
             if (moment(today_date).isSameOrAfter(coming_date)) {
-              console.log("1")
-              sample_1.data1.sort(mySorter);
+              sample_1.sort(mySorter);
             }else{
-              console.log("2")
-              console.log("ss",sample_1)
-              sample_id=sample_1.data1.map((element)=>{
+              sample_id=sample_1.map((element)=>{
                 return element._id
               })
               console.log("sample_id",sample_id)
               // sample_1= sample_1.data1.filter(element => element._id != sample_id );
-              sample_1=sample_1.data1.filter(element => !sample_id.some((d)=>{d.id === element._id  }) );
+              sample_1=sample_1.filter(element => !sample_id.some((d)=>{d.id === element._id  }) );
               console.log("sample_1132",sample_1)
             }
           })
@@ -1134,6 +1130,9 @@ router.get("/patientTaskandService/:patient_id", function (req, res) {
             var final_data1 = lodash.sortBy(final_data, (e) => {
               return e.due_on.date
             });
+            if(final_data1 && final_data.length>0){
+              final_data1.reverse()
+            }
             res.json({
               status: 200,
               hassuccessed: true,

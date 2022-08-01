@@ -55,6 +55,11 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
 
 var AssignedSchema = new Schema(
   {
+    title : {
+      type: String,
+      required: true,
+      unique: false,
+    },
     assinged_to: [ProfessionalInfo],
     speciality: {
       type: Object,
