@@ -128,12 +128,9 @@ var AssignedSchema = new Schema(
       required: false,
       unique: false,
     },
-    done_on: {
-      type: String,
-      required: false,
-      unique: false,
+    due_on: {
+      type: Object,
     },
-    
     is_decline: { 
       type: Boolean,
       required: false,
