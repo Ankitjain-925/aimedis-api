@@ -3392,7 +3392,99 @@
                     }
                 }
             }
+        },
+        "/vc/nurseapp": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
+
+            "tags": [
+                "Ais Care"
+            ],
+            "summary": "get nurse appoints",
+            "produces": [
+                "application/json"
+            ],
+            "responses": {
+                "200": {
+                    "description": "Get Data"
+                }
+            }
         }
+        },
+        "/vc/nurseafter": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "getList",
+                        "in": "body",
+                        "description": "Get data",
+                        "schema": {
+                            "$ref": "#/definitions/nurse"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "get appointment and servies with  patient id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        },
+        "/vc/nursebefore": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "getList",
+                        "in": "body",
+                        "description": "Get data",
+                        "schema": {
+                            "$ref": "#/definitions/nurse"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Ais Care"
+                ],
+                "summary": "get appointment and servies with  patient id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Data"
+                    }
+                }
+            }
+        }
+
+
 
     },
     "definitions": {
@@ -3441,6 +3533,16 @@
                     "uniqueItems": false
                 },
                 "amount": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "nurse": {
+            
+            "properties": {
+
+                "nurse_id": {
                     "type": "string",
                     "uniqueItems": false
                 }
