@@ -68,7 +68,7 @@ var AssignedSchema = new Schema(
     },
     
     assign_service: { 
-      type: String,
+      type: Array,
       required: true,
       unique: false,
     },
@@ -123,12 +123,9 @@ var AssignedSchema = new Schema(
       required: false,
       unique: false,
     },
-    done_on: {
-      type: String,
-      required: false,
-      unique: false,
+    due_on: {
+      type: Object,
     },
-    
     is_decline: { 
       type: Boolean,
       required: false,
@@ -145,6 +142,9 @@ var AssignedSchema = new Schema(
       type: Date,
       required: false,
       unique: false,
+    },
+    due_on: {
+      type: Object,
     },
   },
   { strict: false }

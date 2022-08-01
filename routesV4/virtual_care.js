@@ -298,117 +298,125 @@ router.get(
 var arr1 = [];
 
 router.get("/infoOfPatients/:house_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  arr = []
-  fullinfo = [];
-  if (legit) {
-    arr1 = [];
-    virtual_Case.find({ house_id: req.params.house_id, $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
-      if (err && !userdata) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "user not found",
-          error: err,
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    arr = []
+    fullinfo = [];
+    if (legit) {
+        arr1 = [];
+        virtual_Case.find({house_id: req.params.house_id, $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
+            if (err && !userdata) {
+                res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "user not found",
+                    error: err,
+                });
+            } else {
+                forEachPromise(userdata, getfull).then((result) => {
+                    
+                    res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        data: fullinfo
+                    });
+                })
+            }
         });
-      } else {
-        forEachPromise(userdata, getfull).then((result) => {
-
-          res.json({
+    } else {
+        res.json({
             status: 200,
-            hassuccessed: true,
-            data: fullinfo
-          });
-        })
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
+            hassuccessed: false,
+            message: "Authentication required.",
+        });
+    }
 });
 
 
 
 function getfull(data) {
-
-  return new Promise((resolve, reject) => {
-    try {
-      if (data) {
-        console.log(data.case_id)
-        User.findOne({ _id: data.patient_id })
-          .exec()
-          .then(function (doc5) {
-            if (doc5) {
-              var data5 = {}
-              data5 = doc5;
-              var Tasks = new Promise((resolve, reject) => {
-                virtual_Task.aggregate([
-                  {
-                    "$facet": {
-                      "total_task": [
-                        { "$match": { "case_id": data._id.toString(), "status": { "$exists": true, } } },
-                        { "$count": "total_task" },
-                      ],
-                      "done_task": [
-                        { "$match": { "case_id": data._id.toString(), "status": "done" } },
-                        { "$count": "done_task" }
-                      ],
-                      "total_comments": [
-                        { "$match": { "case_id": data._id.toString(), } },
-                        {
-                          "$group": {
-                            "_id": null,
-                            "total_count": { $sum: { $size: "$comments" } }
-                          }
-                        },]
-                    }
-                  },
-                  {
-                    "$project": {
-                      "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
-                      "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] },
-                      "total_comments": { "$arrayElemAt": ["$total_comments.total_count", 0] }
-                    }
-                  }
-
-                ], function (err, results) {
-                  resolve(results)
-                })
-              }).then((data3) => {
-                // console.log(data3[0].done_task)
-                if (data3 && data3.length > 0) {
-                  data.done_task = data3[0].done_task;
-                  data.total_task = data3[0].total_task;
-                  data.total_comments = data3[0].total_comments;
-                  data.full_address = { address: data5.address, email: data5.email, mobile: data5.mobile, city: data5.city, pastal_code: data5.pastal_code, country: data5.country }
-                  fullinfo.push(data)
-                  resolve(fullinfo);
+  
+    return new Promise((resolve, reject) => {
+        try {
+                if (data) {
+                  console.log(data.case_id)
+                  User.findOne({ _id: data.patient_id })
+                    .exec()
+                    .then(function (doc5) {
+                      if (doc5) {
+                          var data5 = {}
+                          data5 = doc5;
+                          var Tasks = new Promise((resolve, reject) => {
+                            virtual_Task.aggregate([
+                              {
+                                "$facet": {
+                                  "total_task": [
+                                    { "$match": { "case_id": data._id.toString(), "status": { "$exists": true, } } },
+                                    { "$count": "total_task" },
+                                  ],
+                                  "done_task": [
+                                    { "$match": { "case_id": data._id.toString(), "status": "done" } },
+                                    { "$count": "done_task" }
+                                  ],
+                                  "total_comments": [
+                                    { "$match": { "case_id": data._id.toString(), } },
+                                    {
+                                      "$group": {
+                                        "_id": null,
+                                        "total_count": { $sum: { $size: "$comments" } }
+                                      }
+                                    },]
+                                }
+                              },
+                              {
+                                "$project": {
+                                  "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
+                                  "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] },
+                                  "total_comments": { "$arrayElemAt": ["$total_comments.total_count", 0] }
+                                }
+                              }
+    
+                            ], function (err, results) {
+                              resolve(results)
+                            })
+                          }).then((data3) => {
+                            // console.log(data3[0].done_task)
+                            if (data3 && data3.length > 0) {
+                              data.done_task = data3[0].done_task;
+                              data.total_task = data3[0].total_task;
+                              data.total_comments = data3[0].total_comments;
+                              data.full_address = {address: data5.address,email: data5.email,mobile: data5.mobile, city: data5.city, pastal_code: data5.pastal_code, country: data5.country }                           
+                              fullinfo.push(data)
+                              resolve(fullinfo);
+                            }
+                            else {
+                              fullinfo.push(data);
+                              resolve(fullinfo);
+                            }
+                          })
+                      }
+                      else {
+                        resolve(fullinfo);
+                      }
+                    })
                 }
                 else {
-                  fullinfo.push(data);
                   resolve(fullinfo);
                 }
-              })
-            }
-            else {
-              resolve(fullinfo);
-            }
-          })
-      }
-      else {
-        resolve(fullinfo);
-      }
-    } catch (error) {
-      console.log(error)
-      resolve(data);
-    }
-  });
+        } catch (error) {
+            console.log(error)
+            resolve(data);
+        }
+    });
 
+}
+
+function forEachPromise(items, fn) {
+    return items.reduce(function (promise, item) {
+        return promise.then(function () {
+            return fn(item);
+        });
+    }, Promise.resolve());
 }
 
 function forEachPromise(items, fn) {
