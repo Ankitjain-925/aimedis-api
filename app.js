@@ -191,8 +191,41 @@ cron.schedule('0 0 */12 * * *', function(){
 
 function SetArchiveUnuseMeeting(){
   sick_meeting.find()
-  .exec(function (err, doc1) {
-    if (err && !doc1) {
+    .exec(function (err, doc1) {
+      if (err && !doc1) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "update data failed",
+          error: err,
+        });
+      } else {
+        console.log("doc1", doc1)
+        let ttime = moment()
+        doc1.forEach((element) => {
+          var enddate = moment(element.date);
+          var diff1 = ttime.diff(enddate, 'hours')
+          if (diff1 > 6) {
+            virtual_Task.updateMany({
+              _id: element.task_id, $or: [
+                { meetingjoined: { $ne: true } },
+                { meetingjoined: { $exists: false } }
+              ]
+            }, { archived: true }, function (err, data) {
+              if (err) { console.log("err", err) }
+              else { console.log("data", data) }
+            })
+          }
+        })
+      }
+    }
+    );
+}
+
+function removeOldBackups() {
+  const directoryPath = path.join(__dirname, "./DBbackups/")
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
       res.json({
         status: 200,
         hassuccessed: false,
@@ -469,6 +502,7 @@ var vactive = require("./routesV4/virtual_active");
 var market = require("./routesV4/marketing");
 var cquestionnaire = require("./routesV4/care_questionnaires.js");
 var assignservice = require("./routesV4/assign_services.js");
+var vcare4 = require("./routesV4/virtual_care");
 
 var UserData5 = require("./routesV5/UserTrack");
 var UserProfile5 = require("./routesV5/userProfile");
@@ -554,6 +588,7 @@ app.use("/api/v4/marketing", merketing);
 app.use("/api/v4/cquestionnaire", cquestionnaire);
 app.use("/api/v4/assignservice", assignservice);
 app.use("/api/v4/vactive", vactive);
+app.use("/api/v4/vc", vcare4);
 
 
 app.use("/api/v5/User", UserData5);
@@ -585,10 +620,7 @@ app.use("/api/v5/vactive", vactive5);
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get("/s",(res,req)=>{
-  console.log("nnnnnnnnnnnnn")
 
-})
 
 ////////////admin+main/////////////
 appAdmin.use(function (req, res, next) {
@@ -624,21 +656,12 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
   console.log("err", err);
-  return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
+  // return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
  
 });
 
-app.listen(5002, () => {
-  console.log("Server started on port 5000");
-});
+// app.listen(5001, () => {
+//   console.log("Server started on port 5001");
+// });
 
-//  module.exports = app;
-
-const LoggerMiddleware = (req,res,next) =>{
-  console.log(`Logged  ${req.url}  ${req.method} -- ${new Date()}`)
-  next();
-}
-
-
-// application level middleware
-app.use(LoggerMiddleware);
+ module.exports = app;

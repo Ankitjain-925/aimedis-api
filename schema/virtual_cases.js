@@ -44,6 +44,11 @@ var CaseSchema = new Schema({
         required: false,
         unique: false
     },
+    full_address:{
+        type: Object,
+        required: false,
+        unique: false
+    },
     case_number:{
       type: String,
       required: true,
