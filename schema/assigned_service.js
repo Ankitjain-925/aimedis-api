@@ -157,7 +157,7 @@ var AssignedSchema = new Schema(
 
 AssignedSchema.plugin(mongooseFieldEncryption, {
 
-    fields: ["assign_service","description","service_type","house_id","status",
+    fields: ["description","service_type","house_id","status",
 "priority","patient_id","case_id","done_on","created_at","place_of_birth"
 ], secret: process.env.SOME_32BYTE_BASE64_STRING,
 
