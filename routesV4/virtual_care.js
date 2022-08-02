@@ -13,6 +13,7 @@ var Prescription = require("../schema/prescription");
 var Cretificate = require("../schema/sick_certificate");
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
+let lodash = require("lodash");
 const moment = require("moment");
 const { getMsgLang, trans } = require("./GetsetLang");
 const sendSms = require("./sendSms");
@@ -64,8 +65,7 @@ router.post("/UpdateAddress", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    
-    virtual_Case.findOne({ _id: req.body.case_id  }, function (err, data1) {
+    virtual_Case.findOne({ _id: req.body.case_id }, function (err, data1) {
       if (err) {
         res.json({
           status: 200,
@@ -85,10 +85,18 @@ router.post("/UpdateAddress", function (req, res) {
               });
             } else {
               if (data) {
-                console.log("data", data)
-                console.log("data", data.country, data.country_code)
                 if (data.address && data.city && data.country && data.pastal_code) {
-                  virtual_Case.updateMany({ case_number: { $in: [case_number, VirtualtToSearchWith.case_number] } }, { external_space: true }, function (err, data2) {
+                  virtual_Case.updateMany({ _id: req.body.case_id }, {
+                    '$unset':
+                    {
+                      'bed': '',
+                      'rooms': '',
+                      'wards': ''
+                    },
+                    $set: { external: true } 
+
+
+                  }, function (err, data2) {
                     if (err) {
                       console.log("err2", err)
                       res.json({
@@ -98,6 +106,7 @@ router.post("/UpdateAddress", function (req, res) {
                         error: err,
                       });
                     } else {
+                      console.log("data2", data2)
                       res.json({
                         status: 200,
                         hassuccessed: true,
@@ -105,67 +114,67 @@ router.post("/UpdateAddress", function (req, res) {
                       });
                     }
                   })
-                } else {
-                  var sendData =
-                    `<div>Dear Patient,
+        } else {
+          var sendData =
+            `<div>Dear Patient,
                     Please fill your full address at your profile of Aimedis, The hospital- ${req.body.HospitalName} wants to add you in AIS Care, for that hospital admin staff needs your proper address, So hospital can add you as AIS Care. Please update full address immediately.</div>`;
-                  var sendMob = `Dear Patient,Please fill your full address at your profile of Aimedis, The hospital- ${req.body.HospitalName} wants to add you in AIS Care, for that hospital admin staff needs your proper address, So hospital can add you as AIS Care. Please update full address immediately.`
+          var sendMob = `Dear Patient,Please fill your full address at your profile of Aimedis, The hospital- ${req.body.HospitalName} wants to add you in AIS Care, for that hospital admin staff needs your proper address, So hospital can add you as AIS Care. Please update full address immediately.`
 
-                  generateTemplate(
-                    EMAIL.generalEmail.createTemplate("en", {
-                      title: "",
-                      content: sendData,
-                    }),
-                    (error, html) => {
-                      if (!error) {
-                        let mailOptions = {
-                          from: "contact@aimedis.com",
-                          to: data.email,
-                          subject: "Update your Address",
-                          html: html,
-                        };
-                        let sendmail = transporter.sendMail(mailOptions);
-                      }
-                    }
-                  );
-                  var lan1 = getMsgLang(data._id);
-                  lan1.then((result) => {
-                    result = result === "ch" ? "zh" : result === "sp" ? "es" : result === "rs" ? "ru" : result;
-                    trans(sendMob, { source: "en", target: result }).then((res1) => {
-                      sendSms(data.mobile, res1).then((result) => { }).catch((e) => { })
-                    });
-                  })
-                  res.json({
-                    status: 200,
-                    message: "Mail sent Successfully",
-                    hassuccessed: true,
-                  })
-                }
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "No User Found",
-                });
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate("en", {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: data.email,
+                  subject: "Update your Address",
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
               }
             }
+          );
+          var lan1 = getMsgLang(data._id);
+          lan1.then((result) => {
+            result = result === "ch" ? "zh" : result === "sp" ? "es" : result === "rs" ? "ru" : result;
+            trans(sendMob, { source: "en", target: result }).then((res1) => {
+              sendSms(data.mobile, res1).then((result) => { }).catch((e) => { })
+            });
           })
-        } else {
           res.json({
             status: 200,
-            hassuccessed: false,
-            message: "No User Found",
-          });
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          })
         }
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "No User Found",
+        });
+      }
+    }
+          })
+        } else {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "No User Found",
+  });
+}
       }
     })
   } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "Authentication required.",
+  });
+}
 
 });
 
@@ -410,8 +419,16 @@ function forEachPromise(items, fn) {
     }, Promise.resolve());
 }
 
+function forEachPromise(items, fn) {
+  return items.reduce(function (promise, item) {
+    return promise.then(function () {
+      return fn(item);
+    });
+  }, Promise.resolve());
+}
+
 router.post("/nurseapp", function (req, res) {
-  User.findOne({ _id:req.body.nurse_id }, function (err, Userinfo) {
+  User.findOne({ _id: req.body.nurse_id }, function (err, Userinfo) {
     if (err) {
       console.log("err", err)
       res.json({
@@ -837,14 +854,13 @@ router.post("/nurseapp", function (req, res) {
   })
 })
 
-var sample = {}
 
 router.post("/nurseafter", function (req, res) {
   doctor_id = req.body.nurse_id
   const AppointToSearchWith = new Appointments({ doctor_id });
   AppointToSearchWith.encryptFieldsSync();
-  sample = {}
-  var sampl_1={}
+  const result = []
+  var sample_1 = []
   Appointments.find({
     $or: [
       { doctor_id: doctor_id },
@@ -859,76 +875,34 @@ router.post("/nurseafter", function (req, res) {
         error: err,
       });
     } else {
-      // sample = [];
-      sample.data1 = data
-      sample.data1.forEach((element) => {
-      coming_date = new Date(element.date).setHours(0, 0, 0, 0)
-
-     var today_date = new Date().setHours(0, 0, 0, 0)
-
-
-        Service(today_date, coming_date, doctor_id).then(() => {
-
-          sampl_1=sample
-          console.log("sampl_1",sampl_1)
-        
-      res.json({ status: 200, hassuccessed: true, data: sampl_1 })
-
+      assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+          });
+        } else {
+          sample_1 = [...data, ...data2];
+          sample_1.forEach((element) => {
+            coming_date = (element.task_name || element.title) ? new Date(element.due_on.date).setHours(0, 0, 0, 0) : new Date(element.date).setHours(0, 0, 0, 0)
+            today_date = new Date().setHours(0, 0, 0, 0)
+            console.log("today_date", today_date)
+            if (moment(today_date).isSameOrBefore(coming_date)) {
+              result.push(element)
+              result.sort(mySorter1);
+            }
+          })
+          res.json({ status: 200, hassuccessed: true, data: result })
+        }
       })
-    })
+
     }
   })
 })
 
-function Service(today_date, coming_date, doctor_id) {
-  return new Promise((resolve, reject) => {
-    console.log("today_date",today_date,"coming_date",coming_date)
-    if (moment(today_date).isSameOrBefore(coming_date)) {
-      console.log("1")
-      Assign(doctor_id).then(()=>{
-         resolve(sample)
-      })
-     
-    } else {
-
-      console.log("2")
-      sample_id=sample.data1.map((element)=>{
-             element
-      })
-      console.log("sample_id",sample_id)
-      sample= sample.data1.filter(element => ! sample_id.some((d)=>{d.id === element._id  }) );
-      console.log("sample",sample)
-      resolve(sample)
-    }
-  })
-}
-
-function Assign(doctor_id){
-  return new Promise((resolve, reject) => {
-    try{
-      assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
-        if (err) {
-          console.log("err", err)
-        } else {
-          sample.data2 = data2
-          sample.data1.sort(mySorter1);
-          resolve(sample)
-        }
-      })
-    }catch(error){
-      console.log("error",error)
-reject(error)
-    }
-    
-
-  })
- 
-}
-
-
 function mySorter1(a, b) {
   if (a.date && b.date) {
-    console.log("a", a.date, "b", b.date)
     return a.date > b.date ? 1 : a.date < b.date ? -1 : 0;
   } else {
     return -1;
@@ -937,7 +911,6 @@ function mySorter1(a, b) {
 
 function mySorter(a, b) {
   if (a.date && b.date) {
-    console.log("a", a.date, "b", b.date)
     return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
   } else {
     return -1;
@@ -947,8 +920,8 @@ router.post("/nursebefore", function (req, res) {
   doctor_id = req.body.nurse_id
   const AppointToSearchWith = new Appointments({ doctor_id });
   AppointToSearchWith.encryptFieldsSync();
-  final = []
-  sample_1 = {}
+  const result = []
+  sample_1 = [];
   Appointments.find({
     $or: [
       { doctor_id: doctor_id },
@@ -964,38 +937,24 @@ router.post("/nursebefore", function (req, res) {
     } else {
       assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
         if (err) {
-          console.log("err",err)
+          console.log("err", err)
           res.json({
             status: 200,
             hassuccessed: false,
             message: "Something went wrong",
           });
         } else {
-          sample_1.data1 = data
-          sample_1.data2 = data2
-          sample_1.data1.forEach((element) => {
-            coming_date = new Date(element.date).setHours(0, 0, 0, 0)
-           console.log("coming_date",element.date)
+          sample_1 = [...data, ...data2];
+          sample_1.forEach((element) => {
+            coming_date = (element.task_name || element.title) ? new Date(element.due_on.date).setHours(0, 0, 0, 0) : new Date(element.date).setHours(0, 0, 0, 0)
             today_date = new Date().setHours(0, 0, 0, 0)
-            console.log("today_date",today_date)
+            console.log("today_date", today_date)
             if (moment(today_date).isSameOrAfter(coming_date)) {
-              console.log("1")
-              sample_1.data1.sort(mySorter);
-            }else{
-              console.log("2")
-              console.log("ss",sample_1)
-              sample_id=sample_1.data1.map((element)=>{
-                return element._id
-              })
-              console.log("sample_id",sample_id)
-              // sample_1= sample_1.data1.filter(element => element._id != sample_id );
-              sample_1=sample_1.data1.filter(element => !sample_id.some((d)=>{d.id === element._id  }) );
-              console.log("sample_1132",sample_1)
+              result.push(element)
+              result.sort(mySorter);
             }
           })
-          console.log("sample",sample_1)
-
-          res.json({ status: 200, hassuccessed: true, data: sample_1 })
+          res.json({ status: 200, hassuccessed: true, data: result })
         }
       })
     }
@@ -1129,13 +1088,18 @@ router.get("/patientTaskandService/:patient_id", function (req, res) {
               message: "Something went wrong",
             });
           } else {
-            console.log("data", data2)
-            final_data.task = data
-            final_data.service = data2
+            final_data = [...data, ...data2];
+            var final_data1 = lodash.sortBy(final_data, (e) => {
+              return e.due_on.date
+            });
+            if (final_data1 && final_data.length > 0) {
+              final_data1.reverse()
+            }
             res.json({
               status: 200,
               hassuccessed: true,
-              message: final_data
+              data: final_data1,
+              msg: 'successfully fetched'
             })
           }
         })

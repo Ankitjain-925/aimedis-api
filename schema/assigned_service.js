@@ -55,6 +55,11 @@ ProfessionalInfo.plugin(mongooseFieldEncryption, {
 
 var AssignedSchema = new Schema(
   {
+    title : {
+      type: String,
+      required: true,
+      unique: false,
+    },
     assinged_to: [ProfessionalInfo],
     speciality: {
       type: Object,
@@ -123,12 +128,9 @@ var AssignedSchema = new Schema(
       required: false,
       unique: false,
     },
-    done_on: {
-      type: String,
-      required: false,
-      unique: false,
+    due_on: {
+      type: Object,
     },
-    
     is_decline: { 
       type: Boolean,
       required: false,
@@ -145,6 +147,9 @@ var AssignedSchema = new Schema(
       type: Date,
       required: false,
       unique: false,
+    },
+    due_on: {
+      type: Object,
     },
   },
   { strict: false }
