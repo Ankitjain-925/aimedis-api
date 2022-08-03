@@ -1,5 +1,6 @@
 RewriteEngine On
 RewriteBase /
+
 Redirect 301 /.env https://aidoc.io/
 Redirect 301 /app.js https://aidoc.io/
 Redirect 301 /jwttoken.js https://aidoc.io/
@@ -17,3 +18,4 @@ Redirect 301 /config/ https://aidoc.io/
 Redirect 301 /public/ https://aidoc.io/
 Redirect 301 /lib/  https://aidoc.io/
 Redirect 301 /regions.json https://aidoc.io/
+

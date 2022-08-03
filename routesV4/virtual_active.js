@@ -1,10 +1,6 @@
 require("dotenv").config();
-var aws = require("aws-sdk");
-
 var re = require("../regions.json");
-
 const axios = require("axios");
-
 var express = require("express");
 let router = express.Router();
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
@@ -118,7 +114,85 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
   return timeStops;
 }
 
-router.get("/SelectDocforSickleave", function (req, res, next) {
+router.post("/SelectDocforSickleave2", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  
+  if (legit) {
+    
+    const VirtualtToSearchWith = new virtual_Task({ task_type: "sick_leave" });
+     VirtualtToSearchWith.encryptFieldsSync();
+    virtual_Task.find(
+      {
+        "assinged_to.user_id" : req.body.doctor_id ,
+        archived: { $ne: true },
+        $and: [
+        { $or: [ {is_decline: {$exists: false}}, 
+          {is_decline: {$eq : false}}
+        ]},
+        {
+          $or: [
+            { task_type: { $eq: "sick_leave" } },
+            { task_type: { $eq: VirtualtToSearchWith.task_type } },
+          ]
+        }
+        ]
+        },
+      function (err, user_data) {
+        if (err && !user_data) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          var arr = [];
+          let  comingdate = new Date(new Date(req.body.date).setHours(0, 0, 0, 0));
+          // let comingdate = new Date(req.body.date).setHours(0, 0, 0, 0);
+          var newData = user_data.map(
+            (item) => {
+              let itemdate = new Date(new Date(new Date().setDate(new Date(item.date).getDate())).setHours(0, 0, 0, 0));
+              if( moment(itemdate).format("MM/DD/YYYY") ===
+              moment(comingdate).format("MM/DD/YYYY")){
+
+                let d2 = moment(new Date(item.approved_date));
+                let d1 = moment();
+                var diffMins = d1.diff(d2, 'minutes')
+                if(item.is_payment || diffMins < 20 ){
+                  return { start: item.start, end: item.end }
+                }
+                else{
+                  return 0;
+                }
+              }
+              else{
+                return 0;
+              }
+            }
+          );
+          
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            data: newData,
+          });
+    
+        }
+    
+      }
+    );
+    
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+router.get("/SelectDocforSickleave", function (req, res, next) { 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = process.env.institute_id;
@@ -127,7 +201,7 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
       .countDocuments()
       .exec(function (err, total) {
         var random = Math.floor(Math.random() * total);
-        if (total >= 1) {
+        if (total > 1) {
           User.find({ current_available: true, institute_id: institute_id })
             .skip(random)
             .limit(1)
@@ -161,6 +235,7 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
                       custom_text =
                         Userinfo[i].sickleave_appointment[j].custom_text;
                     }
+
                     if (
                       (userdata[i].sickleave_appointment[j].monday_start,
                         userdata[i].sickleave_appointment[j].monday_end,
@@ -276,6 +351,7 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
               });
             });
         } else {
+
           res.json({
             status: 200,
             hassuccessed: false,
@@ -332,15 +408,12 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
     virtual_Task.find(
       {
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+        archived: { $ne: true },
         $or: [
           { task_type: { $eq: "sick_leave" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
-        $or: [
-          { archived: { $ne: true } },
-          { archived: { $exists: false } }
-        ]
-
+     
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -351,7 +424,6 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
             error: err,
           });
         } else {
-          console.log("user", userdata)
           if (userdata.length > 0) {
             res.json({ status: 200, hassuccessed: true, data: userdata });
           } else {
@@ -599,7 +671,7 @@ router.post("/approvedrequest", function (req, res) {
   }
 });
 
-router.post("/AddMeeting", function (req, res, next) {
+router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -610,8 +682,13 @@ router.post("/AddMeeting", function (req, res, next) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
           var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-          var start_time = moment(req.body.start_time).format("HH:mm")
-          var end_time = moment(req.body.end_time).format("HH:mm")
+          // var start_date = new Date(req.body.start_time);
+          // var end_date = new Date(req.body.end_time);
+          // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
+          // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
+
+          var start_time = req.params.start_time;
+          var end_time = req.params.end_time;
           var sendData = `Dear Patient,
 
     Your payment process for sick leave certificate application is completed successfully.
@@ -724,16 +801,13 @@ router.post("/AddMeeting", function (req, res, next) {
 
 //     {
 
-//       console.log("file", req.body.fileattach[0].filename.split("&")[0]);
+//     
 //       var work=req.body.fileattach[0].filename.split("&")[0];
 //       work_f = work.split(".com/")[1]
-//       console.log("birthday", work_f);
-//       console.log("file", req.body.fileattach[1].filename.split("&")[0]);
+
 //       var work1 = req.body.fileattach[1].filename.split("&")[0];
 //       work_f1 = work1.split(".com/")[1]
-//       console.log("b", work_f1);
 //       // GetDatafromAws(work-f, work_f1).then((result) => {
-//       //   console.log("result", result)
 //       //   new_link.push(result)
 
 
@@ -777,7 +851,7 @@ router.post("/AddMeeting", function (req, res, next) {
 //           });
 //           //return err;
 //         } else {
-//           console.log("url", url);
+
 
 //       s3.getSignedUrl("getObject", params1, function (err, url1) {
 //         if (err) {
@@ -789,8 +863,7 @@ router.post("/AddMeeting", function (req, res, next) {
 //           //return err;
 //         } else {
 //           image.push({v:url1})
-//           console.log("url", url1);
-//           console.log("url", image);
+
 
 //       Object.entries(req.body).map(([key, value]) => {
 //         if (key === "info") {
@@ -822,22 +895,18 @@ router.post("/AddMeeting", function (req, res, next) {
 //           });
 //         }
 
-//         console.log("work_since", work_since);
 //       });
-//       // console.log("work_since", req.body);
 //       let newperson = {
 //         ...req.body,
 //         img: url,
 //         img1: url1
 //       }
-//       console.log(newperson);
 //       let data1 = date1.map((element) => {
 //         return element.v;
 //       });
 
 //       var template = handlebars.compile(sick);
 //       let house_name = "";
-//       console.log("work_sinc",image);
 
 //       var htmlToSend = template({
 
@@ -894,9 +963,7 @@ router.post("/AddMeeting", function (req, res, next) {
 //                   };
 
 //                   let sendmail = transporter.sendMail(mailOptions);
-//                   console.log("mail", mailOptions);
 //                   if (sendmail) {
-//                     console.log("Mail is sent ");
 
 //                     res.json({
 //                       status: 200,
@@ -904,7 +971,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //                       hassuccessed: true,
 //                     });
 //                   } else {
-//                     console.log("err");
 //                     res.json({
 //                       status: 200,
 //                       msg: "Mail is not sent",
@@ -912,7 +978,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //                     });
 //                   }
 //                 } else {
-//                   console.log("no email");
 //                   res.json({
 //                     status: 200,
 //                     msg: "Mail is not sent",
@@ -934,7 +999,6 @@ router.post("/AddMeeting", function (req, res, next) {
 // });
 //     }
 //   } catch (e) {
-//     console.log("e", e);
 //     res.json({
 //       status: 200,
 //       hassuccessed: false,
@@ -988,7 +1052,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //             });
 //             //return err;
 //           } else {
-//             console.log("url", url);
 
 //           }
 //         });
@@ -1001,7 +1064,6 @@ router.post("/AddMeeting", function (req, res, next) {
 //             });
 //             //return err;
 //           } else {
-//             console.log("url", url1);
 
 //           }
 //         });
@@ -1035,12 +1097,15 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
 
 
     GetDatafromAws(comming, comming2).then((result) => {
-      console.log(result)
       new_link.push(result)
 
 
       var template = handlebars.compile(sick);
-
+      req.body.birthday = getDate(req.body.birthday, "YYYY/MM/DD");
+      req.body.date = getDate(req.body.date, "YYYY/MM/DD");
+      req.body.imposible = getDate(req.body.imposible, "YYYY/MM/DD");
+      req.body.most_likely = getDate(req.body.most_likely, "YYYY/MM/DD");
+      req.body.detected_at = getDate(req.body.detected_at, "YYYY/MM/DD");
       let newperson = {
         ...req.body,
         img: result
@@ -1077,47 +1142,54 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
         };
       }
       let file = [{ content: htmlToSend }];
-      try{
-      html_to_pdf.generatePdfs(file, options).then((output) => {
-        const file = `${__dirname}/${filename}`;
-        if (comming.usefor === "mail") {
-          User.findOne({ _id: comming.patient_id }, function (err, dta) {
+      try {
+        html_to_pdf.generatePdfs(file, options).then((output) => {
+          const file = `${__dirname}/${filename}`;
+          if (comming.usefor === "mail") {
+            User.findOne({ _id: comming.patient_id }, function (err, dta) {
 
-            var sendData = `<div>Dear Patient , <br/>
+              var sendData = `<div>Dear Patient , <br/>
               Here is the Certificate added by doctor on your sick leave certificate request. 
               Please download it from here as well as from the request list page too.</div>`;
 
-            generateTemplate(
-              EMAIL.generalEmail.createTemplate("en", {
-                title: "",
-                content: sendData,
-              }),
-              (error, html) => {
-                if (dta.email !== "") {
-                  let mailOptions = {
-                    from: "contact@aimedis.com",
+              generateTemplate(
+                EMAIL.generalEmail.createTemplate("en", {
+                  title: "",
+                  content: sendData,
+                }),
+                (error, html) => {
+                  if (dta.email !== "") {
+                    let mailOptions = {
+                      from: "contact@aimedis.com",
 
-                    to: dta.email,
-                    subject: "Sick leave certificate Download",
-                    html: html,
-                    attachments: [
-                      {
-                        // utf-8 string as an attachment
-                        filename: "sickleave_certificate.pdf",
+                      to: dta.email,
+                      subject: "Sick leave certificate Download",
+                      html: html,
+                      attachments: [
+                        {
+                          // utf-8 string as an attachment
+                          filename: "sickleave_certificate.pdf",
 
-                        path: file,
-                      },
-                    ],
-                  };
+                          path: file,
+                        },
+                      ],
+                    };
 
-                  let sendmail = transporter.sendMail(mailOptions);
-                  if (sendmail) {
+                    let sendmail = transporter.sendMail(mailOptions);
+                    if (sendmail) {
 
-                    res.json({
-                      status: 200,
-                      message: "Mail sent Successfully",
-                      hassuccessed: true,
-                    });
+                      res.json({
+                        status: 200,
+                        message: "Mail sent Successfully",
+                        hassuccessed: true,
+                      });
+                    } else {
+                      res.json({
+                        status: 200,
+                        msg: "Mail is not sent",
+                        hassuccessed: false,
+                      });
+                    }
                   } else {
                     res.json({
                       status: 200,
@@ -1125,33 +1197,25 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                       hassuccessed: false,
                     });
                   }
-                } else {
-                  res.json({
-                    status: 200,
-                    msg: "Mail is not sent",
-                    hassuccessed: false,
-                  });
                 }
-              }
-            );
-          })
-        } else {
-          res.download(file);
-        }
-      });
-    }
-    catch(e){
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Get catch error",
-        error: e,
-      });
-    }
+              );
+            })
+          } else {
+            res.download(file);
+          }
+        });
+      }
+      catch (e) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Get catch error",
+          error: e,
+        });
+      }
     })
   }
   catch (e) {
-    console.log("e", e)
     res.json({
       status: 200,
       hassuccessed: false,
@@ -1179,7 +1243,6 @@ function GetDatafromAws(comming, comming2) {
               Data.forEach((element) => {
 
                 GetDatafromAws1(element, comming2).then((result) => {
-                  console.log("result", result)
                   new_link.push({ v: result })
                   resolve(new_link)
                 })
@@ -1226,7 +1289,6 @@ function GetDatafromAws1(element, comming2) {
         Bucket: bucket, // your bucket name,
         Key: file2, // path to the object you're looking for
       };
-      console.log("params", params)
       aws.config.update({
         region: data[0].region,
         accessKeyId: process.env.S3_ACCESS_KEY,
@@ -1236,11 +1298,6 @@ function GetDatafromAws1(element, comming2) {
       var s3 = new aws.S3({ apiVersion: "2006-03-01" });
 
       s3.getSignedUrl("getObject", params, function (err, url) {
-
-        // console.log("url",url)
-        // new_link.push({ v: url })
-        // console.log("data", new_link)
-
         resolve(url)
       });
     } catch (e) {
@@ -1319,18 +1376,9 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
         } else {
           if (data !== null) {
             let today = new Date().setHours(0, 0, 0, 0);
-
-
-            // let today =moment().format("MM-DD-YYYY")
-            // let ttime = new Date();
-
             let ttime = moment().format("HH:mm");
-            console.log("data", ttime);
             let data_start = moment(data.start_time).format("HH:mm");
-            console.log("data", data_start);
             let data_end = moment(data.end_time).format("HH:mm");
-            console.log("data", data_end);
-
             let data_d = new Date(data.date).setHours(0, 0, 0, 0);
             if (moment(today).isAfter(data_d)) {
               res.json({
@@ -1358,19 +1406,43 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       if (userdata !== null) {
-                        GetData(data).then((result) => {
-                          let userdata1 = {
-                            ...data,
-                            ...result
-                    
+                        User.findOne({ _id: userdata.patient_id }, function (err, result) {
+                          if(err && !result){
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "link active",
+                              data: { Task: userdata, Session: data },
+                            });
                           }
-                          res.json({
-                            status: 200,
-                            hassuccessed: true,
-                            message: "link active",
-                            data: { Task: userdata, Session: userdata1 },
-                          });
-                        });
+                          else{
+                            if(result !== null){
+                              var patient_info = userdata.patient;
+                              patient_info['image'] = result.image;
+                              userdata.patient = patient_info
+                              res.json({
+                                status: 200,
+                                hassuccessed: true,
+                                message: "link active",
+                                data: { Task: userdata, Session: data },
+                              });
+                            }
+                            else{
+                              var patient_info = userdata.patient;
+                              patient_info['image'] = 'insidenull.jpg';
+                              userdata.patient = patient_info
+                              res.json({
+                                status: 200,
+                                hassuccessed: true,
+                                message: "link active",
+                                data: { Task: userdata, Session: data },
+                              });
+                            }
+                         
+                          }
+                        })
+
+                        
                       }
                       else {
                         const VirtualtToSearchWith = new sick_meeting({
@@ -1389,19 +1461,14 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-
                                 message: "Something went wrong"
-
                               });
                             } else {
                               res.json({
                                 status: 200,
                                 hassuccessed: false,
-
                                 meessage: "Payment process is incomplete"
                               })
-
-
                             }
                           }
                         );
@@ -1450,37 +1517,6 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
 });
 
 
-function GetData(data) {
-  return new Promise((resolve, reject) => {
-    process.nextTick(() => {
-      let patient_id = data.patient_id;
-      var VirtualtToSearchWith = new User({ _id : patient_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-      let doctor_id = data.doctor_id;
-      var VirtualtToSearchWith1 = new User({ _id :  doctor_id });
-      VirtualtToSearchWith1.encryptFieldsSync();
-     
-      User.findOne({
-        $or: [
-          { _id: data.patient_id },
-          { _id: VirtualtToSearchWith.patient_id },
-          { _id: data.doctor_id },
-          { _id: VirtualtToSearchWith1.doctor_id },
-        ],
-      })
-        .exec()
-        .then(function (doc3) {
-          if (doc3) {
-            Mypat.push(doc3);
-            resolve(Mypat);
-          } else {
-            resolve(Mypat);
-          }
-        });
-    });
-  });
-}
-
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1491,14 +1527,17 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
         if (err && !user_data) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
+          var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+          var start_time = moment(req.body.start_time).format("HH:mm");
+            var end_time = moment(req.body.end_time).format("HH:mm");
           var sendData = `<div>Dear Patient,<br/>
         Your payment process for sick leave certificate application is completed successfully.
           "<br/>";
         Please do join the Video call at  
-          ${req.body.date}
+          ${meetingDate}
           from the time slot
-          ${req.body.start}
-          ${req.body.end}
+          ${start_time}
+          ${end_time}
         <br/>
         Your Video call joining link is
           ${req.body.patient_link}
@@ -1508,10 +1547,10 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
         The payment process for sick leave certificate application is completed successfully.
         <br/>
         Please do join the Video call at
-          ${req.body.date}
+          ${meetingDate}
           from the time slot
-          ${req.body.start}+""+
-          ${req.body.end}
+          ${start_time}+""+
+          ${end_time}
           <br/>
         Your Video call joining link is
           ${req.body.doctor_link}
@@ -1594,7 +1633,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
 router.put("/joinmeeting/:task_id", function (req, res, next) {
   virtual_Task.findOneAndUpdate(
     { _id: req.params.task_id },
-    { meetingjoined: true },
+    { $set: { meetingjoined: true } },
     (err, doc1) => {
       if (err && !doc1) {
         res.json({
@@ -1623,12 +1662,59 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
   );
 });
 
+
+// var cron = require('node-cron');
+// router.put("/linkarchive", function (req, res, next) {
+//   cron.schedule('1 * * * * *', () => {
+//     sick_meeting.find()
+//       .exec(function (err, doc1) {
+//         if (err && !doc1) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "update data failed",
+//             error: err,
+//           });
+//         } else {
+//           let ttime = moment(Date.now()).format("YYYY-MM-DD")
+//           // let final= doc1.map((element)=>{
+//           //   return element.endtime
+//           // })
+
+//           doc1.forEach((element) => {
+
+//             var enddate = moment(element.date).format("YYYY-MM-DD");
+
+
+//             if (moment(ttime).diff(enddate, 'days') > 2) {
+//               virtual_Task.updateMany({
+//                 _id: element.task_id, $or: [
+//                   { meetingjoined: { $ne: true } },
+//                   { meetingjoined: { $exists: false } }
+//                 ]
+//               }, { archived: true }, function (err, data) {
+//                 if (err) {
+//                 }
+//                 else {
+//                 }
+//               })
+
+
+//             }
+
+//           })
+//         }
+//       }
+//       );
+//   })
+// });
+
+
 router.post("/sickarchive", function (req, res) {
 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    console.log("1")
     task_type = "sick_leave"
     const VirtualtToSearchWith = new virtual_Task({
       task_type
@@ -1643,7 +1729,6 @@ router.post("/sickarchive", function (req, res) {
 
     virtual_Task.findOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith2.patient_id] }, archived: true, task_type: { $in: [task_type, VirtualtToSearchWith.task_type] } }, function (err, data) {
       if (err) {
-        console.log("err", err)
         res.json({
           status: 200,
           hassuccessed: false,
@@ -1651,7 +1736,6 @@ router.post("/sickarchive", function (req, res) {
         });
 
       } else {
-        console.log("data", data)
         if (data != null) {
           res.json({
             status: 200,
@@ -1670,12 +1754,12 @@ router.post("/sickarchive", function (req, res) {
     })
   }
   else {
- res.json({
+    res.json({
       status: 200,
       hassuccessed: false,
       message: "Authentication required.",
     });
-}
+  }
 })
 
 
@@ -1696,27 +1780,20 @@ router.get("/GetAmount/:house_id", function (req, res) {
           message: "Something went wrong",
         });
       } else {
-        // console.log("data", data);
         if (data) {
           data.institute_groups.map((item) => {
-            // console.log("item", item);
+           
             item.houses.map((item2) => {
-              // console.log("item", item2);
-
+ 
               if (item2.house_id == req.params.house_id) {
 
 
                 if (item2.sickleave_certificate_amount !== "") {
 
                   userdata = item2.sickleave_certificate_amount;
-                  console.log("item1");
                 }
                 else {
                   userdata = item2.sickleave_certificate_amount = "20";
-
-                  console.log("item2");
-
-
                 }
               }
             });
@@ -1763,13 +1840,12 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
         }
       },
 
-      { "arrayFilters" : [{ "e.house_id": req.params.house_id }] },
+      { "arrayFilters": [{ "e.house_id": req.params.house_id }] },
 
 
 
       // 
       function (err, data) {
-        console.log('data', err)
         if (err && !data) {
           res.json({
             status: 200,

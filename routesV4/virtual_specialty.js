@@ -217,102 +217,122 @@ router.post("/AddTask", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var Virtual_tasks = new virtual_Task(req.body);
+    Virtual_tasks = new virtual_Task(req.body);
     Virtual_tasks.save(function (err, user_data) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
-          if (err && !dofc) {
+        var task_type = "sick_leave"
+        const VirtualtToSearchWith1 = new virtual_Task({ task_type });
+        VirtualtToSearchWith1.encryptFieldsSync();
+        virtual_Task.updateOne({ _id: user_data._id, task_type: { $in: [task_type, VirtualtToSearchWith1.task_type] } }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
+          if (err && !doc) {
             res.json({
               status: 200,
               hassuccessed: false,
-              msg: "User is not found",
+              msg: "Something went wrong",
               error: err,
             });
-          } else {
-            if (doc == null || doc == "undefined") {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                msg: "User is not exist",
-              });
-            } else {
-              if (req.body.task_type !== "picture_evaluation") {
-                var m = new Date();
-                var dateString =
-                  m.getUTCFullYear() +
-                  "/" +
-                  (m.getUTCMonth() + 1) +
-                  "/" +
-                  m.getUTCDate() +
-                  " " +
-                  m.getUTCHours() +
-                  ":" +
-                  m.getUTCMinutes() +
-                  ":" +
-                  m.getUTCSeconds();
-                var lan1 = getMsgLang(doc._id);
-                lan1.then((result) => {
-                  result =
-                    result === "ch"
-                      ? "zh"
-                      : result === "sp"
-                        ? "es"
-                        : result === "rs"
-                          ? "ru"
-                          : result;
-                  var sms1 =
-                    "There was a task added on in your Aimedis profile -" +
-                    req.body.task_name +
-                    " (" +
-                    req.body.description +
-                    ") at " +
-                    dateString;
-                  trans(sms1, { source: "en", target: result }).then((res1) => {
-                    sendSms(doc.mobile, res1)
-                      .then((result) => { })
-                      .catch((e) => {
-                    
-                      });
+          }
+          else {
+            User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
+              if (err && !doc) {
+
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "User is not found",
+                  error: err,
+                });
+              } else {
+                if (doc == null || doc == "undefined") {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    msg: "User is not exist",
                   });
-                  if (doc.emergency_number && doc.emergency_number !== "") {
-                    var sms2 =
-                      "There was a task added on -" +
-                      doc.first_name +
+                } else {
+                  if (req.body.task_type !== "picture_evaluation") {
+                    var m = new Date();
+                    var dateString =
+                      m.getUTCFullYear() +
+                      "/" +
+                      (m.getUTCMonth() + 1) +
+                      "/" +
+                      m.getUTCDate() +
                       " " +
-                      doc.last_name +
-                      " Aimedis profile ( " +
-                      doc.profile_id +
-                      " )  " +
-                      " - " +
-                      req.body.task_name +
-                      " (" +
-                      req.body.description +
-                      ") at " +
-                      dateString;
-                    trans(sms2, { source: "en", target: result }).then(
-                      (res1) => {
-                        sendSms(doc.emergency_number, res1)
+                      m.getUTCHours() +
+                      ":" +
+                      m.getUTCMinutes() +
+                      ":" +
+                      m.getUTCSeconds();
+                    var lan1 = getMsgLang(doc._id);
+                    lan1.then((result) => {
+                      result =
+                        result === "ch"
+                          ? "zh"
+                          : result === "sp"
+                            ? "es"
+                            : result === "rs"
+                              ? "ru"
+                              : result;
+                      var sms1 =
+                        "There was a task added on in your Aimedis profile -" +
+                        req.body.task_name +
+                        " (" +
+                        req.body.description +
+                        ") at " +
+                        dateString;
+                      trans(sms1, { source: "en", target: result }).then((res1) => {
+                        sendSms(doc.mobile, res1)
                           .then((result) => { })
                           .catch((e) => {
-                 
-                          });
-                      }
-                    );
-                  }
-                });
-              }
 
-              res.json({
-                status: 200,
-                message: "Added Successfully",
-                hassuccessed: true,
-                data: user_data,
-              });
-            }
+                          });
+                      });
+                      if (doc.emergency_number && doc.emergency_number !== "") {
+                        var sms2 =
+                          "There was a task added on -" +
+                          doc.first_name +
+                          " " +
+                          doc.last_name +
+                          " Aimedis profile ( " +
+                          doc.profile_id +
+                          " )  " +
+                          " - " +
+                          req.body.task_name +
+                          " (" +
+                          req.body.description +
+                          ") at " +
+                          dateString;
+                        trans(sms2, { source: "en", target: result }).then(
+                          (res1) => {
+                            sendSms(doc.emergency_number, res1)
+                              .then((result) => { })
+                              .catch((e) => {
+
+                              });
+                          }
+                        );
+                      }
+                      ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {
+
+                      })
+                    });
+                  }
+
+                  res.json({
+                    status: 200,
+                    message: "Added Successfully",
+                    hassuccessed: true,
+                    data: user_data,
+                  });
+                }
+              }
+            });
+
           }
-        });
+        })
       }
     });
   } else {
@@ -323,6 +343,47 @@ router.post("/AddTask", function (req, res, next) {
     });
   }
 });
+
+
+function ApproveReq(doc, start, end, date) {
+  return new Promise((resolve, reject) => {
+    try {
+
+      let date_fn = moment(date).format("YYYY-MM-DD")
+      sendData = `Dear Patient<br/>
+      Your request for the sick leave certificate is accepted by the doctor on 
+       ${date_fn}
+        at 
+        ${start} 
+        to
+        ${end}
+        So, for the further process please complete your payment process from the request list page. The process of payment is 15 minutes process, So please do payment for this request within 15 minutes. Otherwise this request goes to at archive section automiatically.`;
+      generateTemplate(
+        EMAIL.generalEmail.createTemplate("en", {
+          title: "",
+          content: sendData,
+        }),
+        (error, html) => {
+          let mailOptions = {
+            from: "contact@aimedis.com",
+            to: doc.email,
+            subject: "Approve sick leave request by Doctor",
+            html: html,
+          };
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
+
+          } else {
+            reject(err)
+          }
+        }
+      );
+
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
 
 router.delete("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
@@ -397,9 +458,8 @@ router.put("/AddTask/:task_id", function (req, res, next) {
                             error: err,
                           });
                         } else {
-                          var sendData = `<div> Dear ${data.first_name + " " + data.last_name
-                            },
-                        </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
+                          var sendData = `<div> Dear ${data.first_name + " " + data.last_name} , </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
+
 
                           generateTemplate(
                             EMAIL.generalEmail.createTemplate("en", {
@@ -530,10 +590,20 @@ router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
       house_id,
     });
     messageToSearchWith.encryptFieldsSync();
+
+    const VirtualtToSearchWith2 = new virtual_Task({
+      task_type: "picture_evaluation",
+    });
+    VirtualtToSearchWith2.encryptFieldsSync();
     virtual_Task.find(
       {
         house_id: { $in: [house_id, messageToSearchWith.house_id] },
         archived: { $eq: true },
+        $or: [
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -585,6 +655,7 @@ router.get("/AddTask/:task_ids", function (req, res, next) {
   }
 });
 
+
 router.get("/PatientsTask/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -593,11 +664,20 @@ router.get("/PatientsTask/:patient_id", function (req, res, next) {
       patient_id: req.params.patient_id,
     });
     messageToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith2 = new virtual_Task({
+      task_type: "picture_evaluation",
+    });
+    VirtualtToSearchWith2.encryptFieldsSync();
     virtual_Task.find(
       {
         patient_id: {
           $in: [messageToSearchWith.patient_id, req.params.patient_id],
         },
+        $or: [
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -1782,7 +1862,7 @@ router.post("/checkPatient1", function (req, res, next) {
                         error: err,
                       });
                     } else {
-              
+
                       if (data) {
                         Institute.findOne(
                           {
@@ -1802,7 +1882,7 @@ router.post("/checkPatient1", function (req, res, next) {
                               if (doc3) {
                                 doc3.institute_groups.map(function (dataa) {
                                   dataa.houses.map(function (data1) {
-                                  
+
                                     if (data1.house_id == data.house_id) {
                                       infoHouse.house = data1;
                                       infoHouse.institute_groups = {
@@ -1933,7 +2013,7 @@ router.post("/checkPatient1", function (req, res, next) {
           } else {
             try {
               if (userdata && userdata.length > 0) {
-               
+
                 var newData = userdata.filter(
                   (item) =>
                     moment(item.birthday).format("MM/DD/YYYY") ===
@@ -1971,7 +2051,7 @@ router.post("/checkPatient1", function (req, res, next) {
                                 if (doc3) {
                                   doc3.institute_groups.map(function (dataa) {
                                     dataa.houses.map(function (data1) {
-                                    
+
                                       if (data1.house_id == data.house_id) {
                                         infoHouse.house = data1;
                                         infoHouse.institute_groups = {
@@ -2055,7 +2135,9 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           req.body.patient_name +
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
+
           "https://aidoc.io/approveHospital/" +
+
           req.body.case_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
@@ -2098,7 +2180,9 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
+
           " https://aidoc.io/approveHospital/" +
+
           req.body.case_id;
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
@@ -2372,10 +2456,10 @@ router.get("/stasticsrightinfo/:house_id", function (req, res, next) {
         } else {
           if (userdata) {
             let count = userdata.steps && userdata.steps.length > 0 && userdata.steps.map((element) => {
-                return {
-                  step_name: element.step_name, counts: element.case_numbers ? element.case_numbers.length : 0,
-                };
-              });
+              return {
+                step_name: element.step_name, counts: element.case_numbers ? element.case_numbers.length : 0,
+              };
+            });
             res.json({ status: 200, hassuccessed: true, data: count });
           } else {
             res.json({ status: 200, hassuccessed: true, data: [] });
@@ -2455,7 +2539,7 @@ router.get("/sortinfo1/:patient_id", function (req, res, next) {
             message: "Something went wrong",
           });
         } else {
-   
+
           res.json({ status: 200, hassuccessed: true, result: data });
         }
       });
@@ -2482,7 +2566,7 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
           if (err & !data) {
             res.json({ status: 200, hassuccessed: true, error: err });
           } else {
-    
+
             if (data && data.length > 0) {
               data[0].wards.forEach((element) => {
                 if (element._id == req.params.ward_id) {
@@ -2495,12 +2579,9 @@ router.get("/BedAvability/:specialty_id/:ward_id", function (req, res, next) {
                   if (err & !room) {
                     res.json({ status: 200, hassuccessed: true, error: err });
                   } else {
-                    // console.log("rooms", room[0].rooms)
                     // wards.rooms.forEach((element) => {
                     //   if (room[0].rooms._id == element._id) {
-                    //     console.log("element.room",element.room)
                     //     wards.cases = element.room
-                    //     console.log("wards",wards)
                     //     res.json({ status: 200, hassuccessed: true, data: wards })
                     //   }
 
@@ -2893,12 +2974,12 @@ router.get("/Getinstitutename/:house_id", function (req, res) {
           message: "Something went wrong",
         });
       } else {
-  
+
         if (data) {
           data.institute_groups.map((item) => {
-      
+
             item.houses.map((item2) => {
-              if (item2.house_id == req.body.house_id) {
+              if (item2.house_id == req.params.house_id) {
                 house_name = item2.house_name;
               }
             });
@@ -2921,6 +3002,7 @@ router.get("/Getinstitutename/:house_id", function (req, res) {
     });
   }
 });
+
 
 router.post("/downloadPEBill", function (req, res, next) {
   // Custom handlebar helper
@@ -2950,64 +3032,85 @@ router.post("/downloadPEBill", function (req, res, next) {
           bill2.push({ k: "bill_date", v: getDate(value, "YYYY/MM/DD") });
         }
       });
-      // console.log("data",Data)
     }
-    if(req.body.type=="picture_evaluation"){
-      var template = handlebars.compile(bill);
+    let task_id = req.body.task_id;
+    var VirtualtToSearchWith = new virtual_Task({ _id: task_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    virtual_Task.find(
+      {
+        _id: { $in: [task_id, VirtualtToSearchWith._id] },
 
-    var htmlToSend = template({
-      bill2: bill2,
-      admit: admit,
-      pat_info: req.body,
-      birthday: birthday,
-    });
-  }
-  else {
-    var template1 = handlebars.compile(bill3);
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          var Date = getDate(userdata[0].created_at, "YYYY/MM/DD");
 
-    var htmlToSend2 = template1({
-      bill2: bill2,
-      admit: admit,
-      pat_info: req.body,
-      birthday: birthday,
-      amt:req.body.amt
-    });
+          if (req.body.type == "sick_leave") {
+            var template1 = handlebars.compile(bill3);
 
-  }
-    var filename = "GeneratedReport.pdf";
-    if (htmlToSend) {
-      var options = {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        format: "A4",
-        path: `${__dirname}/${filename}`,
-        displayHeaderFooter: true,
-        margin: { top: 80, bottom: 80, left: 60, right: 60 },
-      };
+            var htmlToSend2 = template1({
+              bill2: bill2,
+              admit: admit,
+              pat_info: req.body,
+              birthday: birthday,
+              amt: userdata[0].amount,
+              date: Date
+            });
+          }
+          else {
+            var template = handlebars.compile(bill);
+            var htmlToSend = template({
+              bill2: bill2,
+              admit: admit,
+              pat_info: req.body,
+              birthday: birthday,
+            });
+          }
+          var filename = "GeneratedReport.pdf";
+          if (htmlToSend) {
+            var options = {
+              args: ["--no-sandbox", "--disable-setuid-sandbox"],
+              format: "A4",
+              path: `${__dirname}/${filename}`,
+              displayHeaderFooter: true,
+              margin: { top: 80, bottom: 80, left: 60, right: 60 },
+            };
 
-      let file = [{ content: htmlToSend }];
-      html_to_pdf.generatePdfs(file, options).then((output) => {
-        const file = `${__dirname}/${filename}`;
-        res.download(file);
-      });
-    } 
-    else if(htmlToSend2){
-      var options = {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        format: "A4",
-        path: `${__dirname}/${filename}`,
-        displayHeaderFooter: true,
-        margin: { top: 80, bottom: 80, left: 60, right: 60 },
-      };
 
-      let file = [{ content: htmlToSend2 }];
-      html_to_pdf.generatePdfs(file, options).then((output) => {
-        const file = `${__dirname}/${filename}`;
-        res.download(file);
-      });
-    }
-    else {
-      res.json({ status: 200, hassuccessed: true, filename: filename });
-    }
+            let file = [{ content: htmlToSend }];
+            html_to_pdf.generatePdfs(file, options).then((output) => {
+              const file = `${__dirname}/${filename}`;
+              res.download(file);
+            });
+          }
+          else if (htmlToSend2) {
+            var options = {
+              args: ["--no-sandbox", "--disable-setuid-sandbox"],
+              format: "A4",
+              path: `${__dirname}/${filename}`,
+              displayHeaderFooter: true,
+              margin: { top: 80, bottom: 80, left: 60, right: 60 },
+            };
+
+            let file = [{ content: htmlToSend2 }];
+            html_to_pdf.generatePdfs(file, options).then((output) => {
+              const file = `${__dirname}/${filename}`;
+              res.download(file);
+            });
+          }
+          else {
+            res.json({ status: 200, hassuccessed: true, filename: filename });
+          }
+        }
+      }
+    );
   } catch (e) {
     res.json({
       status: 200,
@@ -3024,7 +3127,7 @@ router.get("/patientjourneyQue/:patient_id", function (req, res) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     newcf = [];
-    var patient_id = req.body.patient_id;
+    var patient_id = req.params.patient_id;
     const VirtualtToSearchWith = new virtual_Case({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
 
@@ -3116,7 +3219,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
     flatArraya = [];
     Inhospital = [];
     InhopspitalInvoice = [];
-    var patient_id = req.body.patient_id;
+    var patient_id = req.params.patient_id;
     const VirtualtToSearchWith = new virtual_Case({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
 
@@ -3130,7 +3233,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
             forEachPromise(data, taskfromhouseid).then((result) => {
               //  var ansfromhousessid = ansfromhouseid(req.params.patient_id)
               // ansfromhousessid.then((result)=> {
-           
+
               //   flatArraya.push(...result);
               flatArraya.sort(mySorter);
               res.json({
@@ -3315,7 +3418,7 @@ router.post("/setCasenotInhospital", function (req, res) {
       )
       .exec(function (err, data) {
         if (err) {
-  
+
           res.json({
             status: 200,
             hassuccessed: false,
@@ -3820,9 +3923,9 @@ router.post("/deletehouse", function (req, res) {
         User.updateMany({ houses: element }, { $pull: { houses: element } }).exec(
           function (err, data) {
             if (err && !data) {
-        
+
             } else {
-           
+
             }
           }
         );
@@ -3848,9 +3951,9 @@ router.post("/deletehouse", function (req, res) {
           }
         ).exec(function (err, data) {
           if (err && !data) {
-        
+
           } else {
-         
+
           }
         });
       });
@@ -3869,7 +3972,7 @@ router.post("/deletehouse", function (req, res) {
               error: err,
             });
           } else {
-         
+
             res.json({
               status: 200,
               hassuccessed: true,
@@ -3979,7 +4082,7 @@ router.post("/setCasenotInhospital", function (req, res) {
       )
       .exec(function (err, data) {
         if (err) {
- 
+
           res.json({
             status: 200,
             hassuccessed: false,
@@ -4052,14 +4155,14 @@ router.get("/pa", function (req, res, next) {
       ])
       .exec(function (err, data) {
         if (err) {
- 
+
           res.json({
             status: 200,
             hassuccessed: false,
             message: "Something went wrong",
           });
         } else {
-   
+
           res.json({ status: 200, hassuccessed: true, result: data });
         }
       });
@@ -4096,14 +4199,14 @@ router.post("/getSubmitQuestionnaire", function (req, res) {
         },
         function (err, data) {
           if (err) {
- 
+
             res.json({
               status: 200,
               hassuccessed: false,
               message: "Something went wrong",
             });
           } else {
-       
+
             result.data = data;
             if (data && data.length > 0) {
               let pat = data.map((element) => {
@@ -4118,7 +4221,7 @@ router.post("/getSubmitQuestionnaire", function (req, res) {
                     message: "Something went wrong",
                   });
                 } else {
-          
+
                   result.profile_id = data2[0].profile_id;
                   result.first_name = data2[0].first_name;
                   result.last_name = data2[0].last_name;
@@ -4161,7 +4264,7 @@ router.post("/virtualstep1", function (req, res, next) {
     try {
       virtual_step.find({ house_id: req.body.house_id }, function (err, data) {
         if (err) {
-     
+
           res.json({
             status: 200,
             hassuccessed: false,
@@ -4169,7 +4272,7 @@ router.post("/virtualstep1", function (req, res, next) {
           });
         } else {
           if (data) {
-      
+
             virtual_step
               .updateMany({ house_id: req.body.house_id })
               .exec(function (err, data) {
@@ -4217,7 +4320,7 @@ router.post("/virtualstep2", function (req, res, next) {
         { house_id: { $in: [house_id, VirtualtToSearchWith.house_id] } },
         function (err, data) {
           if (err) {
-        
+
             res.json({
               status: 200,
               hassuccessed: false,
@@ -4226,7 +4329,7 @@ router.post("/virtualstep2", function (req, res, next) {
           } else {
 
             if (data) {
-   
+
               virtual_Task
                 .updateMany({
                   house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
@@ -4270,12 +4373,10 @@ router.post("/virtualstep2", function (req, res, next) {
 // router.get("/trackrecords", function (req, res) {
 //   const token = (req.headers.token)
 //   let legit = jwtconfig.verify(token)
-//   console.log("legit", legit)
 //   finaldata = []
 //   if (legit) {
 //     User.find().exec(function (err, data) {
 //       if (err) {
-//         console.log("err", err)
 //         res.json({ status: 200, hassuccessed: false, message: 'Something went wrong' })
 
 //       }
@@ -4283,7 +4384,6 @@ router.post("/virtualstep2", function (req, res, next) {
 //         trackrecords = data.map((element) => {
 //           return element.track_record
 //         })
-//         // console.log("track", trackrecords)
 //         if (trackrecords.length > 0) {
 
 // //       }
@@ -4291,7 +4391,6 @@ router.post("/virtualstep2", function (req, res, next) {
 // //         trackrecords = data.map((element) => {
 // //           return element.track_record
 // //         })
-// //         // console.log("track", trackrecords)
 // //         if (trackrecords.length > 0) {
 
 // //           trackrecords.forEach((element2) => {
@@ -4302,9 +4401,7 @@ router.post("/virtualstep2", function (req, res, next) {
 // //               finaldata.push(lastdata[0].datetime_on)
 // //             }
 // //           })
-// //           console.log("finaldata", finaldata)
 // //           let finaldata1 = finaldata.length
-// //           console.log("finaldata123", finaldata1)
 // //           res.json({ status: 200, hassuccessed: true, data: finaldata1 })
 // //         }
 // //         else {
@@ -4369,7 +4466,7 @@ router.get("/trackrecordsbytype2", function (req, res) {
       ],
       function (err, data) {
         if (err) {
-        
+
           res.json({
             status: 200,
             hassuccessed: false,
@@ -4592,7 +4689,7 @@ router.post("/trackrecordsforprescription", function (req, res) {
       } else {
         if (data.length > 0) {
           data.forEach((element2) => {
-       
+
             var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
             let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
             if (d1 <= d2) {
@@ -4863,7 +4960,7 @@ router.put("/pictureevaluationfeedback/:_id", function (req, res) {
 router.get("/trackrecords", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
- 
+
   finaldata = [];
   if (legit) {
     User.find().exec(function (err, data) {
@@ -4896,7 +4993,7 @@ router.get("/trackrecords", function (req, res) {
             }
           });
           let finaldata1 = finaldata.length;
-   
+
           res.json({
             status: 200,
             hassuccessed: true,
@@ -4940,7 +5037,7 @@ router.get("/trackrecordsforappointment", function (req, res) {
       ],
       function (err, data) {
         if (err) {
-         res.json({
+          res.json({
             status: 200,
             hassuccessed: false,
             message: "Something went wrong",
@@ -5269,14 +5366,17 @@ function taskfromhouseid(item) {
         VirtualtToSearchWith1.encryptFieldsSync();
         virtual_Task
           .find({
-            $or: [
-              { house_id: item.house_id },
-              { house_id: VirtualtToSearchWith.house_id },
-            ],
-            $or: [
-              { task_type: { $ne: "picture_evaluation" } },
-              { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-            ],
+            $and: [{
+              $or: [
+                { house_id: item.house_id },
+                { house_id: VirtualtToSearchWith.house_id },
+              ]
+            }, {
+              $or: [
+                { task_type: { $ne: "picture_evaluation" } },
+                { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+              ]
+            }]
           })
           .exec(function (err, task) {
             if (err) {
@@ -5477,7 +5577,8 @@ function virtualTask(house_id) {
       const VirtualtToSearchWith = new virtual_Task({ house_id: house_id });
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Task.find(
-        { house_id: { $in: [house_id, VirtualtToSearchWith.house_id] } },
+        { house_id: { $in: [house_id, VirtualtToSearchWith.house_id] } ,
+        task_type: { $exists: false }},
         function (err, list) {
           if (err) {
             reject(err);

@@ -124,7 +124,7 @@ app.use(express.static(path.join(__dirname, "build/main")));
 //       CallingDropBox('DBbackups/ICUbeds'+DatEtIME+ '.gz', "/backupdb/ICUbeds"+DatEtIME+ ".gz");
 //       console.log('Successfully backedup the database')
 //     }
-        
+
 // });
 
 // var backupProcess2 = spawn('mongodump', [
@@ -184,84 +184,77 @@ app.use(express.static(path.join(__dirname, "build/main")));
 //     }     
 // });
 // removeOldBackups();
-// SetArchiveUnuseMeeting();
 // });
+cron.schedule('0 0 */12 * * *', function(){
+  SetArchiveUnuseMeeting();
+  SetArchivePayment()
+});
 
-function SetArchiveUnuseMeeting(){
+
+function SetArchiveUnuseMeeting() {
   sick_meeting.find()
-  .exec(function (err, doc1) {
-    if (err && !doc1) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "update data failed",
-        error: err,
-      });
-    } else {
-      console.log("doc1", doc1)
-      let ttime = moment(Date.now()).format("YYYY-MM-DD")
-      // let final= doc1.map((element)=>{
-      //   return element.endtime
-      // })
-
-      doc1.forEach((element) => {
-
-        var enddate = moment(element.date).format("YYYY-MM-DD");
-        
-
-        if (moment(ttime).diff(enddate, 'days') > 2 ) {
-          virtual_Task.updateMany({ _id:element.task_id,  $or: [
-            {meetingjoined: { $ne: true } },
-            { meetingjoined: { $exists: false } }
-          ] }, { archived: true }, function (err, data) {
-            if (err) {
-              console.log("err", err)
-            }
-            else {
-              console.log("data", data)
-            }
-          })
-
-
-        }
-
-      })
+    .exec(function (err, doc1) {
+      if (err && !doc1) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "update data failed",
+          error: err,
+        });
+      } else {
+        console.log("doc1", doc1)
+        let ttime = moment()
+        doc1.forEach((element) => {
+          var enddate = moment(element.date);
+          var diff1 = ttime.diff(enddate, 'hours')
+          if (diff1 > 6) {
+            virtual_Task.updateMany({
+              _id: element.task_id, $or: [
+                { meetingjoined: { $ne: true } },
+                { meetingjoined: { $exists: false } }
+              ]
+            }, { archived: true }, function (err, data) {
+              if (err) { console.log("err", err) }
+              else { console.log("data", data) }
+            })
+          }
+        })
+      }
     }
-  }
-  );
+    );
 }
 
 function removeOldBackups() {
-  const directoryPath =path.join(__dirname, "./DBbackups/")
-fs.readdir(directoryPath, (err, files) => {
-  if (err) {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Something went wrong",
-    });
-  }
-  else {
-    files.forEach(file => {
-      fs.stat(directoryPath + `/${file}`, function (err, data) {
-        let ttime = moment(Date.now()).format("YYYY-MM-DD")
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          var enddate = moment(data.birthtime).format("YYYY-MM-DD");
-         difference= moment(ttime).diff(enddate, 'days')
-          if (moment(ttime).diff(enddate, 'days') >=10) {
-            fs.unlink(directoryPath + `/${file}`, function (err) {})
+  const directoryPath = path.join(__dirname, "./DBbackups/")
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Something went wrong",
+      });
+    }
+    else {
+      files.forEach(file => {
+        fs.stat(directoryPath + `/${file}`, function (err, data) {
+          let ttime = moment(Date.now()).format("YYYY-MM-DD")
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
+          } else {
+            var enddate = moment(data.birthtime).format("YYYY-MM-DD");
+            difference = moment(ttime).diff(enddate, 'days')
+            if (moment(ttime).diff(enddate, 'days') >= 10) {
+              fs.unlink(directoryPath + `/${file}`, function (err) { })
+            }
           }
-        }
-      })
-    });
-  }
-});
+        })
+      });
+    }
+  });
 }
 
 function getData() {
@@ -273,49 +266,49 @@ function getData() {
     "include_non_downloadable_files": true,
     "path": "/backupdb",
     "recursive": false
-    }
-    var config = {
-      method: "POST",
-      url: `https://api.dropboxapi.com/2/files/list_folder`,
-      headers: {
-        authorization: `Bearer ${process.env.DBT}`,
-        'Content-Type': 'application/json',
-      },
-      data: data
-    };
-  
-    axios(config).then(function (data) {
-      let final_data = data.data.entries.sort(mySorter)
-     if (final_data.length > 50) {
-        var tempArray = final_data.slice(0,50);
-        var tempArray2 =final_data.slice(50);
-        tempArray2.forEach((item, index) => {
-            var data = JSON.stringify({
-              path: item.path_lower,
-            });
+  }
+  var config = {
+    method: "POST",
+    url: `https://api.dropboxapi.com/2/files/list_folder`,
+    headers: {
+      authorization: `Bearer ${process.env.DBT}`,
+      'Content-Type': 'application/json',
+    },
+    data: data
+  };
 
-            var config = {
-              method: "post",
-              url: "https://api.dropboxapi.com/2/files/delete_v2",
-              headers: {
-                Authorization:
-                  `Bearer ${process.env.DBT}`,
-                "Content-Type": "application/json",
-              },
-              data: data,
-            };
+  axios(config).then(function (data) {
+    let final_data = data.data.entries.sort(mySorter)
+    if (final_data.length > 50) {
+      var tempArray = final_data.slice(0, 50);
+      var tempArray2 = final_data.slice(50);
+      tempArray2.forEach((item, index) => {
+        var data = JSON.stringify({
+          path: item.path_lower,
+        });
 
-            axios(config)
-              .then(function (response) {
-                console.log("done index", JSON.stringify(response.data));
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
+        var config = {
+          method: "post",
+          url: "https://api.dropboxapi.com/2/files/delete_v2",
+          headers: {
+            Authorization:
+              `Bearer ${process.env.DBT}`,
+            "Content-Type": "application/json",
+          },
+          data: data,
+        };
+
+        axios(config)
+          .then(function (response) {
+            console.log("done index", JSON.stringify(response.data));
+          })
+          .catch(function (error) {
+            console.log(error);
           });
-      }
-    }).catch(function (error) {})
-  
+      });
+    }
+  }).catch(function (error) { })
+
 }
 
 function mySorter(a, b) {
@@ -328,24 +321,24 @@ function mySorter(a, b) {
   }
 }
 
-function CallingDropBox(localFile, SetUrl){
-     var config =  {
-      method: 'POST',
-      url: 'https://content.dropboxapi.com/2/files/upload',
-     headers: {
-       'Authorization': `Bearer ${process.env.DBT}`,
-       'Dropbox-API-Arg': JSON.stringify({
-         'path': SetUrl,
-         'mode': 'overwrite',
-         'autorename': true, 
-         'mute': false,
-         'strict_conflict': false
-       }),
-         'Content-Type': 'application/octet-stream',
-     },
-     data: fs.readFileSync(path.resolve(__dirname, localFile))
-   }
-    axios(config)
+function CallingDropBox(localFile, SetUrl) {
+  var config = {
+    method: 'POST',
+    url: 'https://content.dropboxapi.com/2/files/upload',
+    headers: {
+      'Authorization': `Bearer ${process.env.DBT}`,
+      'Dropbox-API-Arg': JSON.stringify({
+        'path': SetUrl,
+        'mode': 'overwrite',
+        'autorename': true,
+        'mute': false,
+        'strict_conflict': false
+      }),
+      'Content-Type': 'application/octet-stream',
+    },
+    data: fs.readFileSync(path.resolve(__dirname, localFile))
+  }
+  axios(config)
     .then(function (response) {
       console.log('sdfsdfsfsdfsd', response.data)
     })
@@ -361,9 +354,42 @@ function CallingDropBox(localFile, SetUrl){
 // app.use("localhost:5000/api/v4/vactive/linkarchive");
 
 // console.log("enter second")
-  
+
 // });
 
+function SetArchivePayment() {
+  var task_type = "sick_leave"
+  const VirtualtToSearchWith1 = new virtual_Task({ task_type });
+  VirtualtToSearchWith1.encryptFieldsSync();
+  virtual_Task.find({ task_type: { $in: [task_type, VirtualtToSearchWith1.task_type] } })
+    .exec(function (err, doc1) {
+      if (err && !doc1) {
+        console.log("err", err)
+      } else {
+        let ttime = moment()
+        doc1.forEach((element) => {
+          var enddate = moment(element.date)
+          var diff1 = ttime.diff(enddate, 'hours')
+          if (diff1 > 6) {
+            virtual_Task.updateMany({
+              _id: element._id, $or: [
+                { is_payment: { $ne: true } },
+                { is_payment: { $exists: false } }
+              ]
+            }, { archived: true }, function (err, data) {
+              if (err) {
+                console.log("err", err)
+              }
+              else {
+                console.log("data", data)
+              }
+            })
+          }
+        })
+      }
+    }
+    );
+}
 
 var UserData = require("./routes/UserTrack");
 var UserProfile = require("./routes/userProfile");
@@ -549,10 +575,10 @@ appAdmin.use(function (req, res, next) {
   next(err);
 });
 appAdmin.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
+  return res.sendFile(path.resolve(__dirname, 'build/admin', 'index.html'));
 });
-app.use("/sys-n-admin", appAdmin);
 
+app.use("/sys-n-admin", appAdmin);
 
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -563,6 +589,7 @@ appAdmin1.use((err, req, res, next) => {
   return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
 });
 app.use("/sys-n-eval", appAdmin1);
+
 ////////////admin+main+end/////////////
 
 // catch 404 and forward to error handler
@@ -574,12 +601,9 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  // console.log("err", err);
+   return res.sendfile(path.resolve(__dirname, 'build/main', 'index.html'));
+//   console.log("err", err);
 });
 
-// server.listen(5000, () => {
-//   console.log("Server started on port 5001");
-// });
 
 module.exports = app;

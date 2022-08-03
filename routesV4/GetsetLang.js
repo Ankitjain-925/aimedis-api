@@ -2,26 +2,21 @@ var Settings = require("../schema/settings");
 var fetch = require("node-fetch");
 function getMsgLang(UserId = "") {
   let promise = new Promise((resolve, reject) => {
-    console.log("Userid", UserId);
     Settings.findOne({ user_id: UserId })
       .exec()
       .then(function (doc3) {
         var lang = "en";
-        console.log("doc3", doc3);
         if (doc3) {
-          console.log("doc3.msg_language", doc3.msg_language);
           lang = doc3.msg_language ? doc3.msg_language : "en";
         }
         resolve(lang);
       });
   });
   return promise.then((lang) => {
-    console.log("lang", lang);
     return lang;
   });
 }
 function trans(text, opts = {}) {
-  console.log("opts.source", opts.source, "opts.target", opts.target);
   var source = opts.source || "en";
   var target = opts.target || "de";
   var url =

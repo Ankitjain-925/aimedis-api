@@ -87,7 +87,7 @@
         *{
             font-family: Arial, Helvetica, sans-serif !important;
         }
-        .makecenter{
+        /* .makecenter{
             padding: 20px 342px 0px;
         }
         .makecentercont2{
@@ -96,7 +96,7 @@
         .comontable{
             padding: 0px 420px;
 
-        }
+        } */
         .aimedisImg{
             width: 20vw;
         }
@@ -191,7 +191,7 @@
                                     <p style="font-weight: bold;">{{pat_info.data.first_name}} &nbsp;{{pat_info.data.last_name}}</p>
                                     <p>{{pat_info.data.address}}</p>
                                     <p>{{pat_info.data.city}}</p>
-                                    <p>{{pat_info.data.country}}</p>
+                                    <p>{{pat_info.data.country.label}}</p>
                                 </td>
                             </tr>
                     
@@ -238,7 +238,7 @@
                                     {{#each bill2}}
                                     <p>Abrechnungszeitraum:{{v}}</p>
                                     {{/each}}
-                                    <p>sehr geehrte&nbsp;{{pat_info.data.first_name}} &nbsp;{{pat_info.pata.last_name}},</p>
+                                    <p>sehr geehrte&nbsp;{{pat_info.data.first_name}} &nbsp;{{pat_info.data.last_name}},</p>
                                     <p>fur Beratungsleistungen aus unserem portal / Aimedis Elements / erlauben wir uns Ihnen folgende<br/>
                                         Posten in Rechnung zu stellen
                                     </p>
@@ -253,7 +253,7 @@
                             <tr>
                                 <td style="font-size: 15px;" class="tempmidsecall">
                                     <p>Dienstleistung</p>
-                                    <p>Bildauswertung</p>                                   
+                                    <p>Krankenschein</p>                                   
                                 </td>
 
                                 <td class="tempmidsecall">
@@ -276,6 +276,12 @@
                                 <td class="tempmidsecall" style="font-size: 15px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-bottom: 1px solid black;" >
                                     <p>Gesamtbetrag:</p> 
                                     <p>{{amt}}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tempmidsecall" style="font-size: 15px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-bottom: 1px solid black;" >
+                                    <p>Datum:</p> 
+                                    <p>{{date}}</p>
                                 </td>
                             </tr>
                         </table>

@@ -203,9 +203,11 @@ router.post("/Addadminuser", function (req, res, next) {
                       user_id = user_data._id;
                       let token = user_data.usertoken;
                       if (user_data.type == "hospitaladmin") {
+
                         var link = "https://aidoc.io/admin/";
                       } else {
                         var link = "https://aidoc.io/";
+
                       }
                       let mailOptions = {
                         from: "contact@aimedis.com",

@@ -114,7 +114,6 @@ router.put("/AddCase/:speciality_id", function (req, res, next) {
 
 router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
  if(req.body.verifiedbyPatient){
-  console.log('sdsdfsdfsd111')
   virtual_cases.updateOne(
     { _id: req.params.case_id },
     req.body,
@@ -151,7 +150,6 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
     {_id: req.params.case_id},
     function (err, userdata) {
       if (err) {
-        console.log("err",err)
         res.json({
           status: 200,
           hassuccessed: false,
@@ -163,7 +161,6 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
   virtual_cases.findByIdAndRemove(
     { _id: req.params.case_id },
     function (err, doc) {
-      console.log('doc', doc)
       if (err && !doc) {
         res.json({
           status: 200,
@@ -209,7 +206,6 @@ router.post("/AddCase", function (req, res, next) {
         try{
 
         if (err) {
-          console.log("err",err)
           res.json({
             status: 200,
             hassuccessed: false,
@@ -217,7 +213,6 @@ router.post("/AddCase", function (req, res, next) {
             error: err,
           });
         } else {
-            console.log("userdata",userdata)
           if (userdata) {
             res.json({
               status: 200,
@@ -294,17 +289,14 @@ router.post("/checkbedAvailabilityByWard", function (req, res, next) {
               beds = returnNumberofBedOnWard(userdata1, req.body.ward_id)
               beds.forEach((item, index) => {
               var NewUsers= userdata.filter((elem)=>(elem.rooms && elem.rooms._id === item.room_id.toString())) 
-              console.log('NewUsers', NewUsers)
               for (var i = 1; i <= item.bed; i++) {
 
                 if (!NewUsers.some(e => {
-                  console.log('e.bed', e.bed, i );
                   return (e.bed == i)})) {
                   newArray.push(i);
                 }
               }
             })
-            console.log('newArray',newArray)
               res.json({
                 status: 200,
                 message: "Available beds found",
