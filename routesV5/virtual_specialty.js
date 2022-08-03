@@ -416,7 +416,7 @@ router.put(
                                   let mailOptions = {
                                     from: "contact@aimedis.com",
                                     to: data.email,
-                                    subject: "Decline picture evaluation",
+                                    subject: "Decline Online Diagnose",
                                     html: html,
                                   };
 
