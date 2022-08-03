@@ -49,7 +49,7 @@ const appAdmin = express();
 const appAdmin1 = express();
 
 appAdmin.use(express.static(path.join(__dirname, "build/admin")));
-appAdmin1.use(express.static(path.join(__dirname, "build/sickleave")));
+appAdmin1.use(express.static(path.join(__dirname, "build/eval")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 // const server = require("http").createServer(app);
@@ -124,6 +124,7 @@ app.use(express.static(path.join(__dirname, "build/main")));
 //       CallingDropBox('DBbackups/ICUbeds'+DatEtIME+ '.gz', "/backupdb/ICUbeds"+DatEtIME+ ".gz");
 //       console.log('Successfully backedup the database')
 //     }
+
 // });
 
 // var backupProcess2 = spawn('mongodump', [
@@ -188,6 +189,7 @@ cron.schedule('0 0 */12 * * *', function(){
   SetArchiveUnuseMeeting();
   SetArchivePayment()
 });
+
 
 function SetArchiveUnuseMeeting() {
   sick_meeting.find()
@@ -566,6 +568,7 @@ app.use("/api/v5/vactive", vactive5);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ////////////admin+main/////////////
+
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
@@ -583,10 +586,10 @@ appAdmin1.use(function (req, res, next) {
   next(err);
 });
 appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve(__dirname, 'build/sickleave', 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
 });
+app.use("/sys-n-eval", appAdmin1);
 
-app.use("/sys-n-sick", appAdmin1);
 ////////////admin+main+end/////////////
 
 // catch 404 and forward to error handler

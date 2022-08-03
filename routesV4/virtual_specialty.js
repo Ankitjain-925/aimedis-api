@@ -415,6 +415,7 @@ router.delete("/AddTask/:task_id", function (req, res, next) {
 });
 
 router.put("/AddTask/:task_id", function (req, res, next) {
+  console.log('api CALLING')
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -501,6 +502,7 @@ router.put("/AddTask/:task_id", function (req, res, next) {
               }
             );
           } else {
+            console.log('Also here')
             res.json({
               status: 200,
               hassuccessed: true,
@@ -539,15 +541,18 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
       {
         house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
         archived: { $ne: true },
-        $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
-        $or: [
-          // { task_type: { $ne: "sick_leave" } },
-          // { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-          { task_type: { $exists: true, $eq: "picture_evaluation" } },
-          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
-          { task_type: { $exists: false } },
+        $and: [
+          {
+            $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
+          },
+          {
+            $or: [{ task_type: { $exists: true, $eq: "picture_evaluation" } },
+            { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+            { task_type: { $exists: false } },],
+          },
         ],
       },
+      
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -2130,7 +2135,9 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           req.body.patient_name +
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
-          "https://virtualhospital.aidoc.io/approveHospital/" +
+
+          "https://aidoc.io/approveHospital/" +
+
           req.body.case_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
@@ -2173,7 +2180,9 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://virtualhospital.aidoc.io/approveHospital/" +
+
+          " https://aidoc.io/approveHospital/" +
+
           req.body.case_id;
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
@@ -3395,6 +3404,7 @@ router.post("/TaskFilter", function (req, res) {
     });
   }
 });
+
 
 router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;

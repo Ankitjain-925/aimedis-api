@@ -88,7 +88,7 @@ router.post("/Addadminuser", function (req, res, next) {
               "Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>" +
               "Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen.<br/><br/>" +
               "<b>Ihr Aimedis Team</b><br/>" +
-              '<b>Jetzt einloggen: </b> <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+              '<b>Jetzt einloggen: </b> <a href="https://aimedix.com">https://aimedix.com</a><br/>' +
               '<b>Der Aimedis Blog: </b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a>';
 
             if (req.body.type == "patient") {
@@ -101,8 +101,8 @@ router.post("/Addadminuser", function (req, res, next) {
                 "Im Anhang zu dieser E-Mail finden Sie die AGB sowie die Datenschutzbestimmungen.<br/>" +
                 "Sie können uns per WhatsApp oder E-Mail via contact@aimedis.com erreichen. <br/><br/><br/>" +
                 "<b>Ihr Aimedis Team</b><br/>" +
-                '<b>Jetzt einloggen: </b>  <a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
-                '<b>Der Aimedis Blog:</b> <a href="https://sys.aimedis.io">https://blog.aimedis.com</a><br/>';
+                '<b>Jetzt einloggen: </b>  <a href="https://aimedix.com">https://aimedix.com</a><br/>' +
+                '<b>Der Aimedis Blog:</b> <a href="https://aimedix.com">https://blog.aimedis.com</a><br/>';
             }
           } else {
             var dhtml =
@@ -113,7 +113,7 @@ router.post("/Addadminuser", function (req, res, next) {
               "In the attachment to this email you will find the terms and conditions as well as the data protection regulations. <br/>" +
               "You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>" +
               "<b>Your Aimedis team</b><br/>" +
-              '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+              '<b>Log in now:</b><a href="https://aimedix.com">https://aimedix.com</a><br/>' +
               '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
 
             if (req.body.type == "patient") {
@@ -126,7 +126,7 @@ router.post("/Addadminuser", function (req, res, next) {
                 "In the attachment to this email you will find the terms and conditions as well as the data protection regulations.<br/>" +
                 "You can reach us via WhatsApp or email via contact@aimedis.com.<br/><br/><br/>" +
                 "<b>Your Aimedis team</b><br/><br/><br/><br/>" +
-                '<b>Log in now:</b><a href="https://sys.aimedis.io">https://sys.aimedis.io</a><br/>' +
+                '<b>Log in now:</b><a href="https://aimedix.com">https://aimedix.com</a><br/>' +
                 '<b>The Aimedis blog:</b> <a href="https://blog.aimedis.com">https://blog.aimedis.com</a><br/>';
             }
           }
@@ -208,9 +208,9 @@ router.post("/Addadminuser", function (req, res, next) {
                       user_id = user_data._id;
                       let token = user_data.usertoken;
                       if (user_data.type == "hospitaladmin") {
-                        var link = "https://virtualhospital.aidoc.io/admin/";
+                        var link = "https://aidoc.io/admin/";
                       } else {
-                        var link = "https://virtualhospital.aidoc.io/";
+                        var link = "https://aidoc.io/";
                       }
                       let mailOptions = {
                         from: "contact@aimedis.com",

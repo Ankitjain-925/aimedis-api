@@ -1,20 +1,21 @@
 RewriteEngine On
 RewriteBase /
-Redirect 301 /.env https://virtualhospital.aidoc.io
-Redirect 301 /app.js https://virtualhospital.aidoc.io
-Redirect 301 /jwttoken.js https://virtualhospital.aidoc.io
-Redirect 301 /swagger.json https://virtualhospital.aidoc.io
-Redirect 301 /server.js https://virtualhospital.aidoc.io
-Redirect 301 /passport.js https://virtualhospital.aidoc.io
-Redirect 301 /routes/ https://virtualhospital.aidoc.io
-Redirect 301 /routesV2/ https://virtualhospital.aidoc.io
-Redirect 301 /routesV3/ https://virtualhospital.aidoc.io
-Redirect 301 /routesV4/ https://virtualhospital.aidoc.io
-Redirect 301 /routesV5/ https://virtualhospital.aidoc.io
-Redirect 301 /models/ https://virtualhospital.aidoc.io
-Redirect 301 /schema/ https://virtualhospital.aidoc.io
-Redirect 301 /keys/ https://virtualhospital.aidoc.io
-Redirect 301 /config/ https://virtualhospital.aidoc.io
-Redirect 301 /public/ https://virtualhospital.aidoc.io
-Redirect 301 /lib/ https://virtualhospital.aidoc.io
-Redirect 301 /regions.json https://virtualhospital.aidoc.io
+
+Redirect 301 /.env https://aidoc.io/
+Redirect 301 /app.js https://aidoc.io/
+Redirect 301 /jwttoken.js https://aidoc.io/
+Redirect 301 /swagger.json https://aidoc.io/
+Redirect 301 /server.js https://aidoc.io/
+Redirect 301 /passport.js https://aidoc.io/
+Redirect 301 /routes/ https://aidoc.io/
+Redirect 301 /routes2/ https://aidoc.io/
+Redirect 301 /routes3/ https://aidoc.io/
+Redirect 301 /models/ https://aidoc.io/
+Redirect 301 /routes3/ https://aidoc.io/
+Redirect 301 /schema/ https://aidoc.io/
+Redirect 301 /keys/ https://aidoc.io/
+Redirect 301 /config/ https://aidoc.io/
+Redirect 301 /public/ https://aidoc.io/
+Redirect 301 /lib/  https://aidoc.io/
+Redirect 301 /regions.json https://aidoc.io/
+
