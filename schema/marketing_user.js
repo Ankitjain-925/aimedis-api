@@ -25,6 +25,8 @@ var MarketingSchema = new Schema(
   { strict: false }
 );
 
+MarketingSchema.index({ area: "2dsphere" });
+
 MarketingSchema.plugin(mongooseFieldEncryption, {
   fields: ["first_name", "last_name", "email"],
   secret: process.env.SOME_32BYTE_BASE64_STRING,

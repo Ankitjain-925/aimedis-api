@@ -383,7 +383,6 @@ router.post("/UserLogin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-
                       let link = "https://aidoc.io/change-password";
                       var sendData =
                         "<div>Please reset Your Password immediately.</br>" +
@@ -843,7 +842,6 @@ router.post("/UserntfCheck", function (req, res, next) {
 //   // Making POST request to verify captcha
 
 //       let token= "abchere"
-
 //       let link = "https://aidoc.io/";
 //       var verifylink = `https://aidoc.io/?token=${token}`
 //       let datacomposer = (lang, {verifylink}) => {
@@ -1379,7 +1377,6 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                             //let link = 'http://localhost:3000/';
                             let link = "https://aidoc.io/";
                             var verifylink = `https://aidoc.io/?token=${token}`;
-
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1483,10 +1480,8 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                       user_id = user_data._id;
                       let token = user_data.usertoken;
                       //let link = 'http://localhost:3000/';
-
                       let link = "https://aidoc.io/";
                       var verifylink = `https://aidoc.io/?token=${token}`;
-
                       let datacomposer = (lang, { verifylink }) => {
                         return {};
                       };
@@ -7853,10 +7848,8 @@ router.post("/AskPatient/:id", function (req, res, next) {
       .exec()
       .then((user_data1) => {
         if (user_data1) {
-
           // var Link1 = 'https://aidoc.io/patient'
           var Link1 = "https://aidoc.io/patient";
-
 
           var lan1 = getMsgLang(user_data1._id);
           lan1.then((result) => {
@@ -8463,7 +8456,7 @@ router.post("/MailSendToDr", function (req, res) {
   let email = req.body.email;
   var patient_infos = req.body.patient_infos;
   var sendData = `<div> Dear Doctor,
-  </div><br/><div>Here is new Picture evaluation for patient -  ${patient_infos.first_name +
+  </div><br/><div>Here is new Online Diagnose for patient -  ${patient_infos.first_name +
     " " +
     patient_infos.last_name +
     "-" +
@@ -8496,7 +8489,7 @@ router.post("/MailSendToDr", function (req, res) {
       } else {
         var sendData1 = `<div> Dear ${patient_infos.first_name + " " + patient_infos.last_name
           },
-  </div><br/><div>Your Picture evaluation is assigned to the doctor by hospital, And it is in under process please wait for the reply from the doctor.</div>`;
+  </div><br/><div>Your Online Diagnose is assigned to the doctor by hospital, And it is in under process please wait for the reply from the doctor.</div>`;
         if (data) {
           generateTemplate(
             EMAIL.generalEmail.createTemplate("en", {
@@ -8508,7 +8501,7 @@ router.post("/MailSendToDr", function (req, res) {
                 let mailOptions1 = {
                   from: "contact@aimedis.com",
                   to: data.email,
-                  subject: "Picture Evaluation for Patient",
+                  subject: "Online Diagnose for Patient",
                   html: html,
                 };
                 let sendmail1 = transporter.sendMail(mailOptions1);
@@ -8530,7 +8523,7 @@ router.post("/MailSendToDr", function (req, res) {
               let mailOptions = {
                 from: "contact@aimedis.com",
                 to: email,
-                subject: "Picture Evaluation for Patient",
+                subject: "Online Diagnose for Patient",
                 html: html,
               };
 
@@ -8556,7 +8549,7 @@ router.post("/MailSendToPatient", function (req, res) {
       res.json({ status: 200, message: "Something went wrong.", error: err });
     } else {
       var sendData = `<div> Dear ${data.first_name + " " + data.last_name},
-      </div><br/><div>Here is a new update on your request for the picture evaluation by the doctor as comments/document uploads. Please go to detail page and check it.</div>`;
+      </div><br/><div>Here is a new update on your request for the Online Diagnose by the doctor as comments/document uploads. Please go to detail page and check it.</div>`;
 
       generateTemplate(
         EMAIL.generalEmail.createTemplate("en", {
@@ -8568,7 +8561,7 @@ router.post("/MailSendToPatient", function (req, res) {
             let mailOptions = {
               from: "contact@aimedis.com",
               to: data.email,
-              subject: "Latest update on your picture evaluation",
+              subject: "Latest update on your Online Diagnose",
               html: html,
             };
 

@@ -415,7 +415,6 @@ router.delete("/AddTask/:task_id", function (req, res, next) {
 });
 
 router.put("/AddTask/:task_id", function (req, res, next) {
-  console.log('api CALLING')
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -471,7 +470,7 @@ router.put("/AddTask/:task_id", function (req, res, next) {
                                 let mailOptions = {
                                   from: "contact@aimedis.com",
                                   to: data.email,
-                                  subject: "Decline picture evaluation",
+                                  subject: "Decline Online Diagnose",
                                   html: html,
                                 };
 
@@ -502,7 +501,6 @@ router.put("/AddTask/:task_id", function (req, res, next) {
               }
             );
           } else {
-            console.log('Also here')
             res.json({
               status: 200,
               hassuccessed: true,
@@ -541,18 +539,15 @@ router.get("/GetAllTask/:house_id", function (req, res, next) {
       {
         house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
         archived: { $ne: true },
-        $and: [
-          {
-            $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
-          },
-          {
-            $or: [{ task_type: { $exists: true, $eq: "picture_evaluation" } },
-            { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
-            { task_type: { $exists: false } },],
-          },
+        $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
+        $or: [
+          // { task_type: { $ne: "sick_leave" } },
+          // { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
         ],
       },
-      
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -2135,9 +2130,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           req.body.patient_name +
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
-
           "https://aidoc.io/approveHospital/" +
-
           req.body.case_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
@@ -2180,9 +2173,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-
           " https://aidoc.io/approveHospital/" +
-
           req.body.case_id;
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
@@ -3405,7 +3396,6 @@ router.post("/TaskFilter", function (req, res) {
   }
 });
 
-
 router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -3757,6 +3747,8 @@ router.post("/LeftInfoPatient", function (req, res) {
               if (data) {
                 const VirtualtToSearchWith2 = new virtual_Task({ case_id: data._id.toString() });
                 VirtualtToSearchWith2.encryptFieldsSync();
+                const VirtualtToSearchWith7 = new virtual_Task({ status: 'done' });
+                VirtualtToSearchWith7.encryptFieldsSync();
                 virtual_Task.aggregate(
                   [
                     {
@@ -3774,7 +3766,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                           {
                             $match: {
                               $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],
-                              status: "done",
+                              status: {$in : ["done", VirtualtToSearchWith7.status]}
                             },
                           },
                           { $count: "done_task" },
