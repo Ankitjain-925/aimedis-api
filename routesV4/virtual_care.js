@@ -86,19 +86,18 @@ router.post("/UpdateAddress", function (req, res) {
             } else {
               if (data) {
                 if (data.address && data.city && data.country && data.pastal_code) {
-                  virtual_Case.updateMany({ _id: req.body.case_id }, {
+                  virtual_Case.updateOne({ _id: req.body.case_id }, {
                     '$unset':
                     {
                       'bed': '',
                       'rooms': '',
                       'wards': ''
                     },
-                    $set: { external: true } 
+                    $set: { external_space: true } 
 
 
                   }, function (err, data2) {
                     if (err) {
-                      console.log("err2", err)
                       res.json({
                         status: 200,
                         hassuccessed: false,
@@ -106,11 +105,10 @@ router.post("/UpdateAddress", function (req, res) {
                         error: err,
                       });
                     } else {
-                      console.log("data2", data2)
                       res.json({
                         status: 200,
                         hassuccessed: true,
-                        message: "Already upto date",
+                        message: "Updated successfully",
                       });
                     }
                   })
@@ -302,9 +300,11 @@ router.get("/infoOfPatients/:house_id", function (req, res, next) {
     let legit = jwtconfig.verify(token);
     arr = []
     fullinfo = [];
+    const AppointToSearchWith = new virtual_Case({ house_id: req.params.house_id });
+    AppointToSearchWith.encryptFieldsSync();
     if (legit) {
         arr1 = [];
-        virtual_Case.find({house_id: req.params.house_id, $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
+        virtual_Case.find({ house_id: { $in: [req.params.house_id, AppointToSearchWith.house_id] }, $and: [{ external_space: true }, { inhospital: true }] }, function (err, userdata) {
             if (err && !userdata) {
                 res.json({
                     status: 200,
@@ -314,7 +314,6 @@ router.get("/infoOfPatients/:house_id", function (req, res, next) {
                 });
             } else {
                 forEachPromise(userdata, getfull).then((result) => {
-                    
                     res.json({
                         status: 200,
                         hassuccessed: true,
