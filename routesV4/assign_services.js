@@ -8,27 +8,22 @@ const moment = require("moment");
 
 var jwtconfig = require("../jwttoken");
 
-
-router.post("/Addassignservice", async (req, res, next) => {
+router.post("/Addassignservice", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-  const assigndata = new assigned_Service(req.body)
-  assigndata.save()
-    .then(result => {
-         res.json({
-         status: 200,
-         msg: 'service assign successfully',
-         data:result,
-         hassuccessed: true
-         })
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        reeor: err
-      })
-    })
+  var assigndata = new assigned_Service(req.body)
+  assigndata.save(function (err, user_data) {
+    if (err && !user_data) {
+      res.json({ status: 200, message: "Something went wrong.", error: err });
+    } else {
+      res.json({
+        status: 200,
+        message: "Added Successfully",
+        hassuccessed: true,
+      });
+    }
+  });
   }else{
     res.json({
       status: 200,
@@ -237,14 +232,14 @@ router.get("/getAllactivities/:user_id", async (req, res, next) => {
       appointment=[...data3.sort(mySorter)]
       for (i = 0; i < appointment.length; i++) {
         let today = new Date().setHours(0, 0, 0, 0);
-        let data_d = new Date(appointment[i]?.date).setHours(0, 0, 0, 0);
+        let data_d = new Date(appointment[i].date).setHours(0, 0, 0, 0);
         if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
           arr1.push(appointment[i])          
         }
       }
       for (i = 0; i < ll.length; i++) {
         let today = new Date().setHours(0, 0, 0, 0);
-        let data_d = new Date(ll[i]?.due_on?.date).setHours(0, 0, 0, 0);
+        let data_d = new Date(ll[i].due_on.date).setHours(0, 0, 0, 0);
         if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
           arr1.push(ll[i])        
         }
