@@ -237,14 +237,14 @@ router.get("/getAllactivities/:user_id", async (req, res, next) => {
       appointment=[...data3.sort(mySorter)]
       for (i = 0; i < appointment.length; i++) {
         let today = new Date().setHours(0, 0, 0, 0);
-        let data_d = new Date(appointment[i]?.date).setHours(0, 0, 0, 0);
+        let data_d = new Date(appointment[i].date).setHours(0, 0, 0, 0);
         if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
           arr1.push(appointment[i])          
         }
       }
       for (i = 0; i < ll.length; i++) {
         let today = new Date().setHours(0, 0, 0, 0);
-        let data_d = new Date(ll[i]?.due_on?.date).setHours(0, 0, 0, 0);
+        let data_d = new Date(ll[i].due_on.date).setHours(0, 0, 0, 0);
         if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
           arr1.push(ll[i])        
         }
