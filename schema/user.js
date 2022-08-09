@@ -298,6 +298,11 @@ var UserSchema = new Schema(
       required: false,
       unique: false,
     },
+    home_vist: {
+      type: Array,
+      required: false,
+      unique: false,
+    },
     online_appointment: {
       type: Array,
       required: false,
