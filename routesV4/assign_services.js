@@ -8,27 +8,22 @@ const moment = require("moment");
 
 var jwtconfig = require("../jwttoken");
 
-
-router.post("/Addassignservice", async (req, res, next) => {
+router.post("/Addassignservice", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-  const assigndata = new assigned_Service(req.body)
-  assigndata.save()
-    .then(result => {
-         res.json({
-         status: 200,
-         msg: 'service assign successfully',
-         data:result,
-         hassuccessed: true
-         })
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        reeor: err
-      })
-    })
+  var assigndata = new assigned_Service(req.body)
+  assigndata.save(function (err, user_data) {
+    if (err && !user_data) {
+      res.json({ status: 200, message: "Something went wrong.", error: err });
+    } else {
+      res.json({
+        status: 200,
+        message: "Added Successfully",
+        hassuccessed: true,
+      });
+    }
+  });
   }else{
     res.json({
       status: 200,
