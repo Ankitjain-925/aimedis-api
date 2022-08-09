@@ -1326,6 +1326,53 @@ router.post("/AssignFilter", function (req, res) {
   }
 });
 
+router.get("/GetTaskandService/:case_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  final_data = {}
+  if (legit) {
+    case_id = req.params.case_id
+    const AppointToSearchWith = new virtual_Task({ case_id });
+    AppointToSearchWith.encryptFieldsSync();
+    virtual_Task.find({ case_id: { $in: [req.params.case_id, AppointToSearchWith.case_id] } }, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        case_id = req.params.case_id
+        const AppointToSearchWith = new assigned_Service({ case_id });
+        AppointToSearchWith.encryptFieldsSync();
+        assigned_Service.find({ case_id: { $in: [req.params.case_id, AppointToSearchWith.case_id] } }, function (err, data2) {
+          if (err) {
+            console.log("err", err)
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              data: { Task: data, assigned_service: data2 },
+              msg: 'successfully fetched'
+            })
+          }
+        })
+
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
 
 
 module.exports = router;
