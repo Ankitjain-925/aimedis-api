@@ -7065,7 +7065,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
           }
           if (
             Userinfo[i].we_offer &&
-            Userinfo[i].we_offer.home_vist
+            Userinfo[i].we_offer.offer_home_visit
           ) {
     
             (monday = []),
@@ -7081,100 +7081,100 @@ router.get("/getLocation/:radius", function (req, res, next) {
               (holidays_start = ""),
               (holidays_end = ""),
               (appointment_days = "");
-            for (let l = 0; l < Userinfo[i].home_vist.length; l++) {
-              if (Userinfo[i].home_vist[l].appointment_days) {
+            for (let l = 0; l < Userinfo[i].homevisit_appointment.length; l++) {
+              if (Userinfo[i].homevisit_appointment[l].appointment_days) {
                 appointment_days =
-                  Userinfo[i].home_vist[l].appointment_days;
+                  Userinfo[i].homevisit_appointment[l].appointment_days;
               }
-              if (Userinfo[i].home_vist[l].holidays_start) {
+              if (Userinfo[i].homevisit_appointment[l].holidays_start) {
                 holidays_start =
-                  Userinfo[i].home_vist[l].holidays_start;
+                  Userinfo[i].homevisit_appointment[l].holidays_start;
               }
-              if (Userinfo[i].home_vist[l].holidays_end) {
-                holidays_end = Userinfo[i].home_vist[l].holidays_end;
+              if (Userinfo[i].homevisit_appointment[l].holidays_end) {
+                holidays_end = Userinfo[i].homevisit_appointment[l].holidays_end;
               }
-              if (Userinfo[i].home_vist[l].breakslot_start) {
+              if (Userinfo[i].homevisit_appointment[l].breakslot_start) {
                 breakslot_start =
-                  Userinfo[i].home_vist[l].breakslot_start;
+                  Userinfo[i].homevisit_appointment[l].breakslot_start;
               }
-              if (Userinfo[i].home_vist[l].breakslot_end) {
-                breakslot_end = Userinfo[i].home_vist[l].breakslot_end;
+              if (Userinfo[i].homevisit_appointment[l].breakslot_end) {
+                breakslot_end = Userinfo[i].homevisit_appointment[l].breakslot_end;
               }
               if (
-                (Userinfo[i].home_vist[l].monday_start,
-                  Userinfo[i].home_vist[l].monday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots)
+                (Userinfo[i].homevisit_appointment[l].monday_start,
+                  Userinfo[i].homevisit_appointment[l].monday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               ) {
                 monday = getTimeStops(
-                  Userinfo[i].home_vist[l].monday_start,
-                  Userinfo[i].home_vist[l].monday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots
+                  Userinfo[i].homevisit_appointment[l].monday_start,
+                  Userinfo[i].homevisit_appointment[l].monday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots
                 );
               }
               if (
-                (Userinfo[i].home_vist[l].tuesday_start,
-                  Userinfo[i].home_vist[l].tuesday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots)
+                (Userinfo[i].homevisit_appointment[l].tuesday_start,
+                  Userinfo[i].homevisit_appointment[l].tuesday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               ) {
                 tuesday = getTimeStops(
-                  Userinfo[i].home_vist[l].tuesday_start,
-                  Userinfo[i].home_vist[l].tuesday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots
+                  Userinfo[i].homevisit_appointment[l].tuesday_start,
+                  Userinfo[i].homevisit_appointment[l].tuesday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots
                 );
               }
               if (
-                (Userinfo[i].home_vist[l].wednesday_start,
-                  Userinfo[i].home_vist[l].wednesday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots)
+                (Userinfo[i].homevisit_appointment[l].wednesday_start,
+                  Userinfo[i].homevisit_appointment[l].wednesday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               ) {
                 wednesday = getTimeStops(
-                  Userinfo[i].home_vist[l].wednesday_start,
-                  Userinfo[i].home_vist[l].wednesday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots
+                  Userinfo[i].homevisit_appointment[l].wednesday_start,
+                  Userinfo[i].homevisit_appointment[l].wednesday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots
                 );
               }
               if (
-                (Userinfo[i].home_vist[l].thursday_start,
-                  Userinfo[i].home_vist[l].thursday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots)
+                (Userinfo[i].homevisit_appointment[l].thursday_start,
+                  Userinfo[i].homevisit_appointment[l].thursday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               ) {
                 thursday = getTimeStops(
-                  Userinfo[i].home_vist[l].thursday_start,
-                  Userinfo[i].home_vist[l].thursday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots
+                  Userinfo[i].homevisit_appointment[l].thursday_start,
+                  Userinfo[i].homevisit_appointment[l].thursday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots
                 );
               }
               if (
-                (Userinfo[i].home_vist[l].friday_start,
-                  Userinfo[i].home_vist[l].friday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots)
+                (Userinfo[i].homevisit_appointment[l].friday_start,
+                  Userinfo[i].homevisit_appointment[l].friday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               ) {
                 friday = getTimeStops(
-                  Userinfo[i].home_vist[l].friday_start,
-                  Userinfo[i].home_vist[l].friday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots
+                  Userinfo[i].homevisit_appointment[l].friday_start,
+                  Userinfo[i].homevisit_appointment[l].friday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots
                 );
               }
               if (
-                (Userinfo[i].home_vist[l].saturday_start,
-                  Userinfo[i].home_vist[l].saturday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots)
+                (Userinfo[i].homevisit_appointment[l].saturday_start,
+                  Userinfo[i].homevisit_appointment[l].saturday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               ) {
                 saturday = getTimeStops(
-                  Userinfo[i].home_vist[l].saturday_start,
-                  Userinfo[i].home_vist[l].saturday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots
+                  Userinfo[i].homevisit_appointment[l].saturday_start,
+                  Userinfo[i].homevisit_appointment[l].saturday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots
                 );
               }
               if (
-                (Userinfo[i].home_vist[l].sunday_start,
-                  Userinfo[i].home_vist[l].sunday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots)
+                (Userinfo[i].homevisit_appointment[l].sunday_start,
+                  Userinfo[i].homevisit_appointment[l].sunday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               ) {
                 sunday = getTimeStops(
-                  Userinfo[i].home_vist[l].sunday_start,
-                  Userinfo[i].home_vist[l].sunday_end,
-                  Userinfo[i].home_vist[l].duration_of_timeslots
+                  Userinfo[i].homevisit_appointment[l].sunday_start,
+                  Userinfo[i].homevisit_appointment[l].sunday_end,
+                  Userinfo[i].homevisit_appointment[l].duration_of_timeslots
                 );
               }
               Home.push({
@@ -7199,7 +7199,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
             appointments: user,
             online_appointment: online_users,
             practice_days: Practices,
-            home_vist:Home
+            homevisit_appointment:Home
           });
         }
         res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -7361,42 +7361,42 @@ router.get("/getLocation/:radius", function (req, res, next) {
             if (Userinfo[i].we_offer && Userinfo[i].we_offer.Offer_practice_appointment) {
 
               monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], custom_text = "", breakslot_start = "", breakslot_end = "", holidays_start = "", holidays_end = "", appointment_days = "";
-              for (let l = 0; l < Userinfo[i].home_vist.length; l++) {
-                if (Userinfo[i].home_vist[l].appointment_days) {
-                  appointment_days = Userinfo[i].home_vist[l].appointment_days;
+              for (let l = 0; l < Userinfo[i].homevisit_appointment.length; l++) {
+                if (Userinfo[i].homevisit_appointment[l].appointment_days) {
+                  appointment_days = Userinfo[i].homevisit_appointment[l].appointment_days;
                 }
-                if (Userinfo[i].home_vist[l].holidays_start) {
-                  holidays_start = Userinfo[i].home_vist[l].holidays_start;
+                if (Userinfo[i].homevisit_appointment[l].holidays_start) {
+                  holidays_start = Userinfo[i].homevisit_appointment[l].holidays_start;
                 }
-                if (Userinfo[i].home_vist[l].holidays_end) {
-                  holidays_end = Userinfo[i].home_vist[l].holidays_end;
+                if (Userinfo[i].homevisit_appointment[l].holidays_end) {
+                  holidays_end = Userinfo[i].homevisit_appointment[l].holidays_end;
                 }
-                if (Userinfo[i].home_vist[l].breakslot_start) {
-                  breakslot_start = Userinfo[i].home_vist[l].breakslot_start;
+                if (Userinfo[i].homevisit_appointment[l].breakslot_start) {
+                  breakslot_start = Userinfo[i].homevisit_appointment[l].breakslot_start;
                 }
-                if (Userinfo[i].home_vist[l].breakslot_end) {
-                  breakslot_end = Userinfo[i].home_vist[l].breakslot_end;
+                if (Userinfo[i].homevisit_appointment[l].breakslot_end) {
+                  breakslot_end = Userinfo[i].homevisit_appointment[l].breakslot_end;
                 }
-                if (Userinfo[i].home_vist[l].monday_start, Userinfo[i].home_vist[l].monday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                  monday = getTimeStops(Userinfo[i].home_vist[l].monday_start, Userinfo[i].home_vist[l].monday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+                if (Userinfo[i].homevisit_appointment[l].monday_start, Userinfo[i].homevisit_appointment[l].monday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                  monday = getTimeStops(Userinfo[i].homevisit_appointment[l].monday_start, Userinfo[i].homevisit_appointment[l].monday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
                 }
-                if (Userinfo[i].home_vist[l].tuesday_start, Userinfo[i].home_vist[l].tuesday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                  tuesday = getTimeStops(Userinfo[i].home_vist[l].tuesday_start, Userinfo[i].home_vist[l].tuesday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+                if (Userinfo[i].homevisit_appointment[l].tuesday_start, Userinfo[i].homevisit_appointment[l].tuesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                  tuesday = getTimeStops(Userinfo[i].homevisit_appointment[l].tuesday_start, Userinfo[i].homevisit_appointment[l].tuesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
                 }
-                if (Userinfo[i].home_vist[l].wednesday_start, Userinfo[i].home_vist[l].wednesday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                  wednesday = getTimeStops(Userinfo[i].home_vist[l].wednesday_start, Userinfo[i].home_vist[l].wednesday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+                if (Userinfo[i].homevisit_appointment[l].wednesday_start, Userinfo[i].homevisit_appointment[l].wednesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                  wednesday = getTimeStops(Userinfo[i].homevisit_appointment[l].wednesday_start, Userinfo[i].homevisit_appointment[l].wednesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
                 }
-                if (Userinfo[i].home_vist[l].thursday_start, Userinfo[i].home_vist[l].thursday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                  thursday = getTimeStops(Userinfo[i].home_vist[l].thursday_start, Userinfo[i].home_vist[l].thursday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+                if (Userinfo[i].homevisit_appointment[l].thursday_start, Userinfo[i].homevisit_appointment[l].thursday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                  thursday = getTimeStops(Userinfo[i].homevisit_appointment[l].thursday_start, Userinfo[i].homevisit_appointment[l].thursday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
                 }
-                if (Userinfo[i].home_vist[l].friday_start, Userinfo[i].home_vist[l].friday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                  friday = getTimeStops(Userinfo[i].home_vist[l].friday_start, Userinfo[i].home_vist[l].friday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+                if (Userinfo[i].homevisit_appointment[l].friday_start, Userinfo[i].homevisit_appointment[l].friday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                  friday = getTimeStops(Userinfo[i].homevisit_appointment[l].friday_start, Userinfo[i].homevisit_appointment[l].friday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
                 }
-                if (Userinfo[i].home_vist[l].saturday_start, Userinfo[i].home_vist[l].saturday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                  saturday = getTimeStops(Userinfo[i].home_vist[l].saturday_start, Userinfo[i].home_vist[l].saturday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+                if (Userinfo[i].homevisit_appointment[l].saturday_start, Userinfo[i].homevisit_appointment[l].saturday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                  saturday = getTimeStops(Userinfo[i].homevisit_appointment[l].saturday_start, Userinfo[i].homevisit_appointment[l].saturday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
                 }
-                if (Userinfo[i].home_vist[l].sunday_start, Userinfo[i].home_vist[l].sunday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                  sunday = getTimeStops(Userinfo[i].home_vist[l].sunday_start, Userinfo[i].home_vist[l].sunday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+                if (Userinfo[i].homevisit_appointment[l].sunday_start, Userinfo[i].homevisit_appointment[l].sunday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                  sunday = getTimeStops(Userinfo[i].homevisit_appointment[l].sunday_start, Userinfo[i].homevisit_appointment[l].sunday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
                 }
                 Home.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_start, breakslot_end, holidays_end, holidays_start, appointment_days })
               }
@@ -7406,7 +7406,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
-              home_vist:Home
+              homevisit_appointment:Home
             })
           }
           res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -7559,7 +7559,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
               Practices.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start, holidays_end, holidays_start, appointment_days })
             }
             monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], breakslot_start = "", breakslot_end = "", holidays_end = "", holidays_start = "", appointment_days = "";
-            for (let l = 0; l < Userinfo[i].home_vist.length; l++) {
+            for (let l = 0; l < Userinfo[i].homevisit_appointment.length; l++) {
               if (Userinfo[i].private_appointments[l].appointment_days) {
                 appointment_days = Userinfo[i].online_appointment[l].appointment_days;
               }
@@ -7569,32 +7569,32 @@ router.get("/getLocation/:radius", function (req, res, next) {
               if (Userinfo[i].private_appointments[l].holidays_end) {
                 holidays_end = Userinfo[i].online_appointment[l].holidays_end;
               }
-              if (Userinfo[i].home_vist[l].breakslot_start) {
-                breakslot_start = Userinfo[i].home_vist[l].breakslot_start;
+              if (Userinfo[i].homevisit_appointment[l].breakslot_start) {
+                breakslot_start = Userinfo[i].homevisit_appointment[l].breakslot_start;
               }
-              if (Userinfo[i].home_vist[l].breakslot_end) {
-                breakslot_end = Userinfo[i].home_vist[l].breakslot_end;
+              if (Userinfo[i].homevisit_appointment[l].breakslot_end) {
+                breakslot_end = Userinfo[i].homevisit_appointment[l].breakslot_end;
               }
-              if (Userinfo[i].home_vist[l].monday_start, Userinfo[i].home_vist[l].monday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                monday = getTimeStops(Userinfo[i].home_vist[l].monday_start, Userinfo[i].home_vist[l].monday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+              if (Userinfo[i].homevisit_appointment[l].monday_start, Userinfo[i].homevisit_appointment[l].monday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                monday = getTimeStops(Userinfo[i].homevisit_appointment[l].monday_start, Userinfo[i].homevisit_appointment[l].monday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               }
-              if (Userinfo[i].home_vist[l].tuesday_start, Userinfo[i].home_vist[l].tuesday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                tuesday = getTimeStops(Userinfo[i].home_vist[l].tuesday_start, Userinfo[i].home_vist[l].tuesday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+              if (Userinfo[i].homevisit_appointment[l].tuesday_start, Userinfo[i].homevisit_appointment[l].tuesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                tuesday = getTimeStops(Userinfo[i].homevisit_appointment[l].tuesday_start, Userinfo[i].homevisit_appointment[l].tuesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               }
-              if (Userinfo[i].home_vist[l].wednesday_start, Userinfo[i].home_vist[l].wednesday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                wednesday = getTimeStops(Userinfo[i].home_vist[l].wednesday_start, Userinfo[i].home_vist[l].wednesday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+              if (Userinfo[i].homevisit_appointment[l].wednesday_start, Userinfo[i].homevisit_appointment[l].wednesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                wednesday = getTimeStops(Userinfo[i].homevisit_appointment[l].wednesday_start, Userinfo[i].homevisit_appointment[l].wednesday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               }
-              if (Userinfo[i].home_vist[l].thursday_start, Userinfo[i].home_vist[l].thursday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                thursday = getTimeStops(Userinfo[i].home_vist[l].thursday_start, Userinfo[i].home_vist[l].thursday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+              if (Userinfo[i].homevisit_appointment[l].thursday_start, Userinfo[i].homevisit_appointment[l].thursday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                thursday = getTimeStops(Userinfo[i].homevisit_appointment[l].thursday_start, Userinfo[i].homevisit_appointment[l].thursday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               }
-              if (Userinfo[i].home_vist[l].friday_start, Userinfo[i].home_vist[l].friday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                friday = getTimeStops(Userinfo[i].home_vist[l].friday_start, Userinfo[i].home_vist[l].friday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+              if (Userinfo[i].homevisit_appointment[l].friday_start, Userinfo[i].homevisit_appointment[l].friday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                friday = getTimeStops(Userinfo[i].homevisit_appointment[l].friday_start, Userinfo[i].homevisit_appointment[l].friday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               }
-              if (Userinfo[i].home_vist[l].saturday_start, Userinfo[i].home_vist[l].saturday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                saturday = getTimeStops(Userinfo[i].home_vist[l].saturday_start, Userinfo[i].home_vist[l].saturday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+              if (Userinfo[i].homevisit_appointment[l].saturday_start, Userinfo[i].homevisit_appointment[l].saturday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                saturday = getTimeStops(Userinfo[i].homevisit_appointment[l].saturday_start, Userinfo[i].homevisit_appointment[l].saturday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               }
-              if (Userinfo[i].home_vist[l].sunday_start, Userinfo[i].home_vist[l].sunday_end, Userinfo[i].home_vist[l].duration_of_timeslots) {
-                sunday = getTimeStops(Userinfo[i].home_vist[l].sunday_start, Userinfo[i].home_vist[l].sunday_end, Userinfo[i].home_vist[l].duration_of_timeslots)
+              if (Userinfo[i].homevisit_appointment[l].sunday_start, Userinfo[i].homevisit_appointment[l].sunday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots) {
+                sunday = getTimeStops(Userinfo[i].homevisit_appointment[l].sunday_start, Userinfo[i].homevisit_appointment[l].sunday_end, Userinfo[i].homevisit_appointment[l].duration_of_timeslots)
               }
               Home.push({ monday, tuesday, wednesday, thursday, friday, saturday, sunday, breakslot_end, breakslot_start, holidays_end, holidays_start, appointment_days })
             }
@@ -7603,7 +7603,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
-              home_vist:Home
+              homevisit_appointment:Home
             })
           }
 

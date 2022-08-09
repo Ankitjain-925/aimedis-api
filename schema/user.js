@@ -298,7 +298,7 @@ var UserSchema = new Schema(
       required: false,
       unique: false,
     },
-    home_vist: {
+    homevisit_appointment: {
       type: Array,
       required: false,
       unique: false,
