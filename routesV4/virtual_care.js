@@ -1326,6 +1326,85 @@ router.post("/AssignFilter", function (req, res) {
   }
 });
 
+router.get("/GetTaskandService/:case_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  final_data = {}
+  if (legit) {
+    case_id = req.params.case_id
+    const AppointToSearchWith = new virtual_Task({ case_id });
+    AppointToSearchWith.encryptFieldsSync();
+    virtual_Task.find({ case_id: { $in: [req.params.case_id, AppointToSearchWith.case_id] } }, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        case_id = req.params.case_id
+        const AppointToSearchWith = new assigned_Service({ case_id });
+        AppointToSearchWith.encryptFieldsSync();
+        assigned_Service.find({ case_id: { $in: [req.params.case_id, AppointToSearchWith.case_id] } }, function (err, data2) {
+          if (err) {
+            console.log("err", err)
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              data: { Task: data, assigned_service: data2 },
+              msg: 'successfully fetched'
+            })
+          }
+        })
 
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
 
+router.get("/GetUserData/:user_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    user_id = req.params.user_id
+    const AppointToSearchWith = new User({ _id: user_id });
+    AppointToSearchWith.encryptFieldsSync();
+    User.findOne({ _id: { $in: [req.params.user_id, AppointToSearchWith._id] } }, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        console.log(data)
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              data: {first_name: data.first_name, last_name: data.last_name, profile_id: data.profile_id, alies_id: data.alies_id, image: data.image, address: data.address,email: data.email,mobile: data.mobile, city: data.city, pastal_code: data.pastal_code, country: data.country },
+              msg: 'successfully fetched'
+            })
+          
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
 module.exports = router;
