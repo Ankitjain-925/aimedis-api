@@ -1374,5 +1374,37 @@ router.get("/GetTaskandService/:case_id", function (req, res) {
   }
 })
 
-
+router.get("/GetUserData/:user_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    user_id = req.params.user_id
+    const AppointToSearchWith = new User({ _id: user_id });
+    AppointToSearchWith.encryptFieldsSync();
+    User.findOne({ _id: { $in: [req.params.user_id, AppointToSearchWith._id] } }, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        console.log(data)
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              data: {first_name: data.first_name, last_name: data.last_name, profile_id: data.profile_id, alies_id: data.alies_id, image: data.image, address: data.address,email: data.email,mobile: data.mobile, city: data.city, pastal_code: data.pastal_code, country: data.country },
+              msg: 'successfully fetched'
+            })
+          
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
 module.exports = router;
