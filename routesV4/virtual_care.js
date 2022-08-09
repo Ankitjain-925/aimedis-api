@@ -144,8 +144,8 @@ router.post("/UpdateAddress", function (req, res) {
           })
           res.json({
             status: 200,
-            message: "Mail sent Successfully",
-            hassuccessed: true,
+            message: "address is not updated",
+            hassuccessed: false,
           })
         }
       } else {

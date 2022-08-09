@@ -5356,6 +5356,10 @@ function taskfromhouseid(item) {
           task_type: "picture_evaluation",
         });
         VirtualtToSearchWith1.encryptFieldsSync();
+        const VirtualtToSearchWith2 = new virtual_Task({
+          task_type: "sick_leave",
+        });
+        VirtualtToSearchWith2.encryptFieldsSync();
         virtual_Task
           .find({
             $and: [{
@@ -5367,6 +5371,12 @@ function taskfromhouseid(item) {
               $or: [
                 { task_type: { $ne: "picture_evaluation" } },
                 { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+              ]
+            },
+            {
+              $or: [
+                { task_type: { $ne: "sick_leave" } },
+                { task_type: { $ne: VirtualtToSearchWith2.task_type } },
               ]
             }]
           })
@@ -5570,7 +5580,7 @@ function virtualTask(house_id) {
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Task.find(
         { house_id: { $in: [house_id, VirtualtToSearchWith.house_id] } ,
-        task_type: { $exists: false }},
+        },
         function (err, list) {
           if (err) {
             reject(err);
