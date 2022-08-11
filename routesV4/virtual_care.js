@@ -1156,7 +1156,7 @@ router.get(
                     error: err,
                   });
                 } else {
-
+                  
                   virtual_Task.find(
                     {
                       "assinged_to.user_id": doctor_id,
@@ -1221,7 +1221,7 @@ router.get(
 
                         finalArray = [...arr1, ...arr2, ...arr3];
 
-
+                        finalArray.sort(mySorter);
                         res.json({ status: 200, hassuccessed: true, data: finalArray });
                       }
                     }
