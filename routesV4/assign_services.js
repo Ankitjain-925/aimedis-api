@@ -2,8 +2,8 @@ require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 var assigned_Service = require("../schema/assigned_service.js");
-var appontment =  require("../schema/appointments.js")
-var task =  require("../schema/virtual_tasks.js")
+var Appointments =  require("../schema/appointments.js")
+var virtual_Task =  require("../schema/virtual_tasks.js")
 const moment = require("moment");
 
 var jwtconfig = require("../jwttoken");
@@ -154,37 +154,36 @@ router.get("/getAssignedServices/:house_id", function (req, res, next) {
       return -1;
     }
   }
+  function mySorter1(a, b) {
+    if (a.date && b.date) {
+      return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
+    } else {
+      return -1;
+    }
+  }
 
-
-router.get("/getAllactivities/:user_id", async (req, res, next) => {
+router.get(
+  "/getAllactivities/:user_id",
+  function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
+    doctor_id = req.params.user_id;
+    const AppointToSearchWith = new Appointments({ doctor_id });
+    AppointToSearchWith.encryptFieldsSync();
     if (legit) {
-      try{
       var arr1 = [];
-      var ll = [];
-      var appointment=[];
-      let user_id = req.params.user_id
-        const messageToSearchWith = new assigned_Service({user_id });
-        console.log(messageToSearchWith)
-        messageToSearchWith.encryptFieldsSync();
+      var arr2 = [];
+      var arr3 = [];
+      var finalArray = [];
 
-        let doctor_id = req.params.doctor_id
-        const messageToSearchWith1 = new appontment({doctor_id });
-        console.log(messageToSearchWith1)
-        messageToSearchWith1.encryptFieldsSync();
-
-        let user_id1 = req.params.user_id
-        const messageToSearchWith2 = new task({user_id1 });
-        console.log(messageToSearchWith2)
-        messageToSearchWith2.encryptFieldsSync();
-
-       const data1 = await assigned_Service.find(
-        {
-          $or:[ {"assinged_to.user_id": req.params.user_id},{"user_id.user_id": messageToSearchWith.user_id}]  
-        },
-        function (err, userdata) {
-          if (err && !userdata) {
+      Appointments.find({
+        $or: [
+          { doctor_id: doctor_id },
+          { doctor_id: AppointToSearchWith.doctor_id },
+        ]
+      },
+        function (err, userdata1) {
+          if (err && !userdata1) {
             res.json({
               status: 200,
               hassuccessed: false,
@@ -192,66 +191,94 @@ router.get("/getAllactivities/:user_id", async (req, res, next) => {
               error: err,
             });
           } else {
-               return userdata;
-          } } 
-      );
-      const data2 = await task.find(
-        {
-          $or:[ {"assinged_to.user_id": req.params.user_id},{"user_id.user_id": messageToSearchWith.user_id1}]   
-        },
-        function (err, userdata) {
-          if (err && !userdata) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong",
-              error: err,
-            });
-          } else {                                        
-               return userdata;           
+
+
+            assigned_Service.find({ "assinged_to.user_id": doctor_id },
+              function (err, userdata2) {
+                if (err && !userdata2) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+                  
+                  virtual_Task.find(
+                    {
+                      "assinged_to.user_id": doctor_id,
+                      $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+                    },
+                    function (err, userdata3) {
+                      if (err && !userdata3) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "Something went wrong",
+                          error: err,
+                        });
+                      } else {
+                        
+                        for (i = 0; i < userdata1.length; i++) {
+
+                          let today = new Date().setHours(0, 0, 0, 0);
+
+                          let data_d = new Date(userdata1[i].date).setHours(0, 0, 0, 0);
+
+                          if (moment(data_d).isSameOrAfter(today)) {
+                            // userdata1.sort(mySorter);
+                            arr1.push(userdata1[i])
+                          }
+
+                        }
+
+                        for (i = 0; i < userdata2.length; i++) {
+
+                          let today2 = new Date().setHours(0, 0, 0, 0);
+
+                          let data_d2 = new Date(userdata2[i].due_on.date).setHours(0, 0, 0, 0);
+
+                          if (moment(data_d2).isSameOrAfter(today2)) {
+                            // userdata2.sort(mySorter);
+                            arr2.push(userdata2[i])
+                          }
+                        }
+
+
+                        for (i = 0; i < userdata3.length; i++) {
+                          if (userdata3[i].task_type == "sick_leave") {
+                            let today = new Date().setHours(0, 0, 0, 0);
+                            let data_d = new Date(userdata3[i].date).setHours(0, 0, 0, 0);
+                            if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+                              // userdata3.sort(mySorter);
+                              arr3.push(userdata3[i])
+                            }
+                          }
+                          let today = new Date().setHours(0, 0, 0, 0);
+                          let data_d = new Date(userdata3[i].due_on.date).setHours(0, 0, 0, 0);
+                          if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+            
+                            arr3.push(userdata3[i])
+                          }
+                          if (moment(data_d).isBefore(today) && userdata3[i].status !== "done") {
+            
+                            arr3.push(userdata3[i])
+                          }
+                        }
+
+                        finalArray = [...arr1, ...arr2, ...arr3];
+
+                        finalArray.sort(mySorter1);
+                        res.json({ status: 200, hassuccessed: true, data: finalArray });
+                      }
+                    }
+                  );
+                }
+              }
+            );
           }
-         }        
-      );
-      const data3 = await appontment.find(
-        {
-          $or:[ {"doctor_id.doctor_id": req.params.user_id},{"doctor_id.doctor_id": messageToSearchWith.doctor_id}]    
-        },
-        function (err, userdata) {
-          if (err && !userdata) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong",
-              error: err,
-            });
-          } else {
-               return userdata;              
-          } }
-      );
-      ll=[...data1.sort(mySorter),...data2.sort(mySorter)]
-      appointment=[...data3.sort(mySorter)]
-      for (i = 0; i < appointment.length; i++) {
-        let today = new Date().setHours(0, 0, 0, 0);
-        let data_d = new Date(appointment[i].date).setHours(0, 0, 0, 0);
-        if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-          arr1.push(appointment[i])          
         }
-      }
-      for (i = 0; i < ll.length; i++) {
-        let today = new Date().setHours(0, 0, 0, 0);
-        let data_d = new Date(ll[i].due_on.date).setHours(0, 0, 0, 0);
-        if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-          arr1.push(ll[i])        
-        }
-      }
-      res.json({ status: 200, hassuccessed: true, data: arr1 });
-    } catch {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong."
-      });
-    }
+      );
     } else {
       res.json({
         status: 200,
@@ -261,5 +288,7 @@ router.get("/getAllactivities/:user_id", async (req, res, next) => {
     }
   }
 );
+
+
 
 module.exports = router;
