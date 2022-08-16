@@ -7,17 +7,30 @@ var User = require("../schema/user.js")
 var jwtconfig = require("../jwttoken");
 
 
-router.post("/AddQuestionnaire", async(req, res, next) => {
-    try{
-    const bookdata = new CareModel(req.body)
-    const createdata =await bookdata.save()
-    res.status(200).send(createdata)
-  }catch(err){
-    res.status(400).send(err)
-  }
+  router.post("/AddQuestionnaire", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+    var bookdata = new CareModel(req.body)
+    bookdata.save(function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "Added Successfully",
+          hassuccessed: true,
+        });
+      }
+    });
+    }else{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
   });
-
-
                           
 
 router.get("/GetCaredata/:house_id", function (req, res, next) {
