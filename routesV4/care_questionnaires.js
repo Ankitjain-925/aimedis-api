@@ -117,6 +117,38 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     }
   });
 
+  router.get("/GetCareQuestionaire/:house_id", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+        const house_id = req.params.house_id;
+        const messageToSearchWith = new CareModel({ house_id });
+        messageToSearchWith.encryptFieldsSync();
+        CareModel.find(
+            {$or:[{ house_id: messageToSearchWith.house_id },{house_id:house_id}]},
+            function (err, userdata) {
+                if (err && !userdata) {
+                    res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "questionaire not found",
+                        error: err,
+                    });
+                } else {
+                    res.json({ status: 200, hassuccessed: true, data: userdata });
+                }
+            }
+        );
+    } else {
+        res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Authentication required.",
+        });
+    }
+});
+
+
 
   module.exports = router;
 
