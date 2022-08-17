@@ -43,7 +43,7 @@ const CareQuestionnaire = new mongoose.Schema(
       },
     house_id: {
         type: String,
-        required: false,
+        required: true,
         unique: false
       },
     service_id: {
