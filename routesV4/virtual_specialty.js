@@ -315,9 +315,10 @@ router.post("/AddTask", function (req, res, next) {
                           }
                         );
                       }
-                      ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {
-
-                      })
+                      if(req.body.task_type === "sickleave"){
+                        ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {})
+                      }
+                        
                     });
                   }
 
@@ -2344,7 +2345,7 @@ router.get("/getAppointTask/:House_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     User.find(
-      { "houses.value": req.params.House_id, type: "doctor" },
+      { "houses.value": req.params.House_id, type:{$in:["doctor","nurse"]} },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({

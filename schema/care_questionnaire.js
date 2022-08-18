@@ -11,7 +11,7 @@ const CareQuestionnaire = new mongoose.Schema(
       required: false,
       unique: false,
     },
-    type: {
+    questionnaire_type: {
       type: String,
       required: false,
       unique: false
@@ -27,12 +27,12 @@ const CareQuestionnaire = new mongoose.Schema(
       unique: false
     },
     patient_info: {
-        type: String,
+        type: Object,
         required: false,
         unique: false,
       },
     nurse_info: {
-        type: String,
+        type: Object,
         required: false,
         unique: false
       },
@@ -54,6 +54,11 @@ const CareQuestionnaire = new mongoose.Schema(
     questionnaire_answers: {
       type: Object,
       required: false
+     },
+     track_id:{
+      type: String,
+      required: true,
+      unique: false
      }
 
  }
