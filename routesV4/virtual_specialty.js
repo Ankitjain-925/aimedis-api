@@ -2131,7 +2131,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           req.body.patient_name +
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
-          "https://virtualhospital.aidoc.io/approveHospital/" +
+          "https://aidoc.io/approveHospital/" +
           req.body.case_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
@@ -2174,7 +2174,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://virtualhospital.aidoc.io/approveHospital/" +
+          " https://aidoc.io/approveHospital/" +
           req.body.case_id;
 
         trans(sms1, { source: "en", target: result }).then((res1) => {

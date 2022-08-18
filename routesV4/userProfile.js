@@ -383,7 +383,7 @@ router.post("/UserLogin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://virtualhospital.aidoc.io/change-password";
+                      let link = "https://aidoc.io/change-password";
                       var sendData =
                         "<div>Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -666,7 +666,7 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                     var lan1 = getMsgLang(user_data._id);
 
                     lan1.then((result) => {
-                      let link = "https://virtualhospital.aidoc.io/admin/change-password";
+                      let link = "https://aidoc.io/admin/change-password";
                       var sendData =
                         "<div>Admin Aimedis Please reset Your Password immediately.</br>" +
                         "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
@@ -842,8 +842,8 @@ router.post("/UserntfCheck", function (req, res, next) {
 //   // Making POST request to verify captcha
 
 //       let token= "abchere"
-//       let link = "https://virtualhospital.aidoc.io/";
-//       var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`
+//       let link = "https://aidoc.io/";
+//       var verifylink = `https://aidoc.io/?token=${token}`
 //       let datacomposer = (lang, {verifylink}) => {
 //         return {};
 //       };
@@ -1047,8 +1047,8 @@ router.post("/AddUser", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-                            let link = "https://virtualhospital.aidoc.io/";
-                            var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`;
+                            let link = "https://aidoc.io/";
+                            var verifylink = `https://aidoc.io/?token=${token}`;
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1375,8 +1375,8 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-                            let link = "https://virtualhospital.aidoc.io/";
-                            var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`;
+                            let link = "https://aidoc.io/";
+                            var verifylink = `https://aidoc.io/?token=${token}`;
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1480,8 +1480,8 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
                       user_id = user_data._id;
                       let token = user_data.usertoken;
                       //let link = 'http://localhost:3000/';
-                      let link = "https://virtualhospital.aidoc.io/";
-                      var verifylink = `https://virtualhospital.aidoc.io/?token=${token}`;
+                      let link = "https://aidoc.io/";
+                      var verifylink = `https://aidoc.io/?token=${token}`;
                       let datacomposer = (lang, { verifylink }) => {
                         return {};
                       };
@@ -7892,11 +7892,11 @@ router.post("/forgotPassword", function (req, res, next) {
           setTimeout(() => resolve(user_data1, token), 500);
           promise.then((user_data1) => {
             if (token !== "") {
-              var link = "https://virtualhospital.aidoc.io/change-password?token=" + token;
+              var link = "https://aidoc.io/change-password?token=" + token;
               if (req.body.passFrom === "landing") {
                 // link = '/change-password';
-                // link = 'https://virtualhospital.aidoc.io/change-password'
-                link = "https://virtualhospital.aidoc.io/change-password?token=" + token;
+                // link = 'https://aidoc.io/change-password'
+                link = "https://aidoc.io/change-password?token=" + token;
               }
               // link = 'http://localhost:3000/change-password';
               var lan1 = getMsgLang(user_data1._id);
@@ -8066,8 +8066,8 @@ router.post("/AskPatient/:id", function (req, res, next) {
       .exec()
       .then((user_data1) => {
         if (user_data1) {
-          // var Link1 = 'https://virtualhospital.aidoc.io/patient'
-          var Link1 = "https://virtualhospital.aidoc.io/patient";
+          // var Link1 = 'https://aidoc.io/patient'
+          var Link1 = "https://aidoc.io/patient";
 
           var lan1 = getMsgLang(user_data1._id);
           lan1.then((result) => {

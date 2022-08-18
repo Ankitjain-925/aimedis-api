@@ -47,9 +47,11 @@ app.use(express.urlencoded({ extended: false }));
 ////////////admin+main/////////////
 const appAdmin = express();
 const appAdmin1 = express();
+const appAdmin2  = express();
 
 appAdmin.use(express.static(path.join(__dirname, "build/admin")));
-appAdmin1.use(express.static(path.join(__dirname, "build/sickleave")));
+appAdmin1.use(express.static(path.join(__dirname, "build/eval")));
+appAdmin2.use(express.static(path.join(__dirname, "build/sickleave")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 const server = require("http").createServer(app);
@@ -124,6 +126,7 @@ io.on("connection", (socket) => {
 //       CallingDropBox('DBbackups/ICUbeds'+DatEtIME+ '.gz', "/backupdb/ICUbeds"+DatEtIME+ ".gz");
 //       console.log('Successfully backedup the database')
 //     }
+        
 // });
 
 // var backupProcess2 = spawn('mongodump', [
@@ -183,11 +186,53 @@ io.on("connection", (socket) => {
 //     }     
 // });
 // removeOldBackups();
+// SetArchiveUnuseMeeting();
 // });
+
 cron.schedule('0 0 */12 * * *', function(){
   SetArchiveUnuseMeeting();
   SetArchivePayment()
 });
+
+
+function SetArchivePayment() {
+  var task_type= "sick_leave"
+       const VirtualtToSearchWith1 = new virtual_Task({task_type });
+       VirtualtToSearchWith1.encryptFieldsSync();
+ virtual_Task.find({task_type:{ $in: [task_type, VirtualtToSearchWith1.task_type] }})
+   .exec(function (err, doc1) {
+     if (err && !doc1) {
+       res.json({
+         status: 200,
+         hassuccessed: false,
+         message: "update data failed",
+         error: err,
+       });
+     } else {
+       let ttime = moment(Date.now()).format("YYYY-MM-DD")
+       doc1.forEach((element) => {
+         var enddate = moment(element.date).format("YYYY-MM-DD");
+         if (moment(ttime).diff(enddate, 'days') > 1) {
+           virtual_Task.updateMany({
+             _id: element._id, $or: [
+               { is_payment: { $ne: true } },
+               { is_payment: { $exists: false } }
+             ]
+           }, { archived: true }, function (err, data) {
+             if (err) {
+               console.log("err", err)
+             }
+             else {
+               console.log("data", data)
+             }
+           })
+         }
+       })
+     }
+   }
+   );
+}
+
 
 function SetArchiveUnuseMeeting(){
   sick_meeting.find()
@@ -221,6 +266,7 @@ function SetArchiveUnuseMeeting(){
     }
     );
 }
+
 
 function removeOldBackups() {
   const directoryPath = path.join(__dirname, "./DBbackups/")
@@ -266,38 +312,6 @@ function removeOldBackups() {
   );
 }
 
-function removeOldBackups() {
-  const directoryPath =path.join(__dirname, "./DBbackups/")
-fs.readdir(directoryPath, (err, files) => {
-  if (err) {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Something went wrong",
-    });
-  }
-  else {
-    files.forEach(file => {
-      fs.stat(directoryPath + `/${file}`, function (err, data) {
-        let ttime = moment(Date.now()).format("YYYY-MM-DD")
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          var enddate = moment(data.birthtime).format("YYYY-MM-DD");
-         difference= moment(ttime).diff(enddate, 'days')
-          if (moment(ttime).diff(enddate, 'days') >=10) {
-            fs.unlink(directoryPath + `/${file}`, function (err) {})
-          }
-        }
-      })
-    });
-  }
-});
-}
 
 function getData() {
   var data = {
@@ -399,6 +413,7 @@ function CallingDropBox(localFile, SetUrl){
   
 // });
 
+
 function SetArchivePayment() {
    var task_type= "sick_leave"
         const VirtualtToSearchWith1 = new virtual_Task({task_type });
@@ -436,6 +451,7 @@ function SetArchivePayment() {
     }
     );
 }
+
 
 
 var UserData = require("./routes/UserTrack");
@@ -623,6 +639,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 ////////////admin+main/////////////
+
 appAdmin.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
@@ -631,8 +648,8 @@ appAdmin.use(function (req, res, next) {
 appAdmin.use((err, req, res, next) => {
   return res.sendFile(path.resolve( __dirname, 'build/admin' , 'index.html'));
 });
-
 app.use("/sys-n-admin", appAdmin);
+
 
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -640,10 +657,20 @@ appAdmin1.use(function (req, res, next) {
   next(err);
 });
 appAdmin1.use((err, req, res, next) => {
+
+  return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
+});
+app.use("/sys-n-eval", appAdmin1);
+
+appAdmin2.use(function (req, res, next) {
+  var err = new Error("Not Found");
+  err.status = 404;
+  next(err);
+});
+appAdmin2.use((err, req, res, next) => {
   return res.sendFile(path.resolve( __dirname, 'build/sickleave' , 'index.html'));
 });
-
-app.use("/sys-n-sick", appAdmin1);
+app.use("/sys-n-sick", appAdmin2);
 ////////////admin+main+end/////////////
 
 // catch 404 and forward to error handler
@@ -655,13 +682,14 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  console.log("err", err);
-  // return res.sendFile(path.resolve(__dirname, 'build/main', 'index.html'));
- 
+
+   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+  // console.log("err", err);
 });
 
-// app.listen(5001, () => {
+// server.listen(5000, () => {
 //   console.log("Server started on port 5001");
 // });
 
- module.exports = app;
+module.exports = app;
+

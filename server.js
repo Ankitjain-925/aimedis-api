@@ -1,6 +1,7 @@
 const app = require('./app');
 const http = require('http');
 
+
 var server = http.createServer(app);
 const io = require("socket.io")(server, {
     transports: ["polling"],
@@ -27,5 +28,6 @@ const io = require("socket.io")(server, {
     });
   });
 
-  server.listen("5001")
-  
+
+  server.listen(process.env.PORT);
+
