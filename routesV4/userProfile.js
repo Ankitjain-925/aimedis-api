@@ -287,6 +287,9 @@ router.post("/UserLogin", function (req, res, next) {
                         { new: true },
                         (err, doc1) => { }
                       );
+                      if(req.headers._origin == "video-confrance"){
+                        user_data["isRegisterd_for_video"] = true;
+                      }
                       res.json({
                         status: 200,
                         message: "Succefully fetched",
