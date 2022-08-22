@@ -498,6 +498,7 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
                       res.json({
                         status: 200,
                         hassuccessed: true,
+                        data : ids,
                         msg: "track is updated",
                       });
                     }
@@ -508,6 +509,7 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
               res.json({
                 status: 200,
                 hassuccessed: true,
+                data : ids,
                 msg: "track is updated",
               });
             }

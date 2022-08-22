@@ -1149,8 +1149,8 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
             User.findOne({ _id: comming.patient_id }, function (err, dta) {
 
               var sendData = `<div>Dear Patient , <br/>
-              Here is the Certificate added by doctor on your sick leave certificate request. 
-              Please download it from here as well as from the request list page too.</div>`;
+              Please go to the sick certificate site/ application to check the sick certificate given by the doctor.
+             </div>`;
 
               generateTemplate(
                 EMAIL.generalEmail.createTemplate("en", {
@@ -1163,16 +1163,16 @@ router.post("/downloadSickleaveCertificate", function (req, res, next) {
                       from: "contact@aimedis.com",
 
                       to: dta.email,
-                      subject: "Sick leave certificate Download",
+                      subject: "Sick leave certificate update",
                       html: html,
-                      attachments: [
-                        {
-                          // utf-8 string as an attachment
-                          filename: "sickleave_certificate.pdf",
+                      // attachments: [
+                      //   {
+                      //     // utf-8 string as an attachment
+                      //     filename: "sickleave_certificate.pdf",
 
-                          path: file,
-                        },
-                      ],
+                      //     path: file,
+                      //   },
+                      // ],
                     };
 
                     let sendmail = transporter.sendMail(mailOptions);
@@ -1424,7 +1424,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                                 status: 200,
                                 hassuccessed: true,
                                 message: "link active",
-                                data: { Task: userdata, Session: data },
+                                data: { Task: userdata, Session: data, gender: result.sex},
                               });
                             }
                             else{
@@ -1435,7 +1435,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                                 status: 200,
                                 hassuccessed: true,
                                 message: "link active",
-                                data: { Task: userdata, Session: data },
+                                data: { Task: userdata, Session: data, },
                               });
                             }
                          

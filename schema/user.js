@@ -194,6 +194,11 @@ var UserSchema = new Schema(
       required: false,
       unique: false,
     },
+    country:{
+      type: Object,
+      required: false,
+      unique: false,
+    },
     speciality: { type: Array },
     subspeciality: { type: Array },
     phone: {
@@ -289,6 +294,11 @@ var UserSchema = new Schema(
       unique: false,
     },
     days_for_practices: {
+      type: Array,
+      required: false,
+      unique: false,
+    },
+    homevisit_appointment: {
       type: Array,
       required: false,
       unique: false,
@@ -397,6 +407,11 @@ var UserSchema = new Schema(
     },
     aimedis_health_newletter: {
       type: Boolean,
+      required: false,
+      unique: false,
+    },
+    pastal_code:{
+      type: String,
       required: false,
       unique: false,
     },
