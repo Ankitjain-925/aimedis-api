@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aidoc.io",
+    "host": "localhost:5001",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -39,10 +39,14 @@
         {
             "name": "sick",
             "description": "API for cases"
+        },
+        {
+            "name": "Video_Conference",
+            "description": "API for video_conference"
         }
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -635,6 +639,10 @@
                 }
             }
         },
+
+        
+
+
         "/vh/AddSpecialty": {
             "parameters": [
                 {
@@ -2912,10 +2920,137 @@
                     }
                 }
             }
+        },
+        "/vchat/DoctorList": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            
+            ],
+            "get": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Get All Doctor List",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Info is found"
+                    }
+                }
+            }
+        },
+        "/vchat/getuserchat": {
+            
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+                    "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Check User",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get User"
+                    }
+                }
+            }
+        },
+        "/vchat/AddVideoUserAccount": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "User_Registration",
+                        "in": "body",
+                        "description": "Video_Conference",
+                        "schema": {
+                            "$ref": "#/definitions/VideoConference"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+
+        "/vchat/AppointmentBook": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "addappointment",
+                        "in": "body",
+                        "description": "addappointment",
+                        "schema": {
+                            "$ref": "#/definitions/addappointment"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
         }
-       
 
     },
+
+
     "definitions": {
         "setcase": {
             "required": [
@@ -2932,7 +3067,102 @@
                 }
             }
         },
-       
+        "addappointment": {       
+            "properties": {
+                "patient_id":{
+                    "type":"string",
+                    "uniqueItems": false
+                },
+                "Speciality":{
+                    "type":"string",
+                    "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "start_time":{
+                    "type":"string",
+                    "uniqueItems": false
+                },
+                "end_time":{
+                    "type":"string",
+                    "uniqueItems": false
+                },
+                "status":{
+                    "type":"string",
+                    "uniqueItems": false
+                },
+            
+                "payment_type" :{
+                    "type": "string",
+                    "uniqueItems": false
+                 },
+                 "total_amount" :{
+                    "type": "string",
+                    "uniqueItems": false
+                 },
+                 "created_at": {
+                    "type": "string",
+                    "uniqueItems": false
+                  }
+            }
+        },
+        "VideoConference": {
+            "required": [
+                "username",
+                "Patient_id",
+                "is_payment",
+                "email"
+            ],
+            "properties": {
+            "patient_id":{
+                "type": "string",
+                "uniqueItems": false
+
+            },
+           
+             "reg_amount":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "email": {
+                "type": "string",
+                "uniqueItems": false
+
+             },
+        
+             "password":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "prepaid_talktime":{
+                "type": "string",
+                "uniqueItems": false
+            },
+             "status":{
+               "type": "string",
+               "uniqueItems": false
+
+             }, 
+             "date": {
+                "type": "string",
+                "uniqueItems": false
+            },
+            "username":{
+              "type": "string",
+               "required": true,
+               "unique": false
+            },
+             "is_payment":{
+                "type": "boolean",
+                "uniqueItems": false
+
+              }
+            }
+            },
         "user": {
             "required": [
              
@@ -3188,6 +3418,8 @@
                 }
             }
         },
+  
+
         "AddAnswerspatient": {
             "required": [
                 "question_id",
