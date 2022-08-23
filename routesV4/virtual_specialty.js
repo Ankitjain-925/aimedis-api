@@ -315,9 +315,10 @@ router.post("/AddTask", function (req, res, next) {
                           }
                         );
                       }
-                      ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {
-
-                      })
+                      if(req.body.task_type === "sickleave"){
+                        ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {})
+                      }
+                        
                     });
                   }
 
@@ -470,7 +471,7 @@ router.put("/AddTask/:task_id", function (req, res, next) {
                                 let mailOptions = {
                                   from: "contact@aimedis.com",
                                   to: data.email,
-                                  subject: "Decline picture evaluation",
+                                  subject: "Decline Online Diagnose",
                                   html: html,
                                 };
 
@@ -2130,7 +2131,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           req.body.patient_name +
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
-          "https://virtualhospital.aidoc.io/approveHospital/" +
+          "https://aidoc.io/approveHospital/" +
           req.body.case_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
@@ -2173,7 +2174,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://virtualhospital.aidoc.io/approveHospital/" +
+          " https://aidoc.io/approveHospital/" +
           req.body.case_id;
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
@@ -2344,7 +2345,7 @@ router.get("/getAppointTask/:House_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     User.find(
-      { "houses.value": req.params.House_id, type: "doctor" },
+      { "houses.value": req.params.House_id, type:{$in:["doctor","nurse"]} },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -3747,6 +3748,8 @@ router.post("/LeftInfoPatient", function (req, res) {
               if (data) {
                 const VirtualtToSearchWith2 = new virtual_Task({ case_id: data._id.toString() });
                 VirtualtToSearchWith2.encryptFieldsSync();
+                const VirtualtToSearchWith7 = new virtual_Task({ status: 'done' });
+                VirtualtToSearchWith7.encryptFieldsSync();
                 virtual_Task.aggregate(
                   [
                     {
@@ -3764,7 +3767,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                           {
                             $match: {
                               $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],
-                              status: "done",
+                              status: {$in : ["done", VirtualtToSearchWith7.status]}
                             },
                           },
                           { $count: "done_task" },
@@ -5354,6 +5357,10 @@ function taskfromhouseid(item) {
           task_type: "picture_evaluation",
         });
         VirtualtToSearchWith1.encryptFieldsSync();
+        const VirtualtToSearchWith2 = new virtual_Task({
+          task_type: "sick_leave",
+        });
+        VirtualtToSearchWith2.encryptFieldsSync();
         virtual_Task
           .find({
             $and: [{
@@ -5365,6 +5372,12 @@ function taskfromhouseid(item) {
               $or: [
                 { task_type: { $ne: "picture_evaluation" } },
                 { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+              ]
+            },
+            {
+              $or: [
+                { task_type: { $ne: "sick_leave" } },
+                { task_type: { $ne: VirtualtToSearchWith2.task_type } },
               ]
             }]
           })
@@ -5568,7 +5581,7 @@ function virtualTask(house_id) {
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Task.find(
         { house_id: { $in: [house_id, VirtualtToSearchWith.house_id] } ,
-        task_type: { $exists: false }},
+        },
         function (err, list) {
           if (err) {
             reject(err);

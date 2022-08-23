@@ -41,7 +41,7 @@
             "description": "API for cases"
         },
         {
-            "name": "Video_Conference",
+            "name": "video_conference",
             "description": "API for video_conference"
         }
     ],
@@ -2934,7 +2934,7 @@
                 "tags": [
                     "Video_Conference"
                 ],
-                "summary": "Get All Doctor List",
+                "summary": "Get All Doctor",
                 "produces": [
                     "application/json"
                 ],
@@ -3048,9 +3048,9 @@
             }
         }
 
+
+
     },
-
-
     "definitions": {
         "setcase": {
             "required": [
@@ -3159,10 +3159,9 @@
              "is_payment":{
                 "type": "boolean",
                 "uniqueItems": false
-
-              }
+             }
             }
-            },
+        },
         "user": {
             "required": [
              
@@ -3418,49 +3417,7 @@
                 }
             }
         },
-  
-
-        "AddAnswerspatient": {
-            "required": [
-                "question_id",
-                "answers",
-                "house_id",
-                "Patient_id"
-            ],
-            "properties": {
-                "questionaire_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "answers": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    },
-                    "uniqueItems": false
-                },
-                "patient": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_name": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_logo": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "patient_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
+       
         "AddSpecialty": {
             "required": [
                 "specialty_name",
