@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aidoc.io",
+    "host": "localhost:5001",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -39,10 +39,14 @@
         {
             "name": "sick",
             "description": "API for cases"
+        },
+        {
+            "name": "video_conference",
+            "description": "API for video_conference"
         }
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -635,6 +639,10 @@
                 }
             }
         },
+
+        
+
+
         "/vh/AddSpecialty": {
             "parameters": [
                 {
@@ -2913,70 +2921,32 @@
                 }
             }
         },
-        "/cquestionnaire/GetCaredata/{house_id}": {
+        "/vchat/DoctorList": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            
+            ],
             "get": {
-                    "parameters": [
-                        {
-                            "name": "house_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
                 "tags": [
-                    "Ais Care"
+                    "Video_Conference"
                 ],
-                "summary": "get Caredata",
+                "summary": "Get All Doctor",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Get Data"
+                        "description": "Info is found"
                     }
                 }
             }
         },
-        "/cquestionnaire/GetCareNurse/{nurse_id}": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "nurse_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get CareNurse",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/cquestionnaire/GetCarePatient/{patient_id}": {
-            "get": {
+        "/vchat/getuserchat": {
+            
                     "parameters": [
                         {
                             "name": "patient_id",
@@ -2991,84 +2961,22 @@
                             "description": "JWT token User"
                         }
                     ],
-
+                    "post": {
                 "tags": [
-                    "Ais Care"
+                    "Video_Conference"
                 ],
-                "summary": "get CarePatient",
+                "summary": "Check User",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Get Data"
+                        "description": "Get User"
                     }
                 }
             }
         },
-        "/vc/PresentFutureTask/{patient_profile_id}": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "patient_profile_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get PrFuTask",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/vc/PastTask/{patient_profile_id}": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "patient_profile_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get PastTask",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/vc/UpdateAddress": {
+        "/vchat/AddVideoUserAccount": {
             "parameters": [
                 {
                     "name": "token",
@@ -3077,33 +2985,34 @@
                 }
             ],
             "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
                 "parameters": [
                     {
-                        "name": "ADD",
+                        "name": "User_Registration",
                         "in": "body",
-                        "description": "Update Address",
+                        "description": "Video_Conference",
                         "schema": {
-                            "$ref": "#/definitions/UpdateAddress"
-                           
+                            "$ref": "#/definitions/VideoConference"
                         }
                     }
                 ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "Update Address",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
                         "description": "Add Data"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
                     }
                 }
             }
         },
-        "/vc/NurseHomeVisitMail": {
+
+        "/vchat/AppointmentBook": {
             "parameters": [
                 {
                     "name": "token",
@@ -3112,373 +3021,28 @@
                 }
             ],
             "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
                 "parameters": [
                     {
-                        "name": "ADD",
+                        "name": "addappointment",
                         "in": "body",
-                        "description": "Mail to Patient Ais",
+                        "description": "addappointment",
                         "schema": {
-                            "$ref": "#/definitions/NurseHomeVisitMail"
-                           
+                            "$ref": "#/definitions/addappointment"
                         }
                     }
                 ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "Mail to Patient Ais",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
                         "description": "Add Data"
-                    }
-                }
-            }
-        },
-        "/assignservice/Deleteassignservice/{_id}": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                },
-                {
-                    "name": "_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of AS",
-                    "type": "string"
-                }
-                
-            ],
-            "delete": {
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "Delete with given ID",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Delete data"
-                    }
-                }
-            }
-        },
-        "/assignservice/Updateassignservice/{_id}": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                },
-                {
-                    "name": "_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of AS",
-                    "type": "string"
-                }
-                
-            ],
-            "put": {
-                "tags": [
-                    "Ais Care"
-                ],
-                "parameters": [
-                    {
-                        "name": "Ais Care",
-                        "in": "body",
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/Updateassignservice"
-                        }
-                    }
-                ],
-                "summary": "update with given ID",
-                "responses": {
-                    "200": {
-                        "description": "Update Data"
-                    }
-                }
-            }
-        },
-        "/assignservice/Addassignservice": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-                
-            ],
-            "post": {
-                "tags": [
-                    "Ais Care"
-                ],
-                "parameters": [
-                    {
-                        "name": "Ais Care",
-                        "in": "body",
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/Addassignservice"
-                        }
-                    }
-                ],
-                "summary": "Add Data",
-                "responses": {
-                    "200": {
-                        "description": "Add Data"
-                    }
-                }
-            }
-        },
-        "/assignservice/getAssignedServices/{house_id}": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "house_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get AssignedServices",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/cquestionnaire/AddQuestionnaire": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-                
-            ],
-            "post": {
-                "tags": [
-                    "Ais Care"
-                ],
-                "parameters": [
-                    {
-                        "name": "Ais Care",
-                        "in": "body",
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/AddQuestionnaire"
-                        }
-                    }
-                ],
-                "summary": "Add Data",
-                "responses": {
-                    "200": {
-                        "description": "Add Data"
-                    }
-                }
-            }
-        },
-        "/vc/infoOfPatients/{house_id}": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "house_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get InfoOfPatients",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/vc/PastAppointmentServiceTask/{patient_profile_id}": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "patient_profile_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get InfoOfPatients",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/vc/patientTaskandService/{patient_id}": {
-            "get": {
-                    "parameters": [
-                        {
-                            "name": "patient_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get PatientTaskandService",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/vc/nurseapp": {
-            "get": {
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
-
-            "tags": [
-                "Ais Care"
-            ],
-            "summary": "get nurse appoints",
-            "produces": [
-                "application/json"
-            ],
-            "responses": {
-                "200": {
-                    "description": "Get Data"
-                }
-            }
-        }
-        },
-        "/vc/nurseafter": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
-                "parameters": [
-                    {
-                        "name": "getList",
-                        "in": "body",
-                        "description": "Get data",
-                        "schema": {
-                            "$ref": "#/definitions/nurse"
-                        }
-                    }
-                ],
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get appointment and servies with  patient id",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
-                    }
-                }
-            }
-        },
-        "/vc/nursebefore": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
-                "parameters": [
-                    {
-                        "name": "getList",
-                        "in": "body",
-                        "description": "Get data",
-                        "schema": {
-                            "$ref": "#/definitions/nurse"
-                        }
-                    }
-                ],
-                "tags": [
-                    "Ais Care"
-                ],
-                "summary": "get appointment and servies with  patient id",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get Data"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
                     }
                 }
             }
@@ -3503,175 +3067,99 @@
                 }
             }
         },
-        "Updateassignservice": {
-            "required": [
-                "assign_service",
-                "house_id",
-                "status"
-            ],
+        "addappointment": {       
             "properties": {
-                "assign_service": {
-                    "type": "string",
+                "patient_id":{
+                    "type":"string",
                     "uniqueItems": false
                 },
-                "house_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "status": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "assinged_to": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    }
-                },
-                "patient": {
-                    "type": "object",
-                    "uniqueItems": false
-                },
-                "amount": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
-        "nurse": {
-            
-            "properties": {
-
-                "nurse_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
-        "AddQuestionnaire": {
-            "required": [
-               
-            ],
-            "properties": {
-                "submitDate": {
-                    "type": "date",
-                    "uniqueItems": false
-                  },
-                  "type": {
-                    "type": "string",
-                    "uniqueItems": false
-                  },
-                  "patient_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                  },
-                  "case_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                  },
-                  "patient_info": {
-                      "type": "string",
-                      "uniqueItems": false
-                    },
-                  "nurse_info": {
-                      "type": "string",
-                      "uniqueItems": false
-                    },
-                  "nurse_id": {
-                      "type": "string",
-                      "uniqueItems": false
-                    },
-                  "house_id": {
-                      "type": "string",
-                      "uniqueItems": false
-                    },
-                  "service_id": {
-                      "type": "string",
-                      "uniqueItems": false
-                    },
-                  "questionnaire_answers": {
-                    "type": "object",
-                    "uniqueItems": false
-                   }
-                
-            }
-        },
-        "Addassignservice": {
-            "required": [
-                "assign_service",
-                "house_id",
-                "status"
-            ],
-            "properties": {
-                "assign_service": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "status": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "assinged_to": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    }
-                },
-                "patient": {
-                    "type": "object",
-                    "uniqueItems": false
-                },
-                "amount": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
-        "NurseHomeVisitMail": {
-            "required": [
-                
-            ],
-            "properties": {
-                "nurse_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "hospital_name": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "patient_id": {
-                    "type": "string",
+                "Speciality":{
+                    "type":"string",
                     "uniqueItems": false
                 },
                 "date": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "time": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
-
-        "UpdateAddress": {
-            "required": [
-                "case_id"
-            ],
-            "properties": {
-                "case_id": {
-                    "type": "string",
+                "start_time":{
+                    "type":"string",
                     "uniqueItems": false
                 },
-                "HospitalName": {
+                "end_time":{
+                    "type":"string",
+                    "uniqueItems": false
+                },
+                "status":{
+                    "type":"string",
+                    "uniqueItems": false
+                },
+            
+                "payment_type" :{
                     "type": "string",
                     "uniqueItems": false
-                }
+                 },
+                 "total_amount" :{
+                    "type": "string",
+                    "uniqueItems": false
+                 },
+                 "created_at": {
+                    "type": "string",
+                    "uniqueItems": false
+                  }
+            }
+        },
+        "VideoConference": {
+            "required": [
+                "username",
+                "Patient_id",
+                "is_payment",
+                "email"
+            ],
+            "properties": {
+            "patient_id":{
+                "type": "string",
+                "uniqueItems": false
+
+            },
+           
+             "reg_amount":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "email": {
+                "type": "string",
+                "uniqueItems": false
+
+             },
+        
+             "password":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "prepaid_talktime":{
+                "type": "string",
+                "uniqueItems": false
+            },
+             "status":{
+               "type": "string",
+               "uniqueItems": false
+
+             }, 
+             "date": {
+                "type": "string",
+                "uniqueItems": false
+            },
+            "username":{
+              "type": "string",
+               "required": true,
+               "unique": false
+            },
+             "is_payment":{
+                "type": "boolean",
+                "uniqueItems": false
+             }
             }
         },
         "user": {
@@ -3929,47 +3417,7 @@
                 }
             }
         },
-        "AddAnswerspatient": {
-            "required": [
-                "question_id",
-                "answers",
-                "house_id",
-                "Patient_id"
-            ],
-            "properties": {
-                "questionaire_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "answers": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    },
-                    "uniqueItems": false
-                },
-                "patient": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_name": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "house_logo": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "patient_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
+       
         "AddSpecialty": {
             "required": [
                 "specialty_name",
