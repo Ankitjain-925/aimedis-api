@@ -1458,4 +1458,38 @@ function mySorter(a, b) {
   }
 }
 
+router.put("/AppointmentUpdate/:_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    Appointments.updateOne(
+      { _id: req.params._id },
+      req.body,
+      function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "Update Appointment",
+            hassuccessed: true,
+          });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
 module.exports = router;
