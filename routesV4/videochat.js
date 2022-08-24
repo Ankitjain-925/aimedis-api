@@ -113,37 +113,67 @@ router.post("/AppointmentBook", function (req, res, next) {
   }
 });
 
-
-
-
-  router.get("/DoctorList", async(req, res) => {
+  router.post("/Get_Doctor", async(req, res) => {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
       try{
-    console.log(res)
-    user.find({type: 'doctor', first_name:{ $exists:true }})
-    .then(result => {
-      res.status(200).json({
-        newbook:result
-      
-      });
-    })
+    var alies_id = req.body.alies_id
+    var email = req.body.email
+    var profile_id = req.body.profile_id
+    var speciality = req.body.speciality
+    var first_name = req.body.first_name
+    var last_name = req.body.last_name
+    const VirtualtToSearchWith1 = new user({ alies_id, email, profile_id, speciality, first_name, last_name });
+        VirtualtToSearchWith1.encryptFieldsSync();
+    var condition = {}
+    if(req.body.alies_id || req.body.email || req.body.profile_id || req.body.speciality || req.body.first_name || req.body.last_name){
+    
+      if(req.body.alies_id) {
+        condition["alies_id"] ={ $in: [req.body.alies_id,  VirtualtToSearchWith1.alies_id]} ; 
+      }
+      if(req.body.email) {
+        condition["email"] = { $in: [req.body.email,  VirtualtToSearchWith1.email]}; 
+      }
+      if(req.body.profile_id) {
+        condition["profile_id"] ={ $in: [req.body.profile_id,  VirtualtToSearchWith1.profile_id]} 
+      }
+      if(req.body.speciality) {
+        condition["speciality"] ={ $in: [req.body.speciality,  VirtualtToSearchWith1.speciality]} ; 
+      }
+      if(req.body.first_name) {
+        condition["first_name"] =  { $in: [req.body.first_name,  VirtualtToSearchWith1.first_name]}; 
+      }
+      if(req.body.last_name) {
+        condition["last_name"] =  { $in: [req.body.last_name,  VirtualtToSearchWith1.last_name]}; 
+      } 
+      user.find(condition,  function (err, data1) {
+        console.log(data1)
+        if (err) {
+          console.log("err", err)
+          res.json({ status: 200, hassuccessed: true, error: err });
+        } else {
+          
+            res.json({ status: 200, hassuccessed: true, data: data1 });
+            
+          }
+        }
+      )
+    }
   } catch {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Something went wrong."
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong."
+      });
+    }
+    } else {
+      res.json({
+        status: 200,   
+        hassuccessed: false,
+        message: "Authentication required.",
     });
   }
-  } else {
-    res.json({
-      status: 200,   
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-  });
-
+})
 
   module.exports = router;                                                                            
