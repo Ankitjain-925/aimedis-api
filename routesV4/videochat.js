@@ -67,7 +67,6 @@ function getDate(date, dateFormat) {
 router.post("/getuserchat", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  console.log(legit)
   if (legit) {
     let patient_id = req.body._id
     let email = req.body.email
@@ -101,7 +100,6 @@ router.post("/getuserchat", function (req, res, next) {
 router.post("/AddVideoUserAccount", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  console.log(legit)
   if (legit) {
     const data = {
       email: legit.email || req.body.email,
@@ -124,7 +122,6 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
         })
       })
       .catch(err => {
-        console.log(err);
         res.status(500).json({
           reeor: err
         })
@@ -142,9 +139,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
 router.post("/AppointmentBook", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  console.log(legit)
   if (legit) {
-
     const Videodata = new Cappointment(req.body)
     Videodata.save()
       .then(result => {
@@ -156,7 +151,6 @@ router.post("/AppointmentBook", function (req, res, next) {
         })
       })
       .catch(err => {
-        console.log(err);
         res.status(500).json({
           reeor: err
         })
@@ -178,7 +172,6 @@ router.get("/DoctorList", async (req, res) => {
   let legit = jwtconfig.verify(token);
   if (legit) {
     try {
-      console.log(res)
       user.find({ type: 'doctor', first_name: { $exists: true } })
         .then(result => {
           res.status(200).json({
@@ -344,7 +337,6 @@ router.post("/DownloadbillVC", async (req, res) => {
 
       },
       function (err, userdata) {
-        console.log("err", err)
         if (err && !userdata) {
           res.json({
             status: 200,
@@ -386,7 +378,6 @@ router.post("/DownloadbillVC", async (req, res) => {
       }
     );
   } catch (e) {
-    console.log("e", e)
     res.json({
       status: 200,
       hassuccessed: false,
@@ -442,7 +433,6 @@ router.post("/SaveQuestion", function (req, res) {
         }
       var bookdata = new CareModel(datas)
       bookdata.save(function (err, user_data) {
-        console.log("err", err)
         if (err && !user_data) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
