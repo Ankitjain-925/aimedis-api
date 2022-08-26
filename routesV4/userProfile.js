@@ -8976,21 +8976,170 @@ router.delete("/marketing_user/:email", function (req, res) {
 router.post("/marketing_user", function (req, res, next) {
   var email = req.body.email.toLowerCase();
   req.body.email = email;
-  datas = { ...req.body };
-  var marketing_users = new marketing_user(datas);
 
-  marketing_users.save(function (err, user_data) {
-    if (err && !user_data) {
-      res.json({ status: 200, message: "Something went wrong.", error: err });
-    } else {
-      res.json({
-        status: 200,
-        message: "User is added Successfully",
-        hassuccessed: true,
-        data: user_data,
-      });
-    }
-  });
+  datas = { ...req.body };
+  // var email = req.params.email && req.params.email.toLowerCase();
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
+  })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else{
+        var marketing_users = new marketing_user(datas);
+        marketing_users.save(function (err, user_data1) {
+          if (err && !user_data1) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "User is added Successfully",
+              hassuccessed: true,
+              data: user_data1,
+            });
+          }
+        });
+      }
+    })
+
 });
+
+router.post("/marketing_user2", function (req, res, next) {
+  let email =  base64.decode(req.body.email);
+  if(req.body.first_name && req.body.last_name){
+      var first_name =  base64.decode(req.body.first_name);
+      var last_name =  base64.decode(req.body.last_name);
+  }
+  
+  email = email.toLowerCase();
+  req.body.email = email;
+  req.body.first_name = first_name;
+  req.body.last_name = last_name;
+  console.log('req.body', req.body)
+  datas = { ...req.body };
+  // var email = req.params.email && req.params.email.toLowerCase();
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
+  })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else{
+        var marketing_users = new marketing_user(datas);
+        marketing_users.save(function (err, user_data1) {
+          if (err && !user_data1) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "User is added Successfully",
+              hassuccessed: true,
+              data: user_data1,
+            });
+          }
+        });
+      }
+    })
+
+});
+
+router.post("/MarketingSub",function(req,res){
+var email = req.body.email.toLowerCase();
+req.body.email = email;
+
+const messageToSearchWith = new marketing_user({ email: req.body.email });
+messageToSearchWith.encryptFieldsSync();
+marketing_user.findOne({
+  $or: [
+  { email: { $regex: req.body.email, $options: "i" } },
+  { email: { $regex: messageToSearchWith.email, $options: "i" } },
+  ],
+})
+  .exec()
+  .then((user_data) => {
+  if (user_data) {
+      res.json({
+      status: 200,
+      message: "Already added",
+      hassuccessed: false
+      });
+  }
+  else{
+  let emails =  base64.encode(req.body.email);
+
+  let url = ``;
+
+  if(req.body.first_name && req.body.last_name){
+  let first_name = base64.encode(req.body.first_name) ;
+  let last_name= base64.encode(req.body.last_name);
+     url= `first_name=${first_name}&last_name=${last_name}&email=${emails}`
+  }
+  else{
+    url= `email=${emails}`
+  }
+  console.log('email', email)
+  sendData = `Dear User,<br/>
+  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
+  generateTemplate(
+      EMAIL.generalEmail.createTemplate("en", {
+      title: "",
+      content: sendData,
+      }),
+      (error, html) => {
+      if (email !== "") {
+          let mailOptions = {
+          from: "contact@aimedis.com",
+          to: email,
+          subject: "Aimedis Newletter Subscription",
+          html: html,
+          };
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
+          res.json({
+              status: 200,
+              msg: "Mail is sent",
+              hassuccessed: true,
+          });
+          } else {
+          res.json({
+              status: 200,
+              msg: "Mail is not sent",
+              hassuccessed: false,
+          });
+          }
+      } else {
+          res.json({
+          status: 200,
+          msg: "Mail is not sent",
+          hassuccessed: false,
+          });
+      }
+      }
+  );
+  }
+  })
+})
 
 module.exports = router;
