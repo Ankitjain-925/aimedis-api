@@ -8978,11 +8978,6 @@ router.post("/marketing_user", function (req, res, next) {
   req.body.email = email;
 
   datas = { ...req.body };
-<<<<<<< HEAD
-  // var email = req.params.email && req.params.email.toLowerCase();
-=======
-  var email = req.params.email && req.params.email.toLowerCase();
->>>>>>> 0cd093a265a8815275a31ccb1c2e5be7ad822df2
   const messageToSearchWith = new marketing_user({ email: req.body.email });
   messageToSearchWith.encryptFieldsSync();
   marketing_user.findOne({
