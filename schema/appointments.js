@@ -29,6 +29,11 @@ const docProfiles = new mongoose.Schema({
         required: false,
         unique: false
      },
+     type:{
+        type: String,
+        required: false,
+        unique: false
+     },
      speciality :{ type : Array },
     subspeciality : { type: Array },
 },{ strict: false });

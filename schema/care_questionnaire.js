@@ -59,6 +59,11 @@ const CareQuestionnaire = new mongoose.Schema(
       type: String,
       required: true,
       unique: false
+     },
+     type:{
+      type: String,
+      required: false,
+      unique: false
      }
 
  }
