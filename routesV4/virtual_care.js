@@ -25,6 +25,8 @@ const {
   generateTemplate,
 } = require("../emailTemplate/index.js");
 var nodemailer = require("nodemailer");
+var CareQuentionaire = require("../schema/care_questionnaire");
+
 
 var transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
@@ -1407,4 +1409,87 @@ router.get("/GetUserData/:user_id", function (req, res) {
     });
   }
 })
+
+router.get("/GetUserQuerstionair/:patient_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    const AppointToSearchWith = new CareQuentionaire({ patient_id: req.params.patient_id });
+    AppointToSearchWith.encryptFieldsSync();
+    CareQuentionaire.find({ patient_id: { $in: [req.params.patient_id, AppointToSearchWith.patient_id] } }, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      } else {
+        console.log("data",data.length)
+        data.sort(mySorter)
+        console.log("data",data)
+        var temp= data.slice(-2)
+        console.log("temp",temp)
+        console.log("temp",temp.length)
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              data: temp,
+              msg: 'successfully fetched'
+            })
+          
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
+
+function mySorter(a, b) {
+  if (a.submitDate && b.submitDate) {
+    var x = a.submitDate
+    var y = b.submitDate
+    return x < y ? -1 : x > y ? 1 : 0;
+  } else {
+    return -1;
+  }
+}
+
+router.put("/AppointmentUpdate/:_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    Appointments.updateOne(
+      { _id: req.params._id },
+      req.body,
+      function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "Update Appointment",
+            hassuccessed: true,
+          });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
 module.exports = router;

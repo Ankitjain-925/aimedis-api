@@ -2921,26 +2921,37 @@
                 }
             }
         },
-        "/vchat/DoctorList": {
+        "/vchat/Get_Doctor": {
             "parameters": [
                 {
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
                 }
-            
             ],
-            "get": {
+            "post": {
                 "tags": [
                     "Video_Conference"
                 ],
-                "summary": "Get All Doctor",
+                "parameters": [
+                    {
+                        "name": "Doctor",
+                        "in": "body",
+                        "description": "Video_Conference",
+                        "schema": {
+                            "$ref": "#/definitions/getuser"
+                        }
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Info is found"
+                        "description": "Get Doctor"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
                     }
                 }
             }
@@ -3162,6 +3173,35 @@
              }
             }
         },
+        "getuser":{
+            "required": [   ],
+            "properties": {
+                  "profile_id": {
+                       "type": "string",
+                       "uniqueItems": false
+                    },
+                    "alies_id": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "email": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "speciality": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "uniqueItems": false
+                    }
+               }
+             },
         "user": {
             "required": [
              
