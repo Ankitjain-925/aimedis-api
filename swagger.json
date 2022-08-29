@@ -39,11 +39,8 @@
         {
             "name": "sick",
             "description": "API for cases"
-        },
-        {
-            "name": "video_conference",
-            "description": "API for video_conference"
         }
+        
     ],
     "schemes": [
         "http"
@@ -3057,10 +3054,104 @@
                     }
                 }
             }
+        },
+        "/vchat/GetConferencePatient/{patient_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Get patient",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Patient"
+                    }
+                }
+            }
+        },
+        "/vchat/givefeedback": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "Give_Feedback",
+                        "in": "body",
+                        "description": "Video_Conference",
+                        "schema": {
+                            "$ref": "#/definitions/givefeedback"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Add Data"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/vchat/getfeedbackfordoctor/{doctor_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "doctor_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Get Doctor",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Doctor"
+                    }
+                }
+            }
         }
-
-
-
     },
     "definitions": {
         "setcase": {
@@ -3201,6 +3292,42 @@
                         "uniqueItems": false
                     }
                }
+             },
+             "givefeedback":{
+                "required": [
+         
+                ],
+
+                "properties":{
+                    "fast_service": {
+                        "type": "string",
+                        "uniqueItems": false
+                      },
+                    "doctor_explaination":{
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "satification":{
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "doctor_id":{
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "task_id":{
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "patient_infos":{
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        },
+                        "uniqueItems": true
+                    }
+                }
+
              },
         "user": {
             "required": [
