@@ -39,6 +39,10 @@
         {
             "name": "sick",
             "description": "API for cases"
+        },
+        {
+            "name":"Video_Conference",
+            "description": "API for Video_Conference"
         }
         
     ],
@@ -2943,6 +2947,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary": "Get doctor list",
                 "responses": {
                     "200": {
                         "description": "Get Doctor"
@@ -3006,6 +3011,7 @@
                         }
                     }
                 ],
+                "summary": "User_Registration",
                 "produces": [
                     "application/json"
                 ],
@@ -3042,6 +3048,7 @@
                         }
                     }
                 ],
+                "summary": "Book Appointment",
                 "produces": [
                     "application/json"
                 ],
@@ -3108,6 +3115,7 @@
                         }
                     }
                 ],
+                "summary": "Give feedback",
                 "produces": [
                     "application/json"
                 ],
@@ -3141,7 +3149,7 @@
                 "tags": [
                     "Video_Conference"
                 ],
-                "summary": "Get Doctor",
+                "summary": "Get feedback at doctor end",
                 "produces": [
                     "application/json"
                 ],
