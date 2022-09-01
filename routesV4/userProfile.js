@@ -287,6 +287,9 @@ router.post("/UserLogin", function (req, res, next) {
                         { new: true },
                         (err, doc1) => { }
                       );
+                      if(req.headers._origin == "video-confrance"){
+                        user_data["isRegisterd_for_video"] = true;
+                      }
                       res.json({
                         status: 200,
                         message: "Succefully fetched",
@@ -8128,15 +8131,16 @@ router.post("/AskPatient1/:id", function (req, res, next) {
     });
   }
 });
-router.get("/AskPatientProfile/:id", function (req, res, next) {
+
+router.post("/AskPatientProfile", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    const profile_id = req.params.id;
-    const alies_id = req.params.id;
+    const profile_id = req.body.id;
+    const alies_id = req.body.id;
     const messageToSearchWith = new User({ profile_id });
     const messageToSearchWith1 = new User({ alies_id });
-    const email = req.params.id;
+    const email = req.body.id;
     const messageToSearchWith2 = new User({ email });
     messageToSearchWith2.encryptFieldsSync();
     messageToSearchWith.encryptFieldsSync();
@@ -8144,12 +8148,12 @@ router.get("/AskPatientProfile/:id", function (req, res, next) {
     User.findOne({
       type: "patient",
       $or: [
-        { email: req.params.id },
+        { email: req.body.id },
         { email: messageToSearchWith2.email },
         { alies_id: messageToSearchWith1.alies_id },
         { profile_id: messageToSearchWith.profile_id },
-        { profile_id: req.params.id },
-        { alies_id: req.params.id },
+        { profile_id: req.body.id },
+        { alies_id: req.body.id },
       ],
     })
       .exec()

@@ -1,4 +1,4 @@
-require("dotenv").config();
+ require("dotenv").config();
 var express = require("express");
 var path = require("path");
 //var cookieParser = require('cookie-parser');
@@ -193,7 +193,6 @@ cron.schedule('0 0 */12 * * *', function(){
   SetArchiveUnuseMeeting();
   SetArchivePayment()
 });
-
 
 function SetArchivePayment() {
   var task_type= "sick_leave"
@@ -515,6 +514,7 @@ var hadmin4 = require("./routesV4/h_admin");
 var comet4 = require("./routesV4/cometUserList");
 var merketing = require("./routesV4/marketing");
 var vactive = require("./routesV4/virtual_active");
+var Videochat = require("./routesV4/videochat");
 var market = require("./routesV4/marketing");
 var cquestionnaire = require("./routesV4/care_questionnaires.js");
 var assignservice = require("./routesV4/assign_services.js");
@@ -604,6 +604,7 @@ app.use("/api/v4/marketing", merketing);
 app.use("/api/v4/cquestionnaire", cquestionnaire);
 app.use("/api/v4/assignservice", assignservice);
 app.use("/api/v4/vactive", vactive);
+app.use("/api/v4/vchat", Videochat);
 app.use("/api/v4/vc", vcare4);
 
 
@@ -636,6 +637,10 @@ app.use("/api/v5/vactive", vactive5);
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get("/s",(res,req)=>{
+  console.log("nnnnnnnnnnnnn")
+
+})
 
 
 ////////////admin+main/////////////
@@ -657,7 +662,6 @@ appAdmin1.use(function (req, res, next) {
   next(err);
 });
 appAdmin1.use((err, req, res, next) => {
-
   return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
 });
 app.use("/sys-n-eval", appAdmin1);
@@ -682,14 +686,12 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-
    return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
   // console.log("err", err);
 });
 
-// server.listen(5000, () => {
-//   console.log("Server started on port 5001");
-// });
+//server.listen(5001, () => {
+  //console.log("Server started on port 5001");
+//});
 
-module.exports = app;
-
+ module.exports = app;
