@@ -1207,6 +1207,7 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
     });
   }
 });
+
 router.get("/ArchivedTrack/:UserId", function (req, res, next) {
   track2 = [];
   const token = req.headers.token;
