@@ -687,7 +687,7 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
    return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  // console.log("err", err);
+  console.log("err", err);
 });
 
 //server.listen(5001, () => {
