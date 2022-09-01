@@ -6231,6 +6231,7 @@ router.get("/timeSuggest", function (req, res, next) {
           var user = [];
           var online_users = [];
           var Practices = [];
+          var Home =[];
           var monday = [],
             tuesday = [],
             wednesday = [],
@@ -6621,12 +6622,144 @@ router.get("/timeSuggest", function (req, res, next) {
               });
             }
           }
+
+          (monday = []),
+          (tuesday = []),
+          (wednesday = []),
+          (thursday = []),
+          (friday = []),
+          (saturday = []),
+          (sunday = []),
+          (custom_text = ""),
+          (breakslot_start = ""),
+          (breakslot_end = ""),
+          (holidays_start = ""),
+          (appointment_days = ""),
+          (holidays_end = "");
+          if (
+            Userinfo.we_offer &&
+            Userinfo.we_offer.offer_home_visit
+          ) {
+            console.log("1", Userinfo.homevisit_appointment.length)
+            for (let l = 0; l < Userinfo.homevisit_appointment.length; l++) {
+              if (Userinfo.homevisit_appointment[l].appointment_days) {
+                appointment_days =
+                  Userinfo.homevisit_appointment[l].appointment_days;
+              }
+              if (Userinfo.homevisit_appointment[l].holidays_start) {
+                holidays_start = Userinfo.homevisit_appointment[l].holidays_start;
+              }
+              if (Userinfo.homevisit_appointment[l].holidays_end) {
+                holidays_end = Userinfo.homevisit_appointment[l].holidays_end;
+              }
+              if (Userinfo.homevisit_appointment[l].breakslot_start) {
+                breakslot_start =
+                  Userinfo.homevisit_appointment[l].breakslot_start;
+              }
+              if (Userinfo.homevisit_appointment[l].breakslot_end) {
+                breakslot_end = Userinfo.homevisit_appointment[l].breakslot_end;
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].monday_start,
+                  Userinfo.homevisit_appointment[l].monday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                monday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].monday_start,
+                  Userinfo.homevisit_appointment[l].monday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].tuesday_start,
+                  Userinfo.homevisit_appointment[l].tuesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                tuesday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].tuesday_start,
+                  Userinfo.homevisit_appointment[l].tuesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].wednesday_start,
+                  Userinfo.homevisit_appointment[l].wednesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                wednesday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].wednesday_start,
+                  Userinfo.homevisit_appointment[l].wednesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].thursday_start,
+                  Userinfo.homevisit_appointment[l].thursday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                thursday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].thursday_start,
+                  Userinfo.homevisit_appointment[l].thursday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].friday_start,
+                  Userinfo.homevisit_appointment[l].friday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                friday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].friday_start,
+                  Userinfo.homevisit_appointment[l].friday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].saturday_start,
+                  Userinfo.homevisit_appointment[l].saturday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                saturday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].saturday_start,
+                  Userinfo.homevisit_appointment[l].saturday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].sunday_start,
+                  Userinfo.homevisit_appointment[l].sunday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                sunday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].sunday_start,
+                  Userinfo.homevisit_appointment[l].sunday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              Home.push({
+                monday,
+                tuesday,
+                wednesday,
+                thursday,
+                friday,
+                saturday,
+                sunday,
+                breakslot_start,
+                breakslot_end,
+                holidays_start,
+                holidays_end,
+                appointment_days,
+              });
+              console.log("home",Home)
+            }
+          }
           if (Userinfo && getAvailable && getAvailable.length > 0) {
             var finalArray = {
               data: Userinfo,
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
+              homevisit_appointment:Home
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           } else {
@@ -6643,6 +6776,7 @@ router.get("/timeSuggest", function (req, res, next) {
               appointments: [{ custom_text: custom_text }],
               online_appointment: [],
               practice_days: [],
+              homevisit_appointment:[]
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           }
@@ -8807,10 +8941,50 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
       oldSchedule = req.body.oldSchedule,
       doctorProfile = req.body.docProfile,
       timeslot = req.body.timeslot;
-    return Appointment.update({ _id: apppinment_id }, { status: "cancel" })
+    return Appointment.updateOne({ _id: apppinment_id }, { status: "cancel" })
       .exec()
       .then((chnageData) => {
         var lan1 = getMsgLang(req.body.patient_id);
+        if(legit.type=="nurse"){
+          lan1.then((result) => {
+            var sendData = `<div>The appoinment with ${doctorProfile.first_name + " " + doctorProfile.last_name
+              } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
+  
+            generateTemplate(
+              EMAIL.generalEmail.createTemplate(result, {
+                title: "",
+                content: sendData,
+              }),
+              (error, html) => {
+                if (!error) {
+                  let mailOptions = {
+                    from: "contact@aimedis.com",
+                    to: email,
+                    subject: "Appoinment Cancel And New Time Suggestion",
+                    html: html,
+                  };
+                  let sendmail = transporter.sendMail(mailOptions);
+                  if (sendmail) {
+                    console.log("Mail is sent ");
+                  }
+                }
+              }
+            );
+  
+            // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+  
+            // trans(sendData, { source: "en", target: result }).then((res) => {
+            //     var mailOptions = {
+            //         from: "contact@aimedis.com",
+            //         to : email,
+            //         subject: 'Appoinment Cancel And New Time Suggestion',
+            //         html: res.replace(/ @ /g, '@')
+            //     };
+            //     var sendmail = transporter.sendMail(mailOptions)
+            //   });
+          });
+        }
+        else{
         lan1.then((result) => {
           var sendData = `<div>The appoinment with Dr. ${doctorProfile.first_name + " " + doctorProfile.last_name
             } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
@@ -8848,7 +9022,7 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
           //     var sendmail = transporter.sendMail(mailOptions)
           //   });
         });
-
+      }
         // let mailOptions = {
         //     from:'contact@aimedis.com',
         //     to : email,
