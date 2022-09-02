@@ -176,7 +176,7 @@
                         }
                     }
                 ],
-                "summary": "Add Track record",
+                "summary": "Update in Track record",
                 "responses": {
                     "200": {
                         "description": "Track record is added"
@@ -187,7 +187,7 @@
                 "tags": [
                     "TrackRecord"
                 ],
-                "summary": "Add Track record",
+                "summary": "Get Track record",
                 "responses": {
                     "200": {
                         "description": "Track record is found"
@@ -353,6 +353,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add User",
                 "responses": {
                     "200": {
                         "description": "User added succefully",
@@ -519,6 +520,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add Membership",
                 "responses": {
                     "200": {
                         "description": "membership added succefully",
@@ -550,6 +552,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Generate Sick Cretificate",
                 "responses": {
                     "200": {
                         "description": "added succefully",
@@ -774,6 +777,7 @@
                         }
                     }
                 ],
+                "summary":"For Registration",
                 "produces": [
                     "application/json"
                 ],
@@ -805,6 +809,7 @@
                         }
                     }
                 ],
+                "summary":"Add Prescription",
                 "produces": [
                     "application/json"
                 ],
@@ -1063,6 +1068,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add appointment",
                 "responses": {
                     "200": {
                         "description": "Doctor Appointments added succefully",
@@ -1571,6 +1577,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary": "Add Step at patientflow",
                 "responses": {
                     "200": {
                         "description": "step added succefully",
@@ -1648,6 +1655,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add  answer by patient",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -1686,6 +1694,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add Specialty",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -1724,6 +1733,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add task",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -1767,6 +1777,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add comment",
                 "responses": {
                     "200": {
                         "description": "comment added successfully",
@@ -1802,6 +1813,7 @@
                         }
                     }
                 ],
+                "summary":"Add service",
                 "produces": [
                     "application/json"
                 ],
@@ -1840,6 +1852,7 @@
                         }
                     }
                 ],
+                "summary":"Add invoice",
                 "produces": [
                     "application/json"
                 ],
@@ -1878,6 +1891,7 @@
                         }
                     }
                 ],
+                "summary":"Used for filter the data",
                 "produces": [
                     "application/json"
                 ],
@@ -1919,6 +1933,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Filter the data",
                 "responses": {
                     "200": {
                         "description": " information get successfully",
@@ -1954,6 +1969,7 @@
                         }
                     }
                 ],
+                "summary":"Add patient to VH",
                 "Produces": [
                     "application/json"
                 ],
@@ -2772,6 +2788,7 @@
                         }
                     }
                 ],
+                "summary":"Add Case",
                 "produces": [
                     "application/json"
                 ],
@@ -2813,6 +2830,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add Bed and check the availability",
                 "responses": {
                     "200": {
                         "description": "added successfully",
@@ -2851,6 +2869,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add ward and check the availability",
                 "responses": {
                     "200": {
                         "description": "added successfully"
@@ -4134,6 +4153,47 @@
         }
     },
     "definitions": {
+        "AddAnswerspatient": {
+            "required": [
+                "question_id",
+                "answers",
+                "house_id",
+                "Patient_id"
+            ],
+            "properties": {
+                "questionaire_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": false
+                },
+                "patient": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_logo": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
         "User": {
             "required": [
                 "type"
