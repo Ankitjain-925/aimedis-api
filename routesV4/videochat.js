@@ -65,37 +65,37 @@ function getDate(date, dateFormat) {
   }
 }
 
-router.post("/getuserchat", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    let patient_id = req.body._id
-    let email = req.body.email
-    const messageToSearchWith = new user({ patient_id, email });
-    messageToSearchWith.encryptFieldsSync();
-    user.find(
-      { $or: [{ _id: req.body._id }, { patient_id: messageToSearchWith._id }, { email: messageToSearchWith.email }] },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Information not found",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      );
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Authentication required.",
-      });
-    }
+// router.post("/getuserchat", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     let patient_id = req.body._id
+//     let email = req.body.email
+//     const messageToSearchWith = new user({ patient_id, email });
+//     messageToSearchWith.encryptFieldsSync();
+//     user.find(
+//       { $or: [{ _id: req.body._id }, { patient_id: messageToSearchWith._id }, { email: messageToSearchWith.email }] },
+//       function (err, userdata) {
+//         if (err && !userdata) {
+//           res.json({
+//             status: 200,
+//             hassuccessed: false,
+//             message: "Information not found",
+//             error: err,
+//           });
+//         } else {
+//           res.json({ status: 200, hassuccessed: true, data: userdata });
+//         }
+//       };
+//     } else {
+//       res.json({
+//         status: 200,
+//         hassuccessed: false,
+//         message: "Authentication required.",
+//       });
+//     }
 
-});
+// });
 
 router.post("/AddVideoUserAccount", function (req, res, next) {
     const token = req.headers.token;
@@ -136,31 +136,31 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
   }
 });
 
-router.post("/AppointmentBook", function (req, res, next) {
-  const token = req.headers.token;
+// router.post("/AppointmentBook", function (req, res, next) {
+//   const token = req.headers.token;
 
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const Videodata = new Cappointment(req.body)
-    Videodata.save()
-      .then(result => {
-        res.json({
-          status: 200,
-          msg: 'Appointment Book Successfully',
-          data: result,
-          hassuccessed: true
-        })
-      })
-    })
-    } else {
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     const Videodata = new Cappointment(req.body)
+//     Videodata.save()
+//       .then(result => {
+//         res.json({
+//           status: 200,
+//           msg: 'Appointment Book Successfully',
+//           data: result,
+//           hassuccessed: true
+//         })
+//       })
+//     })
+//     } else {
 
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication Required.",
-    });
-  }
-});
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication Required.",
+//     });
+//   }
+// });
 
 router.get("/DoctorList", async (req, res) => {
   const token = req.headers.token;
@@ -473,6 +473,32 @@ router.get("/withdrawal", function (req, res) {
   )
 })
 
+router.get("/refund", function (req, res) {
+  stripe.balanceTransactions.retrieve(
+    {_id:'txn_1032HU2eZvKYlo2CEPtcnUvl'}, function (err, data) {
+      if (err) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        if(data.amount<req.body.amount){
+          res.json({ status: 200, message: "Enter over Amount"});
+        }else{
+          stripe.refunds.create({
+            charge: data.source,
+            amount : req.body.amount
+          },function(err,data){
+            if(err){
+              res.json({
+                status: 200, message: "Something went wrong.", error: err
+              })
+            }else{
+              res.json({status:200,message:"Refund Suceessfully"})
+            }
+          })
+        }
+      }
+    }
+  )
+})
 
   router.post("/Get_Doctor", async(req, res) => {
 
