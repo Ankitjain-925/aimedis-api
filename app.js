@@ -637,10 +637,7 @@ app.use("/api/v5/vactive", vactive5);
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get("/s",(res,req)=>{
-  console.log("nnnnnnnnnnnnn")
 
-})
 
 
 ////////////admin+main/////////////
@@ -687,7 +684,7 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
    return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  // console.log("err", err);
+  console.log("err", err);
 });
 
 app.listen(5000, () => {

@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5001",
+    "host": "virtualhospital.aidoc.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -82,7 +82,7 @@
         
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -3031,6 +3031,7 @@
                 }
             }
         },
+
         "/vh/sortinfo/{patient_id}": {
             "get": {
                 "parameters": [
@@ -3047,6 +3048,7 @@
                         "description": "JWT token User"
                     }
                 ],
+
                 "tags": [
                     "virtual_cases"
                 ],
