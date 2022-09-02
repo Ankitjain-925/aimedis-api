@@ -14,11 +14,11 @@ router.post("/getuserchat", function (req, res, next) {
   console.log(legit)
   if (legit) {
 
-    const messageToSearchWith = new vidchat({ patient_id : req.body._id });
+    const messageToSearchWith = new vidchat({ patient_id: req.body._id });
     messageToSearchWith.encryptFieldsSync();
     vidchat.find(
       {
-         patient_id: { $in: [req.body._id, messageToSearchWith.patient_id] } 
+        patient_id: { $in: [req.body._id, messageToSearchWith.patient_id] }
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -32,7 +32,7 @@ router.post("/getuserchat", function (req, res, next) {
           if (userdata.length > 0) {
             console.log(userdata.length)
 
-            res.json({ status: 200, hassuccessed: true, data: true, message : "user exists" })
+            res.json({ status: 200, hassuccessed: true, data: true, message: "user exists" })
           } else {
             res.json({ status: 200, hassuccessed: false, message: "Users Not Exists", data: false })
           }
@@ -316,5 +316,44 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
     });
   }
 });
+
+router.post("/UsernameLogin", function (req, res, next) {
+  var username = req.body.username;
+  var password = req.body.password;
+  const VirtualtToSearchWith1 = new vidchat({ username, password });
+  VirtualtToSearchWith1.encryptFieldsSync();
+  if (req.body.username == "" || req.body.password == "") {
+    res.json({
+      status: 400,
+      message: "username and password fields should not be empty",
+      hassuccessed: false,
+    });
+  } else {
+    vidchat
+      .findOne({ username: req.body.username })
+      .exec()
+      .then((user_data) => {
+        if (!user_data) {
+          res.json({
+            status: 400,
+            hassuccessed: false,
+            message: "Username not match",
+          });
+        } else {
+          if (user_data.password !== req.body.password) {
+            res.json({
+              status: 400,
+              hassuccessed: false,
+              message: "Password not match",
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: user_data });
+          }
+        }
+      });
+  }
+});
+
+
 
 module.exports = router;                                                                            
