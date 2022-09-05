@@ -637,10 +637,7 @@ app.use("/api/v5/vactive", vactive5);
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get("/s",(res,req)=>{
-  console.log("nnnnnnnnnnnnn")
 
-})
 
 
 ////////////admin+main/////////////
@@ -690,8 +687,10 @@ app.use(function (err, req, res, next) {
   console.log("err", err);
 });
 
-server.listen(5000, () => {
-  console.log("Server started on port 5001");
-});
+
+// app.listen(5000, () => {
+//   console.log("Server started on port 5001")
+// });
+
 
  module.exports = app;
