@@ -55,10 +55,10 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   console.log(legit)
   if (legit) {
-    var username = req.body.username
-    const VirtualtToSearchWith1 = new vidchat({ username });
+    var email = req.body.email
+    const VirtualtToSearchWith1 = new vidchat({ email });
     VirtualtToSearchWith1.encryptFieldsSync();
-    vidchat.find({ $or: [{ username: req.body.username }, { username: VirtualtToSearchWith1.username }] },
+    vidchat.find({ $or: [{ email: req.body.email }, { email: VirtualtToSearchWith1.email }] },
       function (err, data1) {
 
         if (err) {
