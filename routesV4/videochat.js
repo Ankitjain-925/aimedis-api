@@ -517,23 +517,23 @@ router.get("/withdrawal", function (req, res) {
 
 router.get("/refund", function (req, res) {
   stripe.balanceTransactions.retrieve(
-    {_id:'txn_1032HU2eZvKYlo2CEPtcnUvl'}, function (err, data) {
+    { _id: 'txn_1032HU2eZvKYlo2CEPtcnUvl' }, function (err, data) {
       if (err) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        if(data.amount<req.body.amount){
-          res.json({ status: 200, message: "Enter over Amount"});
-        }else{
+        if (data.amount < req.body.amount) {
+          res.json({ status: 200, message: "Enter over Amount" });
+        } else {
           stripe.refunds.create({
             charge: data.source,
-            amount : req.body.amount
-          },function(err,data){
-            if(err){
+            amount: req.body.amount
+          }, function (err, data) {
+            if (err) {
               res.json({
                 status: 200, message: "Something went wrong.", error: err
               })
-            }else{
-              res.json({status:200,message:"Refund Suceessfully"})
+            } else {
+              res.json({ status: 200, message: "Refund Suceessfully" })
             }
           })
         }
@@ -542,56 +542,28 @@ router.get("/refund", function (req, res) {
   )
 })
 
-  router.post("/Get_Doctor", async(req, res) => {
-
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-      try{
-      var alies_id = req.body.alies_id
-      var email = req.body.email
-      var profile_id = req.body.profile_id
-      var speciality = req.body.speciality
-      var first_name = req.body.first_name
-      var last_name = req.body.last_name
-      const VirtualtToSearchWith1 = new user({ alies_id, email, profile_id, speciality, first_name, last_name });
-      VirtualtToSearchWith1.encryptFieldsSync();
-      var condition = {}
-      if (req.body.alies_id || req.body.email || req.body.profile_id || req.body.speciality || req.body.first_name || req.body.last_name) {
-        if (req.body.alies_id) {
-          condition["alies_id"] = { $in: [req.body.alies_id, VirtualtToSearchWith1.alies_id] };
-        }
-        if (req.body.email) {
-          condition["email"] = { $in: [req.body.email, VirtualtToSearchWith1.email] };
-        }
-        if (req.body.profile_id) {
-          condition["profile_id"] = { $in: [req.body.profile_id, VirtualtToSearchWith1.profile_id] }
-        }
-        if (req.body.speciality) {
-          condition["speciality"] = { $in: [req.body.speciality, VirtualtToSearchWith1.speciality] };
-        }
-        if (req.body.first_name) {
-          condition["first_name"] = { $in: [req.body.first_name, VirtualtToSearchWith1.first_name] };
-        }
-        if (req.body.last_name) {
-          condition["last_name"] = { $in: [req.body.last_name, VirtualtToSearchWith1.last_name] };
-        }
-        user.find(condition, function (err, data1) {
-          if (err) {
-            res.json({ status: 200, hassuccessed: true, error: err });
-          } else {
-            res.json({ status: 200, hassuccessed: true, data: data1 });
-          }
-        }
-        )
+router.get("/Get_Doctor/:data", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    user.find({
+      $or: [{ alies_id: { $in: [req.params.data, VirtualtToSearchWith1.alies_id] } },
+      { email: { $in: [req.params.data, VirtualtToSearchWith1.email] } },
+      { profile_id: { $in: [req.params.data, VirtualtToSearchWith1.profile_id] } },
+      { speciality: { $in: [req.params.data, VirtualtToSearchWith1.speciality] } },
+      { first_name: { $in: [req.params.data, VirtualtToSearchWith1.first_name] } },
+      { last_name: { $in: [req.params.data, VirtualtToSearchWith1.last_name] } },
+      ]
+    }, function (err, data1) {
+      if (err) {
+        res.json({ status: 200, hassuccessed: true, error: err });
+      } else {
+        res.json({ status: 200, hassuccessed: true, data: data1 });
       }
-    } catch {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong."
-      });
     }
+    )
   } else {
     res.json({
       status: 200,
