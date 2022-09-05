@@ -5509,7 +5509,7 @@ function virtualTasksforPatient(patient_id) {
     } catch (err) {
       reject(err);
     }
-  });
+  });   
 }
 
 function User_Case(House_id) {
