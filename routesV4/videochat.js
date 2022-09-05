@@ -330,7 +330,7 @@ router.post("/UsernameLogin", function (req, res, next) {
     });
   } else {
     vidchat
-      .findOne({ username: req.body.username })
+      .findOne({ username:{$in: [req.body.username,VirtualtToSearchWith1.username] }})
       .exec()
       .then((user_data) => {
         if (!user_data) {
