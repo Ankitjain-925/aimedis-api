@@ -7,6 +7,8 @@ const Cappointment = require("../schema/conference_appointment.js")
 const Appointment = require("../schema/appointments")
 const virtual_Task = require("../schema/virtual_tasks")
 const CareModel = require("../schema/care_questionnaire")
+const virtual_invoice = require("../schema/virtual_invoice")
+var sick_meeting = require("../schema/sick_meeting");
 var handlebars = require("handlebars");
 var fs = require("fs");
 const { join } = require("path");
@@ -199,35 +201,24 @@ router.post("/MailtoDrandPatient", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    const messageToSearchWith = new user({ patient: req.body.patient });
-    messageToSearchWith.encryptFieldsSync();
-    Appointment.findOne({ patient: req.body.patient, type: "video-conference" }, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-          error: err,
-        });
-      } else {
-        sendData = `Dear ${data.patient_info.first_name + " " + data.patient_info.last_name}<br/>
-        You have an appointment with Dr. ${data.docProfile.first_name + " " + data.docProfile.last_name} on ${data.date} at ${data.start_time}.
+        sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
+        You have an appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
         If you cannot take the appointment, please cancel it at least 24 hours before.
         If you have any questions, contact your doctor via .
         Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
-        sendData2 = `Dear ${data.docProfile.first_name + " " + data.docProfile.last_name}<br/>
-        You have got an appointment with ${data.patient_info.first_name + " " + data.patient_info.last_name} on ${data.date} at ${data.start_time}.
-       Please accept the appointment inside your Aimdis Profile. If you have  any questions,please contact the patient via ${data.patient_info.email} or Alternatively you can contact us via contact@aimedis.com. or the Aimedis support chat if you have difficulties contacting the patient.`;
+        sendData2 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
+        You have got an appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
+       Please accept the appointment inside your Aimdis Profile. If you have  any questions,please contact the patient via ${req.body.patient_info.email} or Alternatively you can contact us via contact@aimedis.com. or the Aimedis support chat if you have difficulties contacting the patient.`;
         generateTemplate(
           EMAIL.generalEmail.createTemplate("en", {
             title: "",
             content: sendData,
           }),
           (error, html) => {
-            if (data.patient_info.email !== "") {
+            if (req.body.patient_info.email !== "") {
               let mailOptions = {
                 from: "contact@aimedis.com",
-                to: data.patient_info.email,
+                to: req.body.patient_info.email,
                 subject: "Approve sick leave request by Doctor",
                 html: html,
               };
@@ -256,10 +247,10 @@ router.post("/MailtoDrandPatient", function (req, res) {
             content: sendData2,
           }),
           (error, html) => {
-            if (data.docProfile.email !== "") {
+            if (req.body.docProfile.email !== "") {
               let mailOptions = {
                 from: "contact@aimedis.com",
-                to: data.docProfile.email,
+                to: req.body.docProfile.email,
                 subject: "Appointment System",
                 html: html,
               };
@@ -287,9 +278,6 @@ router.post("/MailtoDrandPatient", function (req, res) {
           message: "Mail sent Successfully",
           hassuccessed: true,
         });
-      }
-
-    })
   } else {
     res.json({
       status: 200,
@@ -299,7 +287,7 @@ router.post("/MailtoDrandPatient", function (req, res) {
   }
 })
 
-router.post("/DownloadbillVC", async (req, res) => {
+router.post("/DownloadbillVC", function(req, res){
 
   try {
     handlebars.registerHelper("ifCond", function (v1, v2, options) {
@@ -478,5 +466,211 @@ router.get("/withdrawal", function (req, res) {
   )
 })
 
+router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    try {
+      var sick_meetings = new sick_meeting(req.body);
+      sick_meetings.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+          var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+          // var start_date = new Date(req.body.start_time);
+          // var end_date = new Date(req.body.end_time);
+          // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
+          // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
 
+          var start_time = req.params.start_time;
+          var end_time = req.params.end_time;
+          var sendData = `Dear Patient,
+
+    Your payment process for  Video Conference application is completed successfully.
+    Please do join the Video call at ${meetingDate} from the time slot  ${start_time
+            } to ${end_time} 
+    Your Video call joining link is  ${req.body.access_key ? req.body.access_key : "Not mentioned"
+            }
+    Please remind the date and timing as alloted.`;
+
+          var sendData1 = `Dear Doctor,
+
+    The payment process for   Video Conference application is completed successfully.
+    Please do join the Video call at  ${meetingDate} from the time slot ${start_time
+            } to ${end_time}
+    Your Video call joining link is  ${req.body.access_key ? req.body.access_key : "Not mentioned"
+            }
+    Please remind the date and timing as alloted.</div>`;
+
+          if (req.body.patient_mail !== "") {
+            generateTemplate(
+              EMAIL.generalEmail.createTemplate("en", {
+                title: "",
+                content: sendData,
+              }),
+              (error, html) => {
+                if (!error) {
+                  let mailOptions = {
+                    from: "contact@aimedis.com",
+                    to: req.body.patient_mail,
+                    subject: "Link for the Video Conferencce",
+                    html: html,
+                  };
+
+                  let sendmail = transporter.sendMail(mailOptions);
+                  if (sendmail) {
+                  }
+                }
+              }
+            );
+            User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
+              if (err && !userdata) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
+              } else {
+                generateTemplate(
+                  EMAIL.generalEmail.createTemplate("en", {
+                    title: "",
+                    content: sendData1,
+                  }),
+                  (error, html) => {
+                    if (!error) {
+                      let mailOptions1 = {
+                        from: "contact@aimedis.com",
+                        to: userdata.email,
+                        subject: "Link for the Video Conference",
+                        html: html,
+                      };
+                      let sendmail1 = transporter.sendMail(mailOptions1);
+                      if (sendmail1) {
+                      }
+                    }
+                  }
+                );
+              }
+            });
+            res.json({
+              status: 200,
+              message: "Mail sent Successfully",
+              hassuccessed: true,
+            });
+          }
+        }
+      });
+    } catch (err) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong",
+        error: err,
+      });
+    }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
+router.post("/transfer", function(req, res){
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  // var amount = ''
+  if (legit) {
+
+    virtual_invoice.findOne({ _id: req.body._id }, function (err, data) {
+      if (err) {
+        console.log("err",err)
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+          error: err,
+        });
+      } else {
+        console.log('data',data)
+        console.log('data',data.total_amount)
+
+       if(data.total_amount>req.body.amount){
+      
+        virtual_invoice.updateOne({ _id: req.body._id },
+         { $inc: {total_amount: Number(-req.body.amount) }}, function (err, updt) {
+            if (err) {
+              console.log("err", err)
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message:"Update the balance"
+              });
+            }
+          })
+       }else{
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          message:"Low Balance"
+        });
+       }
+       
+      }
+
+    })
+
+
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
+router.post("/PaymentWithWallet", function(req, res){
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  // var amount = ''
+  if (legit) {
+
+    virtual_invoice.findOne({ _id: req.body._id }, function (err, data) {
+      if (err) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong",
+          error: err,
+        });
+      } else {
+       if(data.total_amount < req.body.amount){
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Low Balance switch to Card payment",
+        })
+       }else{
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Transaction Successfully",
+        })
+        }
+      }
+    })
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 module.exports = router;                                                                            
