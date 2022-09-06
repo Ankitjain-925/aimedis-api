@@ -6234,6 +6234,7 @@ router.get("/timeSuggest", function (req, res, next) {
           var user = [];
           var online_users = [];
           var Practices = [];
+          var Home =[];
           var monday = [],
             tuesday = [],
             wednesday = [],
@@ -6624,12 +6625,144 @@ router.get("/timeSuggest", function (req, res, next) {
               });
             }
           }
+
+          (monday = []),
+          (tuesday = []),
+          (wednesday = []),
+          (thursday = []),
+          (friday = []),
+          (saturday = []),
+          (sunday = []),
+          (custom_text = ""),
+          (breakslot_start = ""),
+          (breakslot_end = ""),
+          (holidays_start = ""),
+          (appointment_days = ""),
+          (holidays_end = "");
+          if (
+            Userinfo.we_offer &&
+            Userinfo.we_offer.offer_home_visit
+          ) {
+            console.log("1", Userinfo.homevisit_appointment.length)
+            for (let l = 0; l < Userinfo.homevisit_appointment.length; l++) {
+              if (Userinfo.homevisit_appointment[l].appointment_days) {
+                appointment_days =
+                  Userinfo.homevisit_appointment[l].appointment_days;
+              }
+              if (Userinfo.homevisit_appointment[l].holidays_start) {
+                holidays_start = Userinfo.homevisit_appointment[l].holidays_start;
+              }
+              if (Userinfo.homevisit_appointment[l].holidays_end) {
+                holidays_end = Userinfo.homevisit_appointment[l].holidays_end;
+              }
+              if (Userinfo.homevisit_appointment[l].breakslot_start) {
+                breakslot_start =
+                  Userinfo.homevisit_appointment[l].breakslot_start;
+              }
+              if (Userinfo.homevisit_appointment[l].breakslot_end) {
+                breakslot_end = Userinfo.homevisit_appointment[l].breakslot_end;
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].monday_start,
+                  Userinfo.homevisit_appointment[l].monday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                monday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].monday_start,
+                  Userinfo.homevisit_appointment[l].monday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].tuesday_start,
+                  Userinfo.homevisit_appointment[l].tuesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                tuesday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].tuesday_start,
+                  Userinfo.homevisit_appointment[l].tuesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].wednesday_start,
+                  Userinfo.homevisit_appointment[l].wednesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                wednesday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].wednesday_start,
+                  Userinfo.homevisit_appointment[l].wednesday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].thursday_start,
+                  Userinfo.homevisit_appointment[l].thursday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                thursday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].thursday_start,
+                  Userinfo.homevisit_appointment[l].thursday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].friday_start,
+                  Userinfo.homevisit_appointment[l].friday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                friday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].friday_start,
+                  Userinfo.homevisit_appointment[l].friday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].saturday_start,
+                  Userinfo.homevisit_appointment[l].saturday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                saturday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].saturday_start,
+                  Userinfo.homevisit_appointment[l].saturday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              if (
+                (Userinfo.homevisit_appointment[l].sunday_start,
+                  Userinfo.homevisit_appointment[l].sunday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots)
+              ) {
+                sunday = getTimeStops(
+                  Userinfo.homevisit_appointment[l].sunday_start,
+                  Userinfo.homevisit_appointment[l].sunday_end,
+                  Userinfo.homevisit_appointment[l].duration_of_timeslots
+                );
+              }
+              Home.push({
+                monday,
+                tuesday,
+                wednesday,
+                thursday,
+                friday,
+                saturday,
+                sunday,
+                breakslot_start,
+                breakslot_end,
+                holidays_start,
+                holidays_end,
+                appointment_days,
+              });
+              console.log("home",Home)
+            }
+          }
           if (Userinfo && getAvailable && getAvailable.length > 0) {
             var finalArray = {
               data: Userinfo,
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
+              homevisit_appointment:Home
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           } else {
@@ -6646,6 +6779,7 @@ router.get("/timeSuggest", function (req, res, next) {
               appointments: [{ custom_text: custom_text }],
               online_appointment: [],
               practice_days: [],
+              homevisit_appointment:[]
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           }
@@ -7997,15 +8131,16 @@ router.post("/AskPatient1/:id", function (req, res, next) {
     });
   }
 });
-router.get("/AskPatientProfile/:id", function (req, res, next) {
+
+router.post("/AskPatientProfile", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    const profile_id = req.params.id;
-    const alies_id = req.params.id;
+    const profile_id = req.body.id;
+    const alies_id = req.body.id;
     const messageToSearchWith = new User({ profile_id });
     const messageToSearchWith1 = new User({ alies_id });
-    const email = req.params.id;
+    const email = req.body.id;
     const messageToSearchWith2 = new User({ email });
     messageToSearchWith2.encryptFieldsSync();
     messageToSearchWith.encryptFieldsSync();
@@ -8013,12 +8148,12 @@ router.get("/AskPatientProfile/:id", function (req, res, next) {
     User.findOne({
       type: "patient",
       $or: [
-        { email: req.params.id },
+        { email: req.body.id },
         { email: messageToSearchWith2.email },
         { alies_id: messageToSearchWith1.alies_id },
         { profile_id: messageToSearchWith.profile_id },
-        { profile_id: req.params.id },
-        { alies_id: req.params.id },
+        { profile_id: req.body.id },
+        { alies_id: req.body.id },
       ],
     })
       .exec()
@@ -8810,10 +8945,50 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
       oldSchedule = req.body.oldSchedule,
       doctorProfile = req.body.docProfile,
       timeslot = req.body.timeslot;
-    return Appointment.update({ _id: apppinment_id }, { status: "cancel" })
+    return Appointment.updateOne({ _id: apppinment_id }, { status: "cancel" })
       .exec()
       .then((chnageData) => {
         var lan1 = getMsgLang(req.body.patient_id);
+        if(legit.type=="nurse"){
+          lan1.then((result) => {
+            var sendData = `<div>The appoinment with ${doctorProfile.first_name + " " + doctorProfile.last_name
+              } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
+  
+            generateTemplate(
+              EMAIL.generalEmail.createTemplate(result, {
+                title: "",
+                content: sendData,
+              }),
+              (error, html) => {
+                if (!error) {
+                  let mailOptions = {
+                    from: "contact@aimedis.com",
+                    to: email,
+                    subject: "Appoinment Cancel And New Time Suggestion",
+                    html: html,
+                  };
+                  let sendmail = transporter.sendMail(mailOptions);
+                  if (sendmail) {
+                    console.log("Mail is sent ");
+                  }
+                }
+              }
+            );
+  
+            // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+  
+            // trans(sendData, { source: "en", target: result }).then((res) => {
+            //     var mailOptions = {
+            //         from: "contact@aimedis.com",
+            //         to : email,
+            //         subject: 'Appoinment Cancel And New Time Suggestion',
+            //         html: res.replace(/ @ /g, '@')
+            //     };
+            //     var sendmail = transporter.sendMail(mailOptions)
+            //   });
+          });
+        }
+        else{
         lan1.then((result) => {
           var sendData = `<div>The appoinment with Dr. ${doctorProfile.first_name + " " + doctorProfile.last_name
             } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
@@ -8851,7 +9026,7 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
           //     var sendmail = transporter.sendMail(mailOptions)
           //   });
         });
-
+      }
         // let mailOptions = {
         //     from:'contact@aimedis.com',
         //     to : email,
@@ -8979,21 +9154,169 @@ router.delete("/marketing_user/:email", function (req, res) {
 router.post("/marketing_user", function (req, res, next) {
   var email = req.body.email.toLowerCase();
   req.body.email = email;
-  datas = { ...req.body };
-  var marketing_users = new marketing_user(datas);
 
-  marketing_users.save(function (err, user_data) {
-    if (err && !user_data) {
-      res.json({ status: 200, message: "Something went wrong.", error: err });
-    } else {
-      res.json({
-        status: 200,
-        message: "User is added Successfully",
-        hassuccessed: true,
-        data: user_data,
-      });
-    }
-  });
+  datas = { ...req.body };
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
+  })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else{
+        var marketing_users = new marketing_user(datas);
+        marketing_users.save(function (err, user_data1) {
+          if (err && !user_data1) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "User is added Successfully",
+              hassuccessed: true,
+              data: user_data1,
+            });
+          }
+        });
+      }
+    })
+
 });
+
+router.post("/marketing_user2", function (req, res, next) {
+  let email =  base64.decode(req.body.email);
+  if(req.body.first_name && req.body.last_name){
+      var first_name =  base64.decode(req.body.first_name);
+      var last_name =  base64.decode(req.body.last_name);
+  }
+  
+  email = email.toLowerCase();
+  req.body.email = email;
+  req.body.first_name = first_name;
+  req.body.last_name = last_name;
+  console.log('req.body', req.body)
+  datas = { ...req.body };
+  // var email = req.params.email && req.params.email.toLowerCase();
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
+  })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else{
+        var marketing_users = new marketing_user(datas);
+        marketing_users.save(function (err, user_data1) {
+          if (err && !user_data1) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "User is added Successfully",
+              hassuccessed: true,
+              data: user_data1,
+            });
+          }
+        });
+      }
+    })
+
+});
+
+router.post("/MarketingSub",function(req,res){
+var email = req.body.email.toLowerCase();
+req.body.email = email;
+
+const messageToSearchWith = new marketing_user({ email: req.body.email });
+messageToSearchWith.encryptFieldsSync();
+marketing_user.findOne({
+  $or: [
+  { email: { $regex: req.body.email, $options: "i" } },
+  { email: { $regex: messageToSearchWith.email, $options: "i" } },
+  ],
+})
+  .exec()
+  .then((user_data) => {
+  if (user_data) {
+      res.json({
+      status: 200,
+      message: "Already added",
+      hassuccessed: false
+      });
+  }
+  else{
+  let emails =  base64.encode(req.body.email);
+
+  let url = ``;
+
+  if(req.body.first_name && req.body.last_name){
+  let first_name = base64.encode(req.body.first_name) ;
+  let last_name= base64.encode(req.body.last_name);
+     url= `first_name=${first_name}&last_name=${last_name}&email=${emails}`
+  }
+  else{
+    url= `email=${emails}`
+  }
+  console.log('email', email)
+  sendData = `Dear User,<br/>
+  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
+  generateTemplate(
+      EMAIL.generalEmail.createTemplate("en", {
+      title: "",
+      content: sendData,
+      }),
+      (error, html) => {
+      if (email !== "") {
+          let mailOptions = {
+          from: "contact@aimedis.com",
+          to: email,
+          subject: "Aimedis Newletter Subscription",
+          html: html,
+          };
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
+          res.json({
+              status: 200,
+              msg: "Mail is sent",
+              hassuccessed: true,
+          });
+          } else {
+          res.json({
+              status: 200,
+              msg: "Mail is not sent",
+              hassuccessed: false,
+          });
+          }
+      } else {
+          res.json({
+          status: 200,
+          msg: "Mail is not sent",
+          hassuccessed: false,
+          });
+      }
+      }
+  );
+  }
+  })
+})
 
 module.exports = router;

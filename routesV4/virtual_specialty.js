@@ -1230,16 +1230,16 @@ router.post("/checkPatient", function (req, res, next) {
       const profile_id = req.body.patient_id;
       const messageToSearchWith = new User({ profile_id });
       messageToSearchWith.encryptFieldsSync();
-      const alies_id = req.body.patient_id;
-      const messageToSearchWith1 = new User({ alies_id });
+      const prepaid_talktime = req.body.patient_id;
+      const messageToSearchWith1 = new User({ prepaid_talktime });
       messageToSearchWith1.encryptFieldsSync();
       User.findOne(
         {
           $or: [
             { profile_id: messageToSearchWith.profile_id },
-            { alies_id: messageToSearchWith1.alies_id },
+            { prepaid_talktime: messageToSearchWith1.prepaid_talktime },
             { profile_id: req.body.patient_id },
-            { alies_id: req.body.patient_id },
+            { prepaid_talktime: req.body.patient_id },
           ],
         },
         function (err, userdata) {
@@ -1383,16 +1383,16 @@ router.post("/checkPatient", function (req, res, next) {
 //       const profile_id = req.body.patient_id;
 //       const messageToSearchWith = new User({ profile_id });
 //       messageToSearchWith.encryptFieldsSync();
-//       const alies_id = req.body.patient_id;
-//       const messageToSearchWith1 = new User({ alies_id });
+//       const prepaid_talktime = req.body.patient_id;
+//       const messageToSearchWith1 = new User({ prepaid_talktime });
 //       messageToSearchWith1.encryptFieldsSync();
 //       User.findOne(
 //         {
 //           $or: [
 //             { profile_id: messageToSearchWith.profile_id },
-//             { alies_id: messageToSearchWith1.alies_id },
+//             { prepaid_talktime: messageToSearchWith1.prepaid_talktime },
 //             { profile_id: req.body.patient_id },
-//             { alies_id: req.body.patient_id }
+//             { prepaid_talktime: req.body.patient_id }
 //           ],
 //         },
 //         function (err, userdata) {
@@ -1723,16 +1723,16 @@ router.post("/checkPatient1", function (req, res, next) {
       const profile_id = req.body.patient_id;
       const messageToSearchWith = new User({ profile_id });
       messageToSearchWith.encryptFieldsSync();
-      const alies_id = req.body.patient_id;
-      const messageToSearchWith1 = new User({ alies_id });
+      const prepaid_talktime = req.body.patient_id;
+      const messageToSearchWith1 = new User({ prepaid_talktime });
       messageToSearchWith1.encryptFieldsSync();
       User.findOne(
         {
           $or: [
             { profile_id: messageToSearchWith.profile_id },
-            { alies_id: messageToSearchWith1.alies_id },
+            { prepaid_talktime: messageToSearchWith1.prepaid_talktime },
             { profile_id: req.body.patient_id },
-            { alies_id: req.body.patient_id },
+            { prepaid_talktime: req.body.patient_id },
           ],
         },
         function (err, userdata) {
@@ -5509,7 +5509,7 @@ function virtualTasksforPatient(patient_id) {
     } catch (err) {
       reject(err);
     }
-  });
+  });   
 }
 
 function User_Case(House_id) {

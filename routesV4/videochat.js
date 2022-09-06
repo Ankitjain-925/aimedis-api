@@ -2,6 +2,7 @@ require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 const user = require("../schema/user.js");
+var Video_Conference = require("../schema/pictureevaluation_feedback");
 const vidchat = require("../schema/vid_chat_account.js")
 const Cappointment = require("../schema/conference_appointment.js")
 const Appointment = require("../schema/appointments")
@@ -14,6 +15,7 @@ var fs = require("fs");
 const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
+
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
 var transporter = nodemailer.createTransport({
@@ -66,16 +68,19 @@ function getDate(date, dateFormat) {
   }
 }
 
+
 router.post("/getuserchat", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  console.log(legit)
   if (legit) {
-    let patient_id = req.body._id
-    let email = req.body.email
-    const messageToSearchWith = new user({ patient_id, email });
+
+    const messageToSearchWith = new vidchat({ patient_id: req.body._id });
     messageToSearchWith.encryptFieldsSync();
-    user.find(
-      { $or: [{ _id: req.body._id }, { patient_id: messageToSearchWith._id }, { email: messageToSearchWith.email }] },
+    vidchat.find(
+      {
+        patient_id: { $in: [req.body._id, messageToSearchWith.patient_id] }
+      },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -85,7 +90,14 @@ router.post("/getuserchat", function (req, res, next) {
             error: err,
           });
         } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
+          if (userdata.length > 0) {
+            console.log(userdata.length)
+
+            res.json({ status: 200, hassuccessed: true, data: true, message: "user exists" })
+          } else {
+            res.json({ status: 200, hassuccessed: false, message: "Users Not Exists", data: false })
+          }
+
         }
       }
     );
@@ -99,35 +111,60 @@ router.post("/getuserchat", function (req, res, next) {
 });
 
 
+
 router.post("/AddVideoUserAccount", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  console.log(legit)
   if (legit) {
-    const data = {
-      email: legit.email || req.body.email,
-      patient_id: legit.patient_id || req.body.patient_id,
-      reg_amount: legit.reg_amount || req.body.reg_amount,
-      password: legit.password || req.body.password,
-      username: legit.username || req.body.username,
-      is_payment: legit.is_payment || req.body.is_payment,
-      prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
-      status: legit.stauts || req.body.status,
-    }
-    const Videodata = new vidchat(data)
-    Videodata.save()
-      .then(result => {
-        res.json({
-          status: 200,
-          msg: 'User Register Successfully',
-          data: result,
-          hassuccessed: true
-        })
-      })
-      .catch(err => {
-        res.status(500).json({
-          reeor: err
-        })
-      })
+    var email = req.body.email
+    const VirtualtToSearchWith1 = new vidchat({ email });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    vidchat.find({ $or: [{ email: req.body.email }, { email: VirtualtToSearchWith1.email }] },
+      function (err, data1) {
+
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Information not found",
+            error: err,
+          })
+        } else {
+          if (data1.length > 0) {
+            res.json({ status: 200, hassuccessed: true, data: "User Already Register" })
+          } else {
+            const data = {
+              email: legit.email || req.body.email,
+              patient_id: legit.patient_id || req.body.patient_id,
+              reg_amount: legit.reg_amount || req.body.reg_amount,
+              password: legit.password || req.body.password,
+              username: legit.username || req.body.username,
+              is_payment: legit.is_payment || req.body.is_payment,
+              prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
+              status: legit.stauts || req.body.status,
+              type: "video_conference"
+            }
+            const Videodata = new vidchat(data)
+            Videodata.save()
+              .then(result => {
+                res.json({
+                  status: 200,
+                  msg: 'User Register Successfully',
+                  data: result,
+                  hassuccessed: true
+                })
+              })
+              .catch(err => {
+                console.log(err);
+                res.status(500).json({
+                  reeor: err
+                })
+              })
+          }
+        }
+      }
+    )
   } else {
     res.json({
       status: 200,
@@ -135,12 +172,14 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
       message: "Authentication Required.",
     });
   }
-});
+})
+
 
 
 router.post("/AppointmentBook", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  console.log(legit)
   if (legit) {
     const Videodata = new Cappointment(req.body)
     Videodata.save()
@@ -153,6 +192,7 @@ router.post("/AppointmentBook", function (req, res, next) {
         })
       })
       .catch(err => {
+        console.log(err);
         res.status(500).json({
           reeor: err
         })
@@ -165,9 +205,6 @@ router.post("/AppointmentBook", function (req, res, next) {
     });
   }
 });
-
-
-
 
 router.get("/DoctorList", async (req, res) => {
   const token = req.headers.token;
@@ -567,6 +604,103 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
         hassuccessed: false,
         message: "Something went wrong",
         error: err,
+    })
+  }
+}else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+router.get("/refund", function (req, res) {
+  stripe.balanceTransactions.retrieve(
+    { _id: 'txn_1032HU2eZvKYlo2CEPtcnUvl' }, function (err, data) {
+      if (err) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        if (data.amount < req.body.amount) {
+          res.json({ status: 200, message: "Enter over Amount" });
+        } else {
+          stripe.refunds.create({
+            charge: data.source,
+            amount: req.body.amount
+          }, function (err, data) {
+            if (err) {
+              res.json({
+                status: 200, message: "Something went wrong.", error: err
+              })
+            } else {
+              res.json({ status: 200, message: "Refund Suceessfully" })
+            }
+          })
+        }
+      }
+    }
+  )
+})
+
+router.get("/Get_Doctor/:data", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    user.find({
+      $or: [{ alies_id: { $in: [req.params.data, VirtualtToSearchWith1.alies_id] } },
+      { email: { $in: [req.params.data, VirtualtToSearchWith1.email] } },
+      { profile_id: { $in: [req.params.data, VirtualtToSearchWith1.profile_id] } },
+      { speciality: { $in: [req.params.data, VirtualtToSearchWith1.speciality] } },
+      { first_name: { $in: [req.params.data, VirtualtToSearchWith1.first_name] } },
+      { last_name: { $in: [req.params.data, VirtualtToSearchWith1.last_name] } },
+      ]
+    }, function (err, data1) {
+      if (err) {
+        res.json({ status: 200, hassuccessed: true, error: err });
+      } else {
+        res.json({ status: 200, hassuccessed: true, data: data1 });
+      }
+    }
+    )
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
+
+router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    try {
+      let patient_id = req.params.patient_id
+      const messageToSearchWith = new vidchat({ patient_id });
+      messageToSearchWith.encryptFieldsSync();
+      vidchat.find(
+        { $or: [{ patient_id: req.params.patient_id }, { patient_id: messageToSearchWith.patient_id }] },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Information not found",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
+        }
+      );
+    }
+    catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong."
       });
     }
   } else {
@@ -665,6 +799,46 @@ router.post("/PaymentWithWallet", function(req, res){
         }
       }
     })
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+router.post("/givefeedback", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+      var type = "video-conference",
+        datas = {
+          ...req.body,
+          type,
+        }
+      var bookdata = new Video_Conference(datas)
+      bookdata.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+          res.json({
+            status: 200,
+            message: "Added Successfully",
+            hassuccessed: true,
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something wnet Wrong",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -673,4 +847,81 @@ router.post("/PaymentWithWallet", function(req, res){
     });
   }
 });
+
+router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var type = "video-conference",
+      datas = {
+        type,
+      }
+    Video_Conference
+      .findOne({ doctor_id: req.params.doctor_id, type: "video-conference" })
+      .exec(function (err, data) {
+        if (err && !data) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "data fetch",
+            hassuccessed: true,
+            data: data,
+          });
+        }
+      });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
+router.post("/UsernameLogin", function (req, res, next) {
+  var username = req.body.username;
+  var password = req.body.password;
+  const VirtualtToSearchWith1 = new vidchat({ username, password });
+  VirtualtToSearchWith1.encryptFieldsSync();
+  if (req.body.username == "" || req.body.password == "") {
+    res.json({
+      status: 400,
+      message: "username and password fields should not be empty",
+      hassuccessed: false,
+    });
+  } else {
+    vidchat
+      .findOne({ username: req.body.username })
+      .exec()
+      .then((user_data) => {
+        if (!user_data) {
+          res.json({
+            status: 400,
+            hassuccessed: false,
+            message: "Username not match",
+          });
+        } else {
+          if (user_data.password !== req.body.password) {
+            res.json({
+              status: 400,
+              hassuccessed: false,
+              message: "Password not match",
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: user_data });
+          }
+        }
+      });
+  }
+});
+
+
+
 module.exports = router;                                                                            
