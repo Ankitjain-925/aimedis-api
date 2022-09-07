@@ -3307,25 +3307,27 @@
                 ],
 
                 "properties":{
-                    "fast_service": {
-                        "type": "string",
-                        "uniqueItems": false
+                    "comment": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
                       },
-                    "doctor_explaination":{
-                        "type": "string",
+                    "rating":{
+                        "type": "number",
                         "uniqueItems": false
                     },
-                    "satification":{
-                        "type": "string",
-                        "uniqueItems": false
+                    "patient_id":{
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
                     },
                     "doctor_id":{
-                        "type": "string",
-                        "uniqueItems": false
-                    },
-                    "task_id":{
-                        "type": "string",
-                        "uniqueItems": false
+                        "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
                     },
                     "patient_infos":{
                         "type": "array",
