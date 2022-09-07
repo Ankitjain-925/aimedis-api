@@ -2,7 +2,7 @@ require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 const user = require("../schema/user.js");
-var Video_Conference = require("../schema/pictureevaluation_feedback");
+var Video_Conference = require("../schema/doctor_feedback");
 const vidchat = require("../schema/vid_chat_account.js")
 const Cappointment = require("../schema/conference_appointment.js")
 const Appointment = require("../schema/appointments")
@@ -628,7 +628,7 @@ router.post("/givefeedback", function (req, res) {
       var bookdata = new Video_Conference(datas)
       bookdata.save(function (err, user_data) {
         if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
+          res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err });
         } else {
           res.json({
             status: 200,
@@ -657,12 +657,8 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var type = "video-conference",
-      datas = {
-        type,
-      }
     Video_Conference
-      .findOne({ doctor_id: req.params.doctor_id, type: "video-conference" })
+      .findOne({ doctor_id: req.params.doctor_id})
       .exec(function (err, data) {
         if (err && !data) {
           res.json({
@@ -691,7 +687,7 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
 
 
 router.post("/UsernameLogin", function (req, res, next) {
-  var username = req.body.username;
+  var username = req.body.username.toLowerCase();
   var password = req.body.password;
   const VirtualtToSearchWith1 = new vidchat({ username, password });
   VirtualtToSearchWith1.encryptFieldsSync();
@@ -703,7 +699,7 @@ router.post("/UsernameLogin", function (req, res, next) {
     });
   } else {
     vidchat
-      .findOne({ username: req.body.username })
+      .findOne({ username: { $in: [req.body.username, VirtualtToSearchWith1.username] } })
       .exec()
       .then((user_data) => {
         if (!user_data) {
