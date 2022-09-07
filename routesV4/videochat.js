@@ -658,7 +658,9 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     Video_Conference
-      .findOne({ doctor_id: req.params.doctor_id})
+      .find({ doctor_id: req.params.doctor_id})
+      .limit(10)
+      .sort({ _id: -1 })
       .exec(function (err, data) {
         if (err && !data) {
           res.json({
