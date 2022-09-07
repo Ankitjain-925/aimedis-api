@@ -4,7 +4,6 @@ let router = express.Router();
 const user = require("../schema/user.js");
 var Video_Conference = require("../schema/pictureevaluation_feedback");
 const vidchat = require("../schema/vid_chat_account.js")
-const Cappointment = require("../schema/conference_appointment.js")
 const Appointment = require("../schema/appointments")
 const virtual_Task = require("../schema/virtual_tasks")
 const CareModel = require("../schema/care_questionnaire")
@@ -15,6 +14,7 @@ var fs = require("fs");
 const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
+const { encrypt, decrypt } = require("./Cryptofile.js");
 
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
@@ -143,7 +143,9 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
               is_payment: legit.is_payment || req.body.is_payment,
               prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
               status: legit.stauts || req.body.status,
-              type: "video_conference"
+              type: "video_conference",
+              payment: encrypt(JSON.stringify(req.body.payment))
+             
             }
             const Videodata = new vidchat(data)
             Videodata.save()
@@ -921,6 +923,7 @@ router.post("/UsernameLogin", function (req, res, next) {
       });
   }
 });
+
 
 
 
