@@ -246,14 +246,14 @@ router.get(
 
 
                         for (i = 0; i < userdata3.length; i++) {
-                          if (userdata3[i].task_type == "sick_leave") {
-                            let today = new Date().setHours(0, 0, 0, 0);
-                            let data_d = new Date(userdata3[i].date).setHours(0, 0, 0, 0);
-                            if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-                              // userdata3.sort(mySorter);
-                              arr3.push(userdata3[i])
-                            }
-                          }
+                          // if (userdata3[i].task_type == "sick_leave") {
+                          //   let today = new Date().setHours(0, 0, 0, 0);
+                          //   let data_d = new Date(userdata3[i].date).setHours(0, 0, 0, 0);
+                          //   if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+                          //     // userdata3.sort(mySorter);
+                          //     arr3.push(userdata3[i])
+                          //   }
+                          // }
                           let today = new Date().setHours(0, 0, 0, 0);
                           let data_d = new Date(userdata3[i].due_on.date).setHours(0, 0, 0, 0);
                           if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {

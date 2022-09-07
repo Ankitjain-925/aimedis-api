@@ -3954,7 +3954,7 @@
             
                     "parameters": [
                         {
-                            "name": "patient_id",
+                            "name": "_id",
                             "in": "path",
                             "required": true,
                             "description": "ID",
