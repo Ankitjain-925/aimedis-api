@@ -134,35 +134,48 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
           if (data1.length > 0) {
             res.json({ status: 200, hassuccessed: true, data: "User Already Register" })
           } else {
-            const data = {
-              email: legit.email || req.body.email,
-              patient_id: legit.patient_id || req.body.patient_id,
-              reg_amount: legit.reg_amount || req.body.reg_amount,
-              password: legit.password || req.body.password,
-              username: legit.username || req.body.username,
-              is_payment: legit.is_payment || req.body.is_payment,
-              prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
-              status: legit.stauts || req.body.status,
-              type: "video_conference",
-              payment: encrypt(JSON.stringify(req.body.payment))
-             
+            if(req.body.payment_data){
+              const data = {
+                email: legit.email || req.body.email,
+                patient_id: legit.patient_id || req.body.patient_id,
+                reg_amount: legit.reg_amount || req.body.reg_amount,
+                password: legit.password || req.body.password,
+                username: legit.username || req.body.username,
+                is_payment: legit.is_payment || req.body.is_payment,
+                prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
+                status: legit.stauts || req.body.status,
+                type: "video_conference",
+                payment_data: encrypt(JSON.stringify(req.body.payment_data))
+               
+              }
+              const Videodata = new vidchat(data)
+              Videodata.save()
+                .then(result => {
+                  res.json({
+                    status: 200,
+                    msg: 'User Register Successfully',
+                    data: result,
+                    hassuccessed: true
+                  })
+                })
+                .catch(err => {
+                  console.log(err);
+                  res.json({
+                    status: 200,
+                    msg: 'someting went wrong',
+                    data: err,
+                    hassuccessed: true
+                  })
+                })
             }
-            const Videodata = new vidchat(data)
-            Videodata.save()
-              .then(result => {
-                res.json({
-                  status: 200,
-                  msg: 'User Register Successfully',
-                  data: result,
-                  hassuccessed: true
-                })
+            else{
+              res.json({
+                status: 200,
+                msg: 'payment is pending so can not add',
+                data: 'payment is pending so can not add',
+                hassuccessed: true
               })
-              .catch(err => {
-                console.log(err);
-                res.status(500).json({
-                  reeor: err
-                })
-              })
+            }
           }
         }
       }

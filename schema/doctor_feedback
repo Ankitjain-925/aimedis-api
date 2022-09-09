@@ -45,18 +45,18 @@ patient_infos.plugin(mongooseFieldEncryption, {
 });
 
 var doctor_feedback = new Schema({
-    doctor_explaination: {
-        type: String,
-        required: false,
-        default: ''
-    },
     Comment: {
-        type: Array,
+        type: String,
         required: false,
         unique: false,
     },
+    patient_id: {
+        type: String,
+        required: false,
+        unique: false
+    },
     doctor_id: {
-        type: Array,
+        type: String,
         required: false,
         unique: false
     },
@@ -65,7 +65,8 @@ var doctor_feedback = new Schema({
         required: false,
         unique: false
     },
-    patient_infos: [patient_infos]
+    patient_info: patient_infos,
+    doctor_info: patient_infos
 
 }, { strict: false })
 

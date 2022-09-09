@@ -52,6 +52,11 @@ const mongooseFieldEncryption =
         required: false,
         unique: false,
       },
+      payment_data: {
+         type: String,
+        required: false,
+        unique: false,
+      }
  
 },{ strict: false });
 
