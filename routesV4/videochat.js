@@ -9,13 +9,14 @@ const virtual_Task = require("../schema/virtual_tasks")
 const CareModel = require("../schema/care_questionnaire")
 const virtual_invoice = require("../schema/virtual_invoice")
 var sick_meeting = require("../schema/sick_meeting");
+var User = require("../schema/user")
 var handlebars = require("handlebars");
 var fs = require("fs");
 const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
 const { encrypt, decrypt } = require("./Cryptofile.js");
-
+const moment = require("moment");
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
 var transporter = nodemailer.createTransport({
@@ -145,7 +146,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
               status: legit.stauts || req.body.status,
               type: "video_conference",
               payment: encrypt(JSON.stringify(req.body.payment))
-             
+
             }
             const Videodata = new vidchat(data)
             Videodata.save()
@@ -240,83 +241,83 @@ router.post("/MailtoDrandPatient", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-        sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
+    sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
         You have an appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
         If you cannot take the appointment, please cancel it at least 24 hours before.
         If you have any questions, contact your doctor via .
         Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
-        sendData2 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
+    sendData2 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
         You have got an appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
        Please accept the appointment inside your Aimdis Profile. If you have  any questions,please contact the patient via ${req.body.patient_info.email} or Alternatively you can contact us via contact@aimedis.com. or the Aimedis support chat if you have difficulties contacting the patient.`;
-        generateTemplate(
-          EMAIL.generalEmail.createTemplate("en", {
-            title: "",
-            content: sendData,
-          }),
-          (error, html) => {
-            if (req.body.patient_info.email !== "") {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.patient_info.email,
-                subject: "Approve sick leave request by Doctor",
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
+    generateTemplate(
+      EMAIL.generalEmail.createTemplate("en", {
+        title: "",
+        content: sendData,
+      }),
+      (error, html) => {
+        if (req.body.patient_info.email !== "") {
+          let mailOptions = {
+            from: "contact@aimedis.com",
+            to: req.body.patient_info.email,
+            subject: "Approve sick leave request by Doctor",
+            html: html,
+          };
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
 
-              } else {
-                res.json({
-                  status: 200,
-                  msg: "Mail is not sent",
-                  hassuccessed: false,
-                });
-              }
-            } else {
-              res.json({
-                status: 200,
-                msg: "Mail is not sent",
-                hassuccessed: false,
-              });
-            }
+          } else {
+            res.json({
+              status: 200,
+              msg: "Mail is not sent",
+              hassuccessed: false,
+            });
           }
-        );
-        generateTemplate(
-          EMAIL.generalEmail.createTemplate("en", {
-            title: "",
-            content: sendData2,
-          }),
-          (error, html) => {
-            if (req.body.docProfile.email !== "") {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: "Appointment System",
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
+        } else {
+          res.json({
+            status: 200,
+            msg: "Mail is not sent",
+            hassuccessed: false,
+          });
+        }
+      }
+    );
+    generateTemplate(
+      EMAIL.generalEmail.createTemplate("en", {
+        title: "",
+        content: sendData2,
+      }),
+      (error, html) => {
+        if (req.body.docProfile.email !== "") {
+          let mailOptions = {
+            from: "contact@aimedis.com",
+            to: req.body.docProfile.email,
+            subject: "Appointment System",
+            html: html,
+          };
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
 
-              } else {
-                res.json({
-                  status: 200,
-                  msg: "Mail is not sent",
-                  hassuccessed: false,
-                });
-              }
-            } else {
-              res.json({
-                status: 200,
-                msg: "Mail is not sent",
-                hassuccessed: false,
-              });
-            }
+          } else {
+            res.json({
+              status: 200,
+              msg: "Mail is not sent",
+              hassuccessed: false,
+            });
           }
-        );
-        res.json({
-          status: 200,
-          message: "Mail sent Successfully",
-          hassuccessed: true,
-        });
+        } else {
+          res.json({
+            status: 200,
+            msg: "Mail is not sent",
+            hassuccessed: false,
+          });
+        }
+      }
+    );
+    res.json({
+      status: 200,
+      message: "Mail sent Successfully",
+      hassuccessed: true,
+    });
   } else {
     res.json({
       status: 200,
@@ -326,7 +327,7 @@ router.post("/MailtoDrandPatient", function (req, res) {
   }
 })
 
-router.post("/DownloadbillVC", function(req, res){
+router.post("/DownloadbillVC", function (req, res) {
 
   try {
     handlebars.registerHelper("ifCond", function (v1, v2, options) {
@@ -606,9 +607,9 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
         hassuccessed: false,
         message: "Something went wrong",
         error: err,
-    })
-  }
-}else {
+      })
+    }
+  } else {
     res.json({
       status: 200,
       hassuccessed: false,
@@ -715,7 +716,7 @@ router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
 });
 
 
-router.post("/transfer", function(req, res){
+router.post("/transfer", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   // var amount = ''
@@ -723,7 +724,7 @@ router.post("/transfer", function(req, res){
 
     virtual_invoice.findOne({ _id: req.body._id }, function (err, data) {
       if (err) {
-        console.log("err",err)
+        console.log("err", err)
         res.json({
           status: 200,
           hassuccessed: false,
@@ -731,31 +732,31 @@ router.post("/transfer", function(req, res){
           error: err,
         });
       } else {
-        console.log('data',data)
-        console.log('data',data.total_amount)
+        console.log('data', data)
+        console.log('data', data.total_amount)
 
-       if(data.total_amount>req.body.amount){
-      
-        virtual_invoice.updateOne({ _id: req.body._id },
-         { $inc: {total_amount: Number(-req.body.amount) }}, function (err, updt) {
-            if (err) {
-              console.log("err", err)
-            } else {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message:"Update the balance"
-              });
-            }
-          })
-       }else{
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message:"Low Balance"
-        });
-       }
-       
+        if (data.total_amount > req.body.amount) {
+
+          virtual_invoice.updateOne({ _id: req.body._id },
+            { $inc: { total_amount: Number(-req.body.amount) } }, function (err, updt) {
+              if (err) {
+                console.log("err", err)
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "Update the balance"
+                });
+              }
+            })
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Low Balance"
+          });
+        }
+
       }
 
     })
@@ -771,7 +772,7 @@ router.post("/transfer", function(req, res){
 });
 
 
-router.post("/PaymentWithWallet", function(req, res){
+router.post("/PaymentWithWallet", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   // var amount = ''
@@ -786,18 +787,18 @@ router.post("/PaymentWithWallet", function(req, res){
           error: err,
         });
       } else {
-       if(data.total_amount < req.body.amount){
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Low Balance switch to Card payment",
-        })
-       }else{
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Transaction Successfully",
-        })
+        if (data.total_amount < req.body.amount) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Low Balance switch to Card payment",
+          })
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Transaction Successfully",
+          })
         }
       }
     })
@@ -926,5 +927,177 @@ router.post("/UsernameLogin", function (req, res, next) {
 
 
 
+
+
+router.post("/DynamicSlots", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+
+  if (legit) {
+    User.find({ _id: req.body._id }, function (err, userdata) {
+      if (err) {
+        res.json({
+          status: 200,
+          message: "Something went wrong.",
+          error: err,
+          hassuccessed: false,
+        })
+      } else {
+
+        var finalArray = [];
+        for (let i = 0; i < userdata.length; i++) {
+          let Monday,
+            Tuesday,
+            Wednesday,
+            Thursday,
+            Friday,
+            Saturday,
+            Sunday,
+            custom_text;
+          var user = [];
+          console.log("user", userdata[0].online_appointment)
+          for (
+            let j = 0;
+            j < userdata[i].online_appointment.length;
+            j++
+          ) {
+            if (userdata[i].online_appointment[j].custom_text) {
+              custom_text =
+                userdata[i].online_appointment[j].custom_text;
+            }
+            if (
+              (userdata[i].online_appointment[j].monday_start,
+                userdata[i].online_appointment[j].monday_end
+              )
+            ) {
+              Monday = getTimeStops(
+                userdata[i].online_appointment[j].monday_start,
+                userdata[i].online_appointment[j].monday_end,
+                req.body.duration_of_timeslots
+              );
+            }
+            if (
+              (userdata[i].online_appointment[j].tuesday_start,
+                userdata[i].online_appointment[j].tuesday_end
+              )
+            ) {
+              Tuesday = getTimeStops(
+                userdata[i].online_appointment[j].tuesday_start,
+                userdata[i].online_appointment[j].tuesday_end,
+                req.body.duration_of_timeslots
+              );
+            }
+            if (
+              (userdata[i].online_appointment[j].wednesday_start,
+                userdata[i].online_appointment[j].wednesday_end
+              )
+            ) {
+              Wednesday = getTimeStops(
+                userdata[i].online_appointment[j].wednesday_start,
+                userdata[i].online_appointment[j].wednesday_end,
+              req.body.duration_of_timeslots
+
+              );
+            }
+            if (
+              (userdata[i].online_appointment[j].thursday_start,
+                userdata[i].online_appointment[j].thursday_end
+              )
+            ) {
+              Thursday = getTimeStops(
+                userdata[i].online_appointment[j].thursday_start,
+                userdata[i].online_appointment[j].thursday_end,
+                req.body.duration_of_timeslots
+              );
+            }
+            if (
+              (userdata[i].online_appointment[j].friday_start,
+                userdata[i].online_appointment[j].friday_end
+              )
+            ) {
+              Friday = getTimeStops(
+                userdata[i].online_appointment[j].friday_start,
+                userdata[i].online_appointment[j].friday_end,
+                req.body.duration_of_timeslots
+
+              );
+            }
+            if (
+              (userdata[i].online_appointment[j].saturday_start,
+                userdata[i].online_appointment[j].saturday_end
+              )
+            ) {
+              Saturday = getTimeStops(
+                userdata[i].online_appointment[j].saturday_start,
+                userdata[i].online_appointment[j].saturday_end,
+                req.body.duration_of_timeslots
+
+              );
+            }
+            if (
+              (userdata[i].online_appointment[j].sunday_start,
+                userdata[i].online_appointment[j].sunday_end
+              )
+            ) {
+              Sunday = getTimeStops(
+                userdata[i].online_appointment[j].sunday_start,
+                userdata[i].online_appointment[j].sunday_end,
+                req.body.duration_of_timeslots
+
+              );
+            }
+            user.push({
+              Monday,
+              Tuesday,
+              Wednesday,
+              Thursday,
+              Friday,
+              Saturday,
+              Sunday,
+              custom_text,
+            });
+          }
+        
+          finalArray.push({
+            data: userdata[i],
+            slot: user,
+          });
+
+        }
+
+      }
+      res.json({ status: 200, hassuccessed: true, data: finalArray })
+
+    })
+
+
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+function getTimeStops(start, end, timeslots, breakstart, breakend) {
+  var startTime = moment(start, "HH:mm");
+  var endTime = moment(end, "HH:mm");
+  var timeslot = parseInt(timeslots, 10);
+
+  if (endTime.isBefore(startTime)) {
+    endTime.add(1, "day");
+  }
+  var timeStops = [];
+  console.log("startTime", startTime)
+  console.log("endtime", endTime)
+  while (startTime <= endTime) {
+    timeStops.push(new moment(startTime).format("HH:mm"));
+    startTime.add(timeslot, "minutes");
+  }
+  console.log("timestops", timeStops)
+  return timeStops;
+}
 
 module.exports = router;                                                                            
