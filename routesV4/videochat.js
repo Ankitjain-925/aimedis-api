@@ -2,7 +2,7 @@ require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 const user = require("../schema/user.js");
-var Video_Conference = require("../schema/pictureevaluation_feedback");
+var Video_Conference = require("../schema/doctor_feedback");
 const vidchat = require("../schema/vid_chat_account.js")
 const Appointment = require("../schema/appointments")
 const virtual_Task = require("../schema/virtual_tasks")
@@ -16,7 +16,12 @@ const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
 const { encrypt, decrypt } = require("./Cryptofile.js");
+
 const moment = require("moment");
+const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
+const Video_chat_Account = require("../schema/vid_chat_account.js");
+var base64 = require('base-64');
+
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
 var transporter = nodemailer.createTransport({
@@ -156,14 +161,26 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
                   msg: 'User Register Successfully',
                   data: result,
                   hassuccessed: true
+
                 })
-              })
-              .catch(err => {
-                console.log(err);
-                res.status(500).json({
-                  reeor: err
+                .catch(err => {
+                  console.log(err);
+                  res.json({
+                    status: 200,
+                    msg: 'someting went wrong',
+                    data: err,
+                    hassuccessed: true
+                  })
                 })
+            }
+            else{
+              res.json({
+                status: 200,
+                msg: 'payment is pending so can not add',
+                data: 'payment is pending so can not add',
+                hassuccessed: true
               })
+            }
           }
         }
       }
@@ -209,25 +226,37 @@ router.post("/AppointmentBook", function (req, res, next) {
   }
 });
 
-router.get("/DoctorList", async (req, res) => {
+router.get("/Get_Doctor/:data", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    try {
-      user.find({ type: 'doctor', first_name: { $exists: true } })
-        .then(result => {
-          res.status(200).json({
-            newbook: result
-
-          });
-        })
-    } catch {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong."
-      });
+    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    user.find({
+      type: "doctor",
+      $or: [
+        { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
+        { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
+        { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
+        { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
+        { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
+        ]
+    }, function (err, data1) {
+      console.log(err)
+      if (err) {
+        res.json({ status: 200, hassuccessed: true, error: err });
+      } else {
+        res.json({ status: 200, hassuccessed: true, data: data1 });
+      }
     }
+    )
   } else {
     res.json({
       status: 200,
@@ -447,202 +476,204 @@ router.post("/DownloadbillVC", function (req, res) {
 // });
 
 
-router.post("/SaveQuestion", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-      var type = "video-conference",
-        datas = {
-          ...req.body,
-          type,
-        }
-      var bookdata = new CareModel(datas)
-      bookdata.save(function (err, user_data) {
-        if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
-        } else {
-          res.json({
-            status: 200,
-            message: "Added Successfully",
-            hassuccessed: true,
-          });
-        }
-      });
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something wnet Wrong",
-      });
-    }
+// router.post("/SaveQuestion", function (req, res) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     const token = req.headers.token;
+//     let legit = jwtconfig.verify(token);
+//     if (legit) {
+//       var type = "video-conference",
+//         datas = {
+//           ...req.body,
+//           type,
+//         }
+//       var bookdata = new CareModel(datas)
+//       bookdata.save(function (err, user_data) {
+//         if (err && !user_data) {
+//           res.json({ status: 200, message: "Something went wrong.", error: err });
+//         } else {
+//           res.json({
+//             status: 200,
+//             message: "Added Successfully",
+//             hassuccessed: true,
+//           });
+//         }
+//       });
+//     } else {
+//       res.json({
+//         status: 200,
+//         hassuccessed: false,
+//         message: "Something wnet Wrong",
+//       });
+//     }
 
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
 
 
-router.get("/withdrawal", function (req, res) {
-  stripe.balanceTransactions.retrieve(
-    'txn_1032HU2eZvKYlo2CEPtcnUvl', function (err, data) {
-      if (err) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Paayment Withdrawal",
-          hassuccessed: true,
-        });
-      }
-    }
-  )
-})
+// router.get("/withdrawal", function (req, res) {
+//   stripe.balanceTransactions.retrieve(
+//     'txn_1032HU2eZvKYlo2CEPtcnUvl', function (err, data) {
+//       if (err) {
+//         res.json({ status: 200, message: "Something went wrong.", error: err });
+//       } else {
+//         res.json({
+//           status: 200,
+//           message: "Paayment Withdrawal",
+//           hassuccessed: true,
+//         });
+//       }
+//     }
+//   )
+// })
 
-router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    try {
-      var sick_meetings = new sick_meeting(req.body);
-      sick_meetings.save(function (err, user_data) {
-        if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
-        } else {
-          var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-          // var start_date = new Date(req.body.start_time);
-          // var end_date = new Date(req.body.end_time);
-          // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
-          // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
+// router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     try {
+//       var sick_meetings = new sick_meeting(req.body);
+//       sick_meetings.save(function (err, user_data) {
+//         if (err && !user_data) {
+//           res.json({ status: 200, message: "Something went wrong.", error: err });
+//         } else {
+//           var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
+//           // var start_date = new Date(req.body.start_time);
+//           // var end_date = new Date(req.body.end_time);
+//           // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
+//           // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
 
-          var start_time = req.params.start_time;
-          var end_time = req.params.end_time;
-          var sendData = `Dear Patient,
+//           var start_time = req.params.start_time;
+//           var end_time = req.params.end_time;
+//           var sendData = `Dear Patient,
 
-    Your payment process for  Video Conference application is completed successfully.
-    Please do join the Video call at ${meetingDate} from the time slot  ${start_time
-            } to ${end_time} 
-    Your Video call joining link is  ${req.body.access_key ? req.body.access_key : "Not mentioned"
-            }
-    Please remind the date and timing as alloted.`;
 
-          var sendData1 = `Dear Doctor,
+//     Your payment process for  Video Conference application is completed successfully.
+//     Please do join the Video call at ${meetingDate} from the time slot  ${start_time
+//             } to ${end_time} 
+//     Your Video call joining link is  ${req.body.access_key ? req.body.access_key : "Not mentioned"
+//             }
+//     Please remind the date and timing as alloted.`;
 
-    The payment process for   Video Conference application is completed successfully.
-    Please do join the Video call at  ${meetingDate} from the time slot ${start_time
-            } to ${end_time}
-    Your Video call joining link is  ${req.body.access_key ? req.body.access_key : "Not mentioned"
-            }
-    Please remind the date and timing as alloted.</div>`;
+//           var sendData1 = `Dear Doctor,
 
-          if (req.body.patient_mail !== "") {
-            generateTemplate(
-              EMAIL.generalEmail.createTemplate("en", {
-                title: "",
-                content: sendData,
-              }),
-              (error, html) => {
-                if (!error) {
-                  let mailOptions = {
-                    from: "contact@aimedis.com",
-                    to: req.body.patient_mail,
-                    subject: "Link for the Video Conferencce",
-                    html: html,
-                  };
+//     The payment process for   Video Conference application is completed successfully.
+//     Please do join the Video call at  ${meetingDate} from the time slot ${start_time
+//             } to ${end_time}
+//     Your Video call joining link is  ${req.body.access_key ? req.body.access_key : "Not mentioned"
+//             }
+//     Please remind the date and timing as alloted.</div>`;
 
-                  let sendmail = transporter.sendMail(mailOptions);
-                  if (sendmail) {
-                  }
-                }
-              }
-            );
-            User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
-              if (err && !userdata) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                generateTemplate(
-                  EMAIL.generalEmail.createTemplate("en", {
-                    title: "",
-                    content: sendData1,
-                  }),
-                  (error, html) => {
-                    if (!error) {
-                      let mailOptions1 = {
-                        from: "contact@aimedis.com",
-                        to: userdata.email,
-                        subject: "Link for the Video Conference",
-                        html: html,
-                      };
-                      let sendmail1 = transporter.sendMail(mailOptions1);
-                      if (sendmail1) {
-                      }
-                    }
-                  }
-                );
-              }
-            });
-            res.json({
-              status: 200,
-              message: "Mail sent Successfully",
-              hassuccessed: true,
-            });
-          }
-        }
-      });
-    } catch (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong",
-        error: err,
-      })
-    }
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-router.get("/refund", function (req, res) {
-  stripe.balanceTransactions.retrieve(
-    { _id: 'txn_1032HU2eZvKYlo2CEPtcnUvl' }, function (err, data) {
-      if (err) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        if (data.amount < req.body.amount) {
-          res.json({ status: 200, message: "Enter over Amount" });
-        } else {
-          stripe.refunds.create({
-            charge: data.source,
-            amount: req.body.amount
-          }, function (err, data) {
-            if (err) {
-              res.json({
-                status: 200, message: "Something went wrong.", error: err
-              })
-            } else {
-              res.json({ status: 200, message: "Refund Suceessfully" })
-            }
-          })
-        }
-      }
-    }
-  )
-})
+//           if (req.body.patient_mail !== "") {
+//             generateTemplate(
+//               EMAIL.generalEmail.createTemplate("en", {
+//                 title: "",
+//                 content: sendData,
+//               }),
+//               (error, html) => {
+//                 if (!error) {
+//                   let mailOptions = {
+//                     from: "contact@aimedis.com",
+//                     to: req.body.patient_mail,
+//                     subject: "Link for the Video Conferencce",
+//                     html: html,
+//                   };
+
+//                   let sendmail = transporter.sendMail(mailOptions);
+//                   if (sendmail) {
+//                   }
+//                 }
+//               }
+//             );
+//             User.findOne({ _id: req.body.doctor_id }, function (err, userdata) {
+//               if (err && !userdata) {
+//                 res.json({
+//                   status: 200,
+//                   hassuccessed: false,
+//                   message: "Something went wrong",
+//                   error: err,
+//                 });
+//               } else {
+//                 generateTemplate(
+//                   EMAIL.generalEmail.createTemplate("en", {
+//                     title: "",
+//                     content: sendData1,
+//                   }),
+//                   (error, html) => {
+//                     if (!error) {
+//                       let mailOptions1 = {
+//                         from: "contact@aimedis.com",
+//                         to: userdata.email,
+//                         subject: "Link for the Video Conference",
+//                         html: html,
+//                       };
+//                       let sendmail1 = transporter.sendMail(mailOptions1);
+//                       if (sendmail1) {
+//                       }
+//                     }
+//                   }
+//                 );
+//               }
+//             });
+//             res.json({
+//               status: 200,
+//               message: "Mail sent Successfully",
+//               hassuccessed: true,
+//             });
+//           }
+//         }
+//       });
+//     } catch (err) {
+//       res.json({
+//         status: 200,
+//         hassuccessed: false,
+//         message: "Something went wrong",
+//         error: err,
+//     })
+//   }
+// }else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
+// router.get("/refund", function (req, res) {
+//   stripe.balanceTransactions.retrieve(
+//     { _id: 'txn_1032HU2eZvKYlo2CEPtcnUvl' }, function (err, data) {
+//       if (err) {
+//         res.json({ status: 200, message: "Something went wrong.", error: err });
+//       } else {
+//         if (data.amount < req.body.amount) {
+//           res.json({ status: 200, message: "Enter over Amount" });
+//         } else {
+//           stripe.refunds.create({
+//             charge: data.source,
+//             amount: req.body.amount
+//           }, function (err, data) {
+//             if (err) {
+//               res.json({
+//                 status: 200, message: "Something went wrong.", error: err
+//               })
+//             } else {
+//               res.json({ status: 200, message: "Refund Suceessfully" })
+//             }
+//           })
+//         }
+//       }
+//     }
+//   )
+// })
+
 
 router.get("/Get_Doctor/:data", function (req, res) {
   const token = req.headers.token;
@@ -716,101 +747,103 @@ router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
 });
 
 
-router.post("/transfer", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  // var amount = ''
-  if (legit) {
+// router.post("/transfer", function(req, res){
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   // var amount = ''
+//   if (legit) {
 
-    virtual_invoice.findOne({ _id: req.body._id }, function (err, data) {
-      if (err) {
-        console.log("err", err)
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-          error: err,
-        });
-      } else {
-        console.log('data', data)
-        console.log('data', data.total_amount)
+//     virtual_invoice.findOne({ _id: req.body._id }, function (err, data) {
+//       if (err) {
+//         console.log("err",err)
+//         res.json({
+//           status: 200,
+//           hassuccessed: false,
+//           message: "Something went wrong",
+//           error: err,
+//         });
+//       } else {
+//         console.log('data',data)
+//         console.log('data',data.total_amount)
 
-        if (data.total_amount > req.body.amount) {
+//        if(data.total_amount>req.body.amount){
+      
+//         virtual_invoice.updateOne({ _id: req.body._id },
+//          { $inc: {total_amount: Number(-req.body.amount) }}, function (err, updt) {
+//             if (err) {
+//               console.log("err", err)
+//             } else {
+//               res.json({
+//                 status: 200,
+//                 hassuccessed: true,
+//                 message:"Update the balance"
+//               });
+//             }
+//           })
+//        }else{
+//         res.json({
+//           status: 200,
+//           hassuccessed: true,
+//           message:"Low Balance"
+//         });
+//        }
+       
+//       }
 
-          virtual_invoice.updateOne({ _id: req.body._id },
-            { $inc: { total_amount: Number(-req.body.amount) } }, function (err, updt) {
-              if (err) {
-                console.log("err", err)
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Update the balance"
-                });
-              }
-            })
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Low Balance"
-          });
-        }
-
-      }
-
-    })
-
-
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+//     })
 
 
-router.post("/PaymentWithWallet", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  // var amount = ''
-  if (legit) {
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
-    virtual_invoice.findOne({ _id: req.body._id }, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-          error: err,
-        });
-      } else {
-        if (data.total_amount < req.body.amount) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Low Balance switch to Card payment",
-          })
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Transaction Successfully",
-          })
-        }
-      }
-    })
-  }
-  else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+
+
+// router.post("/PaymentWithWallet", function(req, res){
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   // var amount = ''
+//   if (legit) {
+
+//     virtual_invoice.findOne({ _id: req.body._id }, function (err, data) {
+//       if (err) {
+//         res.json({
+//           status: 200,
+//           hassuccessed: false,
+//           message: "Something went wrong",
+//           error: err,
+//         });
+//       } else {
+//        if(data.total_amount < req.body.amount){
+//         res.json({
+//           status: 200,
+//           hassuccessed: false,
+//           message: "Low Balance switch to Card payment",
+//         })
+//        }else{
+//         res.json({
+//           status: 200,
+//           hassuccessed: false,
+//           message: "Transaction Successfully",
+//         })
+//         }
+//       }
+//     })
+//   }
+//   else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
+
 router.post("/givefeedback", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -826,7 +859,7 @@ router.post("/givefeedback", function (req, res) {
       var bookdata = new Video_Conference(datas)
       bookdata.save(function (err, user_data) {
         if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", error: err });
+          res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err });
         } else {
           res.json({
             status: 200,
@@ -855,12 +888,13 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var type = "video-conference",
-      datas = {
-        type,
-      }
+    var doctor_id = req.body.doctor_id
+    const VirtualtToSearchWith1 = new vidchat({ doctor_id });
+    VirtualtToSearchWith1.encryptFieldsSync();
     Video_Conference
-      .findOne({ doctor_id: req.params.doctor_id, type: "video-conference" })
+      .find({ doctor_id: {$in: [req.body.doctor_id, VirtualtToSearchWith1.doctor_id]}})
+      .limit(10)
+      .sort({ _id: -1 })
       .exec(function (err, data) {
         if (err && !data) {
           res.json({
@@ -887,9 +921,8 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   }
 });
 
-
 router.post("/UsernameLogin", function (req, res, next) {
-  var username = req.body.username;
+  var username = req.body.username.toLowerCase();
   var password = req.body.password;
   const VirtualtToSearchWith1 = new vidchat({ username, password });
   VirtualtToSearchWith1.encryptFieldsSync();
@@ -901,7 +934,7 @@ router.post("/UsernameLogin", function (req, res, next) {
     });
   } else {
     vidchat
-      .findOne({ username: req.body.username })
+      .findOne({ username: { $in: [req.body.username, VirtualtToSearchWith1.username] } })
       .exec()
       .then((user_data) => {
         if (!user_data) {
@@ -925,7 +958,76 @@ router.post("/UsernameLogin", function (req, res, next) {
   }
 });
 
+router.post("/managePrepaid", async (req, res) => {
+  const { manage_for, _id, prepaid_min, paid_amount_data, used_talktime_data } = req.body;
+  if (manage_for == "add") {
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "paid_amount_obj": encrypt(JSON.stringify(paid_amount_data)) } })
+    if (response) {
+      res.json({ status: 200, hassuccessed: true, data: response });
+    } else {
+      res.json({
+        status: 400,
+        hassuccessed: false,
+        message: "Something went wrong",
+      });
+    }
+  } else if (manage_for == 'use') {
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "used_talktime": encrypt(JSON.stringify(used_talktime_data)) } })
+    if (response) {
+      res.json({ status: 200, hassuccessed: true, data: response });
+    } else {
+      res.json({
+        status: 400,
+        hassuccessed: false,
+        message: "Something went wrong",
+      });
+    }
+  }
+})
 
+router.delete('/userdelete/:_id', function (req, res, next) {
+  const token = (req.headers.token);
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    try {
+      const { password } = req.body;
+      vidchat.findById(req.params._id)
+        .exec(function (err, getdtata) {
+          if (getdtata.password !== password && getdtata.password !== "") {
+            res.json({ status: 400, messages: "password not match" })
+          }
+          else {
+            if (getdtata.prepaid_talktime_min > 0) {
+              res.json({ status: 400, messages: "You can't not delete account, because you still havae minutes left ", save: getdtata.prepaid_talktime_min })
+            }
+            else {
+              vidchat.findByIdAndRemove(req.params._id, function (err, data) {
+                if (err) {
+                  res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                } else {
+                  res.json({ status: 200, hassuccessed: true, message: 'Deleted Successfully' });
+                }
+              })
+            }
+          }
+        })
+    }
+    catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong."
+      });
+    }
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
 
 
 

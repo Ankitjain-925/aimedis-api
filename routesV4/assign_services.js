@@ -67,9 +67,6 @@ router.put("/Updateassignservice/:_id", function (req, res, next) {
   }
 });
 
-
-
-
 router.delete("/Deleteassignservice/:_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -102,7 +99,6 @@ router.delete("/Deleteassignservice/:_id", function (req, res, next) {
   }
 });
 
-  
 router.get("/getAssignedServices/:house_id", function (req, res, next) {
       const token = req.headers.token;
       let legit = jwtconfig.verify(token);
@@ -144,8 +140,7 @@ router.get("/getAssignedServices/:house_id", function (req, res, next) {
       }
   });
       
-
-  function mySorter(a, b) {
+function mySorter(a, b) {
     if (a.created_at && b.created_at) {
       var x = a.created_at.toLowerCase();
       var y = b.created_at.toLowerCase();
@@ -153,14 +148,14 @@ router.get("/getAssignedServices/:house_id", function (req, res, next) {
     } else {
       return -1;
     }
+}
+function mySorter1(a, b) {
+  if (a.date && b.date) {
+    return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
+  } else {
+    return -1;
   }
-  function mySorter1(a, b) {
-    if (a.date && b.date) {
-      return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
-    } else {
-      return -1;
-    }
-  }
+}
 
 router.get(
   "/getAllactivities/:user_id",
@@ -246,14 +241,14 @@ router.get(
 
 
                         for (i = 0; i < userdata3.length; i++) {
-                          if (userdata3[i].task_type == "sick_leave") {
-                            let today = new Date().setHours(0, 0, 0, 0);
-                            let data_d = new Date(userdata3[i].date).setHours(0, 0, 0, 0);
-                            if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-                              // userdata3.sort(mySorter);
-                              arr3.push(userdata3[i])
-                            }
-                          }
+                          // if (userdata3[i].task_type == "sick_leave") {
+                          //   let today = new Date().setHours(0, 0, 0, 0);
+                          //   let data_d = new Date(userdata3[i].date).setHours(0, 0, 0, 0);
+                          //   if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+                          //     // userdata3.sort(mySorter);
+                          //     arr3.push(userdata3[i])
+                          //   }
+                          // }
                           let today = new Date().setHours(0, 0, 0, 0);
                           let data_d = new Date(userdata3[i].due_on.date).setHours(0, 0, 0, 0);
                           if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {

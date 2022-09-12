@@ -1,0 +1,82 @@
+require('dotenv').config();
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
+const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
+
+const patient_infos = new mongoose.Schema({
+    patient_id: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    first_name: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    last_name: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    profile_image: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    birthday: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    profile_id: {
+        type: String,
+        required: false,
+        unique: false
+    }
+}, { strict: false });
+
+patient_infos.plugin(mongooseFieldEncryption, {
+    fields: ["patient_id", "profile_id", "first_name", "last_name"],
+    secret: process.env.SOME_32BYTE_BASE64_STRING,
+    saltGenerator: function (secret) {
+        return "1234567890123456"; // should ideally use the secret to return a string of length 16
+    }
+});
+
+var doctor_feedback = new Schema({
+    Comment: {
+        type: String,
+        required: false,
+        unique: false,
+    },
+    patient_id: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    doctor_id: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    rating: {
+        type: Number,
+        required: false,
+        unique: false
+    },
+    patient_info: patient_infos,
+    doctor_info: patient_infos
+
+}, { strict: false })
+
+
+
+doctor_feedback.plugin(mongooseFieldEncryption, {
+    fields: ["patient_id", "doctor_id"], secret: process.env.SOME_32BYTE_BASE64_STRING,
+    saltGenerator: function (secret) {
+        return "1234567890123456"; // should ideally use the secret to return a string of length 16
+    }
+});
+
+module.exports = mongoose.model('doctor_feedback', doctor_feedback);
