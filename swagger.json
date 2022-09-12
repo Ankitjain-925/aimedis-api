@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5001",
+    "host": "virtualhospital.aidoc.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -43,11 +43,46 @@
         {
             "name":"Video_Conference",
             "description": "API for Video_Conference"
+        }, {
+            "name": "TrackRecord",
+            "description": "API for track the record"
+        },
+        {
+            "name": "User",
+            "description": "API for User"
+        },
+        {
+            "name": "Membership",
+            "description": "API for Membership"
+        },
+        {
+            "name": "Metadata",
+            "description": "API for Metadata"
+        },
+        {
+            "name": "Registration",
+            "description": "API for registration"
+        },
+        {
+            "name": "Prescription",
+            "description": "API for Prescription"
+        },
+        {
+            "name": "Appointments",
+            "description": "API for Appointments"
+        },
+        {
+            "name": "EmergencyRecord",
+            "description": "Get Emergency record"
+        },
+        {
+            "name": "DoctorAppointments",
+            "description": "Get Emergency record"
         }
         
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -56,6 +91,998 @@
         "application/json"
     ],
     "paths": {
+      
+        "/hospitaladmin/associatedTo/{user_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "Id of institute",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Hospital_Admin"
+                ],
+                "summary": "update with given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "updated successfully"
+                        
+                    }
+                }
+            }
+            
+        },
+        "/emergency_record/{UserId}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "UserId",
+                    "in": "path",
+                    "description": "Id of user"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "EmergencyRecord"
+                ],
+                "summary": "Get emergency record",
+                "responses": {
+                    "200": {
+                        "description": "Record record is found"
+                    }
+                }
+            }
+        },
+        "/User/AddTrack/{UserId}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "UserId",
+                    "in": "path",
+                    "description": "Id of user"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "TrackRecord"
+                ],
+                "parameters": [
+                    {
+                        "name": "AddTrack",
+                        "in": "body",
+                        "description": "Add track in User Profile",
+                        "schema": {
+                            "$ref": "#/definitions/UserTrack"
+                        }
+                    }
+                ],
+                "summary": "Update in Track record",
+                "responses": {
+                    "200": {
+                        "description": "Track record is added"
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "TrackRecord"
+                ],
+                "summary": "Get Track record",
+                "responses": {
+                    "200": {
+                        "description": "Track record is found"
+                    }
+                }
+            }
+        },
+        "/User/AddTrack/{UserId}/{TrackId}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "UserId",
+                    "in": "path",
+                    "description": "Id of user"
+                },
+                {
+                    "name": "TrackId",
+                    "in": "path",
+                    "description": "Id of user"
+                }
+            ],
+            "delete": {
+                "tags": [
+                    "TrackRecord"
+                ],
+                "summary": "Delete Track record",
+                "responses": {
+                    "200": {
+                        "description": "Track record is deleted"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "TrackRecord"
+                ],
+                "parameters": [
+                    {
+                        "name": "UpdateTrack",
+                        "in": "body",
+                        "description": "Update track in User Profile",
+                        "schema": {
+                            "$ref": "#/definitions/UserTrack"
+                        }
+                    }
+                ],
+                "summary": "Add Track record",
+                "responses": {
+                    "200": {
+                        "description": "Track record is updated"
+                    }
+                }
+            }
+        },
+        "/User/AddTrack/TrackUploadImage": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "UserId",
+                    "in": "path",
+                    "description": "Id of user"
+                },
+                {
+                    "name": "TrackId",
+                    "in": "path",
+                    "description": "Id of user"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "TrackRecord"
+                ],
+                "consumes": "multipart/form-data",
+                "parameters": [
+                    {
+                        "name": "UploadTrackImage",
+                        "in": "formData",
+                        "type": "file",
+                        "description": "Upload image in Track"
+                    }
+                ],
+                "summary": "Add Track record",
+                "responses": {
+                    "200": {
+                        "description": "Track record is added"
+                    }
+                }
+            }
+        },
+        "/cases/Discharge/{patient_id}/{admin_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "patient_id",
+                    "in": "path",
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "admin_id",
+                    "in": "path",
+                    "description": "ID",
+                    "type": "string"
+                }
+                
+             ],
+           "put": {
+                "tags": [
+                    "TrackRecord"
+                ],
+                "parameters": [
+                    {
+                        "name": "Discharge",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/UserTrack"
+                        }
+                    }
+                ],
+                "summary": "update with given Id",
+                "responses": {
+                    "200": {
+                        "description": "successfully discharge"
+                    }
+                }
+            }
+        },
+        "/UserProfile/AddUser/": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "UserSave",
+                        "in": "body",
+                        "description": "Add new User",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary":"Add User",
+                "responses": {
+                    "200": {
+                        "description": "User added succefully",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/UserProfile/uploadImage": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "UserId",
+                    "in": "path",
+                    "description": "Id of user"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "consumes": "multipart/form-data",
+                "parameters": [
+                    {
+                        "name": "uploadImage",
+                        "in": "formData",
+                        "type": "file",
+                        "description": "Upload image"
+                    }
+                ],
+                "summary": "Add user image",
+                "responses": {
+                    "200": {
+                        "description": "user image is added"
+                    }
+                }
+            }
+        },
+        "/UserProfile/UserLogin": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "Login the User",
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                ],
+                "summary": "For Login",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Users/{User_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "User_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of user that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get User with given ID",
+                "responses": {
+                    "200": {
+                        "description": "User found",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete User with given ID",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User is deleted",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get User with given ID",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "Update the User",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User is found",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Membership": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Membership"
+                ],
+                "parameters": [
+                    {
+                        "name": "addMembership",
+                        "in": "body",
+                        "description": "membership",
+                        "schema": {
+                            "$ref": "#/definitions/Membership"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary":"Add Membership",
+                "responses": {
+                    "200": {
+                        "description": "membership added succefully",
+                        "schema": {
+                            "$ref": "#/definitions/Membership"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/UserProfile/SickCertificate": {
+            "post": {
+                "tags": [
+                    "SickCertificate"
+                ],
+                "parameters": [
+                    {
+                        "name": "addMembership",
+                        "in": "body",
+                        "description": "membership",
+                        "schema": {
+                            "$ref": "#/definitions/SickCertificate"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary":"Generate Sick Cretificate",
+                "responses": {
+                    "200": {
+                        "description": "added succefully",
+                        "schema": {
+                            "$ref": "#/definitions/SickCertificate"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/UserProfile/SickCertificate/{sick_certificate_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "sick_certificate_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "SickCertificate"
+                ],
+                "summary": "Get with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Certificate found",
+                        "schema": {
+                            "$ref": "#/definitions/SickCertificate"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "SickCertificate"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Certificate deleted",
+                        "schema": {
+                            "$ref": "#/definitions/SickCertificate"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Metadata": {
+            "get": {
+                "tags": [
+                    "Metadata"
+                ],
+                "summary": "Get Metadata",
+                "responses": {
+                    "200": {
+                        "description": "Metadata found",
+                        "schema": {
+                            "$ref": "#/definitions/Metadata"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Metadata/{Metadata_id}": {
+            "parameters": [
+                {
+                    "name": "Metadata_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Metadata"
+                ],
+                "summary": "Get User with given ID",
+                "parameters": [
+                    {
+                        "name": "Metadata",
+                        "in": "body",
+                        "description": "Update the Metadata",
+                        "schema": {
+                            "$ref": "#/definitions/Metadata"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata",
+                        "schema": {
+                            "$ref": "#/definitions/Metadata"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Membership/{Membership_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "Membership_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of user that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Get User membership with given ID",
+                "responses": {
+                    "200": {
+                        "description": "User membership found",
+                        "schema": {
+                            "$ref": "#/definitions/Membership"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete User membership with given ID",
+                "tags": [
+                    "Membership"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User membership is deleted",
+                        "schema": {
+                            "$ref": "#/definitions/Membership"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Get User membership with given ID",
+                "parameters": [
+                    {
+                        "name": "Membership",
+                        "in": "body",
+                        "description": "Update the User membership",
+                        "schema": {
+                            "$ref": "#/definitions/Membership"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User membership is found",
+                        "schema": {
+                            "$ref": "#/definitions/Membership"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Rigt_management": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Rigt_management"
+                ],
+                "summary": "Update user risk management",
+                "parameters": [
+                    {
+                        "name": "Rigt_management",
+                        "in": "body",
+                        "description": "Update the User Risk management",
+                        "schema": {
+                            "$ref": "#/definitions/Rigt_management"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/Rigt_management"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Registration/": {
+            "post": {
+                "tags": [
+                    "Registration"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration",
+                        "in": "body",
+                        "description": "Add new User",
+                        "schema": {
+                            "$ref": "#/definitions/Registration"
+                        }
+                    }
+                ],
+                "summary":"For Registration",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User added succefully",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/UserProfile/Prescription/": {
+            "post": {
+                "tags": [
+                    "Prescription"
+                ],
+                "parameters": [
+                    {
+                        "name": "Prescription",
+                        "in": "body",
+                        "description": "Add Prescription",
+                        "schema": {
+                            "$ref": "#/definitions/Prescription"
+                        }
+                    }
+                ],
+                "summary":"Add Prescription",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription added succefully",
+                        "schema": {
+                            "$ref": "#/definitions/Prescription"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/UserProfile/GetPrescription/": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "get prescription(doctor)"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Doctor Prescription"
+                ],
+                "summary": "Get with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Prescription found",
+                        "schema": {
+                            "$ref": "#/definitions/GetPrescription"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/GetPrescription/{Prescription_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "get prescription(doctor)"
+                },
+                {
+                    "name": "Prescription_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Doctor Prescription"
+                ],
+                "parameters": [
+                    {
+                        "name": "addstatus",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/GetPrescription"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
+            }
+        },
+        "/UserProfile/GetSickCertificate/": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "get prescription(doctor)"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Doctor Sick Certificate"
+                ],
+                "summary": "Get with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Certificate found",
+                        "schema": {
+                            "$ref": "#/definitions/SickCertificate"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Mypatients/": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "get all my patients"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "My patients"
+                ],
+                "summary": "Get with given ID",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/GetSickCertificate/{sick_certificate_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "get prescription(doctor)"
+                },
+                {
+                    "name": "sick_certificate_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Doctor Sick Certificate"
+                ],
+                "parameters": [
+                    {
+                        "name": "addstatus",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/SickCertificate"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
+            }
+        },
+        "/UserProfile/Prescription/{Prescription_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "Prescription_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Get with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Prescription found",
+                        "schema": {
+                            "$ref": "#/definitions/Prescription"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete with given ID",
+                "tags": [
+                    "Prescription"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription deleted",
+                        "schema": {
+                            "$ref": "#/definitions/SickCertificate"
+                        }
+                    }
+                }
+            }
+        },
+        "/UserProfile/Appointments/{Appointments_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "Appointments_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Appointments"
+                ],
+                "parameters": [
+                    {
+                        "name": "Appointments",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Appointments"
+                        }
+                    }
+                ],
+                "summary": "saved",
+                "responses": {
+                    "200": {
+                        "description": "saved"
+                    }
+                }
+            }
+        },
+        "/UserProfile/Appointments/doctorAppointments": {
+            "post": {
+                "tags": [
+                    "DoctorAppointments"
+                ],
+                "parameters": [
+                    {
+                        "name": "DoctorAppointments",
+                        "in": "body",
+                        "description": "Add Doctor Appointments",
+                        "schema": {
+                            "$ref": "#/definitions/DoctorAppointments"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary":"Add appointment",
+                "responses": {
+                    "200": {
+                        "description": "Doctor Appointments added succefully",
+                        "schema": {
+                            "$ref": "#/definitions/DoctorAppointments"
+                        }
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+
         "/step/GetStep/{house_id}": {
             "parameters": [
                 {
@@ -550,6 +1577,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary": "Add Step at patientflow",
                 "responses": {
                     "200": {
                         "description": "step added succefully",
@@ -627,6 +1655,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add  answer by patient",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -640,10 +1669,6 @@
                 }
             }
         },
-
-        
-
-
         "/vh/AddSpecialty": {
             "parameters": [
                 {
@@ -669,6 +1694,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add Specialty",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -707,6 +1733,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add task",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -750,6 +1777,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add comment",
                 "responses": {
                     "200": {
                         "description": "comment added successfully",
@@ -785,6 +1813,7 @@
                         }
                     }
                 ],
+                "summary":"Add service",
                 "produces": [
                     "application/json"
                 ],
@@ -823,6 +1852,7 @@
                         }
                     }
                 ],
+                "summary":"Add invoice",
                 "produces": [
                     "application/json"
                 ],
@@ -861,6 +1891,7 @@
                         }
                     }
                 ],
+                "summary":"Used for filter the data",
                 "produces": [
                     "application/json"
                 ],
@@ -902,6 +1933,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Filter the data",
                 "responses": {
                     "200": {
                         "description": " information get successfully",
@@ -937,6 +1969,7 @@
                         }
                     }
                 ],
+                "summary":"Add patient to VH",
                 "Produces": [
                     "application/json"
                 ],
@@ -1755,6 +2788,7 @@
                         }
                     }
                 ],
+                "summary":"Add Case",
                 "produces": [
                     "application/json"
                 ],
@@ -1796,6 +2830,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add Bed and check the availability",
                 "responses": {
                     "200": {
                         "description": "added successfully",
@@ -1834,6 +2869,7 @@
                 "produces": [
                     "application/json"
                 ],
+                "summary":"Add ward and check the availability",
                 "responses": {
                     "200": {
                         "description": "added successfully"
@@ -1865,53 +2901,6 @@
                 "responses": {
                     "200": {
                         "description": "information is found"
-                    }
-                }
-            }
-        },
-        "/cases/Discharge/{patient_id}/{admin_id}": {
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                },
-                {
-                    "name": "patient_Id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of patient",
-                    "type": "string"
-                },
-                {
-                    "name": "admin_Id",
-                    "in": "path",
-                    "required": true,
-                    "description": "Id of admin",
-                    "type": "string"
-                }
-            ],
-            "put": {
-                "parameters": [
-                    {
-                        "name": "virtual_cases",
-                        "in": "body",
-                        "description": "Answers",
-                        "schema": {
-                            "$ref": "#/definitions/Ward"
-                        }
-                    }
-                ],
-                "tags": [
-                    "virtual_cases"
-                ],
-                "summary": "update with given ID",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "updated successfully"
                     }
                 }
             }
@@ -2031,6 +3020,7 @@
                 }
             }
         },
+
         "/vh/getAppointTask1/{House_id}": {
             "get": {
                 "parameters": [
@@ -2061,6 +3051,7 @@
                 }
             }
         },
+
         "/vh/sortinfo/{patient_id}": {
             "get": {
                 "parameters": [
@@ -2077,6 +3068,7 @@
                         "description": "JWT token User"
                     }
                 ],
+
                 "tags": [
                     "virtual_cases"
                 ],
@@ -2962,7 +3954,7 @@
             
                     "parameters": [
                         {
-                            "name": "patient_id",
+                            "name": "_id",
                             "in": "path",
                             "required": true,
                             "description": "ID",
@@ -3162,6 +4154,704 @@
         }
     },
     "definitions": {
+        "AddAnswerspatient": {
+            "required": [
+                "question_id",
+                "answers",
+                "house_id",
+                "Patient_id"
+            ],
+            "properties": {
+                "questionaire_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": false
+                },
+                "patient": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_logo": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "User": {
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "parent_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "first_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "last_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "nick_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "title_degreeData": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "sex": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "birthday": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "language": {},
+                "street": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "no": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "zip": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "city": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "area": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "country": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "address": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "speciality": {},
+                "subspeciality": {},
+                "phone": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "mobile": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "fax": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "website": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "password": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "we_offer": {},
+                "image": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "insurance": {},
+                "family_doc": {},
+                "aimedis_doc": {},
+                "marital_status": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "emergency_contact_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "emergency_number": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "emergency_email": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "UserTrack": {
+            "required": [
+                "track_type"
+            ],
+            "properties": {
+                "track_type": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Login": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "password": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Membership": {
+            "required": [
+                "user_type",
+                "user_id",
+                "period"
+            ],
+            "properties": {
+                "period_day": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "is_reccuring": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "status": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Metadata": {
+            "required": [],
+            "properties": {
+                "gender": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "languages": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "speciality": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "title_degreeData": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "subspeciality": {
+                    "type": "object",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Rigt_management": {
+            "required": [],
+            "properties": {
+                "activated_general_right": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "who_else_other_than_me": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "who_else_other_than_me_newEntries": {
+                    "type": "object",
+                    "uniqueItems": false
+                },
+                "emergency_access_to_files": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Registration": {
+            "required": [ ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "password": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "type": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Prescription": {
+            "required": [],
+            "properties": {
+                "patient_id" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "doctor_id" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "first_name" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "last_name" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "birthday" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "status" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "malignant_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "follow_up_prescription" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "musculosceletal_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "substance" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "eye_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "dose" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "infectious_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "trade_name" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "medication" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "atc_code" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "manufacturer" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "pack_size" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "allergies" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "pulmonary_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "renal_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "endrinologic_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "hypertension" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "diabetes" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "thyroid_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "annotations" : {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "SickCertificate": {
+            "required": [],
+            "properties": {
+                "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "doctor_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "doctor_type": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "status": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "country": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "how_are_you": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "fever": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "which_symptomps": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "since_when": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "which_symptomp_first": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "time_unable_work": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "same_problem_before": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "known_diseases": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "medication": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "allergies": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "professions": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "annotations": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Appointments": {
+            "required": [],
+            "properties": {
+                "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "doctor_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "annotations": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "insurance": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "insurance_number": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "pin": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "DoctorAppointments":{
+            "properties":{
+                "monday" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "tuesday" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "wednesday" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "thursday" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "friday" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "saturday" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "sunday" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "timeslots" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "breakslots" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "holidays" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "appointment_days" :{
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "remainder_email_days" :{
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "GetPrescription": {
+            "required": [],
+            "properties": {
+                "patient_id" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "doctor_id" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "first_name" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "last_name" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "birthday" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "status" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "malignant_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "follow_up_prescription" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "musculosceletal_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "substance" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "eye_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "dose" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "infectious_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "trade_name" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "medication" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "atc_code" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "manufacturer" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "pack_size" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "allergies" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "pulmonary_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "renal_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "endrinologic_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "hypertension" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+            
+                "diabetes" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "thyroid_diseases" : {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                
+                "annotations" : {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
         "setcase": {
             "required": [
                 "case_id"

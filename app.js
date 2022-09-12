@@ -580,6 +580,8 @@ app.use("/api/v3/admin", adminse3);
 app.use("/api/v3/aws", Uploadcerts3);
 app.use("/api/v3/blockchain", bloackchain3);
 app.use("/api/v3/cron", cronPrecess3);
+
+
 app.use("/api/v4/",UserData4)
 app.use("/api/v4/User", UserData4);
 app.use("/api/v4/UserProfile", UserProfile4);
@@ -637,10 +639,7 @@ app.use("/api/v5/vactive", vactive5);
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get("/s",(res,req)=>{
-  console.log("nnnnnnnnnnnnn")
 
-})
 
 
 ////////////admin+main/////////////
@@ -690,8 +689,11 @@ app.use(function (err, req, res, next) {
   console.log("err", err);
 });
 
-server.listen(5001, () => {
-  console.log("Server started on port 5001");
-});
 
-// module.exports = app;
+
+// app.listen(5000, () => {
+//   console.log("Server started on port 5001")
+// });
+
+
+module.exports = app;
