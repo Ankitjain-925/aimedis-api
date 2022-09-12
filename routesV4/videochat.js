@@ -15,6 +15,9 @@ const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
 const { encrypt, decrypt } = require("./Cryptofile.js");
+const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
+const Video_chat_Account = require("../schema/vid_chat_account.js");
+var base64 = require('base-64');
 
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
@@ -221,25 +224,37 @@ router.post("/AppointmentBook", function (req, res, next) {
   }
 });
 
-router.get("/DoctorList", async (req, res) => {
+router.get("/Get_Doctor/:data", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    try {
-      user.find({ type: 'doctor', first_name: { $exists: true } })
-        .then(result => {
-          res.status(200).json({
-            newbook: result
-
-          });
-        })
-    } catch {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong."
-      });
+    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    user.find({
+      type: "doctor",
+      $or: [
+        { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
+        { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
+        { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
+        { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
+        { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
+        ]
+    }, function (err, data1) {
+      console.log(err)
+      if (err) {
+        res.json({ status: 200, hassuccessed: true, error: err });
+      } else {
+        res.json({ status: 200, hassuccessed: true, data: data1 });
+      }
     }
+    )
   } else {
     res.json({
       status: 200,
@@ -938,7 +953,76 @@ router.post("/UsernameLogin", function (req, res, next) {
   }
 });
 
+router.post("/managePrepaid", async (req, res) => {
+  const { manage_for, _id, prepaid_min, paid_amount_data, used_talktime_data } = req.body;
+  if (manage_for == "add") {
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "paid_amount_obj": encrypt(JSON.stringify(paid_amount_data)) } })
+    if (response) {
+      res.json({ status: 200, hassuccessed: true, data: response });
+    } else {
+      res.json({
+        status: 400,
+        hassuccessed: false,
+        message: "Something went wrong",
+      });
+    }
+  } else if (manage_for == 'use') {
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "used_talktime": encrypt(JSON.stringify(used_talktime_data)) } })
+    if (response) {
+      res.json({ status: 200, hassuccessed: true, data: response });
+    } else {
+      res.json({
+        status: 400,
+        hassuccessed: false,
+        message: "Something went wrong",
+      });
+    }
+  }
+})
 
+router.delete('/userdelete/:_id', function (req, res, next) {
+  const token = (req.headers.token);
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    try {
+      const { password } = req.body;
+      vidchat.findById(req.params._id)
+        .exec(function (err, getdtata) {
+          if (getdtata.password !== password && getdtata.password !== "") {
+            res.json({ status: 400, messages: "password not match" })
+          }
+          else {
+            if (getdtata.prepaid_talktime_min > 0) {
+              res.json({ status: 400, messages: "You can't not delete account, because you still havae minutes left ", save: getdtata.prepaid_talktime_min })
+            }
+            else {
+              vidchat.findByIdAndRemove(req.params._id, function (err, data) {
+                if (err) {
+                  res.json({ status: 200, hassuccessed: false, message: 'Something went wrong.', error: err });
+                } else {
+                  res.json({ status: 200, hassuccessed: true, message: 'Deleted Successfully' });
+                }
+              })
+            }
+          }
+        })
+    }
+    catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong."
+      });
+    }
+  }
+  else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+})
 
 
 module.exports = router;                                                                            
