@@ -995,7 +995,7 @@ router.post("/DynamicSlots", function (req, res, next) {
               Wednesday = getTimeStops(
                 userdata[i].online_appointment[j].wednesday_start,
                 userdata[i].online_appointment[j].wednesday_end,
-              req.body.duration_of_timeslots
+                req.body.duration_of_timeslots
 
               );
             }
@@ -1057,7 +1057,7 @@ router.post("/DynamicSlots", function (req, res, next) {
               custom_text,
             });
           }
-        
+
           finalArray.push({
             data: userdata[i],
             slot: user,
@@ -1099,5 +1099,66 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
   console.log("timestops", timeStops)
   return timeStops;
 }
+
+router.post("/getSlotTime", function (req, res) {
+  const token = req.headers.token;
+  var finalArray = []
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    const messageToSearchWith = new Appointment({ doctor_id:req.body.doctor_id  });
+    messageToSearchWith.encryptFieldsSync();
+    Appointment.find({ doctor_id:{$in:[ req.body.doctor_id,messageToSearchWith.doctor_id]}, date: req.body.date })
+      .exec(function (err, data) {
+        if (err && !data) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          virtual_Task.find({ "assinged_to.user_id": req.body.doctor_id, date: req.body.date }, function (err, data2) {
+            if (err) {
+              res.json({
+                status: 200,
+                message: "Something went wrong.",
+                error: err,
+                hassuccessed: false,
+              });
+            } else {
+              data.map((element) => {
+                finalArray.push({
+                  starttime : element.start_time,
+                  endtime : element.end_time
+
+                })
+              })
+              data2.forEach((element) => {
+                finalArray.push({
+
+              
+                starttime : element.start,
+                endtime : element.end
+              })
+              })
+              res.json({
+                stayus:200,
+                messaage:"TIme slots",
+                data:finalArray
+              })
+
+            }
+          })
+        }
+      });
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
 
 module.exports = router;                                                                            
