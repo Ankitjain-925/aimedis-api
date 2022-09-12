@@ -140,6 +140,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
           if (data1.length > 0) {
             res.json({ status: 200, hassuccessed: true, data: "User Already Register" })
           } else {
+            if(req.body.payment_data){
             const data = {
               email: legit.email || req.body.email,
               patient_id: legit.patient_id || req.body.patient_id,
@@ -150,7 +151,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
               prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
               status: legit.stauts || req.body.status,
               type: "video_conference",
-              payment: encrypt(JSON.stringify(req.body.payment))
+              payment_data: encrypt(JSON.stringify(req.body.payment_data))
 
             }
             const Videodata = new vidchat(data)
@@ -163,6 +164,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
                   hassuccessed: true
 
                 })
+              })
                 .catch(err => {
                   console.log(err);
                   res.json({
