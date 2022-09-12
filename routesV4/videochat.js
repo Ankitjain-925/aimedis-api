@@ -1135,8 +1135,6 @@ router.post("/getSlotTime", function (req, res) {
               })
               data2.forEach((element) => {
                 finalArray.push({
-
-              
                 starttime : element.start,
                 endtime : element.end
               })
