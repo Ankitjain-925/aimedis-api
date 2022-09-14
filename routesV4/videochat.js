@@ -16,6 +16,9 @@ const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
 const { encrypt, decrypt } = require("./Cryptofile.js");
+const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
+const Video_chat_Account = require("../schema/vid_chat_account.js");
+var base64 = require('base-64');
 
 const moment = require("moment");
 const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
@@ -684,13 +687,21 @@ router.get("/Get_Doctor/:data", function (req, res) {
     const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
     VirtualtToSearchWith1.encryptFieldsSync();
     user.find({
-      $or: [{ alies_id: { $in: [req.params.data, VirtualtToSearchWith1.alies_id] } },
-      { email: { $in: [req.params.data, VirtualtToSearchWith1.email] } },
-      { profile_id: { $in: [req.params.data, VirtualtToSearchWith1.profile_id] } },
-      { speciality: { $in: [req.params.data, VirtualtToSearchWith1.speciality] } },
-      { first_name: { $in: [req.params.data, VirtualtToSearchWith1.first_name] } },
-      { last_name: { $in: [req.params.data, VirtualtToSearchWith1.last_name] } },
-      ]
+      type: "doctor",
+      $or: [
+        { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
+        { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
+        { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
+        { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
+        { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+        { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
+        ]
     }, function (err, data1) {
       if (err) {
         res.json({ status: 200, hassuccessed: true, error: err });
@@ -706,7 +717,7 @@ router.get("/Get_Doctor/:data", function (req, res) {
       message: "Authentication required.",
     });
   }
-})
+});
 
 router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
   const token = req.headers.token;
@@ -890,11 +901,11 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    var doctor_id = req.body.doctor_id
-    const VirtualtToSearchWith1 = new vidchat({ doctor_id });
+    var doctor_id = req.params.doctor_id
+    const VirtualtToSearchWith1 = new Video_Conference({ doctor_id });
     VirtualtToSearchWith1.encryptFieldsSync();
     Video_Conference
-      .find({ doctor_id: {$in: [req.body.doctor_id, VirtualtToSearchWith1.doctor_id]}})
+      .find({ doctor_id: {$in: [req.params.doctor_id, VirtualtToSearchWith1.doctor_id]}})
       .limit(10)
       .sort({ _id: -1 })
       .exec(function (err, data) {
@@ -1030,8 +1041,6 @@ router.delete('/userdelete/:_id', function (req, res, next) {
     });
   }
 })
-
-
 
 router.post("/DynamicSlots", function (req, res, next) {
   const token = req.headers.token;
@@ -1262,5 +1271,45 @@ router.post("/getSlotTime", function (req, res) {
   }
 });
 
+router.get("/GetVideoTask/:patient_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+
+    let patient_id = req.params.patient_id;
+    var VirtualtToSearchWith = new virtual_Task({ patient_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "video-conference" });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    virtual_Task.find(
+      {
+        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+        $or: [
+          { task_type: { $eq: "video-conference" } },
+          { task_type: { $eq: VirtualtToSearchWith1.task_type } },
+        ],
+        archived: { $eq: true },
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 module.exports = router;                                                                            
