@@ -4203,6 +4203,123 @@
                 }
             }
         },
+        "/vchat/userdelete/{_id}": {
+            "delete": {
+                    "parameters": [
+                        {
+                        "name": "Delete Video User",
+                        "in": "body",
+                        "description": "Delete User",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                        },
+                        {
+                            "name": "_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"                          
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Delete User",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete Video User",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                    }
+                }
+            }
+        
+        },
+        "/vchat/getSlotTime": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User",
+                    "schema": {
+                           
+                    }
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "Get TimeSlot",
+                        "in": "body",
+                        "description": "TimeSlot",
+                        "schema": {
+                            "$ref": "#/definitions/Timeslot"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "TimeSlot",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "TimeSlot"
+                    }
+                }
+            }
+        }, "/vchat/DynamicSlots": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User",
+                    "schema": {
+                           
+                    }
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "Get DynamicSlot",
+                        "in": "body",
+                        "description": "DynamicSlot",
+                        "schema": {
+                            "$ref": "#/definitions/Dynamicslot"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "DynamicSlot",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "DynamicSlot"
+                    }
+                }
+            }
+        },
         "/vchat/GetVideoTask/{patient_id}": {
             "get": {
                     "parameters": [
@@ -4277,6 +4394,33 @@
                 }
             }
         },
+        "Timeslot":{
+            "required": [
+                
+            ],
+            "properties": {
+                "doctor_id":{
+                        "type": "string",
+                        "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                  }
+              }
+           
+       },
+       "Dynamicslot":{
+        "required": [
+                
+        ],
+        "properties": {
+            "_id":{
+                "type": "string",
+                "uniqueItems": false
+        }
+        }
+    },
         "User": {
             "required": [
                 "type"

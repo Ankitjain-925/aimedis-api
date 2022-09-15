@@ -21,9 +21,6 @@ const Video_chat_Account = require("../schema/vid_chat_account.js");
 var base64 = require('base-64');
 
 const moment = require("moment");
-const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
-const Video_chat_Account = require("../schema/vid_chat_account.js");
-var base64 = require('base-64');
 
 var html_to_pdf = require("html-pdf-node");
 var nodemailer = require("nodemailer");
@@ -864,7 +861,7 @@ router.post("/givefeedback", function (req, res) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
-      var type = "video-conference",
+      var type = "video_conference",
         datas = {
           ...req.body,
           type,
@@ -1279,13 +1276,13 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
     let patient_id = req.params.patient_id;
     var VirtualtToSearchWith = new virtual_Task({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
-    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "video-conference" });
+    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "video_conference" });
     VirtualtToSearchWith1.encryptFieldsSync();
     virtual_Task.find(
       {
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
         $or: [
-          { task_type: { $eq: "video-conference" } },
+          { task_type: { $eq: "video_conference" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
         archived: { $eq: true },
