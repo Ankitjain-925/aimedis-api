@@ -849,7 +849,7 @@ router.post("/givefeedback", function (req, res) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
-      var type = "video-conference",
+      var type = "video_conference",
         datas = {
           ...req.body,
           type,
