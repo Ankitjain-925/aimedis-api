@@ -1287,7 +1287,10 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
           { task_type: { $eq: "video_conference" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
-        archived: { $eq: true },
+        $or:[
+          {archived: { $eq: true }},
+          {archived:{$exists: false} },
+        ]
       },
       function (err, userdata) {
         if (err && !userdata) {
