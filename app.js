@@ -48,10 +48,12 @@ app.use(express.urlencoded({ extended: false }));
 const appAdmin = express();
 const appAdmin1 = express();
 const appAdmin2  = express();
+const appAdmin3 = express();
 
 appAdmin.use(express.static(path.join(__dirname, "build/admin")));
 appAdmin1.use(express.static(path.join(__dirname, "build/eval")));
 appAdmin2.use(express.static(path.join(__dirname, "build/sickleave")));
+appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 const server = require("http").createServer(app);
@@ -654,6 +656,15 @@ appAdmin.use((err, req, res, next) => {
 });
 app.use("/sys-n-admin", appAdmin);
 
+appAdmin3.use(function (req, res, next) {
+  var err = new Error("Not Found");
+  err.status = 404;
+  next(err);
+});
+appAdmin3.use((err, req, res, next) => {
+  return res.sendFile(path.resolve( __dirname, 'build/videoConf' , 'index.html'));
+});
+app.use("/video-conference", appAdmin3);
 
 appAdmin1.use(function (req, res, next) {
   var err = new Error("Not Found");
