@@ -2,8 +2,8 @@ require("dotenv").config();
 var express = require("express");
 let router = express.Router();
 var assigned_Service = require("../schema/assigned_service.js");
-var Appointments =  require("../schema/appointments.js")
-var virtual_Task =  require("../schema/virtual_tasks.js")
+var Appointments = require("../schema/appointments.js")
+var virtual_Task = require("../schema/virtual_tasks.js")
 const moment = require("moment");
 
 var jwtconfig = require("../jwttoken");
@@ -12,19 +12,19 @@ router.post("/Addassignservice", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-  var assigndata = new assigned_Service(req.body)
-  assigndata.save(function (err, user_data) {
-    if (err && !user_data) {
-      res.json({ status: 200, message: "Something went wrong.", error: err });
-    } else {
-      res.json({
-        status: 200,
-        message: "Added Successfully",
-        hassuccessed: true,
-      });
-    }
-  });
-  }else{
+    var assigndata = new assigned_Service(req.body)
+    assigndata.save(function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "Added Successfully",
+          hassuccessed: true,
+        });
+      }
+    });
+  } else {
     res.json({
       status: 200,
       hassuccessed: false,
@@ -100,54 +100,54 @@ router.delete("/Deleteassignservice/:_id", function (req, res, next) {
 });
 
 router.get("/getAssignedServices/:house_id", function (req, res, next) {
-      const token = req.headers.token;
-      let legit = jwtconfig.verify(token);
-      if (legit) {
-        try{
-        let house_id =req.params.house_id
-        const messageToSearchWith = new assigned_Service({house_id });
-        console.log(messageToSearchWith)
-        messageToSearchWith.encryptFieldsSync();
-        assigned_Service.find(
-          {$or:[ {house_id: req.params.house_id},{house_id: messageToSearchWith.house_id}] },
-          function (err, userdata) {
-            if (err && !userdata) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Information not found",
-                error: err,
-              });
-            } else {
-              res.json({ status: 200, hassuccessed: true, data: userdata });
-      
-            }
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    try {
+      let house_id = req.params.house_id
+      const messageToSearchWith = new assigned_Service({ house_id });
+      console.log(messageToSearchWith)
+      messageToSearchWith.encryptFieldsSync();
+      assigned_Service.find(
+        { $or: [{ house_id: req.params.house_id }, { house_id: messageToSearchWith.house_id }] },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Information not found",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+
           }
-        );
-      } catch {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong."
-        });
-      }
-      } else {
-        res.json({
-          status: 200,   
-          hassuccessed: false,
-          message: "Authentication required.",
-        });
-      }
-  });
-      
-function mySorter(a, b) {
-    if (a.created_at && b.created_at) {
-      var x = a.created_at.toLowerCase();
-      var y = b.created_at.toLowerCase();
-      return x > y ? -1 : x < y ? 1 : 0;
-    } else {
-      return -1;
+        }
+      );
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong."
+      });
     }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+function mySorter(a, b) {
+  if (a.created_at && b.created_at) {
+    var x = a.created_at.toLowerCase();
+    var y = b.created_at.toLowerCase();
+    return x > y ? -1 : x < y ? 1 : 0;
+  } else {
+    return -1;
+  }
 }
 function mySorter1(a, b) {
   if (a.date && b.date) {
@@ -198,11 +198,13 @@ router.get(
                     error: err,
                   });
                 } else {
-                  
+                  const AppointToSearchWith1 = new virtual_Task({ task_type:"video_conference" });
+                  AppointToSearchWith1.encryptFieldsSync();
                   virtual_Task.find(
                     {
                       "assinged_to.user_id": doctor_id,
                       $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+                      task_type: { $nin: ["video_conference",AppointToSearchWith1.task_type] },
                     },
                     function (err, userdata3) {
                       if (err && !userdata3) {
@@ -213,7 +215,7 @@ router.get(
                           error: err,
                         });
                       } else {
-                        
+                        console.log("userdata3",userdata3.length)
                         for (i = 0; i < userdata1.length; i++) {
 
                           let today = new Date().setHours(0, 0, 0, 0);
@@ -252,11 +254,11 @@ router.get(
                           let today = new Date().setHours(0, 0, 0, 0);
                           let data_d = new Date(userdata3[i].due_on.date).setHours(0, 0, 0, 0);
                           if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-            
+
                             arr3.push(userdata3[i])
                           }
                           if (moment(data_d).isBefore(today) && userdata3[i].status !== "done") {
-            
+
                             arr3.push(userdata3[i])
                           }
                         }
