@@ -1276,8 +1276,9 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
         ],
         $or:[
           {archived: { $eq: true }},
-          {archived:{$exists: false} },
-        ]
+          {archived: { $exists: false} },
+          ]
+        
       },
       function (err, userdata) {
         if (err && !userdata) {
