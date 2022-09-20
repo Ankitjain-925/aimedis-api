@@ -16,9 +16,6 @@ const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
 const { encrypt, decrypt } = require("./Cryptofile.js");
-const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
-const Video_chat_Account = require("../schema/vid_chat_account.js");
-var base64 = require('base-64');
 
 const moment = require("moment");
 
@@ -138,49 +135,49 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
           })
         } else {
           if (data1.length > 0) {
-            res.json({ status: 200, hassuccessed: true, data: "User Already Register" })
+            res.json({ status: 200, hassuccessed: false, data: "User Already Register" })
           } else {
-            if(req.body.payment_data){
-            const data = {
-              email: legit.email || req.body.email,
-              patient_id: legit.patient_id || req.body.patient_id,
-              reg_amount: legit.reg_amount || req.body.reg_amount,
-              password: legit.password || req.body.password,
-              username: legit.username || req.body.username,
-              is_payment: legit.is_payment || req.body.is_payment,
-              prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
-              status: legit.stauts || req.body.status,
-              type: "video_conference",
-              payment_data: encrypt(JSON.stringify(req.body.payment_data))
+            if (req.body.payment_data) {
+              const data = {
+                email: legit.email || req.body.email,
+                patient_id: legit.patient_id || req.body.patient_id,
+                reg_amount: legit.reg_amount || req.body.reg_amount,
+                password: legit.password || req.body.password,
+                username: legit.username || req.body.username,
+                is_payment: legit.is_payment || req.body.is_payment,
+                prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
+                status: legit.stauts || req.body.status,
+                type: "video_conference",
+                payment_data: encrypt(JSON.stringify(req.body.payment_data)),
+                _enc_payment_data: true
+              }
+              const Videodata = new vidchat(data)
+              Videodata.save()
+                .then(result => {
+                  res.json({
+                    status: 200,
+                    msg: 'User Register Successfully',
+                    data: result,
+                    hassuccessed: true
 
-            }
-            const Videodata = new vidchat(data)
-            Videodata.save()
-              .then(result => {
-                res.json({
-                  status: 200,
-                  msg: 'User Register Successfully',
-                  data: result,
-                  hassuccessed: true
-
+                  })
                 })
-              })
                 .catch(err => {
                   console.log(err);
                   res.json({
                     status: 200,
                     msg: 'someting went wrong',
                     data: err,
-                    hassuccessed: true
+                    hassuccessed: false
                   })
                 })
             }
-            else{
+            else {
               res.json({
                 status: 200,
                 msg: 'payment is pending so can not add',
                 data: 'payment is pending so can not add',
-                hassuccessed: true
+                hassuccessed: false
               })
             }
           }
@@ -228,34 +225,24 @@ router.post("/AppointmentBook", function (req, res, next) {
   }
 });
 
+
 router.get("/Get_Doctor/:data", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  var final
   if (legit) {
-    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    user.find({
-      type: "doctor",
-      $or: [
-        { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
-        ]
-    }, function (err, data1) {
-      console.log(err)
+    user.find({ type: "doctor", houses: { $exists: true, $not: { $size: 0 } }, institute_id: { $exists: true, $not: { $size: 0 } } }, function (err, data1) {
       if (err) {
+        console.log("err", err)
         res.json({ status: 200, hassuccessed: true, error: err });
       } else {
-        res.json({ status: 200, hassuccessed: true, data: data1 });
+        var final = data1.filter((element) => {
+          if (element.first_name.includes(req.params.data) || element.last_name.includes(req.params.data) || element.alies_id.includes(req.params.data) || element.profile_id.includes(req.params.data) || element.speciality.includes(req.params.data) || element.email.includes(req.params.data)) {
+            return element
+          }
+        })
+        console.log("data1", final)
+        res.json({ status: 200, hassuccessed: true, data: final })
       }
     }
     )
@@ -267,6 +254,7 @@ router.get("/Get_Doctor/:data", function (req, res) {
     });
   }
 });
+
 
 router.post("/MailtoDrandPatient", function (req, res) {
   const token = req.headers.token;
@@ -677,44 +665,44 @@ router.post("/DownloadbillVC", function (req, res) {
 // })
 
 
-router.get("/Get_Doctor/:data", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    user.find({
-      type: "doctor",
-      $or: [
-        { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
-        ]
-    }, function (err, data1) {
-      if (err) {
-        res.json({ status: 200, hassuccessed: true, error: err });
-      } else {
-        res.json({ status: 200, hassuccessed: true, data: data1 });
-      }
-    }
-    )
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+// router.get("/Get_Doctor/:data", function (req, res) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
+//     VirtualtToSearchWith1.encryptFieldsSync();
+//     user.find({
+//       type: "doctor",
+//       $or: [
+//         { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
+//         { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
+//         { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
+//         { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
+//         { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
+//         { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
+//         ]
+//     }, function (err, data1) {
+//       if (err) {
+//         res.json({ status: 200, hassuccessed: true, error: err });
+//       } else {
+//         res.json({ status: 200, hassuccessed: true, data: data1 });
+//       }
+//     }
+//     )
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
 router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
   const token = req.headers.token;
@@ -777,7 +765,7 @@ router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
 //         console.log('data',data.total_amount)
 
 //        if(data.total_amount>req.body.amount){
-      
+
 //         virtual_invoice.updateOne({ _id: req.body._id },
 //          { $inc: {total_amount: Number(-req.body.amount) }}, function (err, updt) {
 //             if (err) {
@@ -797,7 +785,7 @@ router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
 //           message:"Low Balance"
 //         });
 //        }
-       
+
 //       }
 
 //     })
@@ -902,7 +890,7 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
     const VirtualtToSearchWith1 = new Video_Conference({ doctor_id });
     VirtualtToSearchWith1.encryptFieldsSync();
     Video_Conference
-      .find({ doctor_id: {$in: [req.params.doctor_id, VirtualtToSearchWith1.doctor_id]}})
+      .find({ doctor_id: { $in: [req.params.doctor_id, VirtualtToSearchWith1.doctor_id] } })
       .limit(10)
       .sort({ _id: -1 })
       .exec(function (err, data) {
@@ -934,7 +922,8 @@ router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
 router.post("/UsernameLogin", function (req, res, next) {
   var username = req.body.username.toLowerCase();
   var password = req.body.password;
-  const VirtualtToSearchWith1 = new vidchat({ username, password });
+  var email = req.body.email;
+  const VirtualtToSearchWith1 = new vidchat({ username, password, email });
   VirtualtToSearchWith1.encryptFieldsSync();
   if (req.body.username == "" || req.body.password == "") {
     res.json({
@@ -944,7 +933,7 @@ router.post("/UsernameLogin", function (req, res, next) {
     });
   } else {
     vidchat
-      .findOne({ username: { $in: [req.body.username, VirtualtToSearchWith1.username] } })
+      .findOne({ username: { $in: [req.body.username, VirtualtToSearchWith1.username] }, email: { $in: [req.body.email, VirtualtToSearchWith1.email] } })
       .exec()
       .then((user_data) => {
         if (!user_data) {
@@ -971,7 +960,7 @@ router.post("/UsernameLogin", function (req, res, next) {
 router.post("/managePrepaid", async (req, res) => {
   const { manage_for, _id, prepaid_min, paid_amount_data, used_talktime_data } = req.body;
   if (manage_for == "add") {
-    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "paid_amount_obj": encrypt(JSON.stringify(paid_amount_data)) } })
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "paid_amount_obj": paid_amount_data } })
     if (response) {
       res.json({ status: 200, hassuccessed: true, data: response });
     } else {
@@ -982,7 +971,7 @@ router.post("/managePrepaid", async (req, res) => {
       });
     }
   } else if (manage_for == 'use') {
-    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "used_talktime": encrypt(JSON.stringify(used_talktime_data)) } })
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "used_talktime": used_talktime_data } })
     if (response) {
       res.json({ status: 200, hassuccessed: true, data: response });
     } else {
@@ -1215,9 +1204,9 @@ router.post("/getSlotTime", function (req, res) {
   var finalArray = []
   let legit = jwtconfig.verify(token);
   if (legit) {
-    const messageToSearchWith = new Appointment({ doctor_id:req.body.doctor_id  });
+    const messageToSearchWith = new Appointment({ doctor_id: req.body.doctor_id });
     messageToSearchWith.encryptFieldsSync();
-    Appointment.find({ doctor_id:{$in:[ req.body.doctor_id,messageToSearchWith.doctor_id]}, date: req.body.date })
+    Appointment.find({ doctor_id: { $in: [req.body.doctor_id, messageToSearchWith.doctor_id] }, date: req.body.date })
       .exec(function (err, data) {
         if (err && !data) {
           res.json({
@@ -1238,21 +1227,22 @@ router.post("/getSlotTime", function (req, res) {
             } else {
               data.map((element) => {
                 finalArray.push({
-                  starttime : element.start_time,
-                  endtime : element.end_time
+                  starttime: element.start_time,
+                  endtime: element.end_time
 
                 })
               })
               data2.forEach((element) => {
                 finalArray.push({
-                starttime : element.start,
-                endtime : element.end
-              })
+                  starttime: element.start,
+                  endtime: element.end
+                })
               })
               res.json({
-                stayus:200,
-                messaage:"TIme slots",
-                data:finalArray
+                stayus: 200,
+                messaage: "TIme slots",
+                data: finalArray,
+                hassuccessed: true
               })
 
             }
@@ -1272,7 +1262,6 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-
     let patient_id = req.params.patient_id;
     var VirtualtToSearchWith = new virtual_Task({ patient_id });
     VirtualtToSearchWith.encryptFieldsSync();
@@ -1289,6 +1278,7 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
           {archived: { $eq: true }},
           {archived: { $exists: false} },
           ]
+        
       },
       function (err, userdata) {
         if (err && !userdata) {
