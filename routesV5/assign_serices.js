@@ -8,7 +8,7 @@ const moment = require("moment");
 
 var jwtconfig = require("../jwttoken");
 
-router.post("/Addassignservice",CheckRole("add_assign"), function (req, res, next) {
+router.post("/Addassignservice",CheckRole("add_assignedservice"), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -103,7 +103,7 @@ router.delete("/Deleteassignservice/:_id", function (req, res, next) {
 });
 
   
-router.get("/getAssignedServices/:house_id",CheckRole(), function (req, res, next) {
+router.get("/getAssignedServices/:house_id",CheckRole("get_assignedservice"), function (req, res, next) {
       const token = req.headers.token;
       let legit = jwtconfig.verify(token);
       if (legit) {
