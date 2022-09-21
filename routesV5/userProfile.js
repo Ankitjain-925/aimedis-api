@@ -2137,6 +2137,53 @@ router.put("/Users/update", function (req, res, next) {
   }
 });
 
+function AllUpdate( id,patient) {
+  const patient_id = id
+  const messageToSearchWith1 = new virtual_Task({ patient_id });
+  messageToSearchWith1.encryptFieldsSync();
+    virtual_Task.updateMany
+      ({
+        $or: [
+          { patient_id: patient_id },
+          { patient_id: messageToSearchWith1.patient_id },
+        ],
+      },
+        { $set: patient }).exec(function (err, doc3) {
+          if (err) {
+            console.log("err", err)
+          } else {
+            console.log("data")
+          }
+        })
+    const messageToSearchWith2 = new virtual_Case({ patient_id });
+    messageToSearchWith2.encryptFieldsSync();
+    virtual_Case.updateMany
+      ({
+        $or: [
+          { patient_id: patient_id },
+          { patient_id: messageToSearchWith2.patient_id },
+        ],
+      },
+        { $set: patient }).exec(function (err, doc3) {
+          if (err) {
+            console.log("err", err)
+          } else {
+            console.log("data")
+          }
+        })
+    const messageToSearchWith3 = new virtual_Case({ patient_id });
+    messageToSearchWith3.encryptFieldsSync();
+    virtual_Invoice.updateMany
+      ({ "patient.patient_id": { $in: [patient_id, messageToSearchWith3.patient_id] } }, { $set: patient }
+      ).exec(function (err, doc3) {
+        if (err) {
+          console.log("err", err)
+        } else {
+          console.log("doc3")
+        }
+      })
+}
+
 router.put("/Users/update/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -2218,11 +2265,23 @@ router.put("/Users/update/:user_id", function (req, res, next) {
                   error: err,
                 });
               } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Updated",
-                });
+                User.findOne({ _id: changeStatus._id },function(err,doc2){
+                  if(err){
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "update data failed",
+                      error: err,
+                    });
+                  }else{
+                    res.json({
+                      status: 200,
+                      hassuccessed: true,
+                      message: "Updated",
+                      data:doc2
+                    });
+                  }
+                })
               }
             }
           );
@@ -8273,15 +8332,15 @@ router.post("/AskPatient1/:id", function (req, res, next) {
     });
   }
 });
-router.get("/AskPatientProfile/:id", function (req, res, next) {
+router.post("/AskPatientProfile", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    const profile_id = req.params.id;
-    const alies_id = req.params.id;
+    const profile_id = req.body.id;
+    const alies_id = req.body.id;
     const messageToSearchWith = new User({ profile_id });
     const messageToSearchWith1 = new User({ alies_id });
-    const email = req.params.id;
+    const email = req.body.id;
     const messageToSearchWith2 = new User({ email });
     messageToSearchWith2.encryptFieldsSync();
     messageToSearchWith.encryptFieldsSync();
@@ -8289,12 +8348,12 @@ router.get("/AskPatientProfile/:id", function (req, res, next) {
     User.findOne({
       type: "patient",
       $or: [
-        { email: req.params.id },
+        { email: req.body.id },
         { email: messageToSearchWith2.email },
         { alies_id: messageToSearchWith1.alies_id },
         { profile_id: messageToSearchWith.profile_id },
-        { profile_id: req.params.id },
-        { alies_id: req.params.id },
+        { profile_id: req.body.id },
+        { alies_id: req.body.id },
       ],
     })
       .exec()
@@ -9216,5 +9275,215 @@ router.post("/verifyStripe", (req, res) => {
     }
   }
 });
+
+router.delete("/marketing_user/:email", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    var email = req.params.email && req.params.email.toLowerCase();
+    const messageToSearchWith = new marketing_user({ email: email });
+    messageToSearchWith.encryptFieldsSync();
+    marketing_user.deleteOne(
+      {
+        $or: [
+          { email: messageToSearchWith.email },
+          { email: req.params.email },
+        ],
+      },
+      function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "Deleted",
+            hassuccessed: true,
+          });
+        }
+
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+
+router.post("/marketing_user", function (req, res, next) {
+  var email = req.body.email.toLowerCase();
+  req.body.email = email;
+
+  datas = { ...req.body };
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
+  })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else{
+        var marketing_users = new marketing_user(datas);
+        marketing_users.save(function (err, user_data1) {
+          if (err && !user_data1) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "User is added Successfully",
+              hassuccessed: true,
+              data: user_data1,
+            });
+          }
+        });
+      }
+    })
+
+});
+
+router.post("/marketing_user2", function (req, res, next) {
+  let email =  base64.decode(req.body.email);
+  if(req.body.first_name && req.body.last_name){
+      var first_name =  base64.decode(req.body.first_name);
+      var last_name =  base64.decode(req.body.last_name);
+  }
+  
+  email = email.toLowerCase();
+  req.body.email = email;
+  req.body.first_name = first_name;
+  req.body.last_name = last_name;
+  console.log('req.body', req.body)
+  datas = { ...req.body };
+  // var email = req.params.email && req.params.email.toLowerCase();
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
+  })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else{
+        var marketing_users = new marketing_user(datas);
+        marketing_users.save(function (err, user_data1) {
+          if (err && !user_data1) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "User is added Successfully",
+              hassuccessed: true,
+              data: user_data1,
+            });
+          }
+        });
+      }
+    })
+
+});
+
+router.post("/MarketingSub",function(req,res){
+var email = req.body.email.toLowerCase();
+req.body.email = email;
+
+const messageToSearchWith = new marketing_user({ email: req.body.email });
+messageToSearchWith.encryptFieldsSync();
+marketing_user.findOne({
+  $or: [
+  { email: { $regex: req.body.email, $options: "i" } },
+  { email: { $regex: messageToSearchWith.email, $options: "i" } },
+  ],
+})
+  .exec()
+  .then((user_data) => {
+  if (user_data) {
+      res.json({
+      status: 200,
+      message: "Already added",
+      hassuccessed: false
+      });
+  }
+  else{
+  let emails =  base64.encode(req.body.email);
+
+  let url = ``;
+
+  if(req.body.first_name && req.body.last_name){
+  let first_name = base64.encode(req.body.first_name) ;
+  let last_name= base64.encode(req.body.last_name);
+     url= `first_name=${first_name}&last_name=${last_name}&email=${emails}`
+  }
+  else{
+    url= `email=${emails}`
+  }
+  console.log('email', email)
+  sendData = `Dear User,<br/>
+  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
+  generateTemplate(
+      EMAIL.generalEmail.createTemplate("en", {
+      title: "",
+      content: sendData,
+      }),
+      (error, html) => {
+      if (email !== "") {
+          let mailOptions = {
+          from: "contact@aimedis.com",
+          to: email,
+          subject: "Aimedis Newletter Subscription",
+          html: html,
+          };
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
+          res.json({
+              status: 200,
+              msg: "Mail is sent",
+              hassuccessed: true,
+          });
+          } else {
+          res.json({
+              status: 200,
+              msg: "Mail is not sent",
+              hassuccessed: false,
+          });
+          }
+      } else {
+          res.json({
+          status: 200,
+          msg: "Mail is not sent",
+          hassuccessed: false,
+          });
+      }
+      }
+  );
+  }
+  })
+})
 
 module.exports = router;
