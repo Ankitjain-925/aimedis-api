@@ -198,13 +198,13 @@ router.get(
                     error: err,
                   });
                 } else {
-                  const AppointToSearchWith1 = new virtual_Task({ task_type:"video_conference" });
-                  AppointToSearchWith1.encryptFieldsSync();
+                  // const AppointToSearchWith1 = new virtual_Task({ task_type:"video_conference" });
+                  // AppointToSearchWith1.encryptFieldsSync();
                   virtual_Task.find(
                     {
                       "assinged_to.user_id": doctor_id,
                       $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
-                      task_type: { $nin: ["video_conference",AppointToSearchWith1.task_type] },
+                      // task_type: { $nin: ["video_conference",AppointToSearchWith1.task_type] },
                     },
                     function (err, userdata3) {
                       if (err && !userdata3) {

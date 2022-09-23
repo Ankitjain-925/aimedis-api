@@ -682,30 +682,46 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
           var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-          // var start_date = new Date(req.body.start_time);
-          // var end_date = new Date(req.body.end_time);
-          // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
-          // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
-
           var start_time = req.params.start_time;
           var end_time = req.params.end_time;
-          var sendData = `Dear Patient,
 
-    Your payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at ${meetingDate} from the time slot  ${start_time
-            } to ${end_time} 
-    Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : "Not mentioned"
-            }
-    Please remind the date and timing as alloted.`;
+          var sendData =  ``;
+          var sendData1 = ``;
+          
 
-          var sendData1 = `Dear Doctor,
+        
+         
 
-    The payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at  ${meetingDate} from the time slot ${start_time
-            } to ${end_time}
-    Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : "Not mentioned"
-            }
-    Please remind the date and timing as alloted.</div>`;
+          if(task_type === 'video_conference'){
+            sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
+            You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
+            That you have requested from the Video conference system. Here is your access key to join call via system - ${req.body.access_key}
+            you can contact via email or mobile number.
+            Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
+            sendData1 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
+            You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
+            Here is your access key to join call via system - ${req.body.access_key}`
+          }
+          else {
+            sendData = `Dear Patient,
+
+            Your payment process for sick leave certificate application is completed successfully.
+            Please do join the Video call at ${meetingDate} from the time slot  ${start_time
+                    } to ${end_time} 
+            Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : "Not mentioned"
+                    }
+            Please remind the date and timing as alloted.`;
+
+            sendData1 =  `Dear Doctor,
+
+            The payment process for sick leave certificate application is completed successfully.
+            Please do join the Video call at  ${meetingDate} from the time slot ${start_time
+                    } to ${end_time}
+            Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : "Not mentioned"
+                    }
+            Please remind the date and timing as alloted.</div>`;
+          }
+          
 
           if (req.body.patient_mail !== "") {
             generateTemplate(

@@ -261,13 +261,13 @@ router.post("/MailtoDrandPatient", function (req, res) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
-        You have an appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
-        If you cannot take the appointment, please cancel it at least 24 hours before.
-        If you have any questions, contact your doctor via .
-        Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
+    You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
+    That you have requested from the Video conference system. Here is your access key to join call via system - ${req.body.access_key}
+    you can contact via email or mobile number.
+    Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
     sendData2 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
-        You have got an appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
-       Please accept the appointment inside your Aimdis Profile. If you have  any questions,please contact the patient via ${req.body.patient_info.email} or Alternatively you can contact us via contact@aimedis.com. or the Aimedis support chat if you have difficulties contacting the patient.`;
+    You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
+    Here is your access key to join call via system - ${req.body.access_key}`
     generateTemplate(
       EMAIL.generalEmail.createTemplate("en", {
         title: "",
@@ -1261,6 +1261,7 @@ router.post("/getSlotTime", function (req, res) {
 router.get("/GetVideoTask/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ // var full_data;
   if (legit) {
     let patient_id = req.params.patient_id;
     var VirtualtToSearchWith = new virtual_Task({ patient_id });
@@ -1269,18 +1270,18 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
     VirtualtToSearchWith1.encryptFieldsSync();
     virtual_Task.find(
       {
+        $and:[{
         patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
         $or: [
           { task_type: { $eq: "video_conference" } },
           { task_type: { $eq: VirtualtToSearchWith1.task_type } },
         ],
-        $or:[
-          {archived: { $eq: true }},
-          {archived:{$exists: false} },
-        ]
-      },
+        archived :{$ne: true}
+   } ] },
       function (err, userdata) {
-        if (err && !userdata) {
+     
+      // full_data=userdata.filter((item)=>item.task_type==="video_conference")}
+        if (!userdata) {
           res.json({
             status: 200,
             hassuccessed: false,
@@ -1301,4 +1302,5 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
   }
 });
 
+                                                                           
 module.exports = router;                                                                            

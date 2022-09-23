@@ -225,7 +225,12 @@ router.post("/AddTask", function (req, res, next) {
         var task_type = "sick_leave"
         const VirtualtToSearchWith1 = new virtual_Task({ task_type });
         VirtualtToSearchWith1.encryptFieldsSync();
-        virtual_Task.updateOne({ _id: user_data._id, task_type: { $in: [task_type, VirtualtToSearchWith1.task_type] } }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
+
+        var task_type1 = "video_conference"
+        const VirtualtToSearchWith3 = new virtual_Task({ task_type1 });
+        VirtualtToSearchWith3.encryptFieldsSync();
+
+        virtual_Task.updateOne({ _id: user_data._id, task_type: { $in: [task_type, VirtualtToSearchWith1.task_type, task_type1, VirtualtToSearchWith3.task_type1] } }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
           if (err && !doc) {
             res.json({
               status: 200,
@@ -252,7 +257,7 @@ router.post("/AddTask", function (req, res, next) {
                     msg: "User is not exist",
                   });
                 } else {
-                  if (req.body.task_type !== "picture_evaluation") {
+                  if (req.body.task_type !== "picture_evaluation" && req.body.task_type !== "sick_leave" && req.body.task_type !== "video_conference") {
                     var m = new Date();
                     var dateString =
                       m.getUTCFullYear() +
@@ -331,7 +336,6 @@ router.post("/AddTask", function (req, res, next) {
                 }
               }
             });
-
           }
         })
       }
