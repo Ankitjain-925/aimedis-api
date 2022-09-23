@@ -196,43 +196,43 @@ cron.schedule('0 0 */12 * * *', function(){
   SetArchivePayment()
 });
 
-function SetArchivePayment() {
-  var task_type= "sick_leave"
-       const VirtualtToSearchWith1 = new virtual_Task({task_type });
-       VirtualtToSearchWith1.encryptFieldsSync();
- virtual_Task.find({task_type:{ $in: [task_type, VirtualtToSearchWith1.task_type] }})
-   .exec(function (err, doc1) {
-     if (err && !doc1) {
-       res.json({
-         status: 200,
-         hassuccessed: false,
-         message: "update data failed",
-         error: err,
-       });
-     } else {
-       let ttime = moment(Date.now()).format("YYYY-MM-DD")
-       doc1.forEach((element) => {
-         var enddate = moment(element.date).format("YYYY-MM-DD");
-         if (moment(ttime).diff(enddate, 'days') > 1) {
-           virtual_Task.updateMany({
-             _id: element._id, $or: [
-               { is_payment: { $ne: true } },
-               { is_payment: { $exists: false } }
-             ]
-           }, { archived: true }, function (err, data) {
-             if (err) {
-               console.log("err", err)
-             }
-             else {
-               console.log("data", data)
-             }
-           })
-         }
-       })
-     }
-   }
-   );
-}
+// function SetArchivePayment() {
+//   var task_type= "sick_leave"
+//        const VirtualtToSearchWith1 = new virtual_Task({task_type });
+//        VirtualtToSearchWith1.encryptFieldsSync();
+//  virtual_Task.find({task_type:{ $in: [task_type, VirtualtToSearchWith1.task_type] }})
+//    .exec(function (err, doc1) {
+//      if (err && !doc1) {
+//        res.json({
+//          status: 200,
+//          hassuccessed: false,
+//          message: "update data failed",
+//          error: err,
+//        });
+//      } else {
+//        let ttime = moment(Date.now()).format("YYYY-MM-DD")
+//        doc1.forEach((element) => {
+//          var enddate = moment(element.date).format("YYYY-MM-DD");
+//          if (moment(ttime).diff(enddate, 'days') > 1) {
+//            virtual_Task.updateMany({
+//              _id: element._id, $or: [
+//                { is_payment: { $ne: true } },
+//                { is_payment: { $exists: false } }
+//              ]
+//            }, { archived: true }, function (err, data) {
+//              if (err) {
+//                console.log("err", err)
+//              }
+//              else {
+//                console.log("data", data)
+//              }
+//            })
+//          }
+//        })
+//      }
+//    }
+//    );
+// }
 
 
 function SetArchiveUnuseMeeting(){
@@ -416,41 +416,55 @@ function CallingDropBox(localFile, SetUrl){
 
 
 function SetArchivePayment() {
-   var task_type= "sick_leave"
-        const VirtualtToSearchWith1 = new virtual_Task({task_type });
-        VirtualtToSearchWith1.encryptFieldsSync();
-  virtual_Task.find({task_type:{ $in: [task_type, VirtualtToSearchWith1.task_type] }})
-    .exec(function (err, doc1) {
-      if (err && !doc1) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "update data failed",
-          error: err,
-        });
-      } else {
-        let ttime = moment(Date.now()).format("YYYY-MM-DD")
-        doc1.forEach((element) => {
-          var enddate = moment(element.date).format("YYYY-MM-DD");
-          if (moment(ttime).diff(enddate, 'days') > 1) {
-            virtual_Task.updateMany({
-              _id: element._id, $or: [
-                { is_payment: { $ne: true } },
-                { is_payment: { $exists: false } }
-              ]
-            }, { archived: true }, function (err, data) {
-              if (err) {
-                console.log("err", err)
-              }
-              else {
-                console.log("data", data)
-              }
-            })
-          }
-        })
-      }
+const VirtualtToSearchWith1 = new virtual_Task({task_type: "sick_leave" });
+VirtualtToSearchWith1.encryptFieldsSync();
+const VirtualtToSearchWith = new virtual_Task({task_type: "video_conference" });
+VirtualtToSearchWith.encryptFieldsSync();
+virtual_Task.find({
+$and: [{
+$or: [
+  { task_type: { $ne: "sick_leave" } },
+  { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+]
+},
+{
+$or: [
+  { task_type: { $ne: "video_conference" } },
+  { task_type: { $ne: VirtualtToSearchWith.task_type } },
+]
+}]
+})
+.exec(function (err, doc1) {
+if (err && !doc1) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "update data failed",
+    error: err,
+  });
+} else {
+  let ttime = moment(Date.now()).format("YYYY-MM-DD")
+  doc1.forEach((element) => {
+    var enddate = moment(element.date).format("YYYY-MM-DD");
+    if (moment(ttime).diff(enddate, 'days') > 1) {
+      virtual_Task.updateMany({
+        _id: element._id, $or: [
+          { is_payment: { $ne: true } },
+          { is_payment: { $exists: false } }
+        ]
+      }, { archived: true }, function (err, data) {
+        if (err) {
+          console.log("err", err)
+        }
+        else {
+          console.log("data", data)
+        }
+      })
     }
-    );
+  })
+}
+}
+);
 }
 
 
