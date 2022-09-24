@@ -1206,7 +1206,7 @@ router.post("/getSlotTime", function (req, res) {
   if (legit) {
     const messageToSearchWith = new Appointment({ doctor_id: req.body.doctor_id });
     messageToSearchWith.encryptFieldsSync();
-    Appointment.find({ doctor_id: { $in: [req.body.doctor_id, messageToSearchWith.doctor_id] }, date: req.body.date })
+    Appointment.find({ doctor_id: { $in: [req.body.doctor_id, messageToSearchWith.doctor_id] }})
       .exec(function (err, data) {
         if (err && !data) {
           res.json({
@@ -1216,7 +1216,7 @@ router.post("/getSlotTime", function (req, res) {
             hassuccessed: false,
           });
         } else {
-          virtual_Task.find({ "assinged_to.user_id": req.body.doctor_id, date: req.body.date }, function (err, data2) {
+          virtual_Task.find({ "assinged_to.user_id": req.body.doctor_id}, function (err, data2) {
             if (err) {
               res.json({
                 status: 200,
@@ -1226,21 +1226,25 @@ router.post("/getSlotTime", function (req, res) {
               });
             } else {
               data.map((element) => {
-                finalArray.push({
-                  starttime: element.start_time,
-                  endtime: element.end_time
+                if(moment(req.body.date).format("DD/MM/YYYY")==moment(element.date).format("DD/MM/YYYY")){
+                  finalArray.push({
+                    starttime: element.start_time,
+                    endtime: element.end_time
+                  })
+                }
+              })
+              data2.map((element) => {
+                if(moment(req.body.date).format("DD/MM/YYYY")==moment(element.date).format("DD/MM/YYYY")){
+                  finalArray.push({
+                    starttime: element.start,
+                    endtime: element.end
+                  })
+                }
+              })
 
-                })
-              })
-              data2.forEach((element) => {
-                finalArray.push({
-                  starttime: element.start,
-                  endtime: element.end
-                })
-              })
               res.json({
-                stayus: 200,
-                messaage: "TIme slots",
+                status: 200,
+                messaage: "Time slots",
                 data: finalArray,
                 hassuccessed: true
               })

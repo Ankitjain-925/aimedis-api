@@ -710,8 +710,11 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+  //  return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
   console.log("err", err);
 });
 
+app.listen(5000, () => {
+  console.log("Server started on port 5001")
+});
  module.exports = app;
