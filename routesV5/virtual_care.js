@@ -234,7 +234,7 @@ router.get("/PresentFutureTask/:house_id",CheckRole('get_professional_activity')
 );
 
 router.get(
-  "/PastTask/:patient_profile_id",CheckRole('get_earlier_activity'),
+  "/PastTask/:patient_profile_id/:house_id",CheckRole('get_earlier_activity'),
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -297,7 +297,7 @@ router.get(
 
 var arr1 = [];
 
-router.get("/infoOfPatients/:house_id",CheckRole(), function (req, res, next) {
+router.get("/infoOfPatients/:house_id",CheckRole("get_spacemanagement"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     arr = []
