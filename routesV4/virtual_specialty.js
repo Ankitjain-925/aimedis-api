@@ -222,25 +222,7 @@ router.post("/AddTask", function (req, res, next) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        var task_type = "sick_leave"
-        const VirtualtToSearchWith1 = new virtual_Task({ task_type });
-        VirtualtToSearchWith1.encryptFieldsSync();
-
-        var task_type1 = "video_conference"
-        const VirtualtToSearchWith3 = new virtual_Task({ task_type1 });
-        VirtualtToSearchWith3.encryptFieldsSync();
-
-        virtual_Task.updateOne({ _id: user_data._id, task_type: { $in: [task_type, VirtualtToSearchWith1.task_type, task_type1, VirtualtToSearchWith3.task_type1] } }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
-          if (err && !doc) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Something went wrong",
-              error: err,
-            });
-          }
-          else {
-            User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
+       User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
               if (err && !doc) {
 
                 res.json({
@@ -258,6 +240,7 @@ router.post("/AddTask", function (req, res, next) {
                   });
                 } else {
                   if (req.body.task_type !== "picture_evaluation" && req.body.task_type !== "sick_leave" && req.body.task_type !== "video_conference") {
+    
                     var m = new Date();
                     var dateString =
                       m.getUTCFullYear() +
@@ -292,39 +275,48 @@ router.post("/AddTask", function (req, res, next) {
                         sendSms(doc.mobile, res1)
                           .then((result) => { })
                           .catch((e) => {
-
+                
                           });
                       });
-                      if (doc.emergency_number && doc.emergency_number !== "") {
-                        var sms2 =
-                          "There was a task added on -" +
-                          doc.first_name +
-                          " " +
-                          doc.last_name +
-                          " Aimedis profile ( " +
-                          doc.profile_id +
-                          " )  " +
-                          " - " +
-                          req.body.task_name +
-                          " (" +
-                          req.body.description +
-                          ") at " +
-                          dateString;
-                        trans(sms2, { source: "en", target: result }).then(
-                          (res1) => {
-                            sendSms(doc.emergency_number, res1)
-                              .then((result) => { })
-                              .catch((e) => {
-
-                              });
-                          }
-                        );
+                    })
+                    if (doc.emergency_number && doc.emergency_number !== "") {
+                      var sms2 =
+                        "There was a task added on -" +
+                        doc.first_name +
+                        " " +
+                        doc.last_name +
+                        " Aimedis profile ( " +
+                        doc.profile_id +
+                        " )  " +
+                        " - " +
+                        req.body.task_name +
+                        " (" +
+                        req.body.description +
+                        ") at " +
+                        dateString;
+                      trans(sms2, { source: "en", target: result }).then(
+                        (res1) => {
+                          sendSms(doc.emergency_number, res1)
+                            .then((result) => { })
+                            .catch((e) => {
+              
+                            });
+                        }
+                      );
+                    }
+                    
+                  }  
+                  if(req.body.task_type === "sick_leave" || req.body.task_type === "video_conference"){
+                    virtual_Task.updateOne({ _id: user_data._id }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
+                      if (err && !doc1) {
                       }
-                      if(req.body.task_type === "sickleave"){
-                        ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {})
+                      else {
+                        console.log('doc1 updated task 1', doc1)
                       }
-                        
-                    });
+                    })
+                    if(req.body.task_type === "sick_leave"){
+                      ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {})
+                    }
                   }
 
                   res.json({
@@ -336,8 +328,6 @@ router.post("/AddTask", function (req, res, next) {
                 }
               }
             });
-          }
-        })
       }
     });
   } else {

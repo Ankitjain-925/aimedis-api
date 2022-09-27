@@ -688,19 +688,15 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
           var sendData =  ``;
           var sendData1 = ``;
           
-
-        
-         
-
-          if(task_type === 'video_conference'){
+          if(req.body.task_type === 'video_conference'){
             sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
             You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
-            That you have requested from the Video conference system. Here is your access key to join call via system - ${req.body.access_key}
+            That you have requested from the Video conference system. Here is your access key to join call via system - ${req.body.sesion_id}
             you can contact via email or mobile number.
             Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
             sendData1 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
             You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
-            Here is your access key to join call via system - ${req.body.access_key}`
+            Here is your access key to join call via system - ${req.body.sesion_id}`
           }
           else {
             sendData = `Dear Patient,
@@ -722,7 +718,6 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
             Please remind the date and timing as alloted.</div>`;
           }
           
-
           if (req.body.patient_mail !== "") {
             generateTemplate(
               EMAIL.generalEmail.createTemplate("en", {
@@ -1802,10 +1797,7 @@ router.get("/GetAmount/:house_id", function (req, res) {
             item.houses.map((item2) => {
  
               if (item2.house_id == req.params.house_id) {
-
-
                 if (item2.sickleave_certificate_amount !== "") {
-
                   userdata = item2.sickleave_certificate_amount;
                 }
                 else {
