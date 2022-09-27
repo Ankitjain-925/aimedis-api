@@ -163,7 +163,7 @@ router.get("/getAssignedServices/:house_id",CheckRole("get_assignedservice"), fu
   }
 
 router.get(
-  "/getAllactivities/:user_id",
+  "/getAllactivities/:user_id",CheckRole('get_professsionalactivity'),
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
