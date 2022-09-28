@@ -958,11 +958,12 @@ router.post("/UsernameLogin", function (req, res, next) {
 });
 
 router.post("/managePrepaid", async (req, res) => {
-  const { manage_for, _id, prepaid_min, paid_amount_data, used_talktime_data } = req.body;
+  const { manage_for, _id, prepaid_talktime_min, paid_amount_obj, used_talktime } = req.body;
   if (manage_for == "add") {
-    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "paid_amount_obj": paid_amount_data } })
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_talktime_min, $push: { "paid_amount_obj": paid_amount_obj } })
     if (response) {
-      res.json({ status: 200, hassuccessed: true, data: response });
+      let response3 = await vidchat.findOne({ _id })
+      res.json({ status: 200, hassuccessed: true, data: response3 });
     } else {
       res.json({
         status: 400,
@@ -971,9 +972,10 @@ router.post("/managePrepaid", async (req, res) => {
       });
     }
   } else if (manage_for == 'use') {
-    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "used_talktime": used_talktime_data } })
+    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_talktime_min, $push: { "used_talktime": used_talktime } })
     if (response) {
-      res.json({ status: 200, hassuccessed: true, data: response });
+      let response3 = await vidchat.findOne({ _id })
+      res.json({ status: 200, hassuccessed: true, data: response3 });
     } else {
       res.json({
         status: 400,

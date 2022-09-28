@@ -690,12 +690,13 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
           
           if(req.body.task_type === 'video_conference'){
             sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
-            You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
+            You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${meetingDate} at ${req.body.start_time}.
             That you have requested from the Video conference system. Here is your access key to join call via system - ${req.body.sesion_id}
             you can contact via email or mobile number.
             Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
             sendData1 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
-            You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
+            You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} from the time slot  ${start_time
+            } to ${end_time} .
             Here is your access key to join call via system - ${req.body.sesion_id}`
           }
           else {
