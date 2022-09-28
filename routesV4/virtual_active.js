@@ -1365,6 +1365,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   // let legit = jwtconfig.verify(token);
   // if (legit) {
   try {
+    var doctor_info={}
     const VirtualtToSearchWith = new sick_meeting({
       sesion_id: req.params.sesion_id,
     });
@@ -1417,6 +1418,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       if (userdata !== null) {
+                        console.log("2")
                         User.findOne({ _id: userdata.patient_id }, function (err, result) {
                           if(err && !result){
                             res.json({
@@ -1427,28 +1429,47 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                             });
                           }
                           else{
-                            if(result !== null){
-                              var patient_info = userdata.patient;
-                              patient_info['image'] = result.image;
-                              userdata.patient = patient_info
-                              res.json({
-                                status: 200,
-                                hassuccessed: true,
-                                message: "link active",
-                                data: { Task: userdata, Session: data, gender: result.sex},
-                              });
-                            }
-                            else{
-                              var patient_info = userdata.patient;
-                              patient_info['image'] = 'insidenull.jpg';
-                              userdata.patient = patient_info
-                              res.json({
-                                status: 200,
-                                hassuccessed: true,
-                                message: "link active",
-                                data: { Task: userdata, Session: data, },
-                              });
-                            }
+                            User.findOne({_id:userdata.assinged_to[0].user_id},function(err,result2){
+                              console.log("1",result.image)
+                              if(err){
+                                res.json({
+                                  status: 200,
+                                  hassuccessed: false,
+                                  message: "Something went wrong",
+                                  error: err,
+                                });
+                              }else{
+                                doctor_info['first_name']=result2.first_name
+                                doctor_info['last_name']=result.last_name
+                                doctor_info['user_id']=result._id
+                                doctor_info['profile_id']=result.profile_id
+                                doctor_info['alies_id']=result.alies_id
+                                if(result !== null){
+                                  var patient_info = userdata.patient;
+                                  patient_info['image'] = result.image;
+                                  userdata.patient = patient_info
+                                  res.json({
+                                    status: 200,
+                                    hassuccessed: true,
+                                    message: "link active",
+                                    data: { Task: userdata, Session: data, gender: result.sex,doctor_info:doctor_info},
+                                  });
+                                }
+                                else{
+                                  var patient_info = userdata.patient;
+                                  patient_info['image'] = 'insidenull.jpg';
+                                  userdata.patient = patient_info
+                                  res.json({
+                                    status: 200,
+                                    hassuccessed: true,
+                                    message: "link active",
+                                    data: { Task: userdata, Session: data,doctor_info:doctor_info },
+                                  });
+                                }
+
+                              }
+                              
+                            })
                          
                           }
                         })
