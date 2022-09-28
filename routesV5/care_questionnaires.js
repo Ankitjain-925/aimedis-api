@@ -7,7 +7,7 @@ var User = require("../schema/user.js")
 var jwtconfig = require("../jwttoken");
 
 
-  router.post("/AddQuestionnaire",CheckRole("add_questionaire"), function (req, res, next) {
+  router.post("/AddQuestionnaire",CheckRole("add_care_ques"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
