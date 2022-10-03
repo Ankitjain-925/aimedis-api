@@ -78,11 +78,11 @@ router.post("/getuserchat", function (req, res, next) {
   console.log(legit)
   if (legit) {
 
-    const messageToSearchWith = new vidchat({ patient_id: req.body._id });
+    const messageToSearchWith = new vidchat({ email: req.body.email });
     messageToSearchWith.encryptFieldsSync();
     vidchat.find(
       {
-        patient_id: { $in: [req.body._id, messageToSearchWith.patient_id] }
+        email: { $in: [req.body.email, messageToSearchWith.email] }
       },
       function (err, userdata) {
         if (err && !userdata) {

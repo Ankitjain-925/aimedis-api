@@ -26,6 +26,10 @@ const io = require("socket.io")(server, {
       console.log("decline", data);
       socket.broadcast.emit("email_decline", data);
     });
+    socket.on('disconnect', () => {
+     console.log(`socket disconnected`);
+    })
+      
   });
 
 

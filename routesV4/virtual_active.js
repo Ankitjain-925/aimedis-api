@@ -687,17 +687,17 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
 
           var sendData =  ``;
           var sendData1 = ``;
+          var subject = req.body.task_type === 'video_conference' ? "Access key for Video conference": "Link for the Sick leave certificate";
           
           if(req.body.task_type === 'video_conference'){
             sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
-            You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${meetingDate} at ${req.body.start_time}.
-            That you have requested from the Video conference system. Here is your access key to join call via system - ${req.body.sesion_id}
+            You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${meetingDate} at ${start_time}.
+            That you have requested from the Video conference system. Here is your access key to join call via system - <b>${req.body.sesion_id}</b>.
             you can contact via email or mobile number.
             Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
             sendData1 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
-            You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} from the time slot  ${start_time
-            } to ${end_time} .
-            Here is your access key to join call via system - ${req.body.sesion_id}`
+            You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${meetingDate} at ${start_time}.
+            Here is your access key to join call via system - <b>${req.body.sesion_id}</b>`
           }
           else {
             sendData = `Dear Patient,
@@ -730,7 +730,7 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
                   let mailOptions = {
                     from: "contact@aimedis.com",
                     to: req.body.patient_mail,
-                    subject: "Link for the Sick leave certificate",
+                    subject: subject,
                     html: html,
                   };
 
@@ -759,7 +759,7 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
                       let mailOptions1 = {
                         from: "contact@aimedis.com",
                         to: userdata.email,
-                        subject: "Link for the sick leave certificate",
+                        subject:subject,
                         html: html,
                       };
                       let sendmail1 = transporter.sendMail(mailOptions1);
@@ -1441,10 +1441,12 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                                 });
                               }else{
                                 doctor_info['first_name']=result2.first_name
-                                doctor_info['last_name']=result.last_name
-                                doctor_info['user_id']=result._id
-                                doctor_info['profile_id']=result.profile_id
-                                doctor_info['alies_id']=result.alies_id
+                                doctor_info['last_name']=result2.last_name
+                                doctor_info['user_id']=result2._id
+                                doctor_info['profile_id']=result2.profile_id
+                                doctor_info['alies_id']=result2.alies_id
+                                doctor_info['email']=result2.email
+                                doctor_info['image']=result2.image
                                 if(result !== null){
                                   var patient_info = userdata.patient;
                                   patient_info['image'] = result.image;
@@ -1600,7 +1602,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
                   let mailOptions = {
                     from: "contact@aimedis.com",
                     to: req.body.patient_mail,
-                    subject: "Sick leave certificate request",
+                    subject: "Video Conference Request",
                     html: html,
                   };
                   let sendmail = transporter.sendMail(mailOptions);
@@ -1628,7 +1630,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
                       let mailOptions1 = {
                         from: "contact@aimedis.com",
                         to: userdata.email,
-                        subject: "Sick leave certificate request",
+                        subject: "Video conference request",
                         html: html,
                       };
                       let sendmail1 = transporter.sendMail(mailOptions1);

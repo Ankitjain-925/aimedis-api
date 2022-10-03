@@ -431,18 +431,18 @@ router.put("/AddTask/:task_id", function (req, res, next) {
             error: err,
           });
         } else {
-          if (req.body.is_decline) {
-            virtual_Task.findOne(
-              { _id: req.params.task_id },
-              function (err, data1) {
-                if (err) {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    message: "Something went wrong",
-                    error: err,
-                  });
-                } else {
+          virtual_Task.findOne(
+            { _id: req.params.task_id },
+            function (err, data1) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
+              } else {  
+                if (req.body.is_decline) {
                   if (data1.task_type === "picture_evaluation") {
                     User.findOne(
                       { _id: req.body.patient_id },
@@ -490,20 +490,21 @@ router.put("/AddTask/:task_id", function (req, res, next) {
                       status: 200,
                       hassuccessed: true,
                       message: "Task is updated",
-                      data: userdata,
+                      data: data1,
                     });
-                  }
+                  }    
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Task is updated",
+                    data: data1,
+                  });
                 }
-              }
-            );
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Task is updated",
-              data: userdata,
-            });
-          }
+                    }
+            }
+          );
+        
         }
       }
     );
