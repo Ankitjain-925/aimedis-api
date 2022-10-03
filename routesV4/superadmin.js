@@ -9,6 +9,7 @@ const { encrypt, decrypt } = require("./Cryptofile.js");
 var Wishlist = require("../schema/wishlist_schema");
 var jwtconfig = require("../jwttoken");
 const uuidv1 = require("uuid/v1");
+const vidchat = require("../schema/vid_chat_account.js")
 const pdf = require("html-pdf");
 const { promisify } = require("util");
 var nodemailer = require("nodemailer");
@@ -480,7 +481,7 @@ function emptyBucket(bucketName, foldername) {
 }
 
 router.delete("/deleteUser/:UserId", function (req, res, next) {
-  User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
+  User.findByIdAndRemove({ _id: req.params.UserId }, function (err, data12) {
     if (err) {
       res.json({
         status: 200,
@@ -495,6 +496,22 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         var buck = "aimedisfirstbucket";
       }
       emptyBucket(buck, data12.profile_id);
+      var patient_id = req.params.UserId
+      const VirtualtToSearchWith3 = new vidchat({ patient_id });
+      VirtualtToSearchWith3.encryptFieldsSync();
+      vidchat.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith3.patient_id] }},
+        {
+          '$unset': {
+            'patient_id': ''
+          }
+        },function (err, data) {
+          if (err) {
+            console.log("err", err)
+          } else {
+            console.log("data", data)
+          }
+        }
+      )
       var patient_id = req.params.UserId
       const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
       VirtualtToSearchWith1.encryptFieldsSync();
