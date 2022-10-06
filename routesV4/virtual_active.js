@@ -117,7 +117,7 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
 router.post("/SelectDocforSickleave2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  
+  try{
   if (legit) {
     
     const VirtualtToSearchWith = new virtual_Task({ task_type: "sick_leave" });
@@ -190,12 +190,20 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/SelectDocforSickleave", function (req, res, next) { 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = process.env.institute_id;
+ try{
   if (legit) {
     User.find({ current_available: true, institute_id: institute_id })
       .countDocuments()
@@ -366,11 +374,19 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/PatientTask/:profile_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     virtual_Task.find(
       { "assinged_to.profile_id": req.params.profile_id },
@@ -394,11 +410,19 @@ router.get("/PatientTask/:profile_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     let patient_id = req.params.patient_id;
     var VirtualtToSearchWith = new virtual_Task({ patient_id });
@@ -444,9 +468,17 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/DoctorMail", function (req, res) {
+ try{
   var sendData = `<div>Dear Doctor <br/>
     Here is the new Sick leave certificate request from the 
       ${req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id
@@ -487,6 +519,13 @@ router.post("/DoctorMail", function (req, res) {
       }
     }
   );
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
@@ -494,6 +533,7 @@ router.post("/DoctorMail", function (req, res) {
 router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     sick_meeting.findByIdAndRemove(
       { _id: req.params.meeting_id },
@@ -521,6 +561,13 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/approvedrequest", function (req, res) {
@@ -1320,6 +1367,7 @@ function GetDatafromAws1(element, comming2) {
 }
 
 router.post("/SickleaveCretificateToPatient", function (req, res) {
+  try{
   var sendData = `<div>Dear Doctor <br/>
   Here is the new Sick leave certificate request from the 
     ${req.body.first_name + " " + req.body.last_name + " " + req.body.profile_id},
@@ -1359,6 +1407,13 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
       }
     }
   );
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/Linktime/:sesion_id", function (req, res, next) {
@@ -1666,6 +1721,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
 });
 
 router.put("/joinmeeting/:task_id", function (req, res, next) {
+ try{
   virtual_Task.findOneAndUpdate(
     { _id: req.params.task_id },
     { $set: { meetingjoined: true } },
@@ -1695,6 +1751,13 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
       }
     }
   );
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
@@ -1749,6 +1812,7 @@ router.post("/sickarchive", function (req, res) {
 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     task_type = "sick_leave"
     const VirtualtToSearchWith = new virtual_Task({
@@ -1795,6 +1859,13 @@ router.post("/sickarchive", function (req, res) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 })
 
 
@@ -1804,6 +1875,7 @@ router.get("/GetAmount/:house_id", function (req, res) {
   let house_name = "";
   let userdata = "";
   let sickleave_certificate_amount = "";
+ try{
   if (legit) {
     Institute.findOne({
       "institute_groups.houses.house_id": req.params.house_id,
@@ -1842,12 +1914,20 @@ router.get("/GetAmount/:house_id", function (req, res) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
 router.put("/AddAmount/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     // var track_id = {track_id : req.params.TrackId}
 
@@ -1904,11 +1984,19 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/Task/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
 
     let patient_id = req.params.patient_id;
@@ -1945,6 +2033,13 @@ router.get("/Task/:patient_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
