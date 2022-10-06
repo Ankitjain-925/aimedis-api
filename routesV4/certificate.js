@@ -17,6 +17,7 @@ router.get("/DoctorUsersSc", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     user.find(
       {
         type: "doctor",
@@ -36,6 +37,13 @@ router.get("/DoctorUsersSc", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -49,6 +57,7 @@ router.get("/DoctorUsersP", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     user.find(
       {
         type: "doctor",
@@ -68,6 +77,13 @@ router.get("/DoctorUsersP", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
