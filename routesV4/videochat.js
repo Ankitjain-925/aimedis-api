@@ -75,10 +75,9 @@ function getDate(date, dateFormat) {
 router.post("/getuserchat", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // console.log(legit)
+
   try {
     if (legit) {
-
       const messageToSearchWith = new vidchat({ email: req.body.email });
       messageToSearchWith.encryptFieldsSync();
       vidchat.find(
@@ -113,6 +112,7 @@ router.post("/getuserchat", function (req, res, next) {
       });
     }
   } catch (err) {
+
     res.json({
       status: 200,
       hassuccessed: false,
@@ -126,7 +126,7 @@ router.post("/getuserchat", function (req, res, next) {
 router.post("/AddVideoUserAccount", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  // console.log(legit)
+
   try {
     if (legit) {
       var email = req.body.email
@@ -134,6 +134,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
       VirtualtToSearchWith1.encryptFieldsSync();
       vidchat.find({ $or: [{ email: req.body.email }, { email: VirtualtToSearchWith1.email }] },
         function (err, data1) {
+
 
           if (err) {
             res.json({
@@ -192,6 +193,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
             }
           }
         }
+
       )
     } else {
       res.json({
