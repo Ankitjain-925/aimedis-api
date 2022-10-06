@@ -77,7 +77,7 @@ router.post("/getuserchat", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   console.log(legit)
   if (legit) {
-
+    try{
     const messageToSearchWith = new vidchat({ email: req.body.email });
     messageToSearchWith.encryptFieldsSync();
     vidchat.find(
@@ -104,6 +104,13 @@ router.post("/getuserchat", function (req, res, next) {
         }
       }
     );
+    } catch{
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
   } else {
     res.json({
       status: 200,
@@ -120,6 +127,7 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   console.log(legit)
   if (legit) {
+    try{
     var email = req.body.email
     const VirtualtToSearchWith1 = new vidchat({ email });
     VirtualtToSearchWith1.encryptFieldsSync();
@@ -184,6 +192,14 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
         }
       }
     )
+    }catch{
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
+    
   } else {
     res.json({
       status: 200,
@@ -200,6 +216,7 @@ router.post("/AppointmentBook", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   console.log(legit)
   if (legit) {
+    try{
     const Videodata = new Cappointment(req.body)
     Videodata.save()
       .then(result => {
@@ -216,6 +233,13 @@ router.post("/AppointmentBook", function (req, res, next) {
           reeor: err
         })
       })
+    } catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
