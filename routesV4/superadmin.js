@@ -46,6 +46,7 @@ router.post("/Addadminuser", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   var institute_id = { institute_id: 0 };
   if (legit) {
+    try{
     const email = req.body.email;
     const messageToSearchWith = new User({ email });
     messageToSearchWith.encryptFieldsSync();
@@ -326,6 +327,13 @@ router.post("/Addadminuser", function (req, res, next) {
           }
         }
       });
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -340,6 +348,7 @@ router.get("/allusers", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   AllUser1 = [];
   if (legit) {
+    try{
     User.find()
       .exec()
       .catch((error) => {
@@ -364,6 +373,13 @@ router.get("/allusers", function (req, res, next) {
           res.json({ status: 200, hassuccessed: false, msg: "No User found" });
         }
       });
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -378,6 +394,7 @@ router.get("/allHospitalusers/:institute_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   AllUser1 = [];
   if (legit) {
+    try{
     User.find({ institute_id: req.params.institute_id })
       .exec()
       .then((data) => {
@@ -394,6 +411,13 @@ router.get("/allHospitalusers/:institute_id", function (req, res, next) {
           res.json({ status: 200, hassuccessed: false, msg: "No User found" });
         }
       });
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -408,6 +432,7 @@ router.get("/messageUsers", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   AllUser1 = [];
   if (legit) {
+    try{
     User.find({ _id: legit.id })
       .exec()
       .then((data) => {
@@ -436,6 +461,13 @@ router.get("/messageUsers", function (req, res, next) {
           res.json({ status: 200, hassuccessed: false, msg: "User not found" });
         }
       });
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -569,6 +601,7 @@ router.put("/BlockUser/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     User.updateOne(
       { _id: req.params.UserId },
       req.body,
@@ -589,6 +622,13 @@ router.put("/BlockUser/:UserId", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -635,6 +675,7 @@ router.post("/Document", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var data = {
       DocumentId: uuidv1(),
       version: 1,
@@ -663,6 +704,13 @@ router.post("/Document", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -677,6 +725,7 @@ router.get("/Document", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     User.find(
       {
         _id: legit.id,
@@ -701,6 +750,13 @@ router.get("/Document", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -716,6 +772,7 @@ router.put("/ChangeStatus/:DocumentId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     User.updateOne(
       {
         _id: legit.id,
@@ -751,6 +808,13 @@ router.put("/ChangeStatus/:DocumentId", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -764,6 +828,7 @@ router.post("/GetHintinstitute", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     colName = req.body.institute_name;
     Institute.find(
       {
@@ -789,6 +854,13 @@ router.post("/GetHintinstitute", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -802,6 +874,7 @@ router.get("/GetHintinstitute", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     Institute.find(
       { institute_name: { $exists: true } },
       function (err, allinstitute) {
@@ -821,6 +894,13 @@ router.get("/GetHintinstitute", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -838,6 +918,7 @@ router.delete("/Document/:DocumentId", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   var data = req.body.data;
   if (legit) {
+    try{
     User.updateOne(
       { _id: legit.id },
       { $pull: { documents: { DocumentId: req.params.DocumentId } } },
@@ -867,6 +948,13 @@ router.delete("/Document/:DocumentId", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -880,6 +968,7 @@ router.post("/topic", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var topics = new Topic(req.body);
     topics.save(function (err, messages_data) {
       if (err && !messages_data) {
@@ -896,6 +985,13 @@ router.post("/topic", function (req, res, next) {
         });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -908,6 +1004,7 @@ router.get("/topic", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     Topic.find({}, function (err, messages_data) {
       if (err && !messages_data) {
         res.json({
@@ -924,6 +1021,13 @@ router.get("/topic", function (req, res, next) {
         });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -934,6 +1038,7 @@ router.get("/topic", function (req, res, next) {
 });
 
 router.delete("/topic/:id", function (req, res, next) {
+  try{
   Topic.findOneAndRemove({ _id: req.params.id }, function (err, data12) {
     if (err) {
       res.json({
@@ -946,11 +1051,19 @@ router.delete("/topic/:id", function (req, res, next) {
       res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
     }
   });
+}catch{
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "Something went wrong.",
+  });
+}
 });
 
 router.delete("/removeWishlist/:id", function (req, res) {
   let legit = jwtconfig.verify(req.headers.token);
   if (legit) {
+    try{
     Wishlist.findOneAndRemove({ _id: req.params.id }, function (err, data12) {
       if (err) {
         res.json({
@@ -967,6 +1080,13 @@ router.delete("/removeWishlist/:id", function (req, res) {
         });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -980,6 +1100,7 @@ router.put("/topic/:id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     Topic.updateOne(
       { _id: req.params.id },
       req.body,
@@ -1000,6 +1121,13 @@ router.put("/topic/:id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -1014,6 +1142,7 @@ router.get("/allusers/:type", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var batchSize = 10000;
     User.find({ type: req.params.type }).count().then((count) => {
 
@@ -1035,7 +1164,14 @@ router.get("/allusers/:type", function (req, res) {
     //     } else {
     //       res.json({ status: 200, hassuccessed: true, data: data })
     //     }
-    //   })  
+    //   })
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }  
   } else {
     res.json({
       status: 200,
@@ -1049,6 +1185,7 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     User.find({ type: req.params.type }).count().lean().then((count) => {
       let pagenumber = req.params.pagenumber
       var page_limit = 20
@@ -1068,6 +1205,13 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
       res.json({ status: 200, hassuccessed: true, err: err })
 
     })
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
 
   } else {
     res.json({
@@ -1085,6 +1229,7 @@ router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, r
 
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     User.find({ institute_id: req.params.institute_id, type: req.params.type }).count().then((count) => {
       let pagenumber = req.params.pagenumber
       var page_limit = 20
@@ -1105,6 +1250,13 @@ router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, r
       res.json({ status: 200, hassuccessed: true, err: err })
 
     })
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -1173,6 +1325,7 @@ router.post("/allSearchusers", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     if (req.body.type && req.body.search) {
       User.find({ type: req.body.type }).then((data) => {
         let serach_value = SearchUser(req.body.search, data)
@@ -1186,6 +1339,13 @@ router.post("/allSearchusers", function (req, res) {
         msg: "Please send type and search data",
       });
     }
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -1199,7 +1359,7 @@ router.post("/allHospitalusers", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-
+try{
     if (req.body.institue_id && req.body.type && req.body.search) {
       User.find({ institute_id: req.body.institue_id, type: req.body.type }).then((data) => {
         console.log("data", data)
@@ -1215,6 +1375,13 @@ router.post("/allHospitalusers", function (req, res) {
         msg: "Please send type and search data",
       });
     }
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,

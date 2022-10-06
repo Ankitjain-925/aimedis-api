@@ -130,6 +130,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      try{
       let patient_id =req.params.patient_id
       const messageToSearchWith = new CareModel({patient_id });
       messageToSearchWith.encryptFieldsSync();
@@ -148,6 +149,13 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
           }
         }
       );
+      }catch{
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
     } else {
       res.json({
         status: 200,
@@ -161,6 +169,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      try{
         const house_id = req.params.house_id;
         const messageToSearchWith = new CareModel({ house_id });
         messageToSearchWith.encryptFieldsSync();
@@ -179,6 +188,13 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
                 }
             }
         );
+     }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
     } else {
         res.json({
             status: 200,

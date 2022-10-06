@@ -10,6 +10,7 @@ router.post("/AddAnswerspatient", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var answerspatients = new answerspatient(req.body);
     answerspatients.save(function (err, user_data) {
       if (err && !user_data) {
@@ -33,6 +34,13 @@ router.post("/AddAnswerspatient", function (req, res, next) {
         })
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -46,6 +54,7 @@ router.put("/Answer/:answerspatient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     answerspatient.updateOne(
       { _id: req.params.answerspatient_id },
       req.body,
@@ -67,6 +76,13 @@ router.put("/Answer/:answerspatient_id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -80,6 +96,7 @@ router.delete("/Answer/:answerspatient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     answerspatient.findByIdAndRemove(
       { _id: req.params.answerspatient_id },
       req.body,
@@ -100,6 +117,13 @@ router.delete("/Answer/:answerspatient_id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -113,6 +137,7 @@ router.get("/GetAnswerspatient/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     let house_id =req.params.house_id
     const messageToSearchWith = new answerspatient({house_id });
     messageToSearchWith.encryptFieldsSync();
@@ -131,6 +156,13 @@ router.get("/GetAnswerspatient/:house_id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -144,6 +176,7 @@ router.post("/AddQuestionaire", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var questionaires = new questionaire(req.body);
     questionaires.save(function (err, user_data) {
       if (err && !user_data) {
@@ -156,6 +189,13 @@ router.post("/AddQuestionaire", function (req, res, next) {
         });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -169,6 +209,7 @@ router.put("/Question/:questionaire_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     questionaire.updateOne(
       { _id: req.params.questionaire_id },
       req.body,
@@ -190,6 +231,13 @@ router.put("/Question/:questionaire_id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -203,6 +251,7 @@ router.get("/GetQuestionaire/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     const house_id = req.params.house_id;
     const messageToSearchWith = new questionaire({ house_id });
     messageToSearchWith.encryptFieldsSync();
@@ -221,6 +270,13 @@ router.get("/GetQuestionaire/:house_id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
