@@ -44,6 +44,7 @@ var paths = "https://aimedis1.com/public/uploads/Trackrecord";
 router.get("/getKyc/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  try{
   if (legit) {
     const user_id = req.params.UserId;
     const messageToSearchWith = new kyc({ user_id });
@@ -86,12 +87,19 @@ router.get("/getKyc/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/updateKyc/:KYCId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-
+try{
   if (legit) {
     kyc.updateOne(
       { _id: req.params.KYCId },
@@ -121,11 +129,19 @@ router.put("/updateKyc/:KYCId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/getAllKyc", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     kyc.find(function (err, doc) {
       if (err && !doc) {
@@ -151,11 +167,19 @@ router.get("/getAllKyc", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/Addkyc", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     var data = req.body;
     var kycs = new kyc(data);
@@ -170,11 +194,19 @@ router.post("/Addkyc", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/Get_patient_gender/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     user.findOne({ _id: req.params.UserId }, function (err, doc) {
       if (err && !doc) {
@@ -205,12 +237,20 @@ router.get("/Get_patient_gender/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 //Edit track records
 router.put("/AddTrack/:UserId/:TrackId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     // var track_id = {track_id : req.params.TrackId}
 
@@ -259,6 +299,13 @@ router.put("/AddTrack/:UserId/:TrackId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 /*Added for the handle precriptions*/
@@ -266,6 +313,7 @@ router.put("/AddTrack/:UserId/:TrackId", function (req, res, next) {
 router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     var created_by = req.body.data.created_by;
     req.body.data.created_by = encrypt(req.body.data.created_by);
@@ -430,12 +478,20 @@ router.put("/HandlePrescriptions/:UserId/:TrackId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 //Add the track record
 
 router.put("/AddTrack/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     var ids = { track_id: uuidv1() };
     req.body.data.created_by = encrypt(req.body.data.created_by);
@@ -525,11 +581,19 @@ router.put("/AddTrack/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/AddTrackAdmin", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     var ids = { track_id: uuidv1() };
     req.body.data.created_by = encrypt(req.body.data.created_by);
@@ -570,6 +634,13 @@ router.put("/AddTrackAdmin", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
@@ -577,6 +648,7 @@ router.put("/AddTrackAdmin", function (req, res, next) {
 router.delete("/AddTrack/:UserId/:TrackId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     user.updateOne(
       { _id: req.params.UserId },
@@ -614,11 +686,19 @@ router.delete("/AddTrack/:UserId/:TrackId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/AppointOfDate/:date", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const doctor_id = legit.id;
     const messageToSearchWith = new Appointment({ doctor_id });
@@ -651,12 +731,20 @@ router.get("/AppointOfDate/:date", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 //Added by Ankita
 router.get("/AppointOfDate1/:date", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const patient = legit.id;
     const messageToSearchWith = new Appointment({ patient });
@@ -686,11 +774,19 @@ router.get("/AppointOfDate1/:date", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/AppointmentByDate1", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const patient = legit.id;
     const messageToSearchWith = new Appointment({ patient });
@@ -732,11 +828,19 @@ router.get("/AppointmentByDate1", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/AppointmentByDate", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const doctor_id = legit.id;
     const messageToSearchWith = new Appointment({ doctor_id });
@@ -779,9 +883,17 @@ router.get("/AppointmentByDate", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/appointment", function (req, res) {
+ try{
   var Appointments = new Appointment(req.body);
   Appointments.save(function (err, user_data) {
     if (err && !user_data) {
@@ -970,6 +1082,13 @@ router.post("/appointment", function (req, res) {
       });
     }
   });
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 function getDate(date, dateFormat) {
@@ -1022,6 +1141,7 @@ function getDate(date, dateFormat) {
 router.get("/getUser/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  try{
   if (legit) {
     const profile_id = req.params.UserId;
     const alies_id = req.params.UserId;
@@ -1101,12 +1221,20 @@ router.get("/getUser/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 //Get the track record
 router.get("/AddTrack/:UserId", function (req, res, next) {
   trackrecord1 = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     if (req.params.UserId === legit.id) {
       user.find({ _id: req.params.UserId }, function (err, doc) {
@@ -1206,12 +1334,20 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/ArchivedTrack/:UserId", function (req, res, next) {
   track2 = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     user.find({ _id: req.params.UserId }, function (err, doc) {
       if (err && !doc) {
@@ -1248,6 +1384,13 @@ router.get("/ArchivedTrack/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 function forEachPromise(items, fn) {
@@ -1832,6 +1975,7 @@ router.get("/getAllUserProfileId", (req, res, next) => {
 router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     let house_id= req.params.house_id
     const VirtualtToSearchWith = new virtual_Case({house_id });
@@ -1868,6 +2012,13 @@ router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, 
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
