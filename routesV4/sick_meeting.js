@@ -88,6 +88,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     virtual_Task.find(
       { patient_id: req.params.patient_id },
       { task_type: "sick_leave" },
@@ -104,6 +105,13 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
         }
       }
     );
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong."
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -114,6 +122,7 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
 });
 
 router.post("/DoctorMail", function (req, res) {
+  try{
   var sendData = "Dear Doctor," + "<br/>";
   "Here is the new Sick leave certificate request from the " +
     req.body.first_name +
@@ -155,9 +164,17 @@ router.post("/DoctorMail", function (req, res) {
       }
     }
   );
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
 });
 
 router.post("/approvedrequest/:task_id", function (req, res) {
+  try{
   if (req.body.for_manage === "approved") {
     virtual_Task.updateOne(
       { _id: req.params.task_id },
@@ -219,12 +236,20 @@ router.post("/approvedrequest/:task_id", function (req, res) {
       }
     );
   }
+}catch{
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "Something went wrong.",
+  });
+}
 });
 
 router.delete("/AddMeeting/:session_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     sick_meeting.findByIdAndRemove(req.params.session_id, function (err, data) {
       if (err) {
         res.json({
@@ -241,6 +266,13 @@ router.delete("/AddMeeting/:session_id", function (req, res, next) {
         });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -254,6 +286,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var sick_meetings = new sick_meeting(req.body);
     sick_meetings.save(function (err, user_data) {
       if (err && !user_data) {
@@ -343,6 +376,13 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
         });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -356,6 +396,7 @@ router.get("/PatientTask/:profile_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     virtual_Task.find(
       { "assinged_to.profile_id": req.params.profile_id },
       function (err, userdata) {
@@ -371,6 +412,13 @@ router.get("/PatientTask/:profile_id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,

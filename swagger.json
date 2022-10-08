@@ -41,9 +41,10 @@
             "description": "API for cases"
         },
         {
-            "name":"Video_Conference",
+            "name": "Video_Conference",
             "description": "API for Video_Conference"
-        }, {
+        },
+        {
             "name": "TrackRecord",
             "description": "API for track the record"
         },
@@ -79,7 +80,6 @@
             "name": "DoctorAppointments",
             "description": "Get Emergency record"
         }
-        
     ],
     "schemes": [
         "https"
@@ -91,7 +91,6 @@
         "application/json"
     ],
     "paths": {
-      
         "/hospitaladmin/associatedTo/{user_id}": {
             "parameters": [
                 {
@@ -118,11 +117,9 @@
                 "responses": {
                     "200": {
                         "description": "updated successfully"
-                        
                     }
                 }
             }
-            
         },
         "/emergency_record/{UserId}": {
             "parameters": [
@@ -285,7 +282,7 @@
                 }
             }
         },
-        "/cases/Discharge/{patient_id}/{admin_id}":{
+        "/cases/Discharge/{patient_id}/{admin_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -304,9 +301,8 @@
                     "description": "ID",
                     "type": "string"
                 }
-                
-             ],
-           "put": {
+            ],
+            "put": {
                 "tags": [
                     "TrackRecord"
                 ],
@@ -320,7 +316,7 @@
                         }
                     }
                 ],
-                "summary": "update with given Id",
+                "summary": "Update Discharge Patient with Patient_id and Admin_id",
                 "responses": {
                     "200": {
                         "description": "successfully discharge"
@@ -353,7 +349,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add User",
+                "summary": "Add User",
                 "responses": {
                     "200": {
                         "description": "User added succefully",
@@ -520,7 +516,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add Membership",
+                "summary": "Add Membership",
                 "responses": {
                     "200": {
                         "description": "membership added succefully",
@@ -552,7 +548,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Generate Sick Cretificate",
+                "summary": "Generate Sick Cretificate",
                 "responses": {
                     "200": {
                         "description": "added succefully",
@@ -777,7 +773,7 @@
                         }
                     }
                 ],
-                "summary":"For Registration",
+                "summary": "For Registration",
                 "produces": [
                     "application/json"
                 ],
@@ -809,7 +805,7 @@
                         }
                     }
                 ],
-                "summary":"Add Prescription",
+                "summary": "Add Prescription",
                 "produces": [
                     "application/json"
                 ],
@@ -901,10 +897,7 @@
                 "summary": "Get with given ID",
                 "responses": {
                     "200": {
-                        "description": "Certificate found",
-                        "schema": {
-                            "$ref": "#/definitions/SickCertificate"
-                        }
+                        "description": "Certificate found"
                     }
                 }
             }
@@ -1068,7 +1061,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add appointment",
+                "summary": "Add appointment",
                 "responses": {
                     "200": {
                         "description": "Doctor Appointments added succefully",
@@ -1082,7 +1075,6 @@
                 }
             }
         },
-
         "/step/GetStep/{house_id}": {
             "parameters": [
                 {
@@ -1211,7 +1203,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "update with given ID",
+                "summary": "Update Institute with Given Institute_id",
                 "produces": [
                     "application/json"
                 ],
@@ -1577,7 +1569,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Add Step at patientflow",
+                "summary": "Add Step From Patient flow",
                 "responses": {
                     "200": {
                         "description": "step added succefully",
@@ -1616,7 +1608,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Add question at house id --- please add option in form of array",
+                "summary": "Add a questionnaire at the patient end with House Id (please add an option with a form of the array)",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -1655,7 +1647,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add  answer by patient",
+                "summary": "Add Answer at Patient End",
                 "responses": {
                     "200": {
                         "description": " added successfully",
@@ -1694,13 +1686,10 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add Specialty",
+                "summary": "Add Speciality From House",
                 "responses": {
                     "200": {
-                        "description": " added successfully",
-                        "schema": {
-                            "$ref": "#/definitions/AddSpecialty"
-                        }
+                        "description": "Added successfully"
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -1733,13 +1722,10 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add task",
+                "summary": "Add Task from House",
                 "responses": {
                     "200": {
-                        "description": " added successfully",
-                        "schema": {
-                            "$ref": "#/definitions/AddTask"
-                        }
+                        "description": " added successfully"
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -1777,13 +1763,10 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add comment",
+                "summary": "Add Professional Task Comment With task_id",
                 "responses": {
                     "200": {
-                        "description": "comment added successfully",
-                        "schema": {
-                            "$ref": "#/definitions/ProfessionalTaskComment"
-                        }
+                        "description": "comment added successfully"
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -1813,16 +1796,13 @@
                         }
                     }
                 ],
-                "summary":"Add service",
+                "summary": "Add Service From House",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": " added successfully",
-                        "schema": {
-                            "$ref": "#/definitions/AddService"
-                        }
+                        "description": " added successfully"
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -1852,16 +1832,13 @@
                         }
                     }
                 ],
-                "summary":"Add invoice",
+                "summary": "Add Invoice From House",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": " added successfully",
-                        "schema": {
-                            "$ref": "#/definitions/AddInvoice"
-                        }
+                        "description": " added successfully"
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -1891,16 +1868,13 @@
                         }
                     }
                 ],
-                "summary":"Used for filter the data",
+                "summary": " Check Patient with patient_id, pin, institute_id, email",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": " information get successfully",
-                        "schema": {
-                            "$ref": "#/definitions/checkPatient"
-                        }
+                        "description": " information get successfully"
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -1933,13 +1907,11 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Filter the data",
+                "summary": "Check Patient with patient_id, pin, email,  First_name, Last_ name",
                 "responses": {
                     "200": {
-                        "description": " information get successfully",
-                        "schema": {
-                            "$ref": "#/definitions/checkPatient"
-                        }
+                        "description": " information get successfully"
+                        
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -1969,16 +1941,14 @@
                         }
                     }
                 ],
-                "summary":"Add patient to VH",
+                "summary": "Add Patient To Patient Flow",
                 "Produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "case number successfully assigned ",
-                        "schema": {
-                            "$ref": "#/definitions/addPatientToVH"
-                        }
+                        "description": "case number successfully assigned "
+                        
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -2039,7 +2009,7 @@
                 }
             ],
             "delete": {
-                "summary": "Delete with given ID",
+                "summary": "Delete Speciality with Speciality_id",
                 "tags": [
                     "Virtual_Specialty"
                 ],
@@ -2066,7 +2036,7 @@
                         }
                     }
                 ],
-                "summary": "update with given ID",
+                "summary": "Update Speciality with Speciality_id",
                 "responses": {
                     "200": {
                         "description": "specialty updated"
@@ -2090,16 +2060,13 @@
                 }
             ],
             "delete": {
-                "summary": "Delete with given ID",
+                "summary": "Delete Task with Task_id",
                 "tags": [
                     "Virtual_Specialty"
                 ],
                 "responses": {
                     "200": {
-                        "description": "task is deleted",
-                        "schema": {
-                            "$ref": "#/definitions/AddTask"
-                        }
+                        "description": "task is deleted"
                     }
                 }
             },
@@ -2117,7 +2084,7 @@
                         }
                     }
                 ],
-                "summary": "update with given ID",
+                "summary": "Add Task with Task_id",
                 "responses": {
                     "200": {
                         "description": "task is updated"
@@ -2141,7 +2108,7 @@
                 }
             ],
             "delete": {
-                "summary": "Delete with given ID",
+                "summary": "Delete Invoice with Bill_id",
                 "tags": [
                     "Virtual_Specialty"
                 ],
@@ -2168,7 +2135,7 @@
                         }
                     }
                 ],
-                "summary": "update with given ID",
+                "summary": "Add Invoice with Bill_id",
                 "responses": {
                     "200": {
                         "description": "Invoice is updated"
@@ -2192,7 +2159,7 @@
                 }
             ],
             "delete": {
-                "summary": "Delete with given ID",
+                "summary": "Delete Patient with Case_id",
                 "tags": [
                     "Virtual_Specialty"
                 ],
@@ -2219,7 +2186,7 @@
                         }
                     }
                 ],
-                "summary": "update with given ID",
+                "summary": " Add Patient with Case_id",
                 "responses": {
                     "200": {
                         "description": "Case is updated"
@@ -2249,10 +2216,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "answerspatient is deleted Successfully",
-                        "schema": {
-                            "$ref": "#/definitions/AddAnswerspatient"
-                        }
+                        "description": "Delete Answer with Given Id"
                     }
                 }
             },
@@ -2270,7 +2234,7 @@
                         }
                     }
                 ],
-                "summary": "update with given ID",
+                "summary": "Update Answer with Given Id",
                 "responses": {
                     "200": {
                         "description": "answerspatient is updated"
@@ -2307,7 +2271,7 @@
                         }
                     }
                 ],
-                "summary": "update with given Id",
+                "summary": "Update Questionaire with Given Id",
                 "responses": {
                     "200": {
                         "description": "questionaire is updated"
@@ -2338,16 +2302,13 @@
                 }
             ],
             "delete": {
-                "summary": "Delete with given ID",
+                "summary": "Delete Professional Task Comment  with Task_id and Comment_id",
                 "tags": [
                     "Virtual_Specialty"
                 ],
                 "responses": {
                     "200": {
-                        "description": "comment is deleted",
-                        "schema": {
-                            "$ref": "#/definitions/ProfessionalTaskComment"
-                        }
+                        "description": "comment is deleted"
                     }
                 }
             },
@@ -2365,7 +2326,7 @@
                         }
                     }
                 ],
-                "summary": "update with given Id",
+                "summary": " Add Professional Task Comment  with Task_id and Comment_id",
                 "responses": {
                     "200": {
                         "description": "comment is updated"
@@ -2389,16 +2350,13 @@
                 }
             ],
             "delete": {
-                "summary": "Delete with given ID",
+                "summary": "Delete Service  with Task_id and Service_id",
                 "tags": [
                     "Virtual_Specialty"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Service is Deleted Successfully",
-                        "schema": {
-                            "$ref": "#/definitions/AddService"
-                        }
+                        "description": "Service is Deleted Successfully"
                     }
                 }
             },
@@ -2416,7 +2374,7 @@
                         }
                     }
                 ],
-                "summary": "update with given ID",
+                "summary": "Add Service  with Task_id and Service_id",
                 "responses": {
                     "200": {
                         "description": "service is update"
@@ -2450,7 +2408,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "Delete with given ID",
+                "summary": "Delete Institute Group with Given Institute _id",
                 "produces": [
                     "application/json"
                 ],
@@ -2474,7 +2432,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "update with given ID",
+                "summary": "Update Institute Group with Given Institute _id and Group_id",
                 "produces": [
                     "application/json"
                 ],
@@ -2511,7 +2469,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "Delete with given ID",
+                "summary": " Delete  Associate User with Given Institute _id",
                 "produces": [
                     "application/json"
                 ],
@@ -2548,7 +2506,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "Delete with given ID",
+                "summary": " Delete  Assigned Hospital  with Given House _id and User_id",
                 "produces": [
                     "application/json"
                 ],
@@ -2588,7 +2546,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "update with given ID",
+                "summary": " Update Institute Group with Given Institute _id",
                 "produces": [
                     "application/json"
                 ],
@@ -2628,7 +2586,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "update with given ID",
+                "summary": "Update  Assigned Hospital  with Given User _id",
                 "produces": [
                     "application/json"
                 ],
@@ -2665,7 +2623,7 @@
                 "tags": [
                     "Hospital_Admin"
                 ],
-                "summary": "update with given ID",
+                "summary": "Update  Associate User with Given User _id",
                 "produces": [
                     "application/json"
                 ],
@@ -2705,7 +2663,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "update with given ID",
+                "summary": "Add Room with Case_id",
                 "produces": [
                     "application/json"
                 ],
@@ -2744,7 +2702,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "update with given ID",
+                "summary": "Add Case with Speciality_id",
                 "produces": [
                     "application/json"
                 ],
@@ -2788,16 +2746,13 @@
                         }
                     }
                 ],
-                "summary":"Add Case",
+                "summary": "Add Case with case_number, speciality, patient, house_id, wards, room, bed, hospital",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "added successfully",
-                        "schema": {
-                            "$ref": "#/definitions/AddRoom"
-                        }
+                        "description": "added successfully"
                     },
                     "500": {
                         "description": "Something happened wrong"
@@ -2830,7 +2785,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add Bed and check the availability",
+                "summary": "Check Bed availability   with case_number, speciality, patient, house_id, wards, room, bed, hospital",
                 "responses": {
                     "200": {
                         "description": "added successfully",
@@ -2869,7 +2824,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary":"Add ward and check the availability",
+                "summary": "Check Bed Availability with ward_id, specialty_id,  house_id",
                 "responses": {
                     "200": {
                         "description": "added successfully"
@@ -2924,7 +2879,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "using house_id get Task",
+                "summary": "Get appointment Task using House_id",
                 "produces": [
                     "application/json"
                 ],
@@ -2979,7 +2934,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "using house_id get Task",
+                "summary": "Get Statistics right Info using House_id",
                 "produces": [
                     "application/json"
                 ],
@@ -3009,7 +2964,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "using house_id get Task",
+                "summary": "Get Statistics Top Info using House_id",
                 "produces": [
                     "application/json"
                 ],
@@ -3020,7 +2975,6 @@
                 }
             }
         },
-
         "/vh/getAppointTask1/{House_id}": {
             "get": {
                 "parameters": [
@@ -3040,7 +2994,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "using house_id get Task",
+                "summary": "Get Appointment Task Using House_id",
                 "produces": [
                     "application/json"
                 ],
@@ -3051,7 +3005,6 @@
                 }
             }
         },
-
         "/vh/sortinfo/{patient_id}": {
             "get": {
                 "parameters": [
@@ -3068,7 +3021,6 @@
                         "description": "JWT token User"
                     }
                 ],
-
                 "tags": [
                     "virtual_cases"
                 ],
@@ -3142,7 +3094,7 @@
                 "tags": [
                     "virtual_cases"
                 ],
-                "summary": "Api for  Download",
+                "summary": "Download the Invoice in PDF form",
                 "produces": [
                     "application/json"
                 ],
@@ -3459,7 +3411,7 @@
             "parameters": [
                 {
                     "name": "token",
-                  "in": "header",
+                    "in": "header",
                     "description": "JWT token User"
                 }
             ],
@@ -3678,21 +3630,20 @@
         },
         "/vactive/PatientTask/{profile_id}": {
             "get": {
-                    "parameters": [
-                        {
-                            "name": "profile_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
+                "parameters": [
+                    {
+                        "name": "profile_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
                 "tags": [
                     "sick"
                 ],
@@ -3707,24 +3658,22 @@
                 }
             }
         },
-        
         "/vactive/AddMeeting/{meeting_id}": {
             "delete": {
-                    "parameters": [
-                        {
-                            "name": "meeting_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
+                "parameters": [
+                    {
+                        "name": "meeting_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
                 "tags": [
                     "sick"
                 ],
@@ -3741,21 +3690,20 @@
         },
         "/vactive/GetAllPatientData/{patient_id}": {
             "get": {
-                    "parameters": [
-                        {
-                            "name": "patient_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
+                "parameters": [
+                    {
+                        "name": "patient_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
                 "tags": [
                     "sick"
                 ],
@@ -3776,9 +3724,7 @@
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User",
-                    "schema": {
-                           
-                    }
+                    "schema": {}
                 }
             ],
             "post": {
@@ -3789,11 +3735,9 @@
                         "description": "Add meeting",
                         "schema": {
                             "$ref": "#/definitions/Addmeeting"
-                           
                         }
                     }
                 ],
-
                 "tags": [
                     "sick"
                 ],
@@ -3824,11 +3768,9 @@
                         "description": "Approval Request",
                         "schema": {
                             "$ref": "#/definitions/approvedrequest"
-                           
                         }
                     }
                 ],
-
                 "tags": [
                     "sick"
                 ],
@@ -3859,11 +3801,9 @@
                         "description": "Booked Slot",
                         "schema": {
                             "$ref": "#/definitions/SelectDocforSickleave2"
-                           
                         }
                     }
                 ],
-
                 "tags": [
                     "sick"
                 ],
@@ -3878,7 +3818,6 @@
                 }
             }
         },
-
         "/vactive/DoctorMail": {
             "parameters": [
                 {
@@ -3895,11 +3834,9 @@
                         "description": "Mail to Doctor",
                         "schema": {
                             "$ref": "#/definitions/DoctorMail"
-                           
                         }
                     }
                 ],
-
                 "tags": [
                     "sick"
                 ],
@@ -3914,8 +3851,48 @@
                 }
             }
         },
-        "/vchat/Get_Doctor": {
+        "/vchat/Get_Doctor/{data}": {
             "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "data",
+                    "in": "path",
+                    "required": true,
+                    "description": "data",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get All Doctor list from AIS Care",
+                "responses": {
+                    "200": {
+                        "description": "Get Doctor"
+                    },
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/vchat/getuserchat": {
+            "parameters": [
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                },
                 {
                     "name": "token",
                     "in": "header",
@@ -3926,51 +3903,7 @@
                 "tags": [
                     "Video_Conference"
                 ],
-                "parameters": [
-                    {
-                        "name": "Doctor",
-                        "in": "body",
-                        "description": "Video_Conference",
-                        "schema": {
-                            "$ref": "#/definitions/getuser"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get doctor list",
-                "responses": {
-                    "200": {
-                        "description": "Get Doctor"
-                    },               
-                    "500": {
-                        "description": "Something happened wrong"
-                    }
-                }
-            }
-        },
-        "/vchat/getuserchat": {
-            
-                    "parameters": [
-                        {
-                            "name": "_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-                    "post": {
-                "tags": [
-                    "Video_Conference"
-                ],
-                "summary": "Check User",
+                "summary": "Check User Chat with USER_id",
                 "produces": [
                     "application/json"
                 ],
@@ -4003,21 +3936,43 @@
                         }
                     }
                 ],
-                "summary": "User_Registration",
+                "summary": "Add Registration For Video Conference",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
                         "description": "Add Data"
-                    },               
+                    },
                     "500": {
                         "description": "Something happened wrong"
                     }
                 }
             }
         },
-
+        "/vchat/UsernameLogin": {
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "videouser",
+                        "in": "body",
+                        "description": "Login for VideoUser",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                    }
+                ],
+                "summary": "Login with User name and password for  Video Conference",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
         "/vchat/AppointmentBook": {
             "parameters": [
                 {
@@ -4040,14 +3995,14 @@
                         }
                     }
                 ],
-                "summary": "Book Appointment",
+                "summary": "Book Appointment for Video Conference",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
                         "description": "Add Data"
-                    },               
+                    },
                     "500": {
                         "description": "Something happened wrong"
                     }
@@ -4056,25 +4011,24 @@
         },
         "/vchat/GetConferencePatient/{patient_id}": {
             "get": {
-                    "parameters": [
-                        {
-                            "name": "patient_id",
-                            "in": "path",
-                            "required": true,
-                            "description": "ID",
-                            "type": "string"
-                        },
-                        {
-                            "name": "token",
-                            "in": "header",
-                            "description": "JWT token User"
-                        }
-                    ],
-
+                "parameters": [
+                    {
+                        "name": "patient_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
                 "tags": [
                     "Video_Conference"
                 ],
-                "summary": "Get patient",
+                "summary": "Get Conference patient with Patient_id",
                 "produces": [
                     "application/json"
                 ],
@@ -4107,14 +4061,14 @@
                         }
                     }
                 ],
-                "summary": "Give feedback",
+                "summary": "Give FeedBack to doctor",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
                         "description": "Add Data"
-                    },               
+                    },
                     "500": {
                         "description": "Something happened wrong"
                     }
@@ -4123,13 +4077,77 @@
         },
         "/vchat/getfeedbackfordoctor/{doctor_id}": {
             "get": {
+                "parameters": [
+                    {
+                        "name": "doctor_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Give FeedBack to doctor with doctor_id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Doctor"
+                    }
+                }
+            }
+        },
+        "/vchat/managePrepaid": {
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "ManagePrepaid",
+                        "in": "body",
+                        "description": "Prepaid Manage",
+                        "schema": {
+                            "$ref": "#/definitions/Vprepaid"
+                        }
+                    }
+                ],
+                "summary": "Manage Prepaid for topup",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Vprepaid"
+                        }
+                    }
+                }
+            }
+        },
+        "/vchat/userdelete/{_id}": {
+            "delete": {
                     "parameters": [
                         {
-                            "name": "doctor_id",
+                        "name": "Delete Video User",
+                        "in": "body",
+                        "description": "Delete User",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                        },
+                        {
+                            "name": "_id",
                             "in": "path",
                             "required": true,
                             "description": "ID",
-                            "type": "string"
+                            "type": "string"                          
                         },
                         {
                             "name": "token",
@@ -4137,17 +4155,123 @@
                             "description": "JWT token User"
                         }
                     ],
-
                 "tags": [
                     "Video_Conference"
                 ],
-                "summary": "Get feedback at doctor end",
+                "summary": "Delete User with _id",
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Get Doctor"
+                        "description": "Delete Video User"
+                       
+                    }
+                }
+            }
+        
+        },
+        "/vchat/getSlotTime": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User",
+                    "schema": {
+                           
+                    }
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "Get TimeSlot",
+                        "in": "body",
+                        "description": "TimeSlot",
+                        "schema": {
+                            "$ref": "#/definitions/Timeslot"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Get slots for Video Conference",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "TimeSlot"
+                    }
+                }
+            }
+        }, "/vchat/DynamicSlots": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User",
+                    "schema": {
+                           
+                    }
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "Get DynamicSlot",
+                        "in": "body",
+                        "description": "DynamicSlot",
+                        "schema": {
+                            "$ref": "#/definitions/Dynamicslot"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Patient  booked slot dynamically",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "DynamicSlot"
+                    }
+                }
+            }
+        },
+        "/vchat/GetVideoTask/{patient_id}": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "patient_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "JWT token User"
+                    }
+                ],
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Get all Task for Video Conference",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patient  booked slot dynamically"
                     }
                 }
             }
@@ -4195,6 +4319,33 @@
                 }
             }
         },
+        "Timeslot":{
+            "required": [
+                
+            ],
+            "properties": {
+                "doctor_id":{
+                        "type": "string",
+                        "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                  }
+              }
+           
+       },
+       "Dynamicslot":{
+        "required": [
+                
+        ],
+        "properties": {
+            "_id":{
+                "type": "string",
+                "uniqueItems": false
+        }
+        }
+    },
         "User": {
             "required": [
                 "type"
@@ -4408,7 +4559,7 @@
             }
         },
         "Registration": {
-            "required": [ ],
+            "required": [],
             "properties": {
                 "email": {
                     "type": "string",
@@ -4427,129 +4578,107 @@
         "Prescription": {
             "required": [],
             "properties": {
-                "patient_id" : {
+                "patient_id": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "doctor_id" : {
+                "doctor_id": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "first_name" : {
+                "first_name": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "last_name" : {
+                "last_name": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "birthday" : {
+                "birthday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "status" : {
+                "status": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "malignant_diseases" : {
+                "malignant_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "follow_up_prescription" : {
+                "follow_up_prescription": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "musculosceletal_diseases" : {
+                "musculosceletal_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "substance" : {
+                "substance": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "eye_diseases" : {
+                "eye_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "dose" : {
+                "dose": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "infectious_diseases" : {
+                "infectious_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "trade_name" : {
+                "trade_name": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "medication" : {
+                "medication": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "atc_code" : {
+                "atc_code": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "manufacturer" : {
+                "manufacturer": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "pack_size" : {
+                "pack_size": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "allergies" : {
+                "allergies": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "pulmonary_diseases" : {
+                "pulmonary_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "renal_diseases" : {
+                "renal_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "endrinologic_diseases" : {
+                "endrinologic_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "hypertension" : {
+                "hypertension": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "diabetes" : {
+                "diabetes": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "thyroid_diseases" : {
+                "thyroid_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "annotations" : {
+                "annotations": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -4669,53 +4798,53 @@
                 }
             }
         },
-        "DoctorAppointments":{
-            "properties":{
-                "monday" : {
+        "DoctorAppointments": {
+            "properties": {
+                "monday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "tuesday" :{
+                "tuesday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "wednesday" :{
+                "wednesday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "thursday" :{
+                "thursday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "friday" :{
+                "friday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "saturday" :{
+                "saturday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "sunday" :{
+                "sunday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "timeslots" :{
+                "timeslots": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "breakslots" :{
+                "breakslots": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "holidays" :{
+                "holidays": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "appointment_days" :{
+                "appointment_days": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "remainder_email_days" :{
+                "remainder_email_days": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -4724,129 +4853,107 @@
         "GetPrescription": {
             "required": [],
             "properties": {
-                "patient_id" : {
+                "patient_id": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "doctor_id" : {
+                "doctor_id": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "first_name" : {
+                "first_name": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "last_name" : {
+                "last_name": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "birthday" : {
+                "birthday": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "status" : {
+                "status": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "malignant_diseases" : {
+                "malignant_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "follow_up_prescription" : {
+                "follow_up_prescription": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "musculosceletal_diseases" : {
+                "musculosceletal_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "substance" : {
+                "substance": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "eye_diseases" : {
+                "eye_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "dose" : {
+                "dose": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "infectious_diseases" : {
+                "infectious_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "trade_name" : {
+                "trade_name": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "medication" : {
+                "medication": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "atc_code" : {
+                "atc_code": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "manufacturer" : {
+                "manufacturer": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "pack_size" : {
+                "pack_size": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "allergies" : {
+                "allergies": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "pulmonary_diseases" : {
+                "pulmonary_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "renal_diseases" : {
+                "renal_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "endrinologic_diseases" : {
+                "endrinologic_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "hypertension" : {
+                "hypertension": {
                     "type": "string",
                     "uniqueItems": false
                 },
-            
-                "diabetes" : {
+                "diabetes": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "thyroid_diseases" : {
+                "thyroid_diseases": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                
-                "annotations" : {
+                "annotations": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -4857,7 +4964,6 @@
                 "case_id"
             ],
             "properties": {
-
                 "case_id": {
                     "type": "array",
                     "items": {
@@ -4867,45 +4973,44 @@
                 }
             }
         },
-        "addappointment": {       
+        "addappointment": {
             "properties": {
-                "patient_id":{
-                    "type":"string",
+                "patient_id": {
+                    "type": "string",
                     "uniqueItems": false
                 },
-                "Speciality":{
-                    "type":"string",
+                "Speciality": {
+                    "type": "string",
                     "uniqueItems": false
                 },
                 "date": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "start_time":{
-                    "type":"string",
-                    "uniqueItems": false
-                },
-                "end_time":{
-                    "type":"string",
-                    "uniqueItems": false
-                },
-                "status":{
-                    "type":"string",
-                    "uniqueItems": false
-                },
-            
-                "payment_type" :{
+                "start_time": {
                     "type": "string",
                     "uniqueItems": false
-                 },
-                 "total_amount" :{
+                },
+                "end_time": {
                     "type": "string",
                     "uniqueItems": false
-                 },
-                 "created_at": {
+                },
+                "status": {
                     "type": "string",
                     "uniqueItems": false
-                  }
+                },
+                "payment_type": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "total_amount": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "created_at": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
             }
         },
         "VideoConference": {
@@ -4916,123 +5021,149 @@
                 "email"
             ],
             "properties": {
-            "patient_id":{
-                "type": "string",
-                "uniqueItems": false
-
-            },
-           
-             "reg_amount":{
-                "type": "string",
-                "uniqueItems": false
-
-             },
-             "email": {
-                "type": "string",
-                "uniqueItems": false
-
-             },
-        
-             "password":{
-                "type": "string",
-                "uniqueItems": false
-
-             },
-             "prepaid_talktime":{
-                "type": "string",
-                "uniqueItems": false
-            },
-             "status":{
-               "type": "string",
-               "uniqueItems": false
-
-             }, 
-             "date": {
-                "type": "string",
-                "uniqueItems": false
-            },
-            "username":{
-              "type": "string",
-               "required": true,
-               "unique": false
-            },
-             "is_payment":{
-                "type": "boolean",
-                "uniqueItems": false
-             }
+                "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "reg_amount": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "password": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "prepaid_talktime": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "status": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "username": {
+                    "type": "string",
+                    "required": true,
+                    "unique": false
+                },
+                "is_payment": {
+                    "type": "boolean",
+                    "uniqueItems": false
+                }
             }
         },
-        "getuser":{
-            "required": [   ],
+        "getuser": {
+            "required": [],
             "properties": {
-                  "profile_id": {
-                       "type": "string",
-                       "uniqueItems": false
-                    },
-                    "alies_id": {
-                        "type": "string",
-                        "uniqueItems": false
-                    },
-                    "email": {
-                        "type": "string",
-                        "uniqueItems": false
-                    },
-                    "speciality": {
-                        "type": "string",
-                        "uniqueItems": false
-                    },
-                    "first_name": {
-                        "type": "string",
-                        "uniqueItems": false
-                    },
-                    "last_name": {
-                        "type": "string",
-                        "uniqueItems": false
-                    }
-               }
-             },
-             "givefeedback":{
-                "required": [
-         
-                ],
-
-                "properties":{
-                    "comment": {
-                        "type": "array",
-                        "items": {
-                            "type": "object"
-                        }
-                      },
-                    "rating":{
-                        "type": "number",
-                        "uniqueItems": false
-                    },
-                    "patient_id":{
-                        "type": "array",
-                        "items": {
-                            "type": "object"
-                        }
-                    },
-                    "doctor_id":{
-                        "type": "array",
+                "profile_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "alies_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "email": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "speciality": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "first_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "last_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "givefeedback": {
+            "required": [],
+            "properties": {
+                "comment": {
+                    "type": "array",
                     "items": {
                         "type": "object"
                     }
-                    },
-                    "patient_infos":{
-                        "type": "array",
-                        "items": {
-                            "type": "object"
-                        },
-                        "uniqueItems": true
+                },
+                "rating": {
+                    "type": "number",
+                    "uniqueItems": false
+                },
+                "patient_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
                     }
+                },
+                "doctor_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "patient_infos": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": true
                 }
-
-             },
-        "user": {
+            }
+        },
+        "VideoLogin": {
             "required": [
-             
+                "username",
+                "password"
             ],
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "password": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Vprepaid": {
+            "required": [
+                "_id"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "manage_for": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "paid_amount_data": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "prepaid_min": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "user": {
+            "required": [],
             "properties": {
                 "email": {
                     "type": "string",
@@ -5052,12 +5183,9 @@
                 }
             }
         },
-        "SelectDocforSickleave2":{
-            "required": [
-             
-            ],
+        "SelectDocforSickleave2": {
+            "required": [],
             "properties": {
-                
                 "approved_date": {
                     "type": "date",
                     "uniqueItems": false
@@ -5067,12 +5195,10 @@
                     "uniqueItems": false
                 }
             }
-
         },
-      
-        "DoctorMail":{
+        "DoctorMail": {
             "required": [
-             "email"
+                "email"
             ],
             "properties": {
                 "email": {
@@ -5104,13 +5230,9 @@
                     "uniqueItems": false
                 }
             }
-            
-
         },
-        "approvedrequest":{
-            "required": [
-             
-            ],
+        "approvedrequest": {
+            "required": [],
             "properties": {
                 "for_manage": {
                     "type": "string",
@@ -5137,9 +5259,7 @@
                     "uniqueItems": false
                 }
             }
-
         },
-        
         "AddtheGroup": {
             "required": [
                 "group_name"
@@ -5208,7 +5328,6 @@
             }
         },
         "Addmeeting": {
-           
             "properties": {
                 "patient_profile_id": {
                     "type": "string",
@@ -5284,7 +5403,6 @@
                 }
             }
         },
-       
         "AddSpecialty": {
             "required": [
                 "specialty_name",
@@ -5438,7 +5556,7 @@
                     "type": "string",
                     "uniqueItems": false
                 },
-                "email":{
+                "email": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -5459,13 +5577,15 @@
                     "type": "string",
                     "uniqueItems": false
                 },
-                "email":{
+                "email": {
                     "type": "string",
                     "uniqueItems": false
-                },"first_name":{
+                },
+                "first_name": {
                     "type": "string",
                     "uniqueItems": false
-                },"last_name":{
+                },
+                "last_name": {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -5533,8 +5653,7 @@
             }
         },
         "Checkward": {
-            "required": [
-            ],
+            "required": [],
             "properties": {
                 "ward_id": {
                     "type": "string",
@@ -5702,7 +5821,6 @@
                     "type": "string",
                     "uniqueItems": true
                 }
-                
             }
         },
         "Billfilter": {
@@ -5826,7 +5944,6 @@
                     "type": "string",
                     "uniqueItems": true
                 }
-               
             }
         }
     }

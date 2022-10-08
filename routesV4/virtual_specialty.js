@@ -222,118 +222,114 @@ router.post("/AddTask", function (req, res, next) {
       if (err && !user_data) {
         res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
-        var task_type = "sick_leave"
-        const VirtualtToSearchWith1 = new virtual_Task({ task_type });
-        VirtualtToSearchWith1.encryptFieldsSync();
-        virtual_Task.updateOne({ _id: user_data._id, task_type: { $in: [task_type, VirtualtToSearchWith1.task_type] } }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
+        User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
           if (err && !doc) {
+
             res.json({
               status: 200,
               hassuccessed: false,
-              msg: "Something went wrong",
+              msg: "User is not found",
               error: err,
             });
-          }
-          else {
-            User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
-              if (err && !doc) {
+          } else {
+            if (doc == null || doc == "undefined") {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                msg: "User is not exist",
+              });
+            } else {
+              if (req.body.task_type !== "picture_evaluation" && req.body.task_type !== "sick_leave" && req.body.task_type !== "video_conference") {
 
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  msg: "User is not found",
-                  error: err,
-                });
-              } else {
-                if (doc == null || doc == "undefined") {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    msg: "User is not exist",
+                var m = new Date();
+                var dateString =
+                  m.getUTCFullYear() +
+                  "/" +
+                  (m.getUTCMonth() + 1) +
+                  "/" +
+                  m.getUTCDate() +
+                  " " +
+                  m.getUTCHours() +
+                  ":" +
+                  m.getUTCMinutes() +
+                  ":" +
+                  m.getUTCSeconds();
+                var lan1 = getMsgLang(doc._id);
+                lan1.then((result) => {
+                  result =
+                    result === "ch"
+                      ? "zh"
+                      : result === "sp"
+                        ? "es"
+                        : result === "rs"
+                          ? "ru"
+                          : result;
+                  var sms1 =
+                    "There was a task added on in your Aimedis profile -" +
+                    req.body.task_name +
+                    " (" +
+                    req.body.description +
+                    ") at " +
+                    dateString;
+                  trans(sms1, { source: "en", target: result }).then((res1) => {
+                    sendSms(doc.mobile, res1)
+                      .then((result) => { })
+                      .catch((e) => {
+
+                      });
                   });
-                } else {
-                  if (req.body.task_type !== "picture_evaluation") {
-                    var m = new Date();
-                    var dateString =
-                      m.getUTCFullYear() +
-                      "/" +
-                      (m.getUTCMonth() + 1) +
-                      "/" +
-                      m.getUTCDate() +
+
+                  if (doc.emergency_number && doc.emergency_number !== "") {
+                    var sms2 =
+                      "There was a task added on -" +
+                      doc.first_name +
                       " " +
-                      m.getUTCHours() +
-                      ":" +
-                      m.getUTCMinutes() +
-                      ":" +
-                      m.getUTCSeconds();
-                    var lan1 = getMsgLang(doc._id);
-                    lan1.then((result) => {
-                      result =
-                        result === "ch"
-                          ? "zh"
-                          : result === "sp"
-                            ? "es"
-                            : result === "rs"
-                              ? "ru"
-                              : result;
-                      var sms1 =
-                        "There was a task added on in your Aimedis profile -" +
-                        req.body.task_name +
-                        " (" +
-                        req.body.description +
-                        ") at " +
-                        dateString;
-                      trans(sms1, { source: "en", target: result }).then((res1) => {
-                        sendSms(doc.mobile, res1)
+                      doc.last_name +
+                      " Aimedis profile ( " +
+                      doc.profile_id +
+                      " )  " +
+                      " - " +
+                      req.body.task_name +
+                      " (" +
+                      req.body.description +
+                      ") at " +
+                      dateString;
+                    trans(sms2, { source: "en", target: result }).then(
+                      (res1) => {
+                        sendSms(doc.emergency_number, res1)
                           .then((result) => { })
                           .catch((e) => {
 
                           });
-                      });
-                      if (doc.emergency_number && doc.emergency_number !== "") {
-                        var sms2 =
-                          "There was a task added on -" +
-                          doc.first_name +
-                          " " +
-                          doc.last_name +
-                          " Aimedis profile ( " +
-                          doc.profile_id +
-                          " )  " +
-                          " - " +
-                          req.body.task_name +
-                          " (" +
-                          req.body.description +
-                          ") at " +
-                          dateString;
-                        trans(sms2, { source: "en", target: result }).then(
-                          (res1) => {
-                            sendSms(doc.emergency_number, res1)
-                              .then((result) => { })
-                              .catch((e) => {
-
-                              });
-                          }
-                        );
                       }
-                      if(req.body.task_type === "sickleave"){
-                        ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {})
-                      }
-                        
-                    });
+                    );
                   }
+                })
 
-                  res.json({
-                    status: 200,
-                    message: "Added Successfully",
-                    hassuccessed: true,
-                    data: user_data,
-                  });
+
+              }
+              if(req.body.task_type === "sick_leave" || req.body.task_type === "video_conference") {
+                virtual_Task.updateOne({ _id: user_data._id }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
+                  if (err && !doc1) {
+                  }
+                  else {
+                    console.log('doc1 updated task 1', doc1)
+                  }
+                })
+                if (req.body.task_type === "sick_leave") {
+                  ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => { })
                 }
               }
-            });
 
+              res.json({
+                status: 200,
+                message: "Added Successfully",
+                hassuccessed: true,
+                data: user_data,
+              });
+            }
           }
-        })
+        });
       }
     });
   } else {
@@ -435,18 +431,18 @@ router.put("/AddTask/:task_id", function (req, res, next) {
             error: err,
           });
         } else {
-          if (req.body.is_decline) {
-            virtual_Task.findOne(
-              { _id: req.params.task_id },
-              function (err, data1) {
-                if (err) {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    message: "Something went wrong",
-                    error: err,
-                  });
-                } else {
+          virtual_Task.findOne(
+            { _id: req.params.task_id },
+            function (err, data1) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+                });
+              } else {  
+                if (req.body.is_decline) {
                   if (data1.task_type === "picture_evaluation") {
                     User.findOne(
                       { _id: req.body.patient_id },
@@ -459,7 +455,6 @@ router.put("/AddTask/:task_id", function (req, res, next) {
                           });
                         } else {
                           var sendData = `<div> Dear ${data.first_name + " " + data.last_name} , </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
-
 
                           generateTemplate(
                             EMAIL.generalEmail.createTemplate("en", {
@@ -495,20 +490,21 @@ router.put("/AddTask/:task_id", function (req, res, next) {
                       status: 200,
                       hassuccessed: true,
                       message: "Task is updated",
-                      data: userdata,
+                      data: data1,
                     });
-                  }
+                  }    
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Task is updated",
+                    data: data1,
+                  });
                 }
-              }
-            );
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Task is updated",
-              data: userdata,
-            });
-          }
+                    }
+            }
+          );
+        
         }
       }
     );

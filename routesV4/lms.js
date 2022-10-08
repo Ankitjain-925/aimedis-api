@@ -18,6 +18,7 @@ router.post("/addLms", (req, res) => {
   var lmsSchema = new Schema(req.body);
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  try{
   if (legit) {
     lmsSchema.save((err, result) => {
       if (result) {
@@ -43,12 +44,20 @@ router.post("/addLms", (req, res) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/getVideoList", (req, res, next) => {
   AllCourse = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Schema.find(
       { permission: { $elemMatch: { $in: [req.body.user_type] } } },
@@ -80,6 +89,13 @@ router.post("/getVideoList", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 function forEachPromise(items, fn) {
@@ -119,6 +135,7 @@ function getAllrating(data) {
 router.post("/getFilteredVideoList", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Schema.find(
       {
@@ -150,11 +167,19 @@ router.post("/getFilteredVideoList", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/getlanguageBasedVideoList", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Schema.find(
       {
@@ -186,11 +211,19 @@ router.post("/getlanguageBasedVideoList", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/getCart", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const user_id = req.body.user_id;
     const messageToSearchWith = new Cart({ user_id });
@@ -227,11 +260,19 @@ router.post("/getCart", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/addtocart", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     // Find the document
     const user_id = req.body.user_id;
@@ -270,12 +311,20 @@ router.post("/addtocart", (req, res, next) => {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 //remove CART
 router.delete("/removeCart/:UserId/:CourseId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const user_id = req.params.UserId;
     const messageToSearchWith = new Cart({ user_id });
@@ -321,11 +370,19 @@ router.delete("/removeCart/:UserId/:CourseId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/addtowishlist", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     var wishlists = new Wishlist(req.body);
     wishlists.save((err) => {
@@ -360,11 +417,19 @@ router.post("/addtowishlist", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/AverageRating", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Rating.aggregate(
       [
@@ -392,11 +457,19 @@ router.get("/AverageRating", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/getWishlist", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  try{
   if (legit) {
     const user_id = req.body.user_id;
     const messageToSearchWith = new Wishlist({ user_id });
@@ -433,11 +506,19 @@ router.post("/getWishlist", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/getAllLms", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Schema.find({}, function (err, result) {
       if (err) {
@@ -463,12 +544,20 @@ router.get("/getAllLms", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 // Model.update(query, { name: 'jason bourne' }, options, callback);
 router.post("/editLms/:_id", (req, res) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Schema.updateOne({ _id: req.params._id }, req.body)
       .then((data) => {
@@ -494,11 +583,19 @@ router.post("/editLms/:_id", (req, res) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/getWishlist", (req, res) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Wishlist.find({}, (err, data) => {
       if (data) {
@@ -523,10 +620,18 @@ router.get("/getWishlist", (req, res) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.delete("/removeLms/:Id", function (req, res) {
   let legit = jwtconfig.verify(req.headers.token);
+ try{
   if (legit) {
     Schema.findOneAndRemove({ _id: req.params.Id }, function (err, data12) {
       if (err) {
@@ -547,11 +652,19 @@ router.delete("/removeLms/:Id", function (req, res) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/getOrderHistory/:id", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const user_id = req.params.user_id;
     const messageToSearchWith = new Payment({ user_id });
@@ -599,11 +712,19 @@ router.get("/getOrderHistory/:id", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/getOrderHistory", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const user_id = req.body.user_id;
     const messageToSearchWith = new Payment({ user_id });
@@ -651,11 +772,19 @@ router.post("/getOrderHistory", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/getOrderHistory", (req, res, next) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Payment.find({}, function (err, result) {
       if (err) {
@@ -692,12 +821,20 @@ router.get("/getOrderHistory", (req, res, next) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/addRating", (req, res) => {
   var Ratings = new Rating(req.body);
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Ratings.save((err, result) => {
       if (result) {
@@ -723,11 +860,19 @@ router.post("/addRating", (req, res) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/myRating", (req, res) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const user_id = legit.id;
     const messageToSearchWith = new Rating({ user_id });
@@ -761,6 +906,13 @@ router.get("/myRating", (req, res) => {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 module.exports = router;
