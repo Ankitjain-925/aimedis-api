@@ -53,9 +53,24 @@ const mongooseFieldEncryption =
         unique: false,
       },
       payment_data: {
-         type: String,
+         type: Object,
         required: false,
         unique: false,
+      },
+      prepaid_talktime_min :{
+         type: String,
+         required: false,
+         unique: false
+      },
+      paid_amount_obj :{
+         type: [],
+         required: false,
+         unique: false
+      },
+      used_talktime:{
+         type: [],
+         required: false,
+         unique: false   
       }
  
 },{ strict: false });

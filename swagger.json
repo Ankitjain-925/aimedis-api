@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aidoc.io",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -82,7 +82,7 @@
         
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -4017,7 +4017,32 @@
                 }
             }
         },
-
+        "/vchat/UsernameLogin": {
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "videouser",
+                        "in": "body",
+                        "description": "Login for VideoUser",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                    }
+                ],
+                "summary": "For Login",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                    }
+                }
+            }
+        },
         "/vchat/AppointmentBook": {
             "parameters": [
                 {
@@ -4151,6 +4176,180 @@
                     }
                 }
             }
+        },
+        "/vchat/managePrepaid": {
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "ManagePrepaid",
+                        "in": "body",
+                        "description": "Prepaid Manage",
+                        "schema": {
+                            "$ref": "#/definitions/Vprepaid"
+                        }
+                    }
+                ],
+                "summary": "For Login",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Vprepaid"
+                        }
+                    }
+                }
+            }
+        },
+        "/vchat/userdelete/{_id}": {
+            "delete": {
+                    "parameters": [
+                        {
+                        "name": "Delete Video User",
+                        "in": "body",
+                        "description": "Delete User",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                        },
+                        {
+                            "name": "_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"                          
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Delete User",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete Video User",
+                        "schema": {
+                            "$ref": "#/definitions/VideoLogin"
+                        }
+                    }
+                }
+            }
+        
+        },
+        "/vchat/getSlotTime": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User",
+                    "schema": {
+                           
+                    }
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "Get TimeSlot",
+                        "in": "body",
+                        "description": "TimeSlot",
+                        "schema": {
+                            "$ref": "#/definitions/Timeslot"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "TimeSlot",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "TimeSlot"
+                    }
+                }
+            }
+        }, "/vchat/DynamicSlots": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User",
+                    "schema": {
+                           
+                    }
+                }
+            ],
+            "post": {
+                "parameters": [
+                    {
+                        "name": "Get DynamicSlot",
+                        "in": "body",
+                        "description": "DynamicSlot",
+                        "schema": {
+                            "$ref": "#/definitions/Dynamicslot"
+                           
+                        }
+                    }
+                ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "DynamicSlot",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "DynamicSlot"
+                    }
+                }
+            }
+        },
+        "/vchat/GetVideoTask/{patient_id}": {
+            "get": {
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Get All Task",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Task"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -4195,6 +4394,33 @@
                 }
             }
         },
+        "Timeslot":{
+            "required": [
+                
+            ],
+            "properties": {
+                "doctor_id":{
+                        "type": "string",
+                        "uniqueItems": false
+                },
+                "date": {
+                    "type": "string",
+                    "uniqueItems": false
+                  }
+              }
+           
+       },
+       "Dynamicslot":{
+        "required": [
+                
+        ],
+        "properties": {
+            "_id":{
+                "type": "string",
+                "uniqueItems": false
+        }
+        }
+    },
         "User": {
             "required": [
                 "type"
@@ -5029,6 +5255,46 @@
                 }
 
              },
+             "VideoLogin": {
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "uniqueItems": false
+                    }
+                }
+            },
+             "Vprepaid": {
+                "required": [
+                    "_id"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "manage_for": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "paid_amount_data": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "prepaid_min": {
+                        "type": "string",
+                        "uniqueItems": false
+                    }
+                    
+                }
+            },
         "user": {
             "required": [
              

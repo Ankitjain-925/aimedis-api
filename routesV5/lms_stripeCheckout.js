@@ -53,6 +53,11 @@ catch(stripeErr){
 }
 });
 
+router.post("/intent-pop",  (req, res) => {
+  var token = req.body.source;
+  stripe.charges.create(req.body, postStripeCharge(res, token));
+});
+
 router.post("/saveData", (req, res) => {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
