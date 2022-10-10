@@ -6,6 +6,7 @@ var virtual_Case = require("../schema/virtual_cases.js");
 var virtual_Task = require("../schema/virtual_tasks.js");
 var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
+var picture_Evaluation = require("../schema/pictureevaluation_feedback");
 var User = require("../schema/user.js");
 var questionaire = require("../schema/questionaire");
 var Institute = require("../schema/institute.js");
@@ -14,6 +15,9 @@ var virtual_step = require("../schema/virtual_step");
 var answerspatient = require("../schema/answerspatient");
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
+const moment = require("moment");
+var Prescription = require("../schema/prescription");
+var Cretificate = require("../schema/sick_certificate");
 const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
 var newcf = [];
@@ -48,6 +52,7 @@ var transporter = nodemailer.createTransport({
   },
 });
 var mongoose = require("mongoose");
+const { encrypt, decrypt } = require("./Cryptofile.js");
 var CheckRole = require("./../middleware/middleware");
 
 function getDate(date, dateFormat) {
@@ -80,7 +85,7 @@ function getDate(date, dateFormat) {
 }
 
 router.delete(
-  "/AddSpecialty/:specialty_id/:house_id",
+  "/AddSpecialty/:specialty_id",
   CheckRole("delete_speciality"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -116,7 +121,7 @@ router.delete(
 );
 
 router.put(
-  "/AddSpecialty/:specialty_id/:house_id",
+  "/AddSpecialty/:specialty_id",
   CheckRole("edit_speciality"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -369,7 +374,7 @@ function ApproveReq(doc, start, end, date) {
 }
 
 router.delete(
-  "/AddTask/:task_id/:house_id",
+  "/AddTask/:task_id",
   CheckRole("delete_task"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -402,7 +407,7 @@ router.delete(
 );
 
 router.put(
-  "/AddTask/:task_id/:house_id",
+  "/AddTask/:task_id",
   CheckRole("edit_task"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -577,6 +582,7 @@ router.get(
       const VirtualtToSearchWith2 = new virtual_Task({
         task_type: "picture_evaluation",
       });
+      VirtualtToSearchWith2.encryptFieldsSync();
       virtual_Task.find(
         {
           house_id: { $in: [house_id, messageToSearchWith.house_id] },
@@ -907,7 +913,7 @@ router.delete(
 );
 
 router.delete(
-  "/AddService/:service_id/:house_id",
+  "/AddService/:service_id",
   CheckRole("delete_service"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -1042,7 +1048,7 @@ router.get("/GetService/:house_id", function (req, res, next) {
   }
 });
 router.delete(
-  "/AddInvoice/:bill_id/:house_id",
+  "/AddInvoice/:bill_id",
   CheckRole("delete_invoice"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -3470,17 +3476,6 @@ router.post(
         task_type: { $exists: false },
         house_id: { $in: [req.body.house_id, VirtualtToSearchWith1.house_id] },
       };
-      if (req.body.status) {
-        var status = req.body.status;
-        statuscheck = status.map((element) => {
-          VirtualtToSearchWith3 = new virtual_Task({ status: element });
-          VirtualtToSearchWith3.encryptFieldsSync();
-          return VirtualtToSearchWith3.status;
-        });
-
-        statuscheck = [...status, ...statuscheck];
-        condition.status = { $in: statuscheck };
-      }
       if (req.body.speciality_id) {
         condition["speciality._id"] = req.body.speciality_id;
       }

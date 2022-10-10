@@ -161,5 +161,68 @@ router.post('/subscribe', (req, res) => {
 })
 
 
+router.post("/avalonMail1", function (req, res) {
+  if (req.body.email != "") {
+    let mailOptions = {
+      from: req.body.email,
+      to: 'inquiries@aimedis.com, steve.ambrose@aimedis.com, rupalii.webnexus@gmail.com',
+      subject: "New Inquiry - Avalon",
+      html:
+      "<div><b>Interested :-&nbsp;</b>" +
+      req.body.interested +
+      "</div><div><b>Represent :-&nbsp;</b>" +
+      req.body.represent +
+      "</div>"
+    };
+
+    transporter.sendMail(mailOptions).then(()=>{
+      res.json({
+        status: 200,
+        message: "Mail sent Successfully",
+        hassuccessed: true,
+      });
+     }).catch((err)=>{
+      res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false , data: err});
+     }); 
+     
+  } else {
+    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+  }
+});
+
+router.post("/avalonMail2", function (req, res) {
+  if (req.body.email != "") {
+    let mailOptions = {
+      from: req.body.email,
+      to: 'inquiries@aimedis.com, steve.ambrose@aimedis.com, rupalii.webnexus@gmail.com',
+      subject: "New Inquiry - Avalon",
+      html:
+        "<div><b>Name:-</b>&nbsp;" +
+        req.body.first_name +
+        "&nbsp;" +
+        req.body.last_name +
+        "</div><div><b>Interested :-&nbsp;</b>" +
+        req.body.interested +
+        "</div><div><b>Represent :-&nbsp;</b>" +
+        req.body.represent +
+        "</div><div><b>Company Name :-&nbsp;</b>" +
+        req.body.company_name +
+        "</div>"
+    };
+
+   transporter.sendMail(mailOptions).then(()=>{
+    res.json({
+      status: 200,
+      message: "Mail sent Successfully",
+      hassuccessed: true,
+    });
+   }).catch((err)=>{
+    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false , data: err});
+   });
+  } else {
+    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+  }
+});
+
 module.exports = router;
 

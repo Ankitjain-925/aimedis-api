@@ -50,6 +50,8 @@ var transporter = nodemailer.createTransport({
 });
 var mongoose = require("mongoose");
 
+var re = require("../regions.json");
+var aws = require("aws-sdk");
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
