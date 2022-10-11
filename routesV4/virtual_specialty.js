@@ -89,31 +89,39 @@ function getDate(date, dateFormat) {
 router.delete("/AddSpecialty/:specialty_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    Virtual_Specialty.findByIdAndRemove(
-      req.params.specialty_id,
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Speciality is Deleted Successfully",
-          });
+  try {
+    if (legit) {
+      Virtual_Specialty.findByIdAndRemove(
+        req.params.specialty_id,
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Speciality is Deleted Successfully",
+            });
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -121,33 +129,41 @@ router.delete("/AddSpecialty/:specialty_id", function (req, res, next) {
 router.put("/AddSpecialty/:specialty_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    Virtual_Specialty.updateOne(
-      { _id: req.params.specialty_id },
-      req.body,
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Specialty is updated",
-            data: userdata,
-          });
+  try {
+    if (legit) {
+      Virtual_Specialty.updateOne(
+        { _id: req.params.specialty_id },
+        req.body,
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Specialty is updated",
+              data: userdata,
+            });
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -155,24 +171,32 @@ router.put("/AddSpecialty/:specialty_id", function (req, res, next) {
 router.post("/AddSpecialty", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    var Virtual_Specialtys = new Virtual_Specialty(req.body);
-    Virtual_Specialtys.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
-      }
-    });
-  } else {
+  try {
+    if (legit) {
+      var Virtual_Specialtys = new Virtual_Specialty(req.body);
+      Virtual_Specialtys.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+          res.json({
+            status: 200,
+            message: "Added Successfully",
+            hassuccessed: true,
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -180,35 +204,43 @@ router.post("/AddSpecialty", function (req, res, next) {
 router.get("/AddSpecialty/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    let house_id = req.params.house_id;
-    const VirtualtToSearchWith = new Virtual_Specialty({ house_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    Virtual_Specialty.find(
-      {
-        $or: [
-          { house_id: req.params.house_id },
-          { house_id: VirtualtToSearchWith.house_id },
-        ],
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "specialities not found",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
+  try {
+    if (legit) {
+      let house_id = req.params.house_id;
+      const VirtualtToSearchWith = new Virtual_Specialty({ house_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      Virtual_Specialty.find(
+        {
+          $or: [
+            { house_id: req.params.house_id },
+            { house_id: VirtualtToSearchWith.house_id },
+          ],
+        },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "specialities not found",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -216,127 +248,135 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
 router.post("/AddTask", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    Virtual_tasks = new virtual_Task(req.body);
-    Virtual_tasks.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
-          if (err && !doc) {
+  try {
+    if (legit) {
+      Virtual_tasks = new virtual_Task(req.body);
+      Virtual_tasks.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+          User.findOne({ _id: req.body.patient_id }).exec(function (err, doc) {
+            if (err && !doc) {
 
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "User is not found",
-              error: err,
-            });
-          } else {
-            if (doc == null || doc == "undefined") {
               res.json({
                 status: 200,
                 hassuccessed: false,
-                msg: "User is not exist",
+                msg: "User is not found",
+                error: err,
               });
             } else {
-              if (req.body.task_type !== "picture_evaluation" && req.body.task_type !== "sick_leave" && req.body.task_type !== "video_conference") {
+              if (doc == null || doc == "undefined") {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "User is not exist",
+                });
+              } else {
+                if (req.body.task_type !== "picture_evaluation" && req.body.task_type !== "sick_leave" && req.body.task_type !== "video_conference") {
 
-                var m = new Date();
-                var dateString =
-                  m.getUTCFullYear() +
-                  "/" +
-                  (m.getUTCMonth() + 1) +
-                  "/" +
-                  m.getUTCDate() +
-                  " " +
-                  m.getUTCHours() +
-                  ":" +
-                  m.getUTCMinutes() +
-                  ":" +
-                  m.getUTCSeconds();
-                var lan1 = getMsgLang(doc._id);
-                lan1.then((result) => {
-                  result =
-                    result === "ch"
-                      ? "zh"
-                      : result === "sp"
-                        ? "es"
-                        : result === "rs"
-                          ? "ru"
-                          : result;
-                  var sms1 =
-                    "There was a task added on in your Aimedis profile -" +
-                    req.body.task_name +
-                    " (" +
-                    req.body.description +
-                    ") at " +
-                    dateString;
-                  trans(sms1, { source: "en", target: result }).then((res1) => {
-                    sendSms(doc.mobile, res1)
-                      .then((result) => { })
-                      .catch((e) => {
-
-                      });
-                  });
-
-                  if (doc.emergency_number && doc.emergency_number !== "") {
-                    var sms2 =
-                      "There was a task added on -" +
-                      doc.first_name +
-                      " " +
-                      doc.last_name +
-                      " Aimedis profile ( " +
-                      doc.profile_id +
-                      " )  " +
-                      " - " +
+                  var m = new Date();
+                  var dateString =
+                    m.getUTCFullYear() +
+                    "/" +
+                    (m.getUTCMonth() + 1) +
+                    "/" +
+                    m.getUTCDate() +
+                    " " +
+                    m.getUTCHours() +
+                    ":" +
+                    m.getUTCMinutes() +
+                    ":" +
+                    m.getUTCSeconds();
+                  var lan1 = getMsgLang(doc._id);
+                  lan1.then((result) => {
+                    result =
+                      result === "ch"
+                        ? "zh"
+                        : result === "sp"
+                          ? "es"
+                          : result === "rs"
+                            ? "ru"
+                            : result;
+                    var sms1 =
+                      "There was a task added on in your Aimedis profile -" +
                       req.body.task_name +
                       " (" +
                       req.body.description +
                       ") at " +
                       dateString;
-                    trans(sms2, { source: "en", target: result }).then(
-                      (res1) => {
-                        sendSms(doc.emergency_number, res1)
-                          .then((result) => { })
-                          .catch((e) => {
+                    trans(sms1, { source: "en", target: result }).then((res1) => {
+                      sendSms(doc.mobile, res1)
+                        .then((result) => { })
+                        .catch((e) => {
 
-                          });
-                      }
-                    );
-                  }
-                })
+                        });
+                    });
+
+                    if (doc.emergency_number && doc.emergency_number !== "") {
+                      var sms2 =
+                        "There was a task added on -" +
+                        doc.first_name +
+                        " " +
+                        doc.last_name +
+                        " Aimedis profile ( " +
+                        doc.profile_id +
+                        " )  " +
+                        " - " +
+                        req.body.task_name +
+                        " (" +
+                        req.body.description +
+                        ") at " +
+                        dateString;
+                      trans(sms2, { source: "en", target: result }).then(
+                        (res1) => {
+                          sendSms(doc.emergency_number, res1)
+                            .then((result) => { })
+                            .catch((e) => {
+
+                            });
+                        }
+                      );
+                    }
+                  })
 
 
-              }
-              if(req.body.task_type === "sick_leave" || req.body.task_type === "video_conference") {
-                virtual_Task.updateOne({ _id: user_data._id }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
-                  if (err && !doc1) {
-                  }
-                  else {
-                    console.log('doc1 updated task 1', doc1)
-                  }
-                })
-                if (req.body.task_type === "sick_leave") {
-                  ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => { })
                 }
-              }
+                if (req.body.task_type === "sick_leave" || req.body.task_type === "video_conference") {
+                  virtual_Task.updateOne({ _id: user_data._id }, { approved_date: req.body.created_at, approved: true }).exec(function (err, doc1) {
+                    if (err && !doc1) {
+                    }
+                    else {
+                      console.log('doc1 updated task 1', doc1)
+                    }
+                  })
+                  if (req.body.task_type === "sick_leave") {
+                    ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => { })
+                  }
+                }
 
-              res.json({
-                status: 200,
-                message: "Added Successfully",
-                hassuccessed: true,
-                data: user_data,
-              });
+                res.json({
+                  status: 200,
+                  message: "Added Successfully",
+                  hassuccessed: true,
+                  data: user_data,
+                });
+              }
             }
-          }
-        });
-      }
-    });
-  } else {
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -385,28 +425,36 @@ function ApproveReq(doc, start, end, date) {
 router.delete("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Task.findByIdAndRemove(req.params.task_id, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "Task is Deleted Successfully",
-        });
-      }
-    });
-  } else {
+  try {
+    if (legit) {
+      virtual_Task.findByIdAndRemove(req.params.task_id, function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Task is Deleted Successfully",
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -414,77 +462,86 @@ router.delete("/AddTask/:task_id", function (req, res, next) {
 router.put("/AddTask/:task_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    if (req.body.payment_data && req.body.payment_data !== null && !req.body._enc_payment_data) {
-      req.body.payment_data = encrypt(JSON.stringify(req.body.payment_data))
-      req.body._enc_payment_data = true
-    }
-    virtual_Task.updateOne(
-      { _id: req.params.task_id },
-      req.body,
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          virtual_Task.findOne(
-            { _id: req.params.task_id },
-            function (err, data1) {
-              if (err) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {  
-                if (req.body.is_decline) {
-                  if (data1.task_type === "picture_evaluation") {
-                    User.findOne(
-                      { _id: req.body.patient_id },
-                      function (err, data) {
-                        if (err) {
-                          res.json({
-                            status: 200,
-                            message: "Something went wrong.",
-                            error: err,
-                          });
-                        } else {
-                          var sendData = `<div> Dear ${data.first_name + " " + data.last_name} , </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
+  try {
+    if (legit) {
+      if (req.body.payment_data && req.body.payment_data !== null && !req.body._enc_payment_data) {
+        req.body.payment_data = encrypt(JSON.stringify(req.body.payment_data))
+        req.body._enc_payment_data = true
+      }
+      virtual_Task.updateOne(
+        { _id: req.params.task_id },
+        req.body,
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            virtual_Task.findOne(
+              { _id: req.params.task_id },
+              function (err, data1) {
+                if (err) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+                  if (req.body.is_decline) {
+                    if (data1.task_type === "picture_evaluation") {
+                      User.findOne(
+                        { _id: req.body.patient_id },
+                        function (err, data) {
+                          if (err) {
+                            res.json({
+                              status: 200,
+                              message: "Something went wrong.",
+                              error: err,
+                            });
+                          } else {
+                            var sendData = `<div> Dear ${data.first_name + " " + data.last_name} , </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
 
-                          generateTemplate(
-                            EMAIL.generalEmail.createTemplate("en", {
-                              title: "",
-                              content: sendData,
-                            }),
-                            (error, html) => {
-                              if (!error) {
-                                let mailOptions = {
-                                  from: "contact@aimedis.com",
-                                  to: data.email,
-                                  subject: "Decline Online Diagnose",
-                                  html: html,
-                                };
+                            generateTemplate(
+                              EMAIL.generalEmail.createTemplate("en", {
+                                title: "",
+                                content: sendData,
+                              }),
+                              (error, html) => {
+                                if (!error) {
+                                  let mailOptions = {
+                                    from: "contact@aimedis.com",
+                                    to: data.email,
+                                    subject: "Decline Online Diagnose",
+                                    html: html,
+                                  };
 
-                                let sendmail =
-                                  transporter.sendMail(mailOptions);
-                                if (sendmail) {
-                                  res.json({
-                                    status: 200,
-                                    message: "Mail sent Successfully",
-                                    hassuccessed: true,
-                                  });
+                                  let sendmail =
+                                    transporter.sendMail(mailOptions);
+                                  if (sendmail) {
+                                    res.json({
+                                      status: 200,
+                                      message: "Mail sent Successfully",
+                                      hassuccessed: true,
+                                    });
+                                  }
                                 }
                               }
-                            }
-                          );
+                            );
+                          }
                         }
-                      }
-                    );
+                      );
+                    } else {
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "Task is updated",
+                        data: data1,
+                      });
+                    }
                   } else {
                     res.json({
                       status: 200,
@@ -492,27 +549,26 @@ router.put("/AddTask/:task_id", function (req, res, next) {
                       message: "Task is updated",
                       data: data1,
                     });
-                  }    
-                } else {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "Task is updated",
-                    data: data1,
-                  });
+                  }
                 }
-                    }
-            }
-          );
-        
+              }
+            );
+
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -520,221 +576,31 @@ router.put("/AddTask/:task_id", function (req, res, next) {
 router.get("/GetAllTask/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    let house_id = req.params.house_id;
-    const VirtualtToSearchWith = new virtual_Task({ house_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    // const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
-    // VirtualtToSearchWith1.encryptFieldsSync();
-
-    const VirtualtToSearchWith2 = new virtual_Task({
-      task_type: "picture_evaluation",
-    });
-    VirtualtToSearchWith2.encryptFieldsSync();
-
-    virtual_Task.find(
-      {
-        house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
-        archived: { $ne: true },
-        $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
-        $or: [
-          // { task_type: { $ne: "sick_leave" } },
-          // { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-          { task_type: { $exists: true, $eq: "picture_evaluation" } },
-          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
-          { task_type: { $exists: false } },
-        ],
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          userdata.sort(mysort1);
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "success",
-            data: userdata,
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    let house_id = req.params.house_id;
-    const messageToSearchWith = new virtual_Task({
-      house_id,
-    });
-    messageToSearchWith.encryptFieldsSync();
-
-    const VirtualtToSearchWith2 = new virtual_Task({
-      task_type: "picture_evaluation",
-    });
-    VirtualtToSearchWith2.encryptFieldsSync();
-    virtual_Task.find(
-      {
-        house_id: { $in: [house_id, messageToSearchWith.house_id] },
-        archived: { $eq: true },
-        $or: [
-          { task_type: { $exists: true, $eq: "picture_evaluation" } },
-          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
-          { task_type: { $exists: false } },
-        ],
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/AddTask/:task_ids", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Task.findOne(
-      { _id: req.params.task_ids },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-
-router.get("/PatientsTask/:patient_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const messageToSearchWith = new virtual_Task({
-      patient_id: req.params.patient_id,
-    });
-    messageToSearchWith.encryptFieldsSync();
-    const VirtualtToSearchWith2 = new virtual_Task({
-      task_type: "picture_evaluation",
-    });
-    VirtualtToSearchWith2.encryptFieldsSync();
-    virtual_Task.find(
-      {
-        patient_id: {
-          $in: [messageToSearchWith.patient_id, req.params.patient_id],
-        },
-        $or: [
-          { task_type: { $exists: true, $eq: "picture_evaluation" } },
-          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
-          { task_type: { $exists: false } },
-        ],
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/ProfessionalTask/:patient_profile_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Task.find(
-      { "assinged_to.profile_id": req.params.patient_profile_id },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get(
-  "/ProfessionalTask/:patient_profile_id/:house_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
+  try {
     if (legit) {
       let house_id = req.params.house_id;
-      var VirtualtToSearchWith = new virtual_Task({ house_id });
+      const VirtualtToSearchWith = new virtual_Task({ house_id });
       VirtualtToSearchWith.encryptFieldsSync();
+      // const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+      // VirtualtToSearchWith1.encryptFieldsSync();
+
+      const VirtualtToSearchWith2 = new virtual_Task({
+        task_type: "picture_evaluation",
+      });
+      VirtualtToSearchWith2.encryptFieldsSync();
+
       virtual_Task.find(
         {
-          "assinged_to.profile_id": req.params.patient_profile_id,
           house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
-          $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+          archived: { $ne: true },
+          $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
+          $or: [
+            // { task_type: { $ne: "sick_leave" } },
+            // { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+            { task_type: { $exists: true, $eq: "picture_evaluation" } },
+            { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+            { task_type: { $exists: false } },
+          ],
         },
         function (err, userdata) {
           if (err && !userdata) {
@@ -745,7 +611,66 @@ router.get(
               error: err,
             });
           } else {
-            userdata.sort(mySorter);
+            userdata.sort(mysort1);
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "success",
+              data: userdata,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/GetAllArchivedTask/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      let house_id = req.params.house_id;
+      const messageToSearchWith = new virtual_Task({
+        house_id,
+      });
+      messageToSearchWith.encryptFieldsSync();
+
+      const VirtualtToSearchWith2 = new virtual_Task({
+        task_type: "picture_evaluation",
+      });
+      VirtualtToSearchWith2.encryptFieldsSync();
+      virtual_Task.find(
+        {
+          house_id: { $in: [house_id, messageToSearchWith.house_id] },
+          archived: { $eq: true },
+          $or: [
+            { task_type: { $exists: true, $eq: "picture_evaluation" } },
+            { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+            { task_type: { $exists: false } },
+          ],
+        },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
             res.json({ status: 200, hassuccessed: true, data: userdata });
           }
         }
@@ -757,69 +682,199 @@ router.get(
         message: "Authentication required.",
       });
     }
-  }
-);
-
-router.post("/ProfessionalTaskComment/:task_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    req.body.comment_id =
-      req.params.task_id + "_" + req.body.comment_by + "_" + Date.now();
-    virtual_Task.updateOne(
-      { _id: req.params.task_id },
-      { $push: { comments: req.body } },
-      { safe: true, upsert: true },
-      function (err, doc) {
-        if (err && !doc) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          if (doc.nModified == "0") {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Task is not found",
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Comment is added",
-            });
-          }
-        }
-      }
-    );
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
-router.put(
-  "/ProfessionalTaskComment/:task_id/:comment_id",
+router.get("/AddTask/:task_ids", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_Task.findOne(
+        { _id: req.params.task_ids },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+
+router.get("/PatientsTask/:patient_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const messageToSearchWith = new virtual_Task({
+        patient_id: req.params.patient_id,
+      });
+      messageToSearchWith.encryptFieldsSync();
+      const VirtualtToSearchWith2 = new virtual_Task({
+        task_type: "picture_evaluation",
+      });
+      VirtualtToSearchWith2.encryptFieldsSync();
+      virtual_Task.find(
+        {
+          patient_id: {
+            $in: [messageToSearchWith.patient_id, req.params.patient_id],
+          },
+          $or: [
+            { task_type: { $exists: true, $eq: "picture_evaluation" } },
+            { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+            { task_type: { $exists: false } },
+          ],
+        },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/ProfessionalTask/:patient_profile_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_Task.find(
+        { "assinged_to.profile_id": req.params.patient_profile_id },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get(
+  "/ProfessionalTask/:patient_profile_id/:house_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
-    if (legit) {
-      virtual_Task.updateOne(
-        {
-          _id: req.params.task_id,
-          "comments.comment_id": req.params.comment_id,
-        },
-        {
-          $set: {
-            "comments.$": req.body,
+    try {
+      if (legit) {
+        let house_id = req.params.house_id;
+        var VirtualtToSearchWith = new virtual_Task({ house_id });
+        VirtualtToSearchWith.encryptFieldsSync();
+        virtual_Task.find(
+          {
+            "assinged_to.profile_id": req.params.patient_profile_id,
+            house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
+            $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
           },
-        },
+          function (err, userdata) {
+            if (err && !userdata) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+              });
+            } else {
+              userdata.sort(mySorter);
+              res.json({ status: 200, hassuccessed: true, data: userdata });
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Some thing went wrong.",
+      });
+    }
+  });
+
+router.post("/ProfessionalTaskComment/:task_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      req.body.comment_id =
+        req.params.task_id + "_" + req.body.comment_by + "_" + Date.now();
+      virtual_Task.updateOne(
+        { _id: req.params.task_id },
+        { $push: { comments: req.body } },
+        { safe: true, upsert: true },
         function (err, doc) {
           if (err && !doc) {
             res.json({
@@ -839,7 +894,7 @@ router.put(
               res.json({
                 status: 200,
                 hassuccessed: true,
-                message: "Comment is updated",
+                message: "Comment is added",
               });
             }
           }
@@ -852,393 +907,135 @@ router.put(
         message: "Authentication required.",
       });
     }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
   }
-);
+});
+
+router.put(
+  "/ProfessionalTaskComment/:task_id/:comment_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    try {
+      if (legit) {
+        virtual_Task.updateOne(
+          {
+            _id: req.params.task_id,
+            "comments.comment_id": req.params.comment_id,
+          },
+          {
+            $set: {
+              "comments.$": req.body,
+            },
+          },
+          function (err, doc) {
+            if (err && !doc) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong",
+                error: err,
+              });
+            } else {
+              if (doc.nModified == "0") {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Task is not found",
+                });
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "Comment is updated",
+                });
+              }
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Some thing went wrong.",
+      });
+    }
+  });
 
 router.delete(
   "/ProfessionalTaskComment/:task_id/:comment_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
-    if (legit) {
-      virtual_Task.updateOne(
-        { _id: req.params.task_id },
-        { $pull: { comments: { comment_id: req.params.comment_id } } },
-        { multi: true },
-        function (err, doc) {
-          if (err && !doc) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong",
-              error: err,
-            });
-          } else {
-            if (doc.nModified == "0") {
+    try {
+      if (legit) {
+        virtual_Task.updateOne(
+          { _id: req.params.task_id },
+          { $pull: { comments: { comment_id: req.params.comment_id } } },
+          { multi: true },
+          function (err, doc) {
+            if (err && !doc) {
               res.json({
                 status: 200,
                 hassuccessed: false,
-                message: "Comment is not found",
+                message: "Something went wrong",
+                error: err,
               });
             } else {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "Comment is deleted",
-              });
-            }
-          }
-        }
-      );
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Authentication required.",
-      });
-    }
-  }
-);
-
-router.delete("/AddService/:service_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Service.findByIdAndRemove(
-      req.params.service_id,
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Service is Deleted Successfully",
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.put("/AddService/:service_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Service.updateOne(
-      { _id: req.params.service_id },
-      req.body,
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Service is updated",
-            data: userdata,
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/AddService", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    var Virtual_Services = new virtual_Service(req.body);
-    Virtual_Services.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/GetService/:house_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    let house_id = req.params.house_id;
-    const messageToSearchWith = new virtual_Service({ house_id });
-    messageToSearchWith.encryptFieldsSync();
-    virtual_Service.find(
-      {
-        $or: [
-          { house_id: req.params.house_id },
-          { house_id: messageToSearchWith.house_id },
-        ],
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "services not found",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.delete("/AddInvoice/:bill_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Invoice.findByIdAndRemove(req.params.bill_id, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "Invoice is Deleted Successfully",
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.put("/AddInvoice/:bill_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Invoice.updateOne(
-      { _id: req.params.bill_id },
-      req.body,
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Invoice is updated",
-            data: userdata,
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/AddInvoice", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    var virtual_Invoices = new virtual_Invoice(req.body);
-    var invoice_id = req.body.invoice_id;
-    const AppointToSearchWith = new virtual_Invoice({ invoice_id });
-    AppointToSearchWith.encryptFieldsSync();
-    virtual_Invoice.find(
-      {
-        $or: [
-          { invoice_id: invoice_id },
-          { invoice_id: AppointToSearchWith.invoice_id },
-        ],
-      },
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          if (data.length) {
-            res.json({ status: 200, message: "Invoice Already Exits" });
-          } else {
-            virtual_Invoices.save(function (err, user_data) {
-              if (err && !user_data) {
+              if (doc.nModified == "0") {
                 res.json({
                   status: 200,
-                  message: "Something went wrong.",
-                  error: err,
+                  hassuccessed: false,
+                  message: "Comment is not found",
                 });
               } else {
                 res.json({
                   status: 200,
-                  message: "Added Successfully",
                   hassuccessed: true,
+                  message: "Comment is deleted",
                 });
               }
-            });
+            }
           }
-        }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
       }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
 
-router.get("/AddInvoice/:house_id/:status", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    let house_id = req.params.house_id;
-    const VirtualtToSearchWith = new virtual_Invoice({ house_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-
-    var search = {
-      house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
-    };
-    if (req.params.status !== "all") {
-      var search = {
-        house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
-        "status.value": req.params.status,
-      };
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Some thing went wrong.",
+      });
     }
-    virtual_Invoice.find(search, function (err, userdata) {
-      if (err && !userdata) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "invoice not found",
-          error: err,
-        });
-      } else {
-        userdata.sort(mysort1);
-        res.json({ status: 200, hassuccessed: true, data: userdata });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+  });
 
-router.get("/infoOfHouses", function (req, res, next) {
+router.delete("/AddService/:service_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    fullInfo = [];
-    User.findOne({ _id: legit.id }, function (err, userdata) {
-      if (err && !userdata) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "user not found",
-          error: err,
-        });
-      } else {
-        if (userdata && userdata.houses && userdata.houses.length > 0) {
-          forEachPromise(userdata.houses, getfullInfo).then((result) => {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Houses is found",
-              data: fullInfo,
-            });
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/checkPatient", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    if (req.body.patient_id) {
-      const profile_id = req.body.patient_id;
-      const messageToSearchWith = new User({ profile_id });
-      messageToSearchWith.encryptFieldsSync();
-      const prepaid_talktime = req.body.patient_id;
-      const messageToSearchWith1 = new User({ prepaid_talktime });
-      messageToSearchWith1.encryptFieldsSync();
-      User.findOne(
-        {
-          $or: [
-            { profile_id: messageToSearchWith.profile_id },
-            { prepaid_talktime: messageToSearchWith1.prepaid_talktime },
-            { profile_id: req.body.patient_id },
-            { prepaid_talktime: req.body.patient_id },
-          ],
-        },
-        function (err, userdata) {
+  try {
+    if (legit) {
+      virtual_Service.findByIdAndRemove(
+        req.params.service_id,
+        function (err, data) {
           if (err) {
             res.json({
               status: 200,
@@ -1247,109 +1044,269 @@ router.post("/checkPatient", function (req, res, next) {
               error: err,
             });
           } else {
-            try {
-              if (userdata) {
-                var createCase = false;
-                if (req.body.pin) {
-                  createCase = req.body.pin == userdata.pin ? true : false;
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Service is Deleted Successfully",
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.put("/AddService/:service_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_Service.updateOne(
+        { _id: req.params.service_id },
+        req.body,
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Service is updated",
+              data: userdata,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/AddService", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      var Virtual_Services = new virtual_Service(req.body);
+      Virtual_Services.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+          res.json({
+            status: 200,
+            message: "Added Successfully",
+            hassuccessed: true,
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/GetService/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      let house_id = req.params.house_id;
+      const messageToSearchWith = new virtual_Service({ house_id });
+      messageToSearchWith.encryptFieldsSync();
+      virtual_Service.find(
+        {
+          $or: [
+            { house_id: req.params.house_id },
+            { house_id: messageToSearchWith.house_id },
+          ],
+        },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "services not found",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.delete("/AddInvoice/:bill_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_Invoice.findByIdAndRemove(req.params.bill_id, function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Invoice is Deleted Successfully",
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.put("/AddInvoice/:bill_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_Invoice.updateOne(
+        { _id: req.params.bill_id },
+        req.body,
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Invoice is updated",
+              data: userdata,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/AddInvoice", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      var virtual_Invoices = new virtual_Invoice(req.body);
+      var invoice_id = req.body.invoice_id;
+      const AppointToSearchWith = new virtual_Invoice({ invoice_id });
+      AppointToSearchWith.encryptFieldsSync();
+      virtual_Invoice.find(
+        {
+          $or: [
+            { invoice_id: invoice_id },
+            { invoice_id: AppointToSearchWith.invoice_id },
+          ],
+        },
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            if (data.length) {
+              res.json({ status: 200, message: "Invoice Already Exits" });
+            } else {
+              virtual_Invoices.save(function (err, user_data) {
+                if (err && !user_data) {
+                  res.json({
+                    status: 200,
+                    message: "Something went wrong.",
+                    error: err,
+                  });
                 } else {
-                  var pos = 0;
-                  userdata &&
-                    userdata.assosiated_by.filter(
-                      (data) => data.institute_id === req.body.institute_id
-                    );
-                  createCase =
-                    userdata.parent_id === req.body.institute_id ? true : false;
+                  res.json({
+                    status: 200,
+                    message: "Added Successfully",
+                    hassuccessed: true,
+                  });
                 }
-                if (createCase) {
-                  virtual_Case.findOne(
-                    { patient_id: userdata._id.toString(), inhospital: true },
-                    function (err, data) {
-                      if (err & !data) {
-                        res.json({
-                          status: 200,
-                          message: "Something went wrong.",
-                          hassuccessed: false,
-                          error: err,
-                        });
-                      } else {
-                        if (data) {
-                          Institute.findOne(
-                            {
-                              "institute_groups.houses.house_id":
-                                data.house_id.toString(),
-                            },
-                            function (err, doc3) {
-                              if (err & !doc3) {
-                                res.json({
-                                  status: 200,
-                                  message: "Something went wrongq.",
-                                  hassuccessed: false,
-                                  error: err,
-                                });
-                              } else {
-                                var infoHouse = {};
-                                if (doc3) {
-                                  doc3.institute_groups.map(function (dataa) {
-                                    dataa.houses.map(function (data1) {
-                                      if (data1.house_id == data.house_id) {
-                                        infoHouse.house = data1;
-                                        infoHouse.institute_groups = {
-                                          group_name: dataa.group_name,
-                                          _id: dataa._id,
-                                        };
-                                      }
-                                    });
-                                  });
-                                  res.json({
-                                    status: 200,
-                                    hassuccessed: false,
-                                    message: "Already in other hospital",
-                                    data: infoHouse,
-                                  });
-                                }
-                              }
-                            }
-                          );
-                        } else {
-                          res.json({
-                            status: 200,
-                            hassuccessed: true,
-                            message: "information get successfully",
-                            data: userdata,
-                          });
-                        }
-                      }
-                    }
-                  );
-                } else {
-                  if (req.body.pin) {
-                    res.json({
-                      status: 200,
-                      hassuccessed: false,
-                      message: "pin is not correct",
-                    });
-                  } else {
-                    res.json({
-                      status: 200,
-                      hassuccessed: false,
-                      message: "user is not associated need pin to add",
-                    });
-                  }
-                }
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "patient is not exist",
-                });
-              }
-            } catch (err) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Something went wrong.",
-                error: err,
               });
             }
           }
@@ -1359,14 +1316,265 @@ router.post("/checkPatient", function (req, res, next) {
       res.json({
         status: 200,
         hassuccessed: false,
-        message: "Please enter patient id",
+        message: "Authentication required.",
       });
     }
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/AddInvoice/:house_id/:status", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      let house_id = req.params.house_id;
+      const VirtualtToSearchWith = new virtual_Invoice({ house_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+
+      var search = {
+        house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
+      };
+      if (req.params.status !== "all") {
+        var search = {
+          house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
+          "status.value": req.params.status,
+        };
+      }
+      virtual_Invoice.find(search, function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "invoice not found",
+            error: err,
+          });
+        } else {
+          userdata.sort(mysort1);
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/infoOfHouses", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      fullInfo = [];
+      User.findOne({ _id: legit.id }, function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "user not found",
+            error: err,
+          });
+        } else {
+          if (userdata && userdata.houses && userdata.houses.length > 0) {
+            forEachPromise(userdata.houses, getfullInfo).then((result) => {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Houses is found",
+                data: fullInfo,
+              });
+            });
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/checkPatient", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      if (req.body.patient_id) {
+        const profile_id = req.body.patient_id;
+        const messageToSearchWith = new User({ profile_id });
+        messageToSearchWith.encryptFieldsSync();
+        const prepaid_talktime = req.body.patient_id;
+        const messageToSearchWith1 = new User({ prepaid_talktime });
+        messageToSearchWith1.encryptFieldsSync();
+        User.findOne(
+          {
+            $or: [
+              { profile_id: messageToSearchWith.profile_id },
+              { prepaid_talktime: messageToSearchWith1.prepaid_talktime },
+              { profile_id: req.body.patient_id },
+              { prepaid_talktime: req.body.patient_id },
+            ],
+          },
+          function (err, userdata) {
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong.",
+                error: err,
+              });
+            } else {
+              try {
+                if (userdata) {
+                  var createCase = false;
+                  if (req.body.pin) {
+                    createCase = req.body.pin == userdata.pin ? true : false;
+                  } else {
+                    var pos = 0;
+                    userdata &&
+                      userdata.assosiated_by.filter(
+                        (data) => data.institute_id === req.body.institute_id
+                      );
+                    createCase =
+                      userdata.parent_id === req.body.institute_id ? true : false;
+                  }
+                  if (createCase) {
+                    virtual_Case.findOne(
+                      { patient_id: userdata._id.toString(), inhospital: true },
+                      function (err, data) {
+                        if (err & !data) {
+                          res.json({
+                            status: 200,
+                            message: "Something went wrong.",
+                            hassuccessed: false,
+                            error: err,
+                          });
+                        } else {
+                          if (data) {
+                            Institute.findOne(
+                              {
+                                "institute_groups.houses.house_id":
+                                  data.house_id.toString(),
+                              },
+                              function (err, doc3) {
+                                if (err & !doc3) {
+                                  res.json({
+                                    status: 200,
+                                    message: "Something went wrongq.",
+                                    hassuccessed: false,
+                                    error: err,
+                                  });
+                                } else {
+                                  var infoHouse = {};
+                                  if (doc3) {
+                                    doc3.institute_groups.map(function (dataa) {
+                                      dataa.houses.map(function (data1) {
+                                        if (data1.house_id == data.house_id) {
+                                          infoHouse.house = data1;
+                                          infoHouse.institute_groups = {
+                                            group_name: dataa.group_name,
+                                            _id: dataa._id,
+                                          };
+                                        }
+                                      });
+                                    });
+                                    res.json({
+                                      status: 200,
+                                      hassuccessed: false,
+                                      message: "Already in other hospital",
+                                      data: infoHouse,
+                                    });
+                                  }
+                                }
+                              }
+                            );
+                          } else {
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "information get successfully",
+                              data: userdata,
+                            });
+                          }
+                        }
+                      }
+                    );
+                  } else {
+                    if (req.body.pin) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "pin is not correct",
+                      });
+                    } else {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "user is not associated need pin to add",
+                      });
+                    }
+                  }
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "patient is not exist",
+                  });
+                }
+              } catch (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong.",
+                  error: err,
+                });
+              }
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Please enter patient id",
+        });
+      }
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1714,307 +1922,37 @@ router.post("/checkPatient", function (req, res, next) {
 router.post("/checkPatient1", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    if (req.body.patient_id) {
-      const profile_id = req.body.patient_id;
-      const messageToSearchWith = new User({ profile_id });
-      messageToSearchWith.encryptFieldsSync();
-      const prepaid_talktime = req.body.patient_id;
-      const messageToSearchWith1 = new User({ prepaid_talktime });
-      messageToSearchWith1.encryptFieldsSync();
-      User.findOne(
-        {
-          $or: [
-            { profile_id: messageToSearchWith.profile_id },
-            { prepaid_talktime: messageToSearchWith1.prepaid_talktime },
-            { profile_id: req.body.patient_id },
-            { prepaid_talktime: req.body.patient_id },
-          ],
-        },
-        function (err, userdata) {
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong.",
-              error: err,
-            });
-          } else {
-            try {
-              if (userdata) {
-                virtual_Case.findOne(
-                  { patient_id: userdata._id.toString(), inhospital: true },
-                  function (err, data) {
-                    if (err & !data) {
-                      res.json({
-                        status: 200,
-                        message: "Something went wrong.",
-                        hassuccessed: false,
-                        error: err,
-                      });
-                    } else {
-                      if (data) {
-                        Institute.findOne(
-                          {
-                            "institute_groups.houses.house_id":
-                              data.house_id.toString(),
-                          },
-                          function (err, doc3) {
-                            if (err & !doc3) {
-                              res.json({
-                                status: 200,
-                                message: "Something went wrongq.",
-                                hassuccessed: false,
-                                error: err,
-                              });
-                            } else {
-                              var infoHouse = {};
-                              if (doc3) {
-                                doc3.institute_groups.map(function (dataa) {
-                                  dataa.houses.map(function (data1) {
-                                    if (data1.house_id == data.house_id) {
-                                      infoHouse.house = data1;
-                                      infoHouse.institute_groups = {
-                                        group_name: dataa.group_name,
-                                        _id: dataa._id,
-                                      };
-                                    }
-                                  });
-                                });
-                                res.json({
-                                  status: 200,
-                                  hassuccessed: false,
-                                  message: "Already in other hospital",
-                                  data: infoHouse,
-                                });
-                              } else {
-                              }
-                            }
-                          }
-                        );
-                      } else {
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          message: "information get successfully",
-                          data: userdata,
-                        });
-                      }
-                    }
-                  }
-                );
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "patient is not exist",
-                });
-              }
-            } catch (err) {
+  try {
+    if (legit) {
+      if (req.body.patient_id) {
+        const profile_id = req.body.patient_id;
+        const messageToSearchWith = new User({ profile_id });
+        messageToSearchWith.encryptFieldsSync();
+        const prepaid_talktime = req.body.patient_id;
+        const messageToSearchWith1 = new User({ prepaid_talktime });
+        messageToSearchWith1.encryptFieldsSync();
+        User.findOne(
+          {
+            $or: [
+              { profile_id: messageToSearchWith.profile_id },
+              { prepaid_talktime: messageToSearchWith1.prepaid_talktime },
+              { profile_id: req.body.patient_id },
+              { prepaid_talktime: req.body.patient_id },
+            ],
+          },
+          function (err, userdata) {
+            if (err) {
               res.json({
                 status: 200,
                 hassuccessed: false,
                 message: "Something went wrong.",
                 error: err,
               });
-            }
-          }
-        }
-      );
-    } else if (req.body.email) {
-      const email = req.body.email;
-      const messageToSearchWith = new User({ email });
-      messageToSearchWith.encryptFieldsSync();
-      User.findOne(
-        {
-          $or: [
-            { email: messageToSearchWith.email },
-            { email: req.body.email },
-          ],
-        },
-        function (err, userdata) {
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong.",
-              error: err,
-            });
-          } else {
-            try {
-              if (userdata) {
-                virtual_Case.findOne(
-                  { patient_id: userdata._id.toString(), inhospital: true },
-                  function (err, data) {
-                    if (err & !data) {
-                      res.json({
-                        status: 200,
-                        message: "Something went wrong.",
-                        hassuccessed: false,
-                        error: err,
-                      });
-                    } else {
-
-                      if (data) {
-                        Institute.findOne(
-                          {
-                            "institute_groups.houses.house_id":
-                              data.house_id.toString(),
-                          },
-                          function (err, doc3) {
-                            if (err & !doc3) {
-                              res.json({
-                                status: 200,
-                                message: "Something went wrongq.",
-                                hassuccessed: false,
-                                error: err,
-                              });
-                            } else {
-                              var infoHouse = {};
-                              if (doc3) {
-                                doc3.institute_groups.map(function (dataa) {
-                                  dataa.houses.map(function (data1) {
-
-                                    if (data1.house_id == data.house_id) {
-                                      infoHouse.house = data1;
-                                      infoHouse.institute_groups = {
-                                        group_name: dataa.group_name,
-                                        _id: dataa._id,
-                                      };
-                                    }
-                                  });
-                                });
-                                res.json({
-                                  status: 200,
-                                  hassuccessed: false,
-                                  message: "Already in other hospital",
-                                  data: infoHouse,
-                                });
-                              }
-                            }
-                          }
-                        );
-                      } else {
-                        res.json({
-                          status: 200,
-                          hassuccessed: true,
-                          message: "information get successfully",
-                          data: userdata,
-                        });
-                      }
-                    }
-                  }
-                );
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "patient is not exist",
-                });
-              }
-            } catch (err) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Something went wrong.",
-                error: err,
-              });
-            }
-          }
-        }
-      );
-    } else if (
-      req.body.first_name &&
-      req.body.last_name &&
-      req.body.birthday &&
-      req.body.mobile
-    ) {
-      const first_name = req.body.first_name;
-      const messageToSearchWithfirst = new User({ first_name });
-      messageToSearchWithfirst.encryptFieldsSync();
-
-      const messageToSearchWithfirst2 = new User({
-        first_name: first_name && first_name.toUpperCase(),
-      });
-      messageToSearchWithfirst2.encryptFieldsSync();
-      const messageToSearchWithfirst1 = new User({
-        first_name: first_name && first_name.toLowerCase(),
-      });
-      messageToSearchWithfirst1.encryptFieldsSync();
-
-      const last_name = req.body.last_name;
-      const messageToSearchWith1 = new User({ last_name });
-      messageToSearchWith1.encryptFieldsSync();
-
-      const messageToSearchWithlast2 = new User({
-        last_name: last_name && last_name.toUpperCase(),
-      });
-      messageToSearchWithlast2.encryptFieldsSync();
-      const messageToSearchWithlast3 = new User({
-        last_name: last_name && last_name.toLowerCase(),
-      });
-      messageToSearchWithlast3.encryptFieldsSync();
-
-      const mobile = req.body.mobile;
-      const messageToSearchWith2 = new User({ mobile });
-      messageToSearchWith2.encryptFieldsSync();
-
-      User.find(
-        {
-          $and: [
-            {
-              $or: [
-                { first_name: messageToSearchWithfirst.first_name },
-                { first_name: req.body.first_name },
-                { first_name: first_name.toLowerCase() },
-                { first_name: first_name.toUpperCase() },
-                { first_name: messageToSearchWithfirst1.first_name },
-                { first_name: messageToSearchWithfirst1.first_name },
-              ],
-            },
-            {
-              $or: [
-                { last_name: messageToSearchWith1.last_name },
-                { last_name: req.body.last_name },
-                { last_name: last_name.toLowerCase() },
-                { last_name: last_name.toUpperCase() },
-                { last_name: messageToSearchWithlast2.last_name },
-                { last_name: messageToSearchWithlast3.last_name },
-              ],
-            },
-            {
-              $or: [
-                { mobile: messageToSearchWith2.mobile },
-                { mobile: req.body.mobile },
-              ],
-            },
-            // ,   { $or: [
-            //   { birthday: messageToSearchWith3.birthday },
-            //   { birthday: req.body.birthday }
-            // ]}
-          ],
-        },
-        function (err, userdata) {
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong.",
-              error: err,
-            });
-          } else {
-            try {
-              if (userdata && userdata.length > 0) {
-
-                var newData = userdata.filter(
-                  (item) =>
-                    moment(item.birthday).format("MM/DD/YYYY") ===
-                    moment(req.body.birthday).format("MM/DD/YYYY")
-                );
-
-                if (newData && newData.length > 0) {
+            } else {
+              try {
+                if (userdata) {
                   virtual_Case.findOne(
-                    { patient_id: newData[0]._id.toString(), inhospital: true },
+                    { patient_id: userdata._id.toString(), inhospital: true },
                     function (err, data) {
                       if (err & !data) {
                         res.json({
@@ -2024,6 +1962,108 @@ router.post("/checkPatient1", function (req, res, next) {
                           error: err,
                         });
                       } else {
+                        if (data) {
+                          Institute.findOne(
+                            {
+                              "institute_groups.houses.house_id":
+                                data.house_id.toString(),
+                            },
+                            function (err, doc3) {
+                              if (err & !doc3) {
+                                res.json({
+                                  status: 200,
+                                  message: "Something went wrongq.",
+                                  hassuccessed: false,
+                                  error: err,
+                                });
+                              } else {
+                                var infoHouse = {};
+                                if (doc3) {
+                                  doc3.institute_groups.map(function (dataa) {
+                                    dataa.houses.map(function (data1) {
+                                      if (data1.house_id == data.house_id) {
+                                        infoHouse.house = data1;
+                                        infoHouse.institute_groups = {
+                                          group_name: dataa.group_name,
+                                          _id: dataa._id,
+                                        };
+                                      }
+                                    });
+                                  });
+                                  res.json({
+                                    status: 200,
+                                    hassuccessed: false,
+                                    message: "Already in other hospital",
+                                    data: infoHouse,
+                                  });
+                                } else {
+                                }
+                              }
+                            }
+                          );
+                        } else {
+                          res.json({
+                            status: 200,
+                            hassuccessed: true,
+                            message: "information get successfully",
+                            data: userdata,
+                          });
+                        }
+                      }
+                    }
+                  );
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "patient is not exist",
+                  });
+                }
+              } catch (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong.",
+                  error: err,
+                });
+              }
+            }
+          }
+        );
+      } else if (req.body.email) {
+        const email = req.body.email;
+        const messageToSearchWith = new User({ email });
+        messageToSearchWith.encryptFieldsSync();
+        User.findOne(
+          {
+            $or: [
+              { email: messageToSearchWith.email },
+              { email: req.body.email },
+            ],
+          },
+          function (err, userdata) {
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong.",
+                error: err,
+              });
+            } else {
+              try {
+                if (userdata) {
+                  virtual_Case.findOne(
+                    { patient_id: userdata._id.toString(), inhospital: true },
+                    function (err, data) {
+                      if (err & !data) {
+                        res.json({
+                          status: 200,
+                          message: "Something went wrong.",
+                          hassuccessed: false,
+                          error: err,
+                        });
+                      } else {
+
                         if (data) {
                           Institute.findOne(
                             {
@@ -2068,7 +2108,7 @@ router.post("/checkPatient1", function (req, res, next) {
                             status: 200,
                             hassuccessed: true,
                             message: "information get successfully",
-                            data: newData[0],
+                            data: userdata,
                           });
                         }
                       }
@@ -2081,20 +2121,616 @@ router.post("/checkPatient1", function (req, res, next) {
                     message: "patient is not exist",
                   });
                 }
-              } else {
+              } catch (err) {
                 res.json({
                   status: 200,
                   hassuccessed: false,
-                  message: "patient is not exist",
+                  message: "Something went wrong.",
+                  error: err,
                 });
               }
-            } catch (err) {
+            }
+          }
+        );
+      } else if (
+        req.body.first_name &&
+        req.body.last_name &&
+        req.body.birthday &&
+        req.body.mobile
+      ) {
+        const first_name = req.body.first_name;
+        const messageToSearchWithfirst = new User({ first_name });
+        messageToSearchWithfirst.encryptFieldsSync();
+
+        const messageToSearchWithfirst2 = new User({
+          first_name: first_name && first_name.toUpperCase(),
+        });
+        messageToSearchWithfirst2.encryptFieldsSync();
+        const messageToSearchWithfirst1 = new User({
+          first_name: first_name && first_name.toLowerCase(),
+        });
+        messageToSearchWithfirst1.encryptFieldsSync();
+
+        const last_name = req.body.last_name;
+        const messageToSearchWith1 = new User({ last_name });
+        messageToSearchWith1.encryptFieldsSync();
+
+        const messageToSearchWithlast2 = new User({
+          last_name: last_name && last_name.toUpperCase(),
+        });
+        messageToSearchWithlast2.encryptFieldsSync();
+        const messageToSearchWithlast3 = new User({
+          last_name: last_name && last_name.toLowerCase(),
+        });
+        messageToSearchWithlast3.encryptFieldsSync();
+
+        const mobile = req.body.mobile;
+        const messageToSearchWith2 = new User({ mobile });
+        messageToSearchWith2.encryptFieldsSync();
+
+        User.find(
+          {
+            $and: [
+              {
+                $or: [
+                  { first_name: messageToSearchWithfirst.first_name },
+                  { first_name: req.body.first_name },
+                  { first_name: first_name.toLowerCase() },
+                  { first_name: first_name.toUpperCase() },
+                  { first_name: messageToSearchWithfirst1.first_name },
+                  { first_name: messageToSearchWithfirst1.first_name },
+                ],
+              },
+              {
+                $or: [
+                  { last_name: messageToSearchWith1.last_name },
+                  { last_name: req.body.last_name },
+                  { last_name: last_name.toLowerCase() },
+                  { last_name: last_name.toUpperCase() },
+                  { last_name: messageToSearchWithlast2.last_name },
+                  { last_name: messageToSearchWithlast3.last_name },
+                ],
+              },
+              {
+                $or: [
+                  { mobile: messageToSearchWith2.mobile },
+                  { mobile: req.body.mobile },
+                ],
+              },
+              // ,   { $or: [
+              //   { birthday: messageToSearchWith3.birthday },
+              //   { birthday: req.body.birthday }
+              // ]}
+            ],
+          },
+          function (err, userdata) {
+            if (err) {
               res.json({
                 status: 200,
                 hassuccessed: false,
                 message: "Something went wrong.",
                 error: err,
               });
+            } else {
+              try {
+                if (userdata && userdata.length > 0) {
+
+                  var newData = userdata.filter(
+                    (item) =>
+                      moment(item.birthday).format("MM/DD/YYYY") ===
+                      moment(req.body.birthday).format("MM/DD/YYYY")
+                  );
+
+                  if (newData && newData.length > 0) {
+                    virtual_Case.findOne(
+                      { patient_id: newData[0]._id.toString(), inhospital: true },
+                      function (err, data) {
+                        if (err & !data) {
+                          res.json({
+                            status: 200,
+                            message: "Something went wrong.",
+                            hassuccessed: false,
+                            error: err,
+                          });
+                        } else {
+                          if (data) {
+                            Institute.findOne(
+                              {
+                                "institute_groups.houses.house_id":
+                                  data.house_id.toString(),
+                              },
+                              function (err, doc3) {
+                                if (err & !doc3) {
+                                  res.json({
+                                    status: 200,
+                                    message: "Something went wrongq.",
+                                    hassuccessed: false,
+                                    error: err,
+                                  });
+                                } else {
+                                  var infoHouse = {};
+                                  if (doc3) {
+                                    doc3.institute_groups.map(function (dataa) {
+                                      dataa.houses.map(function (data1) {
+
+                                        if (data1.house_id == data.house_id) {
+                                          infoHouse.house = data1;
+                                          infoHouse.institute_groups = {
+                                            group_name: dataa.group_name,
+                                            _id: dataa._id,
+                                          };
+                                        }
+                                      });
+                                    });
+                                    res.json({
+                                      status: 200,
+                                      hassuccessed: false,
+                                      message: "Already in other hospital",
+                                      data: infoHouse,
+                                    });
+                                  }
+                                }
+                              }
+                            );
+                          } else {
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "information get successfully",
+                              data: newData[0],
+                            });
+                          }
+                        }
+                      }
+                    );
+                  } else {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "patient is not exist",
+                    });
+                  }
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "patient is not exist",
+                  });
+                }
+              } catch (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong.",
+                  error: err,
+                });
+              }
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Please enter patient id",
+        });
+      }
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/linkforAccepthospital", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      var lan1 = getMsgLang(req.body.patient);
+      lan1.then((result) => {
+        if (req.body.email) {
+          var sendData =
+            "Dear,<br/><b>" +
+            req.body.patient_name +
+            "</b><br/> " +
+            "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
+            "https://aidoc.io/approveHospital/" +
+            req.body.case_id +
+            "'>LINK</a></b>";
+          ".<br/>" + "<b>Your Aimedis team </b>";
+
+          generateTemplate(
+            EMAIL.generalEmail.createTemplate(result, {
+              title: "",
+              content: sendData,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.email,
+                  subject: "Request to access you information from Hospital",
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Mail is sent",
+                  });
+                }
+              }
+            }
+          );
+        }
+        if (req.body.mobile) {
+          result =
+            result === "ch"
+              ? "zh"
+              : result === "sp"
+                ? "es"
+                : result === "rs"
+                  ? "ru"
+                  : result;
+          var sms1 =
+            "Dear, " +
+            req.body.patient_name +
+            "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
+            " https://aidoc.io/approveHospital/" +
+            req.body.case_id;
+
+          trans(sms1, { source: "en", target: result }).then((res1) => {
+            sendSms(req.body.mobile, res1)
+              .then((result) => {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "Message is sent",
+                });
+              })
+              .catch((e) => {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Message is not sent",
+                });
+              });
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/addPatientToVH", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      var virtual_Cases = new virtual_Case(req.body);
+      virtual_Cases.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({ status: 200, message: "Something went wrong.", error: err });
+        } else {
+          res.json({
+            status: 200,
+            message: "Case number is assigned",
+            hassuccessed: true,
+            data: user_data._id,
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.put("/addPatientToVH/:case_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_Case.updateOne(
+        { _id: req.params.case_id },
+        req.body,
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Case is updated",
+              data: userdata,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.delete("/addPatientToVH/:case_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_Case.findByIdAndRemove(req.params.case_id, function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Case is Deleted Successfully",
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/getPatientFromVH/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const messageToSearchWithlast3 = new virtual_Case({
+        house_id: req.params.house_id,
+      });
+      messageToSearchWithlast3.encryptFieldsSync();
+      virtual_Case.find(
+        {
+          $and: [
+            {
+              house_id: {
+                $in: [req.params.house_id, messageToSearchWithlast3.house_id],
+              },
+            },
+            { inhospital: true },
+            { verifiedbyPatient: true },
+          ],
+        },
+        function (err, user_data) {
+          if (err && !user_data) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              message: "Get the patients",
+              hassuccessed: true,
+              data: user_data,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/getAppointTask/:House_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      User.find(
+        { "houses.value": req.params.House_id, type: { $in: ["doctor", "nurse"] } },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "specialities not found",
+              error: err,
+            });
+          } else {
+            Promise.all([
+              virtualAppointment(userdata),
+              virtualTask(req.params.House_id),
+            ]).then((list1) => {
+              var flatArray = Array.prototype.concat.apply([], list1);
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                data: flatArray,
+              });
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/getAppointTask1/:House_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      User.find(
+        { "houses.value": req.params.House_id, type: "doctor" },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "specialities not found",
+              error: err,
+            });
+          } else {
+            virtualTask(req.params.House_id).then((list) => {
+              res.json({ status: 200, hassuccessed: true, data: list });
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/statisticstopinfo/:House_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      Promise.all([
+        virtualCase(req.params.House_id),
+        User_Case(req.params.House_id),
+        User_Case1(req.params.House_id),
+      ]).then((list1) => {
+        var flatArray = Array.prototype.concat.apply([], list1);
+
+        res.json({ status: 200, hassuccessed: true, data: flatArray });
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/stasticsrightinfo/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      virtual_step.findOne(
+        { house_id: req.params.house_id },
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "specialities not found",
+              error: err,
+            });
+          } else {
+            if (userdata) {
+              let count = userdata.steps && userdata.steps.length > 0 && userdata.steps.map((element) => {
+                return {
+                  step_name: element.step_name, counts: element.case_numbers ? element.case_numbers.length : 0,
+                };
+              });
+              res.json({ status: 200, hassuccessed: true, data: count });
+            } else {
+              res.json({ status: 200, hassuccessed: true, data: [] });
             }
           }
         }
@@ -2103,363 +2739,14 @@ router.post("/checkPatient1", function (req, res, next) {
       res.json({
         status: 200,
         hassuccessed: false,
-        message: "Please enter patient id",
+        message: "Authentication required.",
       });
     }
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/linkforAccepthospital", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    var lan1 = getMsgLang(req.body.patient);
-    lan1.then((result) => {
-      if (req.body.email) {
-        var sendData =
-          "Dear,<br/><b>" +
-          req.body.patient_name +
-          "</b><br/> " +
-          "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
-          "https://aidoc.io/approveHospital/" +
-          req.body.case_id +
-          "'>LINK</a></b>";
-        ".<br/>" + "<b>Your Aimedis team </b>";
-
-        generateTemplate(
-          EMAIL.generalEmail.createTemplate(result, {
-            title: "",
-            content: sendData,
-          }),
-          (error, html) => {
-            if (!error) {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.email,
-                subject: "Request to access you information from Hospital",
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Mail is sent",
-                });
-              }
-            }
-          }
-        );
-      }
-      if (req.body.mobile) {
-        result =
-          result === "ch"
-            ? "zh"
-            : result === "sp"
-              ? "es"
-              : result === "rs"
-                ? "ru"
-                : result;
-        var sms1 =
-          "Dear, " +
-          req.body.patient_name +
-          "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://aidoc.io/approveHospital/" +
-          req.body.case_id;
-
-        trans(sms1, { source: "en", target: result }).then((res1) => {
-          sendSms(req.body.mobile, res1)
-            .then((result) => {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "Message is sent",
-              });
-            })
-            .catch((e) => {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Message is not sent",
-              });
-            });
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/addPatientToVH", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    var virtual_Cases = new virtual_Case(req.body);
-    virtual_Cases.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Case number is assigned",
-          hassuccessed: true,
-          data: user_data._id,
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.put("/addPatientToVH/:case_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Case.updateOne(
-      { _id: req.params.case_id },
-      req.body,
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Case is updated",
-            data: userdata,
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.delete("/addPatientToVH/:case_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Case.findByIdAndRemove(req.params.case_id, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "Case is Deleted Successfully",
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/getPatientFromVH/:house_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const messageToSearchWithlast3 = new virtual_Case({
-      house_id: req.params.house_id,
-    });
-    messageToSearchWithlast3.encryptFieldsSync();
-    virtual_Case.find(
-      {
-        $and: [
-          {
-            house_id: {
-              $in: [req.params.house_id, messageToSearchWithlast3.house_id],
-            },
-          },
-          { inhospital: true },
-          { verifiedbyPatient: true },
-        ],
-      },
-      function (err, user_data) {
-        if (err && !user_data) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            message: "Get the patients",
-            hassuccessed: true,
-            data: user_data,
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/getAppointTask/:House_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.find(
-      { "houses.value": req.params.House_id, type:{$in:["doctor","nurse"]} },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "specialities not found",
-            error: err,
-          });
-        } else {
-          Promise.all([
-            virtualAppointment(userdata),
-            virtualTask(req.params.House_id),
-          ]).then((list1) => {
-            var flatArray = Array.prototype.concat.apply([], list1);
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              data: flatArray,
-            });
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/getAppointTask1/:House_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.find(
-      { "houses.value": req.params.House_id, type: "doctor" },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "specialities not found",
-            error: err,
-          });
-        } else {
-          virtualTask(req.params.House_id).then((list) => {
-            res.json({ status: 200, hassuccessed: true, data: list });
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/statisticstopinfo/:House_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-
-  if (legit) {
-    Promise.all([
-      virtualCase(req.params.House_id),
-      User_Case(req.params.House_id),
-      User_Case1(req.params.House_id),
-    ]).then((list1) => {
-      var flatArray = Array.prototype.concat.apply([], list1);
-
-      res.json({ status: 200, hassuccessed: true, data: flatArray });
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/stasticsrightinfo/:house_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_step.findOne(
-      { house_id: req.params.house_id },
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "specialities not found",
-            error: err,
-          });
-        } else {
-          if (userdata) {
-            let count = userdata.steps && userdata.steps.length > 0 && userdata.steps.map((element) => {
-              return {
-                step_name: element.step_name, counts: element.case_numbers ? element.case_numbers.length : 0,
-              };
-            });
-            res.json({ status: 200, hassuccessed: true, data: count });
-          } else {
-            res.json({ status: 200, hassuccessed: true, data: [] });
-          }
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2467,18 +2754,26 @@ router.get("/stasticsrightinfo/:house_id", function (req, res, next) {
 router.get("/sortinfo/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    Promise.all([
-      virtualInvoiceforPatient(req.params.patient_id),
-      virtualTasksforPatient(req.params.patient_id),
-    ]).then((data, data1) => {
-      res.json({ status: 200, hassuccessed: true, data: data, data1 });
-    });
-  } else {
+  try {
+    if (legit) {
+      Promise.all([
+        virtualInvoiceforPatient(req.params.patient_id),
+        virtualTasksforPatient(req.params.patient_id),
+      ]).then((data, data1) => {
+        res.json({ status: 200, hassuccessed: true, data: data, data1 });
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2486,56 +2781,64 @@ router.get("/sortinfo/:patient_id", function (req, res, next) {
 router.get("/sortinfo1/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    virtual_Invoice
-      .aggregate([
-        {
-          $match: {
-            "patient._id": ObjectId(req.params.patient_id),
-            // "patient.patient_id": req.params.patient_id,
+  try {
+    if (legit) {
+      virtual_Invoice
+        .aggregate([
+          {
+            $match: {
+              "patient._id": ObjectId(req.params.patient_id),
+              // "patient.patient_id": req.params.patient_id,
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "virtual_tasks",
-            localField: "patient_id",
-            foreignField: "patient_id",
-            as: "complete_info",
+          {
+            $lookup: {
+              from: "virtual_tasks",
+              localField: "patient_id",
+              foreignField: "patient_id",
+              as: "complete_info",
+            },
           },
-        },
-        {
-          $project: {
-            services: 1,
-            invoice_id: 1,
-            patient: 1,
-            case_id: 1,
-            status: 1,
-            total_amount: 1,
-            house_id: 1,
-            created_at: 1,
-            virtualtask: "$complete_info",
+          {
+            $project: {
+              services: 1,
+              invoice_id: 1,
+              patient: 1,
+              case_id: 1,
+              status: 1,
+              total_amount: 1,
+              house_id: 1,
+              created_at: 1,
+              virtualtask: "$complete_info",
+            },
           },
-        },
-        //  { $unwind: "$complete_info"}
-      ])
-      .exec(function (err, data) {
-        if (err) {
+          //  { $unwind: "$complete_info"}
+        ])
+        .exec(function (err, data) {
+          if (err) {
 
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
 
-          res.json({ status: 200, hassuccessed: true, result: data });
-        }
+            res.json({ status: 200, hassuccessed: true, result: data });
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
       });
-  } else {
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2951,42 +3254,50 @@ router.get("/Getinstitutename/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   let house_name = "";
-  if (legit) {
-    Institute.findOne({
-      "institute_groups.houses.house_id": req.params.house_id,
-    }).exec(function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-
-        if (data) {
-          data.institute_groups.map((item) => {
-
-            item.houses.map((item2) => {
-              if (item2.house_id == req.params.house_id) {
-                house_name = item2.house_name;
-              }
-            });
-          });
-          res.json({ status: 200, hassuccessed: true, data: house_name });
-        } else {
+  try {
+    if (legit) {
+      Institute.findOne({
+        "institute_groups.houses.house_id": req.params.house_id,
+      }).exec(function (err, data) {
+        if (err) {
           res.json({
             status: 200,
             hassuccessed: false,
-            message: "House not found",
+            message: "Something went wrong",
           });
+        } else {
+
+          if (data) {
+            data.institute_groups.map((item) => {
+
+              item.houses.map((item2) => {
+                if (item2.house_id == req.params.house_id) {
+                  house_name = item2.house_name;
+                }
+              });
+            });
+            res.json({ status: 200, hassuccessed: true, data: house_name });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "House not found",
+            });
+          }
         }
-      }
-    });
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3113,56 +3424,64 @@ router.post("/downloadPEBill", function (req, res, next) {
 router.get("/patientjourneyQue/:patient_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    newcf = [];
-    var patient_id = req.params.patient_id;
-    const VirtualtToSearchWith = new virtual_Case({ patient_id });
-    VirtualtToSearchWith.encryptFieldsSync();
+  try {
+    if (legit) {
+      newcf = [];
+      var patient_id = req.params.patient_id;
+      const VirtualtToSearchWith = new virtual_Case({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
 
-    virtual_Case.find(
-      {
-        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
-        inhospital: false,
-        viewQuestionaire: true,
-      },
-      function (err, data) {
-        if (err & !data) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          if (data && data.length > 0) {
-            const result1 = data.filter(
-              (thing, index, self) =>
-                index === self.findIndex((t) => t.house_id === thing.house_id)
-            );
-            forEachPromise(result1, GetAllQuestion).then((result) => {
+      virtual_Case.find(
+        {
+          patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+          inhospital: false,
+          viewQuestionaire: true,
+        },
+        function (err, data) {
+          if (err & !data) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            if (data && data.length > 0) {
+              const result1 = data.filter(
+                (thing, index, self) =>
+                  index === self.findIndex((t) => t.house_id === thing.house_id)
+              );
+              forEachPromise(result1, GetAllQuestion).then((result) => {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "succefully find",
+                  data: newcf,
+                });
+              });
+            } else {
               res.json({
                 status: 200,
                 hassuccessed: true,
                 message: "succefully find",
-                data: newcf,
+                data: [],
               });
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "succefully find",
-              data: [],
-            });
+            }
           }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3203,51 +3522,59 @@ router.get("/patientjourney/:patient_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   let Array_flat = [];
-  if (legit) {
-    flatArraya = [];
-    Inhospital = [];
-    InhopspitalInvoice = [];
-    var patient_id = req.params.patient_id;
-    const VirtualtToSearchWith = new virtual_Case({ patient_id });
-    VirtualtToSearchWith.encryptFieldsSync();
+  try {
+    if (legit) {
+      flatArraya = [];
+      Inhospital = [];
+      InhopspitalInvoice = [];
+      var patient_id = req.params.patient_id;
+      const VirtualtToSearchWith = new virtual_Case({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
 
-    virtual_Case.find(
-      { patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
-      function (err, data) {
-        if (err & !data) {
-          res.json({ status: 200, hassuccessed: true, error: err });
-        } else {
-          if (data && data.length > 0) {
-            forEachPromise(data, taskfromhouseid).then((result) => {
-              //  var ansfromhousessid = ansfromhouseid(req.params.patient_id)
-              // ansfromhousessid.then((result)=> {
+      virtual_Case.find(
+        { patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
+        function (err, data) {
+          if (err & !data) {
+            res.json({ status: 200, hassuccessed: true, error: err });
+          } else {
+            if (data && data.length > 0) {
+              forEachPromise(data, taskfromhouseid).then((result) => {
+                //  var ansfromhousessid = ansfromhouseid(req.params.patient_id)
+                // ansfromhousessid.then((result)=> {
 
-              //   flatArraya.push(...result);
-              flatArraya.sort(mySorter);
+                //   flatArraya.push(...result);
+                flatArraya.sort(mySorter);
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "succefully find",
+                  data: flatArraya,
+                });
+                // })
+              });
+            } else {
               res.json({
                 status: 200,
                 hassuccessed: true,
                 message: "succefully find",
-                data: flatArraya,
+                data: [],
               });
-              // })
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "succefully find",
-              data: [],
-            });
+            }
           }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3304,91 +3631,99 @@ function mysort1(a, b) {
 router.post("/TaskFilter", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
+  try {
+    if (legit) {
 
 
-    var house_id = req.body.house_id;
-    const VirtualtToSearchWith1 = new virtual_Task({ house_id });
-    VirtualtToSearchWith1.encryptFieldsSync();
+      var house_id = req.body.house_id;
+      const VirtualtToSearchWith1 = new virtual_Task({ house_id });
+      VirtualtToSearchWith1.encryptFieldsSync();
 
-    var condition = {
-      house_id: { $in: [req.body.house_id, VirtualtToSearchWith1.house_id] },
-    };
-    if (req.body.assigned_to) {
-      condition["assinged_to.user_id"] = { $in: req.body.assigned_to };
-    }
-    if (req.body.status) {
-      var status = req.body.status;
-      statuscheck = status.map((element) => {
-        VirtualtToSearchWith3 = new virtual_Task({ status: element });
-        VirtualtToSearchWith3.encryptFieldsSync();
-        return VirtualtToSearchWith3.status;
-      });
-
-      statuscheck = [...status, ...statuscheck];
-      condition.status = { $in: statuscheck };
-    }
-    if (req.body.speciality_id) {
-      condition["speciality._id"] = req.body.speciality_id;
-    }
-    if (req.body.patient_id) {
-      var patient_id = req.body.patient_id;
-
-      patient_en = patient_id.map((element) => {
-        VirtualtToSearchWith3 = new virtual_Task({ patient_id: element });
-        VirtualtToSearchWith3.encryptFieldsSync();
-        return VirtualtToSearchWith3.patient_id;
-      });
-
-      patient_id = [...patient_id, ...patient_en];
-
-      condition.patient_id = { $in: patient_id };
-    }
-
-    virtual_Task.find(condition, function (err, data) {
-      if (err & !data) {
-        res.json({ status: 200, hassuccessed: true, error: err });
-      } else {
-
-        let condition3 = {
-          house_id: {
-            $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
-          },
-        };
-        if (req.body.ward_id || req.body.room_id) {
-          if (req.body.room_id) {
-            condition3["rooms._id"] = req.body.room_id;
-          }
-          if (req.body.ward_id) {
-            condition3["wards._id"] = req.body.ward_id;
-          }
-
-          virtual_Case.find(condition3, function (err, data1) {
-            if (err) {
-              res.json({ status: 200, hassuccessed: true, error: err });
-            } else {
-              var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id);
-              if (equals) {
-                res.json({ status: 200, hassuccessed: true, data: data1 });
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "No data found",
-                });
-              }
-            }
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
-        }
+      var condition = {
+        house_id: { $in: [req.body.house_id, VirtualtToSearchWith1.house_id] },
+      };
+      if (req.body.assigned_to) {
+        condition["assinged_to.user_id"] = { $in: req.body.assigned_to };
       }
-    });
-  } else {
+      if (req.body.status) {
+        var status = req.body.status;
+        statuscheck = status.map((element) => {
+          VirtualtToSearchWith3 = new virtual_Task({ status: element });
+          VirtualtToSearchWith3.encryptFieldsSync();
+          return VirtualtToSearchWith3.status;
+        });
+
+        statuscheck = [...status, ...statuscheck];
+        condition.status = { $in: statuscheck };
+      }
+      if (req.body.speciality_id) {
+        condition["speciality._id"] = req.body.speciality_id;
+      }
+      if (req.body.patient_id) {
+        var patient_id = req.body.patient_id;
+
+        patient_en = patient_id.map((element) => {
+          VirtualtToSearchWith3 = new virtual_Task({ patient_id: element });
+          VirtualtToSearchWith3.encryptFieldsSync();
+          return VirtualtToSearchWith3.patient_id;
+        });
+
+        patient_id = [...patient_id, ...patient_en];
+
+        condition.patient_id = { $in: patient_id };
+      }
+
+      virtual_Task.find(condition, function (err, data) {
+        if (err & !data) {
+          res.json({ status: 200, hassuccessed: true, error: err });
+        } else {
+
+          let condition3 = {
+            house_id: {
+              $in: [req.body.house_id, VirtualtToSearchWith1.house_id],
+            },
+          };
+          if (req.body.ward_id || req.body.room_id) {
+            if (req.body.room_id) {
+              condition3["rooms._id"] = req.body.room_id;
+            }
+            if (req.body.ward_id) {
+              condition3["wards._id"] = req.body.ward_id;
+            }
+
+            virtual_Case.find(condition3, function (err, data1) {
+              if (err) {
+                res.json({ status: 200, hassuccessed: true, error: err });
+              } else {
+                var equals = data1.length === data.length && data1.every((e, i) => e.patient_id === data[i].patient_id);
+                if (equals) {
+                  res.json({ status: 200, hassuccessed: true, data: data1 });
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "No data found",
+                  });
+                }
+              }
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3396,36 +3731,44 @@ router.post("/TaskFilter", function (req, res) {
 router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    var case_id = req.body.case_id;
-    virtual_Case
-      .updateMany(
-        { _id: { $in: case_id } },
-        { $set: { inhospital: false, status: "5" } }
-      )
-      .exec(function (err, data) {
-        if (err) {
+  try {
+    if (legit) {
+      var case_id = req.body.case_id;
+      virtual_Case
+        .updateMany(
+          { _id: { $in: case_id } },
+          { $set: { inhospital: false, status: "5" } }
+        )
+        .exec(function (err, data) {
+          if (err) {
 
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-            error: err,
-          });
-        } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+              error: err,
+            });
+          } else {
 
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            msg: "update",
-          });
-        }
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              msg: "update",
+            });
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-  } else {
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3569,36 +3912,44 @@ router.post("/CalenderFilter", function (req, res) {
 });
 
 router.post("/temp1", function (req, res) {
-  let patient_id = ["5e871b1ec8a5ee77d0ceba36", "60113e84b488aa271effa411"];
+  try {
+    let patient_id = ["5e871b1ec8a5ee77d0ceba36", "60113e84b488aa271effa411"];
 
 
-  // var VirtualtToSearchWith= new  Appointments({patient:{ $in:patient_id} });
-  // VirtualtToSearchWith.encryptFieldsSync();
+    // var VirtualtToSearchWith= new  Appointments({patient:{ $in:patient_id} });
+    // VirtualtToSearchWith.encryptFieldsSync();
 
-  patient_en = patient_id.map((element) => {
-    VirtualtToSearchWith = new Appointments({ patient: element });
-    VirtualtToSearchWith.encryptFieldsSync();
-    return VirtualtToSearchWith.patient;
-  });
+    patient_en = patient_id.map((element) => {
+      VirtualtToSearchWith = new Appointments({ patient: element });
+      VirtualtToSearchWith.encryptFieldsSync();
+      return VirtualtToSearchWith.patient;
+    });
 
-  patient_id = [...patient_id, ...patient_en];
+    patient_id = [...patient_id, ...patient_en];
 
-  Appointments.find(
-    { patient: { $in: patient_id } },
-    function (err, appointments) {
-      if (err) {
+    Appointments.find(
+      { patient: { $in: patient_id } },
+      function (err, appointments) {
+        if (err) {
 
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
 
-        res.json({ status: 200, hassuccessed: true, data: appointments });
+          res.json({ status: 200, hassuccessed: true, data: appointments });
+        }
       }
-    }
-  );
+    );
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 router.post("/billfilter", function (req, res) {
@@ -3674,41 +4025,49 @@ router.post("/billfilter", function (req, res) {
 router.delete("/AddTrack", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.updateOne(
-      { _id: req.body.UserId },
-      { $pull: { track_record: { track_id: req.body.TrackId } } },
-      { multi: true },
-      function (err, doc) {
-        if (err && !doc) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-            error: err,
-          });
-        } else {
-          if (doc.nModified == "0") {
+  try {
+    if (legit) {
+      User.updateOne(
+        { _id: req.body.UserId },
+        { $pull: { track_record: { track_id: req.body.TrackId } } },
+        { multi: true },
+        function (err, doc) {
+          if (err && !doc) {
             res.json({
               status: 200,
               hassuccessed: false,
-              msg: "Track record is not found",
+              msg: "Something went wrong",
+              error: err,
             });
           } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "track is deleted",
-            });
+            if (doc.nModified == "0") {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                msg: "Track record is not found",
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "track is deleted",
+              });
+            }
           }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3763,7 +4122,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                           {
                             $match: {
                               $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],
-                              status: {$in : ["done", VirtualtToSearchWith7.status]}
+                              status: { $in: ["done", VirtualtToSearchWith7.status] }
                             },
                           },
                           { $count: "done_task" },
@@ -4062,35 +4421,43 @@ router.post("/deletehouse", function (req, res) {
 router.post("/setCasenotInhospital", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    var case_id = req.body.case_id;
-    virtual_Case
-      .updateMany(
-        { _id: { $in: case_id } },
-        { $set: { inhospital: false, status: "5" } }
-      )
-      .exec(function (err, data) {
-        if (err) {
+  try {
+    if (legit) {
+      var case_id = req.body.case_id;
+      virtual_Case
+        .updateMany(
+          { _id: { $in: case_id } },
+          { $set: { inhospital: false, status: "5" } }
+        )
+        .exec(function (err, data) {
+          if (err) {
 
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            msg: "update",
-          });
-        }
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              msg: "update",
+            });
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-  } else {
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4098,68 +4465,76 @@ router.post("/setCasenotInhospital", function (req, res) {
 router.get("/pa", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    let patient_id = new mongoose.Types.ObjectId(req.body.patient_id);
-    // let patient_id = req.body.patient_id
+  try {
+    if (legit) {
+      let patient_id = new mongoose.Types.ObjectId(req.body.patient_id);
+      // let patient_id = req.body.patient_id
 
-    const VirtualtToSearchWith = new User({ patient_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    answerspatient
-      .aggregate([
-        {
-          $match: {
-            $or: [
-              {
-                patient_id: patient_id,
-                patient_id: VirtualtToSearchWith.patient_id,
-              },
-            ],
+      const VirtualtToSearchWith = new User({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      answerspatient
+        .aggregate([
+          {
+            $match: {
+              $or: [
+                {
+                  patient_id: patient_id,
+                  patient_id: VirtualtToSearchWith.patient_id,
+                },
+              ],
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "patient_id",
-            foreignField: "_id",
-            as: "complete_info",
+          {
+            $lookup: {
+              from: "users",
+              localField: "patient_id",
+              foreignField: "_id",
+              as: "complete_info",
+            },
           },
-        },
-        {
-          $project: {
-            questionaire_id: 1,
-            answers: 1,
-            patient: 1,
-            house_name: 1,
-            house_id: 1,
-            house_logo: 1,
-            patient_id: 1,
-            profile_id: "$complete_info.profile_id",
-            email: "$complete_info.email",
-            first_name: "$complete_info.first_name",
-            last_name: "$complete_info.last_name",
-            mobile: "$complete_info.mobile",
+          {
+            $project: {
+              questionaire_id: 1,
+              answers: 1,
+              patient: 1,
+              house_name: 1,
+              house_id: 1,
+              house_logo: 1,
+              patient_id: 1,
+              profile_id: "$complete_info.profile_id",
+              email: "$complete_info.email",
+              first_name: "$complete_info.first_name",
+              last_name: "$complete_info.last_name",
+              mobile: "$complete_info.mobile",
+            },
           },
-        },
-        //  { $unwind: "$complete_info"}
-      ])
-      .exec(function (err, data) {
-        if (err) {
+          //  { $unwind: "$complete_info"}
+        ])
+        .exec(function (err, data) {
+          if (err) {
 
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
 
-          res.json({ status: 200, hassuccessed: true, result: data });
-        }
+            res.json({ status: 200, hassuccessed: true, result: data });
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
       });
-  } else {
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4409,53 +4784,10 @@ router.get("/trackrecordsbytype", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   finaldata = [];
-  if (legit) {
-    User.find({ type: req.body.type }).exec(function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-        if (data.length > 0) {
-          let finalcount = data.length;
-          res.json({ status: 200, hassuccessed: false, data: finalcount });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "No user found",
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/trackrecordsbytype2", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  finaldata = [];
-  if (legit) {
-    User.aggregate(
-      [
-        {
-          $match: { type: req.body.type },
-        },
-        {
-          $count: "Totalnumber",
-        },
-      ],
-      function (err, data) {
+  try {
+    if (legit) {
+      User.find({ type: req.body.type }).exec(function (err, data) {
         if (err) {
-
           res.json({
             status: 200,
             hassuccessed: false,
@@ -4463,7 +4795,8 @@ router.get("/trackrecordsbytype2", function (req, res) {
           });
         } else {
           if (data.length > 0) {
-            res.json({ status: 200, hassuccessed: false, data: data });
+            let finalcount = data.length;
+            res.json({ status: 200, hassuccessed: false, data: finalcount });
           } else {
             res.json({
               status: 200,
@@ -4472,13 +4805,71 @@ router.get("/trackrecordsbytype2", function (req, res) {
             });
           }
         }
-      }
-    );
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/trackrecordsbytype2", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  finaldata = [];
+  try {
+    if (legit) {
+      User.aggregate(
+        [
+          {
+            $match: { type: req.body.type },
+          },
+          {
+            $count: "Totalnumber",
+          },
+        ],
+        function (err, data) {
+          if (err) {
+
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            if (data.length > 0) {
+              res.json({ status: 200, hassuccessed: false, data: data });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "No user found",
+              });
+            }
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4530,55 +4921,63 @@ router.get("/trackrecordsbytype2", function (req, res) {
 router.post("/trackrecordsforpatient", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    let patient_id = req.body.patient_id;
-    const VirtualtToSearchWith = new virtual_Task({
-      patient_id: req.body.patient_id,
-    });
-    VirtualtToSearchWith.encryptFieldsSync();
-    const VirtualtToSearchWith1 = new virtual_Task({
-      task_type: "picture_evaluation",
-    });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    virtual_Task
-      .find({
-        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
-        task_type: {
-          $in: ["picture_evaluation", VirtualtToSearchWith1.task_type],
-        },
-      })
-      .exec(function (err, data) {
-        if (err) {
+  try {
+    if (legit) {
+      let patient_id = req.body.patient_id;
+      const VirtualtToSearchWith = new virtual_Task({
+        patient_id: req.body.patient_id,
+      });
+      VirtualtToSearchWith.encryptFieldsSync();
+      const VirtualtToSearchWith1 = new virtual_Task({
+        task_type: "picture_evaluation",
+      });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      virtual_Task
+        .find({
+          patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+          task_type: {
+            $in: ["picture_evaluation", VirtualtToSearchWith1.task_type],
+          },
+        })
+        .exec(function (err, data) {
+          if (err) {
 
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
-
-          data.sort(mysort1);
-          if (data.length > 0) {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              data: data,
-              message: "Successfully fetch",
-            });
-          } else {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "No Task Found",
+              message: "Something went wrong",
             });
+          } else {
+
+            data.sort(mysort1);
+            if (data.length > 0) {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                data: data,
+                message: "Successfully fetch",
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "No Task Found",
+              });
+            }
           }
-        }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
       });
-  } else {
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4587,77 +4986,94 @@ router.get("/trackrecordsforappointment", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var date = new Date(req.body.date);
-  if (legit) {
-    Appointments.aggregate(
-      [
-        {
-          $match: { date: { $gte: date } },
-        },
-        {
-          $group: {
-            _id: "$patient",
-            count: { $sum: 1 },
+  try {
+    if (legit) {
+      Appointments.aggregate(
+        [
+          {
+            $match: { date: { $gte: date } },
           },
-        },
-      ],
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
+          {
+            $group: {
+              _id: "$patient",
+              count: { $sum: 1 },
+            },
+          },
+        ],
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
+
 router.post("/trackrecordsfordr", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var date = new Date(req.body.date);
-  if (legit) {
-    Appointments.aggregate(
-      [
-        {
-          $match: { date: { $gte: date } },
-        },
-        {
-          $group: {
-            _id: "$doctor_id",
-            count: { $sum: 1 },
+  try {
+    if (legit) {
+      Appointments.aggregate(
+        [
+          {
+            $match: { date: { $gte: date } },
           },
-        },
-      ],
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
+          {
+            $group: {
+              _id: "$doctor_id",
+              count: { $sum: 1 },
+            },
+          },
+        ],
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
 
-          // if(data.length>0){
-          //   User.find()
-          // }
-          res.json({ status: 200, hassuccessed: true, data: data });
+            // if(data.length>0){
+            //   User.find()
+            // }
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4667,516 +5083,9 @@ router.post("/trackrecordsforprescription", function (req, res) {
   let legit = jwtconfig.verify(token);
   let finaldata = [];
   finaldata1 = [];
-  if (legit) {
-    Prescription.find().exec(function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-        if (data.length > 0) {
-          data.forEach((element2) => {
-
-            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
-            let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
-            if (d1 <= d2) {
-              finaldata.push(element2.send_on);
-              finaldata1 = finaldata.length;
-            }
-          });
-          res.json({ status: 200, hassuccessed: true, data: finaldata1 });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "No user found",
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/trackrecordsforsickcertificate", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  let finaldata = [];
-  finaldata1 = [];
-  if (legit) {
-    Cretificate.find({}, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-
-        if (data.length > 0) {
-          data.forEach((element2) => {
-
-            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
-            let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
-            if (d1 <= d2) {
-              finaldata.push(element2.send_on);
-              finaldata1 = finaldata.length;
-            }
-          });
-          res.json({ status: 200, hassuccessed: true, data: finaldata1 });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "No user found",
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/pictureevaluationfeedback", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    var picture_evaluation = new picture_Evaluation(req.body);
-    picture_evaluation.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({
-          status: 200,
-          message: "Something went wrong.",
-          error: err,
-          hassuccessed: false,
-        });
-      } else {
-        res.json({
-          status: 200,
-          message: "Feedback Submit",
-          hassuccessed: true,
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/checkFeedBack/:task_id", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    picture_Evaluation.findOne(
-      { task_id: req.params.task_id },
-      function (err, user_data) {
-        if (err && !user_data) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-            hassuccessed: false,
-          });
-        } else {
-          if (user_data) {
-            res.json({
-              status: 200,
-              message: "Already exists",
-              hassuccessed: true,
-              data: user_data,
-            });
-          } else {
-            res.json({
-              status: 200,
-              message: "Not exists",
-              hassuccessed: false,
-            });
-          }
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/getfeedbackforpatient/:patient_id", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    picture_Evaluation
-      .findOne({ "patient_infos.patient_id": req.params.patient_id })
-      .exec(function (err, data) {
-        if (err && !data) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-            hassuccessed: false,
-          });
-        } else {
-          res.json({
-            status: 200,
-            message: "data fetch",
-            hassuccessed: true,
-            data: data,
-          });
-        }
-      });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    picture_Evaluation
-      .findOne({ doctor_id: req.params.doctor_id })
-      .exec(function (err, data) {
-        if (err && !data) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-            hassuccessed: false,
-          });
-        } else {
-          res.json({
-            status: 200,
-            message: "data fetch",
-            hassuccessed: true,
-            data: data,
-          });
-        }
-      });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.delete("/pictureevaluationfeedback/:_id", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    picture_Evaluation.deleteOne({ _id: req.params._id }, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          message: "Something went wrong.",
-          error: err,
-          hassuccessed: false,
-        });
-      } else {
-        res.json({
-          status: 200,
-          message: "Delete Feedback",
-          hassuccessed: true,
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.put("/pictureevaluationfeedback/:_id", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    picture_Evaluation.updateOne(
-      { _id: req.params._id },
-      req.body,
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-            hassuccessed: false,
-          });
-        } else {
-          res.json({
-            status: 200,
-            message: "Update Feedback",
-            hassuccessed: true,
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/trackrecords", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-
-  finaldata = [];
-  if (legit) {
-    User.find().exec(function (err, data) {
-      if (err) {
-
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-        trackrecords = data.map((element) => {
-
-          return element.track_record;
-        });
-
-        if (trackrecords.length > 0) {
-          var finalLength = trackrecords.length;
-          trackrecords.forEach((element2) => {
-            lastdata = element2 && element2.slice(-1);
-            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
-            let d2 = new Date(lastdata[0] && lastdata[0].datetime_on).setHours(
-              0,
-              0,
-              0,
-              0
-            );
-            if (d1 <= d2) {
-              finaldata.push(lastdata[0].datetime_on);
-            }
-          });
-          let finaldata1 = finaldata.length;
-
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            data: finaldata1,
-            byUser: finalLength,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "No user found",
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/trackrecordsforappointment", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  var date = new Date(req.body.date);
-  if (legit) {
-    Appointments.aggregate(
-      [
-        {
-          $match: { date: { $gte: date } },
-        },
-        {
-          $group: {
-            _id: "$patient",
-            count: { $sum: 1 },
-          },
-        },
-      ],
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/trackrecordsfordr", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  var date = new Date(req.body.date);
-  if (legit) {
-    Appointments.aggregate(
-      [
-        {
-          $match: { date: { $gte: date } },
-        },
-        {
-          $group: {
-            _id: "$doctor_id",
-            count: { $sum: 1 },
-          },
-        },
-      ],
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-          });
-        } else {
-          // if(data.length>0){
-          //   User.find()
-          // }
-          res.json({ status: 200, hassuccessed: true, data: data });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.post("/trackrecordsforprescription", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  let finaldata = [];
-  finaldata1 = [];
-  if (legit) {
-    Prescription.find().exec(function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-        if (data.length > 0) {
-          data.forEach((element2) => {
-            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
-            let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
-            if (d1 <= d2) {
-              finaldata.push(element2.send_on);
-              finaldata1 = finaldata.length;
-            }
-          });
-          res.json({ status: 200, hassuccessed: true, data: finaldata1 });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "No user found",
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/trackrecordsbytype", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  finaldata = [];
-  if (legit) {
-    User.find({ type: req.body.type }).exec(function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-        if (data.length > 0) {
-          let finalcount = data.length;
-          res.json({ status: 200, hassuccessed: false, data: finalcount });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "No user found",
-          });
-        }
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/trackrecordsbytype2", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  finaldata = [];
-  if (legit) {
-    User.aggregate(
-      [
-        {
-          $match: { type: req.body.type },
-        },
-        {
-          $count: "Totalnumber",
-        },
-      ],
-      function (err, data) {
+  try {
+    if (legit) {
+      Prescription.find().exec(function (err, data) {
         if (err) {
           res.json({
             status: 200,
@@ -5185,7 +5094,16 @@ router.get("/trackrecordsbytype2", function (req, res) {
           });
         } else {
           if (data.length > 0) {
-            res.json({ status: 200, hassuccessed: false, data: data });
+            data.forEach((element2) => {
+
+              var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+              let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
+              if (d1 <= d2) {
+                finaldata.push(element2.send_on);
+                finaldata1 = finaldata.length;
+              }
+            });
+            res.json({ status: 200, hassuccessed: true, data: finaldata1 });
           } else {
             res.json({
               status: 200,
@@ -5194,13 +5112,19 @@ router.get("/trackrecordsbytype2", function (req, res) {
             });
           }
         }
-      }
-    );
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -5210,40 +5134,651 @@ router.post("/trackrecordsforsickcertificate", function (req, res) {
   let legit = jwtconfig.verify(token);
   let finaldata = [];
   finaldata1 = [];
-  if (legit) {
-    Cretificate.find({}, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-        });
-      } else {
-        if (data.length > 0) {
-          data.forEach((element2) => {
-
-            var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
-            let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
-            if (d1 <= d2) {
-              finaldata.push(element2.send_on);
-              finaldata1 = finaldata.length;
-            }
-          });
-          res.json({ status: 200, hassuccessed: true, data: finaldata1 });
-        } else {
+  try {
+    if (legit) {
+      Cretificate.find({}, function (err, data) {
+        if (err) {
           res.json({
             status: 200,
             hassuccessed: false,
-            message: "No user found",
+            message: "Something went wrong",
           });
+        } else {
+
+          if (data.length > 0) {
+            data.forEach((element2) => {
+
+              var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+              let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
+              if (d1 <= d2) {
+                finaldata.push(element2.send_on);
+                finaldata1 = finaldata.length;
+              }
+            });
+            res.json({ status: 200, hassuccessed: true, data: finaldata1 });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No user found",
+            });
+          }
         }
-      }
-    });
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/pictureevaluationfeedback", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      var picture_evaluation = new picture_Evaluation(req.body);
+      picture_evaluation.save(function (err, user_data) {
+        if (err && !user_data) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "Feedback Submit",
+            hassuccessed: true,
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/checkFeedBack/:task_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      picture_Evaluation.findOne(
+        { task_id: req.params.task_id },
+        function (err, user_data) {
+          if (err && !user_data) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+              hassuccessed: false,
+            });
+          } else {
+            if (user_data) {
+              res.json({
+                status: 200,
+                message: "Already exists",
+                hassuccessed: true,
+                data: user_data,
+              });
+            } else {
+              res.json({
+                status: 200,
+                message: "Not exists",
+                hassuccessed: false,
+              });
+            }
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/getfeedbackforpatient/:patient_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      picture_Evaluation
+        .findOne({ "patient_infos.patient_id": req.params.patient_id })
+        .exec(function (err, data) {
+          if (err && !data) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+              hassuccessed: false,
+            });
+          } else {
+            res.json({
+              status: 200,
+              message: "data fetch",
+              hassuccessed: true,
+              data: data,
+            });
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      picture_Evaluation
+        .findOne({ doctor_id: req.params.doctor_id })
+        .exec(function (err, data) {
+          if (err && !data) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+              hassuccessed: false,
+            });
+          } else {
+            res.json({
+              status: 200,
+              message: "data fetch",
+              hassuccessed: true,
+              data: data,
+            });
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.delete("/pictureevaluationfeedback/:_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      picture_Evaluation.deleteOne({ _id: req.params._id }, function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          });
+        } else {
+          res.json({
+            status: 200,
+            message: "Delete Feedback",
+            hassuccessed: true,
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.put("/pictureevaluationfeedback/:_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      picture_Evaluation.updateOne(
+        { _id: req.params._id },
+        req.body,
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+              hassuccessed: false,
+            });
+          } else {
+            res.json({
+              status: 200,
+              message: "Update Feedback",
+              hassuccessed: true,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/trackrecords", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  finaldata = [];
+  try {
+    if (legit) {
+      User.find().exec(function (err, data) {
+        if (err) {
+
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+          });
+        } else {
+          trackrecords = data.map((element) => {
+
+            return element.track_record;
+          });
+
+          if (trackrecords.length > 0) {
+            var finalLength = trackrecords.length;
+            trackrecords.forEach((element2) => {
+              lastdata = element2 && element2.slice(-1);
+              var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+              let d2 = new Date(lastdata[0] && lastdata[0].datetime_on).setHours(
+                0,
+                0,
+                0,
+                0
+              );
+              if (d1 <= d2) {
+                finaldata.push(lastdata[0].datetime_on);
+              }
+            });
+            let finaldata1 = finaldata.length;
+
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              data: finaldata1,
+              byUser: finalLength,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No user found",
+            });
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/trackrecordsforappointment", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  var date = new Date(req.body.date);
+  try {
+    if (legit) {
+      Appointments.aggregate(
+        [
+          {
+            $match: { date: { $gte: date } },
+          },
+          {
+            $group: {
+              _id: "$patient",
+              count: { $sum: 1 },
+            },
+          },
+        ],
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/trackrecordsfordr", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  var date = new Date(req.body.date);
+  try {
+    if (legit) {
+      Appointments.aggregate(
+        [
+          {
+            $match: { date: { $gte: date } },
+          },
+          {
+            $group: {
+              _id: "$doctor_id",
+              count: { $sum: 1 },
+            },
+          },
+        ],
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            // if(data.length>0){
+            //   User.find()
+            // }
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/trackrecordsforprescription", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  let finaldata = [];
+  finaldata1 = [];
+  try {
+    if (legit) {
+      Prescription.find().exec(function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+          });
+        } else {
+          if (data.length > 0) {
+            data.forEach((element2) => {
+              var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+              let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
+              if (d1 <= d2) {
+                finaldata.push(element2.send_on);
+                finaldata1 = finaldata.length;
+              }
+            });
+            res.json({ status: 200, hassuccessed: true, data: finaldata1 });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No user found",
+            });
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/trackrecordsbytype", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  finaldata = [];
+  try {
+    if (legit) {
+      User.find({ type: req.body.type }).exec(function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+          });
+        } else {
+          if (data.length > 0) {
+            let finalcount = data.length;
+            res.json({ status: 200, hassuccessed: false, data: finalcount });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No user found",
+            });
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/trackrecordsbytype2", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  finaldata = [];
+  try {
+    if (legit) {
+      User.aggregate(
+        [
+          {
+            $match: { type: req.body.type },
+          },
+          {
+            $count: "Totalnumber",
+          },
+        ],
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+            });
+          } else {
+            if (data.length > 0) {
+              res.json({ status: 200, hassuccessed: false, data: data });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "No user found",
+              });
+            }
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/trackrecordsforsickcertificate", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  let finaldata = [];
+  finaldata1 = [];
+  try {
+    if (legit) {
+      Cretificate.find({}, function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+          });
+        } else {
+          if (data.length > 0) {
+            data.forEach((element2) => {
+
+              var d1 = new Date(req.body.date).setHours(0, 0, 0, 0);
+              let d2 = new Date(element2.send_on).setHours(0, 0, 0, 0);
+              if (d1 <= d2) {
+                finaldata.push(element2.send_on);
+                finaldata1 = finaldata.length;
+              }
+            });
+            res.json({ status: 200, hassuccessed: true, data: finaldata1 });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No user found",
+            });
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -5505,7 +6040,7 @@ function virtualTasksforPatient(patient_id) {
     } catch (err) {
       reject(err);
     }
-  });   
+  });
 }
 
 function User_Case(House_id) {
@@ -5576,7 +6111,8 @@ function virtualTask(house_id) {
       const VirtualtToSearchWith = new virtual_Task({ house_id: house_id });
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Task.find(
-        { house_id: { $in: [house_id, VirtualtToSearchWith.house_id] } ,
+        {
+          house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
         },
         function (err, list) {
           if (err) {
