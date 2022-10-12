@@ -55,10 +55,10 @@ const io = require("socket.io")(server, {
       socket.broadcast.emit("displayadmin", data);
     })
   
-    socket.on('disconnect', () => {
-      console.log(`socket disconnected`);
+    // socket.on('disconnect', () => {
+    //   console.log(`socket disconnected`);
   
-    })
+    // })
   });
 
   // io.on("connection", (socket) => {
@@ -83,5 +83,5 @@ const io = require("socket.io")(server, {
   // });
 
 
-  server.listen(5001);
+  server.listen(process.env.PORT);
 
