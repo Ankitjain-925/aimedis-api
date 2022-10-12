@@ -495,6 +495,68 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         var buck = "aimedisfirstbucket";
       }
       emptyBucket(buck, data12.profile_id);
+      var patient_id = req.params.UserId
+      const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      virtual_cases.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith1.patient_id] } },
+        {
+          '$unset': {
+            'patient.image': ''
+          }
+        }, function (err, data) {
+          if (err) {
+            console.log("err", err)
+          } else {
+            console.log("data", data)
+          }
+        })
+      var patient_id = req.params.UserId
+      const VirtualtToSearchWith = new virtual_tasks({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
+        {
+          '$unset': {
+            'patient.image': ""
+          }
+        }, function (err, data2) {
+          if (err) {
+            console.log("err", err)
+
+          } else {
+            console.log("data", data2)
+          }
+        })
+
+      virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
+        {
+          '$unset': {
+            'patient.image': ""
+          }
+        }, function (err, data3) {
+          if (err) {
+            console.log("err3", err)
+          } else {
+            console.log("data", data3)
+          }
+        })
+      var patient = req.params.UserId
+      const VirtualtToSearchWith2 = new Appointments({ patient });
+      VirtualtToSearchWith2.encryptFieldsSync();
+      Appointments.updateOne({
+        patient: { $in: [patient, VirtualtToSearchWith2.patient] }
+      }, {
+        '$unset': {
+          'patient_info.profile_image': ""
+        }
+      }, function (err, data4) {
+        if (err) {
+          console.log("err", err)
+
+        } else {
+          console.log("data", data4)
+        }
+
+      })
       res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
     }
   });
@@ -1162,9 +1224,6 @@ router.post("/allHospitalusers", function (req, res) {
 
 function SearchUser (searchKey, searchInto) {
   return searchInto.filter(user => {
-    console.log("user",user.email)
-    console.log("userfirst",user.first_name,"userlast",user.last_name)
-    console.log("searchKey",searchKey)
 
     searchKey = searchKey.toLowerCase()
       let email = user.email.toLowerCase().search(searchKey)

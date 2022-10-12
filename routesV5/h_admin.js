@@ -330,11 +330,23 @@ router.put("/assignedHouse/:userid", function (req, res, next) {
                     error: err2,
                   });
                 } else {
-                  res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "House is assigned",
-                  });
+                  User.findOne({_id:req.params.userid},function(err,data){
+                    if(err){
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Something went wrong.",
+                        error: err,
+                      });
+                    }else{
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "House is assigned",
+                        data:data
+                      });
+                    }
+                  })
                 }
               }
             );
@@ -368,11 +380,24 @@ router.delete("/assignedHouse/:userid/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Deleted Successfully",
-          });
+          User.findOne({_id:req.params.userid},function(err,data){
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong.",
+                error: err,
+              });
+            }else{
+             
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Deleted Successfully",
+                data:data
+              });
+            }
+          })
         }
       }
     );

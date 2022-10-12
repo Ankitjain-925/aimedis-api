@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aidoc.io",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -41,10 +41,9 @@
             "description": "API for cases"
         },
         {
-            "name": "Video_Conference",
+            "name":"Video_Conference",
             "description": "API for Video_Conference"
-        },
-        {
+        }, {
             "name": "TrackRecord",
             "description": "API for track the record"
         },
@@ -80,9 +79,10 @@
             "name": "DoctorAppointments",
             "description": "Get Emergency record"
         }
+        
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -91,6 +91,7 @@
         "application/json"
     ],
     "paths": {
+      
         "/hospitaladmin/associatedTo/{user_id}": {
             "parameters": [
                 {
@@ -117,9 +118,11 @@
                 "responses": {
                     "200": {
                         "description": "updated successfully"
+                        
                     }
                 }
             }
+            
         },
         "/emergency_record/{UserId}": {
             "parameters": [
@@ -282,7 +285,7 @@
                 }
             }
         },
-        "/cases/Discharge/{patient_id}/{admin_id}": {
+        "/cases/Discharge/{patient_id}/{admin_id}":{
             "parameters": [
                 {
                     "name": "token",
@@ -301,8 +304,9 @@
                     "description": "ID",
                     "type": "string"
                 }
-            ],
-            "put": {
+                
+             ],
+           "put": {
                 "tags": [
                     "TrackRecord"
                 ],
@@ -349,7 +353,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Add User",
+                "summary":"Add User",
                 "responses": {
                     "200": {
                         "description": "User added succefully",
@@ -516,7 +520,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Add Membership",
+                "summary":"Add Membership",
                 "responses": {
                     "200": {
                         "description": "membership added succefully",
@@ -548,7 +552,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Generate Sick Cretificate",
+                "summary":"Generate Sick Cretificate",
                 "responses": {
                     "200": {
                         "description": "added succefully",
@@ -773,7 +777,7 @@
                         }
                     }
                 ],
-                "summary": "For Registration",
+                "summary":"For Registration",
                 "produces": [
                     "application/json"
                 ],
@@ -805,7 +809,7 @@
                         }
                     }
                 ],
-                "summary": "Add Prescription",
+                "summary":"Add Prescription",
                 "produces": [
                     "application/json"
                 ],
@@ -1061,7 +1065,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Add appointment",
+                "summary":"Add appointment",
                 "responses": {
                     "200": {
                         "description": "Doctor Appointments added succefully",
@@ -1075,6 +1079,7 @@
                 }
             }
         },
+
         "/step/GetStep/{house_id}": {
             "parameters": [
                 {
@@ -2975,6 +2980,7 @@
                 }
             }
         },
+
         "/vh/getAppointTask1/{House_id}": {
             "get": {
                 "parameters": [
@@ -3005,6 +3011,7 @@
                 }
             }
         },
+
         "/vh/sortinfo/{patient_id}": {
             "get": {
                 "parameters": [
@@ -3021,6 +3028,7 @@
                         "description": "JWT token User"
                     }
                 ],
+
                 "tags": [
                     "virtual_cases"
                 ],
@@ -3411,7 +3419,7 @@
             "parameters": [
                 {
                     "name": "token",
-                    "in": "header",
+                  "in": "header",
                     "description": "JWT token User"
                 }
             ],
@@ -3630,20 +3638,21 @@
         },
         "/vactive/PatientTask/{profile_id}": {
             "get": {
-                "parameters": [
-                    {
-                        "name": "profile_id",
-                        "in": "path",
-                        "required": true,
-                        "description": "ID",
-                        "type": "string"
-                    },
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
+                    "parameters": [
+                        {
+                            "name": "profile_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
                 "tags": [
                     "sick"
                 ],
@@ -3658,22 +3667,24 @@
                 }
             }
         },
+        
         "/vactive/AddMeeting/{meeting_id}": {
             "delete": {
-                "parameters": [
-                    {
-                        "name": "meeting_id",
-                        "in": "path",
-                        "required": true,
-                        "description": "ID",
-                        "type": "string"
-                    },
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
+                    "parameters": [
+                        {
+                            "name": "meeting_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
                 "tags": [
                     "sick"
                 ],
@@ -3690,20 +3701,21 @@
         },
         "/vactive/GetAllPatientData/{patient_id}": {
             "get": {
-                "parameters": [
-                    {
-                        "name": "patient_id",
-                        "in": "path",
-                        "required": true,
-                        "description": "ID",
-                        "type": "string"
-                    },
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
                 "tags": [
                     "sick"
                 ],
@@ -3724,7 +3736,9 @@
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User",
-                    "schema": {}
+                    "schema": {
+                           
+                    }
                 }
             ],
             "post": {
@@ -3735,9 +3749,11 @@
                         "description": "Add meeting",
                         "schema": {
                             "$ref": "#/definitions/Addmeeting"
+                           
                         }
                     }
                 ],
+
                 "tags": [
                     "sick"
                 ],
@@ -3768,9 +3784,11 @@
                         "description": "Approval Request",
                         "schema": {
                             "$ref": "#/definitions/approvedrequest"
+                           
                         }
                     }
                 ],
+
                 "tags": [
                     "sick"
                 ],
@@ -3801,9 +3819,11 @@
                         "description": "Booked Slot",
                         "schema": {
                             "$ref": "#/definitions/SelectDocforSickleave2"
+                           
                         }
                     }
                 ],
+
                 "tags": [
                     "sick"
                 ],
@@ -3818,6 +3838,7 @@
                 }
             }
         },
+
         "/vactive/DoctorMail": {
             "parameters": [
                 {
@@ -3834,9 +3855,11 @@
                         "description": "Mail to Doctor",
                         "schema": {
                             "$ref": "#/definitions/DoctorMail"
+                           
                         }
                     }
                 ],
+
                 "tags": [
                     "sick"
                 ],
@@ -3851,24 +3874,27 @@
                 }
             }
         },
-        "/vchat/Get_Doctor/{data}": {
+        "/vchat/Get_Doctor": {
             "parameters": [
                 {
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
-                },
-                {
-                    "name": "data",
-                    "in": "path",
-                    "required": true,
-                    "description": "data",
-                    "type": "string"
                 }
             ],
-            "get": {
+            "post": {
                 "tags": [
                     "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "Doctor",
+                        "in": "body",
+                        "description": "Video_Conference",
+                        "schema": {
+                            "$ref": "#/definitions/getuser"
+                        }
+                    }
                 ],
                 "produces": [
                     "application/json"
@@ -3877,7 +3903,7 @@
                 "responses": {
                     "200": {
                         "description": "Get Doctor"
-                    },
+                    },               
                     "500": {
                         "description": "Something happened wrong"
                     }
@@ -3885,21 +3911,22 @@
             }
         },
         "/vchat/getuserchat": {
-            "parameters": [
-                {
-                    "name": "_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "ID",
-                    "type": "string"
-                },
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "JWT token User"
-                }
-            ],
-            "post": {
+            
+                    "parameters": [
+                        {
+                            "name": "_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+                    "post": {
                 "tags": [
                     "Video_Conference"
                 ],
@@ -3943,7 +3970,7 @@
                 "responses": {
                     "200": {
                         "description": "Add Data"
-                    },
+                    },               
                     "500": {
                         "description": "Something happened wrong"
                     }
@@ -4002,7 +4029,7 @@
                 "responses": {
                     "200": {
                         "description": "Add Data"
-                    },
+                    },               
                     "500": {
                         "description": "Something happened wrong"
                     }
@@ -4011,20 +4038,21 @@
         },
         "/vchat/GetConferencePatient/{patient_id}": {
             "get": {
-                "parameters": [
-                    {
-                        "name": "patient_id",
-                        "in": "path",
-                        "required": true,
-                        "description": "ID",
-                        "type": "string"
-                    },
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
                 "tags": [
                     "Video_Conference"
                 ],
@@ -4068,7 +4096,7 @@
                 "responses": {
                     "200": {
                         "description": "Add Data"
-                    },
+                    },               
                     "500": {
                         "description": "Something happened wrong"
                     }
@@ -4077,20 +4105,21 @@
         },
         "/vchat/getfeedbackfordoctor/{doctor_id}": {
             "get": {
-                "parameters": [
-                    {
-                        "name": "doctor_id",
-                        "in": "path",
-                        "required": true,
-                        "description": "ID",
-                        "type": "string"
-                    },
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
+                    "parameters": [
+                        {
+                            "name": "doctor_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
                 "tags": [
                     "Video_Conference"
                 ],
@@ -4248,20 +4277,21 @@
         },
         "/vchat/GetVideoTask/{patient_id}": {
             "get": {
-                "parameters": [
-                    {
-                        "name": "patient_id",
-                        "in": "path",
-                        "required": true,
-                        "description": "ID",
-                        "type": "string"
-                    },
-                    {
-                        "name": "token",
-                        "in": "header",
-                        "description": "JWT token User"
-                    }
-                ],
+                    "parameters": [
+                        {
+                            "name": "patient_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+
                 "tags": [
                     "Video_Conference"
                 ],
@@ -4559,7 +4589,7 @@
             }
         },
         "Registration": {
-            "required": [],
+            "required": [ ],
             "properties": {
                 "email": {
                     "type": "string",
@@ -4578,107 +4608,129 @@
         "Prescription": {
             "required": [],
             "properties": {
-                "patient_id": {
+                "patient_id" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "doctor_id": {
+            
+                "doctor_id" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "first_name": {
+            
+                "first_name" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "last_name": {
+            
+                "last_name" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "birthday": {
+            
+                "birthday" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "status": {
+                
+                "status" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "malignant_diseases": {
+                "malignant_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "follow_up_prescription": {
+                "follow_up_prescription" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "musculosceletal_diseases": {
+                "musculosceletal_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "substance": {
+            
+                "substance" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "eye_diseases": {
+            
+                "eye_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "dose": {
+            
+                "dose" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "infectious_diseases": {
+            
+                "infectious_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "trade_name": {
+            
+                "trade_name" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "medication": {
+            
+                "medication" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "atc_code": {
+            
+                "atc_code" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "manufacturer": {
+                
+                "manufacturer" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "pack_size": {
+            
+                "pack_size" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "allergies": {
+            
+                "allergies" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "pulmonary_diseases": {
+            
+                "pulmonary_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "renal_diseases": {
+            
+                "renal_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "endrinologic_diseases": {
+            
+                "endrinologic_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "hypertension": {
+            
+                "hypertension" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "diabetes": {
+            
+                "diabetes" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "thyroid_diseases": {
+                
+                "thyroid_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "annotations": {
+                
+                "annotations" : {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -4798,53 +4850,53 @@
                 }
             }
         },
-        "DoctorAppointments": {
-            "properties": {
-                "monday": {
+        "DoctorAppointments":{
+            "properties":{
+                "monday" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "tuesday": {
+                "tuesday" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "wednesday": {
+                "wednesday" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "thursday": {
+                "thursday" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "friday": {
+                "friday" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "saturday": {
+                "saturday" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "sunday": {
+                "sunday" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "timeslots": {
+                "timeslots" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "breakslots": {
+                "breakslots" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "holidays": {
+                "holidays" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "appointment_days": {
+                "appointment_days" :{
                     "type": "string",
                     "uniqueItems": false
                 },
-                "remainder_email_days": {
+                "remainder_email_days" :{
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -4853,107 +4905,129 @@
         "GetPrescription": {
             "required": [],
             "properties": {
-                "patient_id": {
+                "patient_id" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "doctor_id": {
+            
+                "doctor_id" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "first_name": {
+            
+                "first_name" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "last_name": {
+            
+                "last_name" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "birthday": {
+            
+                "birthday" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "status": {
+                
+                "status" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "malignant_diseases": {
+                "malignant_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "follow_up_prescription": {
+                "follow_up_prescription" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "musculosceletal_diseases": {
+                "musculosceletal_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "substance": {
+            
+                "substance" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "eye_diseases": {
+            
+                "eye_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "dose": {
+            
+                "dose" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "infectious_diseases": {
+            
+                "infectious_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "trade_name": {
+            
+                "trade_name" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "medication": {
+            
+                "medication" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "atc_code": {
+            
+                "atc_code" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "manufacturer": {
+                
+                "manufacturer" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "pack_size": {
+            
+                "pack_size" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "allergies": {
+            
+                "allergies" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "pulmonary_diseases": {
+            
+                "pulmonary_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "renal_diseases": {
+            
+                "renal_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "endrinologic_diseases": {
+            
+                "endrinologic_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "hypertension": {
+            
+                "hypertension" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "diabetes": {
+            
+                "diabetes" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "thyroid_diseases": {
+                
+                "thyroid_diseases" : {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "annotations": {
+                
+                "annotations" : {
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -4964,6 +5038,7 @@
                 "case_id"
             ],
             "properties": {
+
                 "case_id": {
                     "type": "array",
                     "items": {
@@ -4973,44 +5048,45 @@
                 }
             }
         },
-        "addappointment": {
+        "addappointment": {       
             "properties": {
-                "patient_id": {
-                    "type": "string",
+                "patient_id":{
+                    "type":"string",
                     "uniqueItems": false
                 },
-                "Speciality": {
-                    "type": "string",
+                "Speciality":{
+                    "type":"string",
                     "uniqueItems": false
                 },
                 "date": {
                     "type": "string",
                     "uniqueItems": false
                 },
-                "start_time": {
-                    "type": "string",
+                "start_time":{
+                    "type":"string",
                     "uniqueItems": false
                 },
-                "end_time": {
-                    "type": "string",
+                "end_time":{
+                    "type":"string",
                     "uniqueItems": false
                 },
-                "status": {
-                    "type": "string",
+                "status":{
+                    "type":"string",
                     "uniqueItems": false
                 },
-                "payment_type": {
+            
+                "payment_type" :{
                     "type": "string",
                     "uniqueItems": false
-                },
-                "total_amount": {
+                 },
+                 "total_amount" :{
                     "type": "string",
                     "uniqueItems": false
-                },
-                "created_at": {
+                 },
+                 "created_at": {
                     "type": "string",
                     "uniqueItems": false
-                }
+                  }
             }
         },
         "VideoConference": {
@@ -5021,149 +5097,163 @@
                 "email"
             ],
             "properties": {
-                "patient_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "reg_amount": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "email": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "password": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "prepaid_talktime": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "status": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "date": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "username": {
-                    "type": "string",
-                    "required": true,
-                    "unique": false
-                },
-                "is_payment": {
-                    "type": "boolean",
-                    "uniqueItems": false
-                }
+            "patient_id":{
+                "type": "string",
+                "uniqueItems": false
+
+            },
+           
+             "reg_amount":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "email": {
+                "type": "string",
+                "uniqueItems": false
+
+             },
+        
+             "password":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "prepaid_talktime":{
+                "type": "string",
+                "uniqueItems": false
+            },
+             "status":{
+               "type": "string",
+               "uniqueItems": false
+
+             }, 
+             "date": {
+                "type": "string",
+                "uniqueItems": false
+            },
+            "username":{
+              "type": "string",
+               "required": true,
+               "unique": false
+            },
+             "is_payment":{
+                "type": "boolean",
+                "uniqueItems": false
+             }
             }
         },
-        "getuser": {
-            "required": [],
+        "getuser":{
+            "required": [   ],
             "properties": {
-                "profile_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "alies_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "email": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "speciality": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "first_name": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "last_name": {
-                    "type": "string",
-                    "uniqueItems": false
-                }
-            }
-        },
-        "givefeedback": {
-            "required": [],
-            "properties": {
-                "comment": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    }
-                },
-                "rating": {
-                    "type": "number",
-                    "uniqueItems": false
-                },
-                "patient_id": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    }
-                },
-                "doctor_id": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    }
-                },
-                "patient_infos": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
+                  "profile_id": {
+                       "type": "string",
+                       "uniqueItems": false
                     },
-                    "uniqueItems": true
+                    "alies_id": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "email": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "speciality": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "uniqueItems": false
+                    }
+               }
+             },
+             "givefeedback":{
+                "required": [
+         
+                ],
+
+                "properties":{
+                    "comment": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                      },
+                    "rating":{
+                        "type": "number",
+                        "uniqueItems": false
+                    },
+                    "patient_id":{
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "doctor_id":{
+                        "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                    },
+                    "patient_infos":{
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        },
+                        "uniqueItems": true
+                    }
                 }
-            }
-        },
-        "VideoLogin": {
-            "required": [
-                "username",
-                "password"
-            ],
-            "properties": {
-                "username": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "password": {
-                    "type": "string",
-                    "uniqueItems": false
+
+             },
+             "VideoLogin": {
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "uniqueItems": false
+                    }
                 }
-            }
-        },
-        "Vprepaid": {
-            "required": [
-                "_id"
-            ],
-            "properties": {
-                "_id": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "manage_for": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "paid_amount_data": {
-                    "type": "string",
-                    "uniqueItems": false
-                },
-                "prepaid_min": {
-                    "type": "string",
-                    "uniqueItems": false
+            },
+             "Vprepaid": {
+                "required": [
+                    "_id"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "manage_for": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "paid_amount_data": {
+                        "type": "string",
+                        "uniqueItems": false
+                    },
+                    "prepaid_min": {
+                        "type": "string",
+                        "uniqueItems": false
+                    }
+                    
                 }
-            }
-        },
+            },
         "user": {
-            "required": [],
+            "required": [
+             
+            ],
             "properties": {
                 "email": {
                     "type": "string",
@@ -5183,9 +5273,12 @@
                 }
             }
         },
-        "SelectDocforSickleave2": {
-            "required": [],
+        "SelectDocforSickleave2":{
+            "required": [
+             
+            ],
             "properties": {
+                
                 "approved_date": {
                     "type": "date",
                     "uniqueItems": false
@@ -5195,10 +5288,12 @@
                     "uniqueItems": false
                 }
             }
+
         },
-        "DoctorMail": {
+      
+        "DoctorMail":{
             "required": [
-                "email"
+             "email"
             ],
             "properties": {
                 "email": {
@@ -5230,9 +5325,13 @@
                     "uniqueItems": false
                 }
             }
+            
+
         },
-        "approvedrequest": {
-            "required": [],
+        "approvedrequest":{
+            "required": [
+             
+            ],
             "properties": {
                 "for_manage": {
                     "type": "string",
@@ -5259,7 +5358,9 @@
                     "uniqueItems": false
                 }
             }
+
         },
+        
         "AddtheGroup": {
             "required": [
                 "group_name"
@@ -5328,6 +5429,7 @@
             }
         },
         "Addmeeting": {
+           
             "properties": {
                 "patient_profile_id": {
                     "type": "string",
@@ -5403,6 +5505,7 @@
                 }
             }
         },
+       
         "AddSpecialty": {
             "required": [
                 "specialty_name",
@@ -5556,7 +5659,7 @@
                     "type": "string",
                     "uniqueItems": false
                 },
-                "email": {
+                "email":{
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -5577,15 +5680,13 @@
                     "type": "string",
                     "uniqueItems": false
                 },
-                "email": {
+                "email":{
                     "type": "string",
                     "uniqueItems": false
-                },
-                "first_name": {
+                },"first_name":{
                     "type": "string",
                     "uniqueItems": false
-                },
-                "last_name": {
+                },"last_name":{
                     "type": "string",
                     "uniqueItems": false
                 }
@@ -5653,7 +5754,8 @@
             }
         },
         "Checkward": {
-            "required": [],
+            "required": [
+            ],
             "properties": {
                 "ward_id": {
                     "type": "string",
@@ -5821,6 +5923,7 @@
                     "type": "string",
                     "uniqueItems": true
                 }
+                
             }
         },
         "Billfilter": {
@@ -5944,6 +6047,7 @@
                     "type": "string",
                     "uniqueItems": true
                 }
+               
             }
         }
     }

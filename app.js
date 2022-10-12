@@ -69,17 +69,49 @@ io.on("connection", (socket) => {
   console.log("A user is connected");
 
   socket.on("update", (data) => {
-    console.log("data", data);
     socket.broadcast.emit("data_shown", data);
   });
   socket.on("addpatient", (data) => {
-    console.log("addpatient", data);
     socket.broadcast.emit("email_accept", data);
   });
   socket.on("decline", (data) => {
-    console.log("decline", data);
     socket.broadcast.emit("email_decline", data);
   });
+  socket.on('nurse',(data)=>{
+    socket.broadcast.emit("displaynurse", data);
+  })
+  socket.on('doctor',(data)=>{
+    socket.broadcast.emit("displaydoctor", data);
+  })
+  socket.on("delete",(data)=>{
+    socket.broadcast.emit("deletedata",data)
+  })
+  socket.on("Updated",(data)=>{
+    socket.broadcast.emit("Updateddata",data)
+  })
+
+  socket.on("deleteN",(data)=>{
+    socket.broadcast.emit("deletedataN",data)
+  })
+  socket.on("UpdateN",(data)=>{
+    socket.broadcast.emit("UpdateddataN",data)
+  })
+
+  socket.on("deleteA",(data)=>{
+    socket.broadcast.emit("deletedataA",data)
+  })
+  socket.on("UpdateA",(data)=>{
+    socket.broadcast.emit("UpdateddataA",data)
+  })
+
+  socket.on('adminstaff',(data)=>{
+    socket.broadcast.emit("displayadmin", data);
+  })
+
+  socket.on('disconnect', () => {
+    console.log(`socket disconnected`);
+
+  })
 });
 
 
@@ -645,7 +677,7 @@ app.use("/api/v5/questionaire", questionaire5);
 app.use("/api/v5/cases", vcases5);
 app.use("/api/v5/hospitaladmin", hadmin5);
 app.use("/api/v5/cometUserList", comet5);
-
+app.use("/api/v5/assignservice", assignservice);
 app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
 
