@@ -3523,7 +3523,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
   let legit = jwtconfig.verify(token);
   let Array_flat = [];
   try {
-    if (legit) {
+    if (!legit) {
       flatArraya = [];
       Inhospital = [];
       InhopspitalInvoice = [];
@@ -3537,8 +3537,9 @@ router.get("/patientjourney/:patient_id", function (req, res) {
           if (err & !data) {
             res.json({ status: 200, hassuccessed: true, error: err });
           } else {
+            console.log("11", data)
             if (data && data.length > 0) {
-              forEachPromise(data, taskfromhouseid).then((result) => {
+              forEachPromise(data, taskfrompatientid).then((result) => {
                 //  var ansfromhousessid = ansfromhouseid(req.params.patient_id)
                 // ansfromhousessid.then((result)=> {
 
@@ -5876,13 +5877,13 @@ function ansfromhouseid(patient_id) {
   });
 }
 
-function taskfromhouseid(item) {
+function taskfrompatientid(item) {
   return new Promise((resolve, reject) => {
     process.nextTick(() => {
       try {
         let infoHouse1 = {};
-        let house_id = item.house_id;
-        const VirtualtToSearchWith = new virtual_Task({ house_id });
+        let patient_id = item.patient_id;
+        const VirtualtToSearchWith = new virtual_Task({ patient_id });
         VirtualtToSearchWith.encryptFieldsSync();
         const VirtualtToSearchWith1 = new virtual_Task({
           task_type: "picture_evaluation",
@@ -5896,8 +5897,8 @@ function taskfromhouseid(item) {
           .find({
             $and: [{
               $or: [
-                { house_id: item.house_id },
-                { house_id: VirtualtToSearchWith.house_id },
+                { patient_id: item.patient_id },
+                { patient_id: VirtualtToSearchWith.patient_id },
               ]
             }, {
               $or: [
@@ -5921,7 +5922,7 @@ function taskfromhouseid(item) {
               }
               if (item.inhospital == false) {
                 if (!InhopspitalInvoice.includes(item.house_id)) {
-                  var invoices = invoicefromhouseid(item);
+                  var invoices = invoicefrompatientid(item);
                   invoices.then((result) => {
                     flatArraya.push(...result);
                   });
@@ -5972,18 +5973,14 @@ function taskfromhouseid(item) {
 //   })
 // }
 
-function invoicefromhouseid(data) {
+function invoicefrompatientid(data) {
   return new Promise((resolve, reject) => {
     try {
-      let house_id = data.house_id;
-      const VirtualtToSearchWith = new virtual_Task({ house_id });
-      VirtualtToSearchWith.encryptFieldsSync();
+
+      let patient_id = data.patient_id;
       virtual_Invoice
         .find({
-          $or: [
-            { house_id: house_id },
-            { house_id: VirtualtToSearchWith.house_id },
-          ],
+          "patient.patient_id": patient_id
         })
         .exec(function (err, invoice) {
           if (err) {
