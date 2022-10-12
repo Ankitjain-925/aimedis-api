@@ -6,6 +6,7 @@ var virtual_Case = require("../schema/virtual_cases.js");
 var virtual_Task = require("../schema/virtual_tasks.js");
 var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
+var picture_Evaluation = require("../schema/pictureevaluation_feedback");
 var User = require("../schema/user.js");
 var questionaire = require("../schema/questionaire");
 var Institute = require("../schema/institute.js");
@@ -14,6 +15,9 @@ var virtual_step = require("../schema/virtual_step");
 var answerspatient = require("../schema/answerspatient");
 var handlebars = require("handlebars");
 var jwtconfig = require("../jwttoken");
+const moment = require("moment");
+var Prescription = require("../schema/prescription");
+var Cretificate = require("../schema/sick_certificate");
 const { TrunkInstance } = require("twilio/lib/rest/trunking/v1/trunk");
 var fullinfo = [];
 var newcf = [];
@@ -48,6 +52,7 @@ var transporter = nodemailer.createTransport({
   },
 });
 var mongoose = require("mongoose");
+const { encrypt, decrypt } = require("./Cryptofile.js");
 var CheckRole = require("./../middleware/middleware");
 
 function getDate(date, dateFormat) {
@@ -80,7 +85,7 @@ function getDate(date, dateFormat) {
 }
 
 router.delete(
-  "/AddSpecialty/:specialty_id/:house_id",
+  "/AddSpecialty/:specialty_id",
   CheckRole("delete_speciality"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -116,7 +121,7 @@ router.delete(
 );
 
 router.put(
-  "/AddSpecialty/:specialty_id/:house_id",
+  "/AddSpecialty/:specialty_id",
   CheckRole("edit_speciality"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -302,6 +307,10 @@ router.post("/AddTask", CheckRole("add_task"), function (req, res, next) {
                       }
                     );
                   }
+                  if(req.body.task_type === "sickleave"){
+                    ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {})
+                  }
+
                 });
               }
 
@@ -324,9 +333,48 @@ router.post("/AddTask", CheckRole("add_task"), function (req, res, next) {
     });
   }
 });
+function ApproveReq(doc, start, end, date) {
+  return new Promise((resolve, reject) => {
+    try {
+
+      let date_fn = moment(date).format("YYYY-MM-DD")
+      sendData = `Dear Patient<br/>
+      Your request for the sick leave certificate is accepted by the doctor on 
+       ${date_fn}
+        at 
+        ${start} 
+        to
+        ${end}
+        So, for the further process please complete your payment process from the request list page. The process of payment is 15 minutes process, So please do payment for this request within 15 minutes. Otherwise this request goes to at archive section automiatically.`;
+      generateTemplate(
+        EMAIL.generalEmail.createTemplate("en", {
+          title: "",
+          content: sendData,
+        }),
+        (error, html) => {
+          let mailOptions = {
+            from: "contact@aimedis.com",
+            to: doc.email,
+            subject: "Approve sick leave request by Doctor",
+            html: html,
+          };
+          let sendmail = transporter.sendMail(mailOptions);
+          if (sendmail) {
+
+          } else {
+            reject(err)
+          }
+        }
+      );
+
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
 
 router.delete(
-  "/AddTask/:task_id/:house_id",
+  "/AddTask/:task_id",
   CheckRole("delete_task"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -359,12 +407,16 @@ router.delete(
 );
 
 router.put(
-  "/AddTask/:task_id/:house_id",
+  "/AddTask/:task_id",
   CheckRole("edit_task"),
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      if (req.body.payment_data && req.body.payment_data !== null && !req.body._enc_payment_data) {
+        req.body.payment_data = encrypt(JSON.stringify(req.body.payment_data))
+        req.body._enc_payment_data = true
+      }
       virtual_Task.updateOne(
         { _id: req.params.task_id },
         req.body,
@@ -467,55 +519,53 @@ router.put(
   }
 );
 
-// router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, next) {
-//   const token = req.headers.token;
-//   let legit = jwtconfig.verify(token);
-//   if (legit) {
-//     let house_id = req.params.house_id
-//     const VirtualtToSearchWith = new virtual_Task({ house_id });
-//     VirtualtToSearchWith.encryptFieldsSync();
-//     const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
-//     VirtualtToSearchWith1.encryptFieldsSync();
-//     const VirtualtToSearchWith2 = new virtual_Task({ task_type: "picture_evaluation" });
-//     VirtualtToSearchWith2.encryptlFieldsSync();
+router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    let house_id = req.params.house_id
+    const VirtualtToSearchWith = new virtual_Task({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+    // const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
+    // VirtualtToSearchWith1.encryptFieldsSync();
+    const VirtualtToSearchWith2 = new virtual_Task({ task_type: "picture_evaluation" });
+    VirtualtToSearchWith2.encryptFieldsSync();
 
-//     virtual_Task.find(
-//       {
-//         house_id: { $in: [house_id, VirtualtToSearchWith.house_id] }, archived: { $ne: true },
-//         $or: [
-//           { is_payment: { $exists: false } },
-//           { is_payment: true }],
-//         $and: [{$or: [
-//           { task_type: { $ne: "sick_leave" }  },
-//           { task_type: { $ne: VirtualtToSearchWith1.task_type }} ] },
-//           { task_type: { $eq: "picture_evaluation" }  },
-//           { task_type: { $eq: VirtualtToSearchWith2.task_type }} ] }
-//           { task_type: { $exists: false } }]
-//       },
-//       function (err, userdata) {
-//         if (err && !userdata) {
-//           console.log("err", err);
-
-//           res.json({
-//             status: 200,
-//             hassuccessed: false,
-//             message: "Something went wrong",
-//             error: err,
-//           });
-//         } else {
-
-//           res.json({ status: 200, hassuccessed: true, data: userdata });
-//         }
-//       }
-//     );
-//   } else {
-//     res.json({
-//       status: 200,
-//       hassuccessed: false,
-//       message: "Authentication required.",
-//     });
-//   }
-// });
+    virtual_Task.find(
+      {
+        house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
+        archived: { $ne: true },
+        $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
+        $or: [
+          // { task_type: { $ne: "sick_leave" } },
+          // { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          userdata.sort(mysort1);
+          res.json({ status: 200, hassuccessed: true,   message: "success", data: userdata });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
 router.get(
   "/GetAllArchivedTask/:house_id",
@@ -529,10 +579,19 @@ router.get(
         house_id,
       });
       messageToSearchWith.encryptFieldsSync();
+      const VirtualtToSearchWith2 = new virtual_Task({
+        task_type: "picture_evaluation",
+      });
+      VirtualtToSearchWith2.encryptFieldsSync();
       virtual_Task.find(
         {
           house_id: { $in: [house_id, messageToSearchWith.house_id] },
-          archived: { $eq: true },
+        archived: { $eq: true },
+        $or: [
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
         },
         function (err, userdata) {
           if (err && !userdata) {
@@ -597,11 +656,20 @@ router.get("/PatientsTask/:patient_id", function (req, res, next) {
       patient_id: req.params.patient_id,
     });
     messageToSearchWith.encryptFieldsSync();
+    const VirtualtToSearchWith2 = new virtual_Task({
+      task_type: "picture_evaluation",
+    });
+    VirtualtToSearchWith2.encryptFieldsSync();
     virtual_Task.find(
       {
         patient_id: {
           $in: [messageToSearchWith.patient_id, req.params.patient_id],
         },
+        $or: [
+          { task_type: { $exists: true, $eq: "picture_evaluation" } },
+          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+          { task_type: { $exists: false } },
+        ],
       },
       function (err, userdata) {
         if (err && !userdata) {
@@ -670,10 +738,14 @@ router.get(
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+
+      let house_id = req.params.house_id;
+      var VirtualtToSearchWith = new virtual_Task({ house_id });
+      VirtualtToSearchWith.encryptFieldsSync();
       virtual_Task.find(
         {
           "assinged_to.profile_id": req.params.patient_profile_id,
-          house_id: req.params.house_id,
+          house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
           $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
         },
         function (err, userdata) {
@@ -841,7 +913,7 @@ router.delete(
 );
 
 router.delete(
-  "/AddService/:service_id/:house_id",
+  "/AddService/:service_id",
   CheckRole("delete_service"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -918,33 +990,44 @@ router.post("/AddService", CheckRole("add_service"), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-    let house_id = req.params.house_id;
-    const VirtualtToSearchWith = new virtual_Task({ house_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    const VirtualtToSearchWith2 = new virtual_Task({
-      task_type: "picture_evaluation",
+    var Virtual_Services = new virtual_Service(req.body);
+    Virtual_Services.save(function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
+      } else {
+        res.json({
+          status: 200,
+          message: "Added Successfully",
+          hassuccessed: true,
+        });
+      }
     });
-    VirtualtToSearchWith2.encryptFieldsSync();
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
 
-    virtual_Task.find(
+
+router.get("/GetService/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    let house_id = req.params.house_id;
+    const messageToSearchWith = new virtual_Service({ house_id });
+    messageToSearchWith.encryptFieldsSync();
+    virtual_Service.find(
       {
-        house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
-        archived: { $ne: true },
-        $or: [{ is_payment: { $exists: false } }, { is_payment: true }],
         $or: [
-          { task_type: { $ne: "sick_leave" } },
-          { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-          { task_type: { $ne: "picture_evaluation" } },
-          { task_type: { $ne: VirtualtToSearchWith2.task_type } },
-          { task_type: { $exists: false } },
+          { house_id: req.params.house_id },
+          { house_id: messageToSearchWith.house_id },
         ],
       },
       function (err, userdata) {
         if (err && !userdata) {
-          console.log("err", err);
-
           res.json({
             status: 200,
             hassuccessed: false,
@@ -952,7 +1035,6 @@ router.post("/AddService", CheckRole("add_service"), function (req, res, next) {
             error: err,
           });
         } else {
-          userdata.sort(mysort1);
           res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
@@ -965,9 +1047,8 @@ router.post("/AddService", CheckRole("add_service"), function (req, res, next) {
     });
   }
 });
-
 router.delete(
-  "/AddInvoice/:bill_id/:house_id",
+  "/AddInvoice/:bill_id",
   CheckRole("delete_invoice"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -1087,6 +1168,44 @@ router.post("/AddInvoice", CheckRole("add_service"), function (req, res, next) {
         }
       }
     );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+router.get("/AddInvoice/:house_id/:status", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    let house_id = req.params.house_id;
+    const VirtualtToSearchWith = new virtual_Invoice({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
+
+    var search = {
+      house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
+    };
+    if (req.params.status !== "all") {
+      var search = {
+        house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
+        "status.value": req.params.status,
+      };
+    }
+    virtual_Invoice.find(search, function (err, userdata) {
+      if (err && !userdata) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "invoice not found",
+          error: err,
+        });
+      } else {
+        userdata.sort(mysort1);
+        res.json({ status: 200, hassuccessed: true, data: userdata });
+      }
+    });
   } else {
     res.json({
       status: 200,
@@ -2250,8 +2369,20 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    const messageToSearchWithlast3 = new virtual_Case({
+      house_id: req.params.house_id,
+    });
+    messageToSearchWithlast3.encryptFieldsSync();
     virtual_Case.find(
-      { $and: [{ house_id: req.params.house_id }, { inhospital: true }] },
+      {  $and: [
+        {
+          house_id: {
+            $in: [req.params.house_id, messageToSearchWithlast3.house_id],
+          },
+        },
+        { inhospital: true },
+        { verifiedbyPatient: true },
+      ],},
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -2283,7 +2414,7 @@ router.get("/getAppointTask/:House_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     User.find(
-      { "houses.value": req.params.House_id, type: "doctor" },
+      { "houses.value": req.params.House_id, type:{$in:["doctor","nurse"]}  },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -3014,50 +3145,6 @@ router.post("/downloadPEBill", function (req, res, next) {
   }
 });
 
-router.get(
-  "/AddInvoice/:house_id/:status",
-  CheckRole("show_invoice"),
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-      let house_id = req.params.house_id;
-      const VirtualtToSearchWith = new virtual_Invoice({ house_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-
-      var search = {
-        house_id: { $in: [req.params.house_id, VirtualtToSearchWith.house_id] },
-      };
-      if (req.params.status !== "all") {
-        var search = {
-          house_id: {
-            $in: [req.params.house_id, VirtualtToSearchWith.house_id],
-          },
-          "status.value": req.params.status,
-        };
-      }
-      virtual_Invoice.find(search, function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "invoice not found",
-            error: err,
-          });
-        } else {
-          userdata.sort(mysort1);
-          res.json({ status: 200, hassuccessed: true, data: userdata });
-        }
-      });
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Authentication required.",
-      });
-    }
-  }
-);
 
 router.get("/patientjourneyQue/:patient_id", function (req, res) {
   const token = req.headers.token;
@@ -3267,7 +3354,15 @@ router.post("/TaskFilter", function (req, res) {
       condition["assinged_to.user_id"] = { $in: req.body.assigned_to };
     }
     if (req.body.status) {
-      condition.status = { $in: req.body.status };
+      var status = req.body.status;
+      statuscheck = status.map((element) => {
+        VirtualtToSearchWith3 = new virtual_Task({ status: element });
+        VirtualtToSearchWith3.encryptFieldsSync();
+        return VirtualtToSearchWith3.status;
+      });
+
+      statuscheck = [...status, ...statuscheck];
+      condition.status = { $in: statuscheck };
     }
     if (req.body.speciality_id) {
       condition["speciality._id"] = req.body.speciality_id;
@@ -3378,17 +3473,36 @@ router.post(
       VirtualtToSearchWith1.encryptFieldsSync();
 
       var condition = {
+        task_type: { $exists: false },
         house_id: { $in: [req.body.house_id, VirtualtToSearchWith1.house_id] },
       };
-      if (req.body.status) {
-        condition.status = { $in: req.body.status };
-      }
       if (req.body.speciality_id) {
         condition["speciality._id"] = req.body.speciality_id;
       }
-      // if (req.body.patient_id) {
-      //   condition.patient_id = { $in: req.body.patient_id }
-      // }
+      if (req.body.status) {
+        var status = req.body.status;
+        statuscheck = status.map((element) => {
+          VirtualtToSearchWith3 = new virtual_Task({ status: element });
+          VirtualtToSearchWith3.encryptFieldsSync();
+          return VirtualtToSearchWith3.status;
+        });
+
+        statuscheck = [...status, ...statuscheck];
+        condition.status = { $in: statuscheck };
+      }
+      if (req.body.patient_id) {
+        var patient_id = req.body.patient_id;
+
+        patient_en = patient_id.map((element) => {
+          VirtualtToSearchWith3 = new virtual_Task({ patient_id: element });
+          VirtualtToSearchWith3.encryptFieldsSync();
+          return VirtualtToSearchWith3.patient_id;
+        });
+
+        patient_id = [...patient_id, ...patient_en];
+
+        condition.patient_id = { $in: patient_id };
+      }
 
       virtual_Task.find(condition, function (err, data) {
         if (err & !data) {
@@ -3416,10 +3530,19 @@ router.post(
                   error: err,
                 });
               } else {
-                console.log("data1", data1);
+                let patient_en = data1.map((element) => {
+                  var VirtualtToSearchWith = new Appointments({
+                    patient: element.patient_id,
+                  });
+                  VirtualtToSearchWith.encryptFieldsSync();
+                  return VirtualtToSearchWith.patient;
+                });
+
                 let patient_id = data1.map((element) => {
                   return element.patient_id;
                 });
+
+                patient_id = [...patient_id, ...patient_en];
                 Appointments.find(
                   { patient: { $in: patient_id } },
                   function (err, appointments) {
@@ -3591,12 +3714,14 @@ router.post("/LeftInfoPatient", function (req, res) {
   var leftdataPatient = {};
   if (legit) {
     let house_id = req.body.house_id;
-    const VirtualtToSearchWith = new User({ house_id });
+    const VirtualtToSearchWith = new virtual_Case({ house_id });
+    const VirtualtToSearchWith1 = new virtual_Case({ patient_id: req.body.patient_id });
+      VirtualtToSearchWith1.encryptFieldsSync();
     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Case.findOne(
       {
         $or: [{ house_id: house_id, house_id: VirtualtToSearchWith.house_id }],
-        patient_id: req.body.patient_id,
+        $or: [{ patient_id: req.body.patient_id, patient_id: VirtualtToSearchWith1.patient_id }],
         inhospital: true,
       },
       function (err, data) {
@@ -3611,6 +3736,10 @@ router.post("/LeftInfoPatient", function (req, res) {
           try {
             leftdataPatient.data = data;
             if (data) {
+              const VirtualtToSearchWith2 = new virtual_Task({ case_id: data._id.toString() });
+                VirtualtToSearchWith2.encryptFieldsSync();
+                const VirtualtToSearchWith7 = new virtual_Task({ status: 'done' });
+                VirtualtToSearchWith7.encryptFieldsSync();
               virtual_Task.aggregate(
                 [
                   {
@@ -3618,7 +3747,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                       total_task: [
                         {
                           $match: {
-                            case_id: data._id.toString(),
+                            $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],
                             status: { $exists: true },
                           },
                         },
@@ -3627,8 +3756,8 @@ router.post("/LeftInfoPatient", function (req, res) {
                       done_task: [
                         {
                           $match: {
-                            case_id: data._id.toString(),
-                            status: "done",
+                            $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],
+                            status: {$in : ["done", VirtualtToSearchWith7.status]}
                           },
                         },
                         { $count: "done_task" },
@@ -3705,7 +3834,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                               });
                             }
                             virtual_Invoice
-                              .find({ case_id: data._id.toString() })
+                              .find({ $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }] })
                               .exec(function (err, invoice) {
                                 if (err) {
                                   res.json({
@@ -3782,6 +3911,26 @@ router.post("/deletehouse", function (req, res) {
     });
 
     let final_house_id = [...patient_en, ...house_id];
+    house_id.forEach((element1, index) => {
+      Institute.updateMany(
+        {
+          "institute_groups.houses.house_id": element1,
+        },
+        {
+          $pull: {
+            institute_groups: {
+              houses: { $elemMatch: { house_id: element1 } },
+            },
+          },
+        }
+      ).exec(function (err, data) {
+        if (err && !data) {
+
+        } else {
+
+        }
+      });
+    });
     virtual_Case
       .updateMany(
         { house_id: { $in: final_house_id } },

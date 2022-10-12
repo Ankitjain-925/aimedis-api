@@ -65,24 +65,6 @@ const io = require("socket.io")(server, {
 });
 ////////////admin+main+end/////////////
 
-io.on("connection", (socket) => {
-  console.log("A user is connected");
-
-  socket.on("update", (data) => {
-    console.log("data", data);
-    socket.broadcast.emit("data_shown", data);
-  });
-  socket.on("addpatient", (data) => {
-    console.log("addpatient", data);
-    socket.broadcast.emit("email_accept", data);
-  });
-  socket.on("decline", (data) => {
-    console.log("decline", data);
-    socket.broadcast.emit("email_decline", data);
-  });
-});
-
-
 // cron.schedule('0 0 */12 * * *', function(){
 //   getData();
 //   var DatEtIME = new Date().getTime();
@@ -645,7 +627,7 @@ app.use("/api/v5/questionaire", questionaire5);
 app.use("/api/v5/cases", vcases5);
 app.use("/api/v5/hospitaladmin", hadmin5);
 app.use("/api/v5/cometUserList", comet5);
-
+app.use("/api/v5/assignservice", assignservice);
 app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
 

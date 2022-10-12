@@ -571,7 +571,176 @@ router.post("/AddStep", function (req, res, next) {
       });
     });
   }
-  
+ 
+ 
+router.get('/GetStepV2/:house_id',function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+    newDatafull = [];
+    virtual_step.findOne({ house_id: req.params.house_id }, function (err, userdata) {
+      if (err && !userdata) {
+        res.json({ status: 200, hassuccessed: false, message: "step not found", error: err })
+      } else {
+        if (userdata) {
+          if (userdata.steps && userdata.steps.length > 0) {
+            forEachPromise(userdata.steps, getCaes1).then((data) => {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Steps is found",
+                data: newDatafull,
+              });
+            })
+          }
+          else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Steps is found",
+              data: []
+            });
+          }
+        }
+        else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "Steps is found",
+            data: []
+          });
+        }
+      }
+    })
+  } else {
+    res.json({ status: 200, hassuccessed: false, message: 'Authentication required.' })
+  }
+})
+
+
+function getCaes1(data1) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      fullinfo = [];
+      if (data1.case_numbers && data1.case_numbers.length > 0) {
+        forEachPromise(data1.case_numbers, getfullInfo1).then((data) => {
+          var finald = data1;
+          finald.case_numbers = data;
+          newDatafull.push(finald);
+          resolve(newDatafull);
+        })
+      }
+      else {
+        newDatafull.push(data1);
+        resolve(newDatafull);
+      }
+    })
+  })
+}
+
+function getfullInfo1(data) {
+  return new Promise((resolve, reject) => {
+    process.nextTick(() => {
+      if (data.case_id) {
+        virtual_cases.findOne({ _id: data.case_id.toString() })
+          .exec()
+          .then(function (doc3) {
+            if (doc3) {
+              User.findOne({ _id: doc3.patient_id })
+                .exec()
+                .then(function (doc5) {
+                  if (doc5) {
+                    const VirtualtToSearchWith9 = new virtual_tasks({ case_id: data.case_id.toString() });
+                    VirtualtToSearchWith9.encryptFieldsSync();
+                    const VirtualtToSearchWith7 = new virtual_tasks({ status: 'done' });
+                    VirtualtToSearchWith7.encryptFieldsSync();
+                    if (doc3.inhospital == true) {
+                      var data5 = {}
+                      data5 = doc3;
+                      var Tasks = new Promise((resolve, reject) => {
+                        virtual_tasks.aggregate([
+                          {
+                            $facet: {
+                              total_task: [
+                                {
+                                  $match: {
+                                    $or: [{ case_id: data.case_id.toString(), case_id: VirtualtToSearchWith9.case_id }],
+                                    status: { $exists: true },
+                                  },
+                                },
+                                { $count: "total_task" },
+                              ],
+                              done_task: [
+                                {
+                                  $match: {
+                                    $or: [{ case_id: data.case_id.toString(), case_id: VirtualtToSearchWith9.case_id }],
+                                    status: {$in : ["done", VirtualtToSearchWith7.status]}
+                                  },
+                                },
+                                { $count: "done_task" },
+                              ],
+                              "total_comments": [
+                                { "$match": { "case_id": data.case_id, } },
+                                {
+                                  "$group": {
+                                    "_id": null,
+                                    "total_count": { $sum: { $size: "$comments" } }
+                                  }
+                                },]
+                            },
+
+                          },
+                          {
+                            "$project": {
+                              "total_task": { "$arrayElemAt": ["$total_task.total_task", 0] },
+                              "done_task": { "$arrayElemAt": ["$done_task.done_task", 0] },
+                              "total_comments": { "$arrayElemAt": ["$total_comments.total_count", 0] }
+                            }
+                          }
+
+                        ], function (err, results) {
+                          resolve(results)
+                        })
+                      }).then((data3) => {
+                        if (data3 && data3.length > 0) {
+                          data5.done_task = data3[0].done_task;
+                          data5.total_task = data3[0].total_task;
+                          data5.total_comments = data3[0].total_comments;
+                          data5.full_address = {address: doc5.address,email: doc5.email,mobile: doc5.mobile, city: doc5.city, pastal_code: doc5.pastal_code, country: doc5.country }                           
+          
+                          fullinfo.push(data5);
+                          resolve(fullinfo);
+                        }
+                        else {
+                          fullinfo.push(data5);
+                          resolve(fullinfo);
+                        }
+                      })
+
+                    }
+                    else {
+                      resolve(fullinfo);
+                    }
+                  }
+                  else {
+                    resolve(fullinfo);
+                  }
+                })
+            }
+            else {
+              resolve(fullinfo);
+            }
+          }).catch((error) => {
+            resolve(data)
+          });
+      }
+      else {
+        resolve(fullinfo);
+      }
+    });
+  });
+} 
+
   function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
       return promise.then(function () {
