@@ -194,16 +194,13 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
                     error: err,
                   });
                 } else {
-
                   res.json({
                     status: 200,
                     hassuccessed: true,
                     msg: "case is deleted",
                   });
-
                 }
               })
-
           }
           else {
             res.json({
@@ -333,7 +330,6 @@ try{
               beds.forEach((item, index) => {
                 var NewUsers = userdata.filter((elem) => (elem.rooms && elem.rooms._id === item.room_id.toString()))
                 for (var i = 1; i <= item.bed; i++) {
-
                   if (!NewUsers.some(e => {
                     return (e.bed == i)
                   })) {

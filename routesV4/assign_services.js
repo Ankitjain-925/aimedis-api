@@ -247,11 +247,8 @@ router.get(
                         } else {
                           console.log("userdata3", userdata3.length)
                           for (i = 0; i < userdata1.length; i++) {
-
                             let today = new Date().setHours(0, 0, 0, 0);
-
                             let data_d = new Date(userdata1[i].date).setHours(0, 0, 0, 0);
-
                             if (moment(data_d).isSameOrAfter(today)) {
                               // userdata1.sort(mySorter);
                               arr1.push(userdata1[i])
@@ -260,11 +257,8 @@ router.get(
                           }
 
                           for (i = 0; i < userdata2.length; i++) {
-
                             let today2 = new Date().setHours(0, 0, 0, 0);
-
                             let data_d2 = new Date(userdata2[i].due_on.date).setHours(0, 0, 0, 0);
-
                             if (moment(data_d2).isSameOrAfter(today2)) {
                               // userdata2.sort(mySorter);
                               arr2.push(userdata2[i])
@@ -284,17 +278,13 @@ router.get(
                             let today = new Date().setHours(0, 0, 0, 0);
                             let data_d = new Date(userdata3[i].due_on.date).setHours(0, 0, 0, 0);
                             if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-
                               arr3.push(userdata3[i])
                             }
                             if (moment(data_d).isBefore(today) && userdata3[i].status !== "done") {
-
                               arr3.push(userdata3[i])
                             }
                           }
-
                           finalArray = [...arr1, ...arr2, ...arr3];
-
                           finalArray.sort(mySorter1);
                           res.json({ status: 200, hassuccessed: true, data: finalArray });
                         }
