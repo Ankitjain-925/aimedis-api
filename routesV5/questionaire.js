@@ -11,37 +11,54 @@ router.post("/AddAnswerspatient", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      try {
+        const patient_id = req.body.patient_id;
+        const house_id = req.body.house_id;
+        const messageToSearchWith = new virtual_Case({ patient_id })
+        messageToSearchWith.encryptFieldsSync();
+        const messageToSearchWith1 = new virtual_Case({ house_id })
+        messageToSearchWith1.encryptFieldsSync();
         var answerspatients = new answerspatient(req.body);
+        console.log("1")
         answerspatients.save(function (err, user_data) {
-            if (err && !user_data) {
+          if (err && !user_data) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            console.log("112")
+            virtual_Case.findOneAndUpdate({ patient_id: { $in: [req.body.patient_id, messageToSearchWith.patient_id] }, inhospital: false, viewQuestionaire: true, house_id: { $in: [req.body.house_id, messageToSearchWith1.house_id] } }, {
+              $set: {
+                submitQuestionaire: true, viewQuestionaire: false
+              }
+            }, function (err, data) {
+              if (err && !data) {
                 res.json({ status: 200, message: "Something went wrong.", error: err });
-            } else {
-                virtual_Case.findOneAndUpdate({ patient_id: req.body.patient_id, inhospital: false, viewQuestionaire: true, house_id: req.body.house_id }, {
-                    $set: {
-                        submitQuestionaire: true, viewQuestionaire: false
-                    }
-                }, function (err, data) {
-                    if (err && !data) {
-                        res.json({ status: 200, message: "Something went wrong.", error: err });
-                    }
-                    else {
-                        res.json({
-                            status: 200,
-                            message: "Added Successfully",
-                            hassuccessed: true,
-                        });
-                    }
-                })
-            }
+              }
+              else {
+                res.json({
+                  status: 200,
+                  message: "Added Successfully",
+                  hassuccessed: true,
+                });
+              }
+            })
+          }
         });
-    } else {
+      } catch {
         res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Authentication required.",
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
         });
+      }
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
     }
-});
+  });
+  
 
 router.put("/Answer/:answerspatient_id", function (req, res, next) {
     const token = req.headers.token;
@@ -171,8 +188,6 @@ router.put("/Question/:questionaire_id", CheckRole("edit_questionnaire"), functi
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
-        const VirtualtToSearchWith = new questionaire({ questionaire_id : req.params.sesion_id});
-        VirtualtToSearchWith.encryptFieldsSync();
         questionaire.updateOne(
             { _id: req.params.questionaire_id },
             req.body,
