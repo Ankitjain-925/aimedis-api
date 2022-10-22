@@ -11,6 +11,11 @@ const PaitentList = new mongoose.Schema(
       required: false,
       unique: false,
     },
+    byhospital: {
+      type: Boolean,
+      required: false,
+      unique: false
+  },
   },
   { strict: false }
 );
