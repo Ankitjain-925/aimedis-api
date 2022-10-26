@@ -48,85 +48,11 @@ router.get("/AddCase/:speciality_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
-  virtual_cases.findOne(
-    { _id: req.params.speciality_id },
-    req.body,
-    function (err, userdata) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "case is updated",
-          data: userdata,
-        });
-      }
-    }
-  );
-} else {
-  res.json({
-    status: 200,
-    hassuccessed: false,
-    message: "Authentication required.",
-  });
-}
-});
-
-router.put("/AddCase/:speciality_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-  virtual_cases.updateOne(
-    { _id: req.params.speciality_id },
-    req.body,
-    function (err, userdata) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "case is updated",
-          data: userdata,
-        });
-      }
-    }
-  );
-} else {
-  res.json({
-    status: 200,
-    hassuccessed: false,
-    message: "Authentication required.",
-  });
-}
-});
-
-router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
- if(req.body.verifiedbyPatient){
-  virtual_cases.updateOne(
-    { _id: req.params.case_id },
-    req.body,
-    function (err, userdata) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong",
-          error: err,
-        });
-      } else {
-        if (userdata.nModified == "0") {
+    virtual_cases.findOne(
+      { _id: req.params.speciality_id },
+      req.body,
+      function (err, userdata) {
+        if (err) {
           res.json({
             status: 200,
             hassuccessed: false,
@@ -142,64 +68,138 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
           });
         }
       }
-    }
-  );
- }
- else{
-  virtual_cases.findOne(
-    {_id: req.params.case_id},
-    function (err, userdata) {
-      if (err) {
-        console.log("err",err)
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        if (userdata) {
-  virtual_cases.findByIdAndRemove(
-    { _id: req.params.case_id },
-    function (err, doc) {
-      console.log('doc', doc)
-      if (err && !doc) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "Something went wrong",
-          error: err,
-        });
-      } else {
-        
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            msg: "case is deleted",
-          });
-        
-      }
-    })
-
-  }
-  else{
+    );
+  } else {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Case is not found",
+      message: "Authentication required.",
     });
   }
- }
-
 });
- }
+
+router.put("/AddCase/:speciality_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    virtual_cases.updateOne(
+      { _id: req.params.speciality_id },
+      req.body,
+      function (err, userdata) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "case is updated",
+            data: userdata,
+          });
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
+  if (req.body.verifiedbyPatient) {
+    virtual_cases.updateOne(
+      { _id: req.params.case_id },
+      req.body,
+      function (err, userdata) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          if (userdata.nModified == "0") {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "case is updated",
+              data: userdata,
+            });
+          }
+        }
+      }
+    );
+  }
+  else {
+    virtual_cases.findOne(
+      { _id: req.params.case_id },
+      function (err, userdata) {
+        if (err) {
+          console.log("err", err)
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          if (userdata) {
+            virtual_cases.findByIdAndRemove(
+              { _id: req.params.case_id },
+              function (err, doc) {
+                console.log('doc', doc)
+                if (err && !doc) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    msg: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    msg: "case is deleted",
+                  });
+
+                }
+              })
+
+          }
+          else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Case is not found",
+            });
+          }
+        }
+
+      });
+  }
 })
 
 router.put("/addmypatient/:case_id", function (req, res, next) {
-  try{
-    virtual_cases.findOne({ _id: req.params.case_id},
+  try {
+    virtual_cases.findOne({ _id: req.params.case_id },
       function (err, user_data) {
-        if(err){
+        if (err) {
           res.json({
             status: 200,
             hassuccessed: false,
@@ -207,61 +207,61 @@ router.put("/addmypatient/:case_id", function (req, res, next) {
             error: err,
           });
         }
-        else{
-          if(user_data){
-          user.updateMany(
-            { _id: {$in: req.body.users_id} },
-            {mypatient: {profile_id: user_data.patient.profile_id, byhospital: true}},
-            function (err, userdata) {
-              if (err) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "Something went wrong",
-                  error: err,
-                });
-              } else {
-                user.updateOne(
-                  { _id: user_data.patient_id },
-                  {fav_doc: req.body.fav_doc},
-                  function (err, userdata) {
-                    if (err) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "Something went wrong",
-                        error: err,
-                      });
-                    } else {
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        msg: "Added in doctorlist",
-                      });
+        else {
+          if (user_data) {
+            user.updateMany(
+              { _id: { $in: req.body.users_id } },
+              { mypatient: { profile_id: user_data.patient.profile_id, byhospital: true } },
+              function (err, userdata) {
+                if (err) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
+                } else {
+                  user.updateOne(
+                    { _id: user_data.patient_id },
+                    { fav_doc: req.body.fav_doc },
+                    function (err, userdata) {
+                      if (err) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "Something went wrong",
+                          error: err,
+                        });
+                      } else {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          msg: "Added in doctorlist",
+                        });
+                      }
                     }
-                  }
-                );
+                  );
+                }
               }
-            }
-          );
+            );
+          }
+          else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Case is not found",
+            });
+          }
         }
-        else{
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Case is not found",
-          });
-        }
-        }
-   
-    });
-  } catch(e){
+
+      });
+  } catch (e) {
     res.json({ status: 200, message: "Something went wrong.", error: err });
   }
-  
-  
 
- })
+
+
+})
 
 router.post("/AddCase", function (req, res, next) {
   const token = req.headers.token;
@@ -271,54 +271,54 @@ router.post("/AddCase", function (req, res, next) {
     const messageToSearchWith1 = new virtual_cases({ patient_id });
     messageToSearchWith1.encryptFieldsSync();
     virtual_cases.findOne(
-      { patient_id: {$in:[ req.body.patient_id,messageToSearchWith1.patient_id]}, inhospital: { $eq: true }, house_id: req.body.house_id },
+      { patient_id: { $in: [req.body.patient_id, messageToSearchWith1.patient_id] }, inhospital: { $eq: true }, house_id: req.body.house_id },
       function (err, userdata) {
-        try{
+        try {
 
-        if (err) {
-          console.log("err",err)
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-            console.log("userdata",userdata)
-          if (userdata) {
+          if (err) {
+            console.log("err", err)
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "case is already exist in hospital",
+              message: "Something went wrong.",
+              error: err,
             });
           } else {
-            var Virtual_Cases = new virtual_cases(req.body);
-            Virtual_Cases.save(function (err, user_data) {
-              if (err && !user_data) {
-                res.json({
-                  status: 200,
-                  message: "Something went wrong.",
-                  error: err,
-                });
-              } else {
-                res.json({
-                  status: 200,
-                  message: "Added Successfully",
-                  hassuccessed: true,
-                  data: user_data._id,
-                });
-              }
-            });
+            console.log("userdata", userdata)
+            if (userdata) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "case is already exist in hospital",
+              });
+            } else {
+              var Virtual_Cases = new virtual_cases(req.body);
+              Virtual_Cases.save(function (err, user_data) {
+                if (err && !user_data) {
+                  res.json({
+                    status: 200,
+                    message: "Something went wrong.",
+                    error: err,
+                  });
+                } else {
+                  res.json({
+                    status: 200,
+                    message: "Added Successfully",
+                    hassuccessed: true,
+                    data: user_data._id,
+                  });
+                }
+              });
+            }
+
           }
-        
+        } catch (err) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+          });
         }
-      }catch(err){
-        res.json({
-          status: 200,
-          message: "Something went wrong.",
-          error: err,
-        });
-      }
       }
     );
   } else {
@@ -847,9 +847,23 @@ router.delete("/removemypatientdischarge", function (req, res, next) {
   let finaldata = [];
   try {
     if (legit) {
-      user.find(
+      user.updateMany(
         { _id: { $in: req.body.User_id } },
-        function (err, userdata) {
+        {
+          $pull: {
+            myPatient: {
+              $and: [
+                {
+                  profile_id: req.body.profile_id,
+                },
+                {
+                  byhospital: true,
+                },
+              ],
+            },
+          },
+        },
+        function (err, userdata1) {
           if (err) {
             res.json({
               status: 200,
@@ -857,52 +871,18 @@ router.delete("/removemypatientdischarge", function (req, res, next) {
               message: "Something went wrong.",
               error: err,
             });
-          } else {
-            
-            userdata.forEach((element) => {
-              user.updateMany(
-                { _id: { $in: element._id } },
-                {
-                  $pull: {
-                    myPatient: {
-                      $and: [
-                        {
-                          profile_id: req.body.profile_id,
-                        },
-                        {
-                          byhospital: true,
-                        },
-                      ],
-                    },
-                  },
-                },
-                function (err, userdata1) {
-                  if (err) {
-                    res.json({
-                      status: 200,
-                      hassuccessed: false,
-                      message: "Something went wrong.",
-                      error: err,
-                    });
-                  }
-                  else {
-
-                    finaldata.push(userdata1);
-
-                  }
-                }
-              );
-            });
-
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Successfully Deleted",
-            });
-
+          }
+          else {
+            favdoc_del(req.body.profile_idf);
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Successfully Deleted",
+              });
           }
         }
       );
+
     } else {
       res.json({
         status: 200,
@@ -918,6 +898,39 @@ router.delete("/removemypatientdischarge", function (req, res, next) {
     });
   }
 });
+
+
+function favdoc_del(idf) {
+  idf.forEach((element) => {
+    user.updateMany(
+      { "fav_doctor.profile_id": element  },
+      {
+        $pull: {
+          fav_doctor: {
+            $and: [
+              {
+                profile_id: element,
+              },
+              {
+                byhospital: true,
+              },
+            ],
+          },
+        },
+      },
+      function (err, userdata1) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Some thing went wrong.",
+          });
+        }
+      }
+    );
+  });
+
+}
 
 
 module.exports = router;
