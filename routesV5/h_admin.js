@@ -441,4 +441,26 @@ router.get("/GetProfessional/:house_id", function (req, res, next) {
   }
 });
 
+router.get("/GetProfessional1/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+    User.find(
+      {
+        $or : [{type: 'doctor'}, {type : 'nurse'}],
+        houses: { $elemMatch: { value: req.params.house_id } },
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
+        }
+      }
+    );
+});
+
 module.exports = router;
