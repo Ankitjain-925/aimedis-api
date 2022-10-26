@@ -588,54 +588,6 @@ router.get('/patient/:patient_id', function (req, res, next) {
 //   }
 // })
 
-router.delete("/favDo", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-
-  if (!legit) {
-
-    user.update(
-      { _id: { $in: req.body.User_id._id } },
-      {
-        $pull: {
-          myPatient: {
-            $and: [
-              {
-                $or: [
-
-                  { profile_id: req.body.profile_id },
-                ],
-              },
-            ],
-          },
-        },
-      },
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        }
-        else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Deleted Successfully",
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
 
 router.delete("/removemypatientdischarge", function (req, res, next) {
   const token = req.headers.token;
