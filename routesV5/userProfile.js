@@ -4502,6 +4502,9 @@ function getMyPat(data) {
         .exec()
         .then(function (doc3) {
           if (doc3) {
+            console.log('data.byhospital', data.byhospital)
+            doc3['byhospital'] = data.byhospital
+            console.log('here1111', doc3.byhospital)
             Mypat.push(doc3);
             resolve(Mypat);
           } else {

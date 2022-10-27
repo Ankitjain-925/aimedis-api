@@ -5,7 +5,7 @@ var CareModel = require("../schema/care_questionnaire.js");
 var VirtualModel = require("../schema/virtual_cases.js")
 var User = require("../schema/user.js")
 var jwtconfig = require("../jwttoken");
-
+var CheckRole = require("./../middleware/middleware")
 
 
   router.post("/AddQuestionnaire",CheckRole("add_care_ques"), function (req, res, next) {
