@@ -9,11 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-<<<<<<< HEAD
     "host": "localhost:5001",
-=======
-    "host": "https://virtualhospital.aidoc.io",
->>>>>>> 9051b26256cfa93e80ad45f285dc615b69bc8633
     "basePath": "/api/v4",
     "tags": [
         {

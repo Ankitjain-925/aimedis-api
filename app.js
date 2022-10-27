@@ -696,16 +696,11 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-<<<<<<< HEAD
-=======
-  //  return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
->>>>>>> 9051b26256cfa93e80ad45f285dc615b69bc8633
-  console.log("err", err);
+   console.log("err", err);
    return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
   
 });
 
-<<<<<<< HEAD
 
 app.listen(5001, () => {
   console.log("Server started on port 5001")
@@ -713,9 +708,3 @@ app.listen(5001, () => {
 
 
 // module.exports = app;
-=======
-// app.listen(5000, () => {
-//   console.log("Server started on port 5001")
-// });
- module.exports = app;
->>>>>>> 9051b26256cfa93e80ad45f285dc615b69bc8633
