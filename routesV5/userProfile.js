@@ -9581,4 +9581,95 @@ else {
   }
 })
 
+router.get("/DocNurses", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  let count = 0;
+  finaldata = []
+  try {
+    if (legit) {
+
+      User.find(
+        {
+          _id: legit.id
+        },
+        function (err, changeStatus) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          }
+          if (changeStatus && changeStatus.length > 0) {
+
+            changeStatus.map(function (content) {
+              let counting = content.fav_doctor.length
+              content.fav_doctor.map(function (content) {
+                const messageToSearchWith = new User({ profile_id: content.profile_id });
+                messageToSearchWith.encryptFieldsSync();
+                User.findOne(
+                  { profile_id: { $in: [content.profile_id, messageToSearchWith.profile_id] } },
+
+                  function (err, userdata1) {
+                    if (err) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Something went wrong.",
+                        error: err,
+                      });
+                    }
+                    else {
+                      data = {
+                        first_name: userdata1.first_name,
+                        last_name: userdata1.last_name,
+                        image: userdata1.image,
+                        profile_id: userdata1.profile_id,
+                        alies_id: userdata1.alies_id
+                      }
+                      count++
+                      finaldata.push(data)
+                      if (counting == count) (
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "Successfully Fetched",
+                          data: finaldata
+                        })
+                      )
+
+                    }
+                  }
+                );
+              });
+
+            });
+
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No Data exist",
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
 module.exports = router;
