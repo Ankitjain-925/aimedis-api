@@ -26,6 +26,7 @@ const {
 } = require("../emailTemplate/index.js");
 var nodemailer = require("nodemailer");
 var CareQuentionaire = require("../schema/care_questionnaire");
+var CheckRole = require("./../middleware/middleware");
 
 
 var transporter = nodemailer.createTransport({

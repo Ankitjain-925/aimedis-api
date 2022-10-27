@@ -540,6 +540,7 @@ var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
+var vcare5 = require("./routesV5/virtual_care");
 
 // app.use("/api/v1/User", UserData);
 // app.use("/api/v1/UserProfile", UserProfile);
@@ -632,7 +633,7 @@ app.use("/api/v5/assignservice", assignservice);
 app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
 app.use("/api/v5/cquestionnaire", cquestionnaire5);
-
+app.use("/api/v5/vc", vcare5);
 // app.use("/api/v4/bk", bk)
 
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
@@ -694,8 +695,8 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  //  return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  console.log("err", err);
+   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+  // console.log("err", err);
 });
 
 // app.listen(5000, () => {
