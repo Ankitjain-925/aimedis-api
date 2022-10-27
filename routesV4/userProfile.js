@@ -125,202 +125,178 @@ var transporter = nodemailer.createTransport({
 
 // For landing pages
 router.post("/SupportMail", function (req, res) {
-  let mailOptions = {
-    from: req.body.email,
-    to: "contact@aimedis.com",
-    subject: "Contact and Support Message",
-    html:
-      "<div>This is -</b> " +
-      req.body.name +
-      " </b></div><div>" +
-      req.body.msg +
-      "</div>",
-  };
-  let sendmail = transporter.sendMail(mailOptions);
-  if (sendmail) {
+  try {
+    let mailOptions = {
+      from: req.body.email,
+      to: "contact@aimedis.com",
+      subject: "Contact and Support Message",
+      html:
+        "<div>This is -</b> " +
+        req.body.name +
+        " </b></div><div>" +
+        req.body.msg +
+        "</div>",
+    };
+    let sendmail = transporter.sendMail(mailOptions);
+    if (sendmail) {
+      res.json({
+        status: 200,
+        message: "Mail sent Successfully",
+        hassuccessed: true,
+      });
+    } else {
+      res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+    }
+  } catch {
     res.json({
       status: 200,
-      message: "Mail sent Successfully",
-      hassuccessed: true,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
     });
-  } else {
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
   }
 });
 
 // For landing pages
 router.post("/IssuegetMail", function (req, res) {
-  let mailOptions = {
-    to: req.body.email,
-    from: "contact@aimedis.com",
-    subject: "Got some issue on the Aimedis App",
-    html: req.body.message,
-  };
-  let sendmail = transporter.sendMail(mailOptions);
-  if (sendmail) {
+  try {
+    let mailOptions = {
+      to: req.body.email,
+      from: "contact@aimedis.com",
+      subject: "Got some issue on the Aimedis App",
+      html: req.body.message,
+    };
+    let sendmail = transporter.sendMail(mailOptions);
+    if (sendmail) {
+      res.json({
+        status: 200,
+        message: "Mail sent Successfully",
+        hassuccessed: true,
+      });
+    } else {
+      res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+    }
+  } catch {
     res.json({
       status: 200,
-      message: "Mail sent Successfully",
-      hassuccessed: true,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
     });
-  } else {
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
   }
 });
 
 router.post("/sendRegisterationMail", function (req, res, next) {
-  const token = req.headers.token;
-  var link = "http://localhost:3000/";
-  var mailOptions = {
-    from: "contact@aimedis.com",
-    to: req.body.email,
-    subject: "Aimedis Registration",
-    html:
-      "<div>You have registered successfully" +
-      '<a href="' +
-      link +
-      "?token=" +
-      token +
-      '">click here</a> to login</div>' +
-      "<div>If you have any questions, please do not hesitate to contact us via icuservices@aimedis.com.</div>" +
-      '<div style="color:#ddd, font-size: 9px;">Aimedis Customer Support <br/> - Aimedis B.V. <br/> Sint Michaëlstraat 45935 BL Steyl<br/> Netherlands - <br/>Aimedis B.V. Netherlands' +
-      "<br/>Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO <br/> VAT No.: NL858194478B01</div>",
-  };
-  var sendmail = transporter.sendMail(mailOptions);
+  try {
+    const token = req.headers.token;
+    var link = "http://localhost:3000/";
+    var mailOptions = {
+      from: "contact@aimedis.com",
+      to: req.body.email,
+      subject: "Aimedis Registration",
+      html:
+        "<div>You have registered successfully" +
+        '<a href="' +
+        link +
+        "?token=" +
+        token +
+        '">click here</a> to login</div>' +
+        "<div>If you have any questions, please do not hesitate to contact us via icuservices@aimedis.com.</div>" +
+        '<div style="color:#ddd, font-size: 9px;">Aimedis Customer Support <br/> - Aimedis B.V. <br/> Sint Michaëlstraat 45935 BL Steyl<br/> Netherlands - <br/>Aimedis B.V. Netherlands' +
+        "<br/>Management board: Michael J. Kaldasch MD, CEO, Ben El Idrissi MD, COO <br/> VAT No.: NL858194478B01</div>",
+    };
+    var sendmail = transporter.sendMail(mailOptions);
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 //For login the user
 
 router.post("/UserLogin", function (req, res, next) {
-  if (req.body.email == "" || req.body.password == "") {
-    res.json({
-      status: 450,
-      message: "Email and password fields should not be empty",
-      hassuccessed: false,
-    });
-  } else {
-    const email = req.body.email;
-    const messageToSearchWith = new User({ email });
-    messageToSearchWith.encryptFieldsSync();
-    const messageToSearchWith1 = new User({
-      email: req.body.email.toLowerCase(),
-    });
-    messageToSearchWith1.encryptFieldsSync();
-    const messageToSearchWith2 = new User({
-      email: req.body.email.toUpperCase(),
-    });
-    messageToSearchWith2.encryptFieldsSync();
-    User.findOne({
-      $or: [
-        { email: { $regex: req.body.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith1.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith2.email, $options: "i" } },
-      ],
-    })
-      .exec()
-      .then((user_data) => {
-        if (user_data) {
-          if (user_data.isblock === true) {
-            res.json({
-              status: 450,
-              hassuccessed: false,
-              isVerified: true,
-              isBlocked: true,
-              type: user_data.type,
-              message: "User is blocked",
-            });
-          } else {
-            let promise = new Promise(function (resolve, reject) {
-              if (
-                req.body.logintoken != "" &&
-                req.body.logintoken != undefined
-              ) {
-                if (req.body.logintoken == user_data.usertoken) {
-                  User.findOneAndUpdate(
-                    { _id: user_data._id },
-                    { $set: { verified: "true" } },
-                    { new: true },
-                    (err, doc1) => {
-                      if (err && !doc1) {
-                        res.json({
-                          status: 450,
-                          hassuccessed: false,
-                          message: "Verification Failed",
-                          error: err,
-                        });
-                      } else {
-                        user_data = doc1;
-                      }
-                    }
-                  );
-                } else {
-                  res.json({
-                    status: 450,
-                    hassuccessed: false,
-                    message: "Verification Failed",
-                  });
-                }
-              }
-              setTimeout(() => resolve(), 500);
-            });
-            promise.then(() => {
-              var decodes = base64.decode(user_data.password);
-              if (
-                decodes === req.body.password ||
-                decrypt(parseReturn(decodes)) === req.body.password
-              ) {
-                if (user_data.verified === "true") {
-                  if (!user_data.is2fa || user_data.is2fa === false) {
-                    let payload = {
-                      email: user_data.email,
-                      name: user_data.first_name + " " + user_data.last_name,
-                      id: user_data._id,
-                      type: user_data.type,
-                    };
-                    var token = jwtconfig.sign(payload);
-
-                    if (user_data.type !== "superadmin") {
-                      User.findOneAndUpdate(
-                        { _id: user_data._id },
-                        { $set: { logWrongPass: 0 } },
-                        { new: true },
-                        (err, doc1) => { }
-                      );
-                      if(req.headers._origin == "video-confrance"){
-                        user_data["isRegisterd_for_video"] = true;
-                      }
-                      res.json({
-                        status: 200,
-                        message: "Succefully fetched",
-                        hassuccessed: true,
-                        user: user_data,
-                        token: token,
-                      });
-                    } else {
-                      res.json({
-                        status: 450,
-                        message: "User does not exist",
-                        hassuccessed: false,
-                      });
-                    }
-                  } else {
-                    if (user_data.authyId) {
-                      authy.requestSms(
-                        { authyId: user_data.authyId },
-                        { force: true },
-                        function (err, smsRes) {
-                          if (err) {
-                            res.json({
-                              status: 450,
-                              hassuccessed: false,
-                              message: "request not send",
-                              error: err,
-                            });
-                          }
+  try {
+    if (req.body.email == "" || req.body.password == "") {
+      res.json({
+        status: 450,
+        message: "Email and password fields should not be empty",
+        hassuccessed: false,
+      });
+    } else {
+      const email = req.body.email;
+      const messageToSearchWith = new User({ email });
+      messageToSearchWith.encryptFieldsSync();
+      const messageToSearchWith1 = new User({
+        email: req.body.email.toLowerCase(),
+      });
+      messageToSearchWith1.encryptFieldsSync();
+      const messageToSearchWith2 = new User({
+        email: req.body.email.toUpperCase(),
+      });
+      messageToSearchWith2.encryptFieldsSync();
+      User.findOne({
+        $or: [
+          { email: { $regex: req.body.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith1.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith2.email, $options: "i" } },
+        ],
+      })
+        .exec()
+        .then((user_data) => {
+          if (user_data) {
+            if (user_data.isblock === true) {
+              res.json({
+                status: 450,
+                hassuccessed: false,
+                isVerified: true,
+                isBlocked: true,
+                type: user_data.type,
+                message: "User is blocked",
+              });
+            } else {
+              let promise = new Promise(function (resolve, reject) {
+                if (
+                  req.body.logintoken != "" &&
+                  req.body.logintoken != undefined
+                ) {
+                  if (req.body.logintoken == user_data.usertoken) {
+                    User.findOneAndUpdate(
+                      { _id: user_data._id },
+                      { $set: { verified: "true" } },
+                      { new: true },
+                      (err, doc1) => {
+                        if (err && !doc1) {
+                          res.json({
+                            status: 450,
+                            hassuccessed: false,
+                            message: "Verification Failed",
+                            error: err,
+                          });
+                        } else {
+                          user_data = doc1;
                         }
-                      );
-
+                      }
+                    );
+                  } else {
+                    res.json({
+                      status: 450,
+                      hassuccessed: false,
+                      message: "Verification Failed",
+                    });
+                  }
+                }
+                setTimeout(() => resolve(), 500);
+              });
+              promise.then(() => {
+                var decodes = base64.decode(user_data.password);
+                if (
+                  decodes === req.body.password ||
+                  decrypt(parseReturn(decodes)) === req.body.password
+                ) {
+                  if (user_data.verified === "true") {
+                    if (!user_data.is2fa || user_data.is2fa === false) {
                       let payload = {
                         email: user_data.email,
                         name: user_data.first_name + " " + user_data.last_name,
@@ -336,6 +312,9 @@ router.post("/UserLogin", function (req, res, next) {
                           { new: true },
                           (err, doc1) => { }
                         );
+                        if (req.headers._origin == "video-confrance") {
+                          user_data["isRegisterd_for_video"] = true;
+                        }
                         res.json({
                           status: 200,
                           message: "Succefully fetched",
@@ -351,262 +330,271 @@ router.post("/UserLogin", function (req, res, next) {
                         });
                       }
                     } else {
-                      res.json({
-                        status: 450,
-                        message:
-                          "Can not get Mobile number for the notification",
-                        hassuccessed: false,
-                      });
-                    }
-                  }
-                } else {
-                  res.json({
-                    status: 450,
-                    message:
-                      "Your Account is not verified, please check your email account.",
-                    isVerified: false,
-                    isBlocked: false,
-                    type: user_data.type,
-                    hassuccessed: false,
-                  });
-                }
-              } else {
-                if (user_data.type !== "superadmin") {
-                  var count =
-                    user_data.logWrongPass && user_data.logWrongPass < 5
-                      ? user_data.logWrongPass + 1
-                      : 1;
-                  if (count == 5) {
-                    let payload1 = {
-                      email: user_data.email,
-                      id: user_data._id,
-                      type: user_data.type,
-                    };
-                    token1 = jwtconfig.sign(payload1);
-                    var lan1 = getMsgLang(user_data._id);
-
-                    lan1.then((result) => {
-                      let link = "https://aidoc.io/change-password";
-                      var sendData =
-                        "<div>Please reset Your Password immediately.</br>" +
-                        "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
-                        '<a href="' +
-                        link +
-                        "?token=" +
-                        token1 +
-                        '">LINK TO RESET PASSWORD </a><br/>' +
-                        "You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br></br>" +
-                        "Your Aimedis team";
-
-                      generateTemplate(
-                        EMAIL.generalEmail.createTemplate(result, {
-                          title: "",
-                          content: sendData,
-                        }),
-                        (error, html) => {
-                          if (!error) {
-                            let mailOptions = {
-                              from: "contact@aimedis.com",
-                              to: req.body.email,
-                              subject: "Reset Your Password immediately!!",
-                              html: html,
-                            };
-                            let sendmail = transporter.sendMail(mailOptions);
-                            if (sendmail) {
-                              console.log("Mail is sent ");
+                      if (user_data.authyId) {
+                        authy.requestSms(
+                          { authyId: user_data.authyId },
+                          { force: true },
+                          function (err, smsRes) {
+                            if (err) {
+                              res.json({
+                                status: 450,
+                                hassuccessed: false,
+                                message: "request not send",
+                                error: err,
+                              });
                             }
                           }
+                        );
+
+                        let payload = {
+                          email: user_data.email,
+                          name: user_data.first_name + " " + user_data.last_name,
+                          id: user_data._id,
+                          type: user_data.type,
+                        };
+                        var token = jwtconfig.sign(payload);
+
+                        if (user_data.type !== "superadmin") {
+                          User.findOneAndUpdate(
+                            { _id: user_data._id },
+                            { $set: { logWrongPass: 0 } },
+                            { new: true },
+                            (err, doc1) => { }
+                          );
+                          res.json({
+                            status: 200,
+                            message: "Succefully fetched",
+                            hassuccessed: true,
+                            user: user_data,
+                            token: token,
+                          });
+                        } else {
+                          res.json({
+                            status: 450,
+                            message: "User does not exist",
+                            hassuccessed: false,
+                          });
                         }
-                      );
-                      // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-                      // trans(sendData, { source: "en", target: result }).then((res) => {
-                      //     var mailOptions = {
-                      //         from: "contact@aimedis.com",
-                      //         to: user_data.email,
-                      //         subject: 'Reset Your Password immediately!!',
-                      //     html: res.replace(/ @ /g, '@')
-                      //     };
-                      //     var sendmail = transporter.sendMail(mailOptions)
-
-                      // });
-                    });
-
-                    // var mailOptions1 = {
-                    //     from: "contact@aimedis.com",
-                    //     to: user_data.email,
-                    //     subject: 'Reset Your Password immediately!!',
-                    //     html: '<div>Please reset Your Password immediately.</br>'
-                    //         + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
-                    //         '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>' +
-                    //         'You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
-                    //         '<b>Your Aimedis team </b>'
-                    // };
-                    // var sendmail = transporter.sendMail(mailOptions1)
-                    User.findOneAndUpdate(
-                      { _id: user_data._id },
-                      { $set: { logWrongPass: count, isblock: true } },
-                      { new: true },
-                      (err, doc1) => { }
-                    );
+                      } else {
+                        res.json({
+                          status: 450,
+                          message:
+                            "Can not get Mobile number for the notification",
+                          hassuccessed: false,
+                        });
+                      }
+                    }
                   } else {
-                    User.findOneAndUpdate(
-                      { _id: user_data._id },
-                      { $set: { logWrongPass: count } },
-                      { new: true },
-                      (err, doc1) => { }
-                    );
+                    res.json({
+                      status: 450,
+                      message:
+                        "Your Account is not verified, please check your email account.",
+                      isVerified: false,
+                      isBlocked: false,
+                      type: user_data.type,
+                      hassuccessed: false,
+                    });
                   }
-
-                  res.json({
-                    status: 450,
-                    message: "Wrong password",
-                    hassuccessed: false,
-                  });
                 } else {
-                  res.json({
-                    status: 450,
-                    message: "User does not exist",
-                    hassuccessed: false,
-                  });
+                  if (user_data.type !== "superadmin") {
+                    var count =
+                      user_data.logWrongPass && user_data.logWrongPass < 5
+                        ? user_data.logWrongPass + 1
+                        : 1;
+                    if (count == 5) {
+                      let payload1 = {
+                        email: user_data.email,
+                        id: user_data._id,
+                        type: user_data.type,
+                      };
+                      token1 = jwtconfig.sign(payload1);
+                      var lan1 = getMsgLang(user_data._id);
+
+                      lan1.then((result) => {
+                        let link = "https://aidoc.io/change-password";
+                        var sendData =
+                          "<div>Please reset Your Password immediately.</br>" +
+                          "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
+                          '<a href="' +
+                          link +
+                          "?token=" +
+                          token1 +
+                          '">LINK TO RESET PASSWORD </a><br/>' +
+                          "You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br></br>" +
+                          "Your Aimedis team";
+
+                        generateTemplate(
+                          EMAIL.generalEmail.createTemplate(result, {
+                            title: "",
+                            content: sendData,
+                          }),
+                          (error, html) => {
+                            if (!error) {
+                              let mailOptions = {
+                                from: "contact@aimedis.com",
+                                to: req.body.email,
+                                subject: "Reset Your Password immediately!!",
+                                html: html,
+                              };
+                              let sendmail = transporter.sendMail(mailOptions);
+                              if (sendmail) {
+                                console.log("Mail is sent ");
+                              }
+                            }
+                          }
+                        );
+                        // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                        // trans(sendData, { source: "en", target: result }).then((res) => {
+                        //     var mailOptions = {
+                        //         from: "contact@aimedis.com",
+                        //         to: user_data.email,
+                        //         subject: 'Reset Your Password immediately!!',
+                        //     html: res.replace(/ @ /g, '@')
+                        //     };
+                        //     var sendmail = transporter.sendMail(mailOptions)
+
+                        // });
+                      });
+
+                      // var mailOptions1 = {
+                      //     from: "contact@aimedis.com",
+                      //     to: user_data.email,
+                      //     subject: 'Reset Your Password immediately!!',
+                      //     html: '<div>Please reset Your Password immediately.</br>'
+                      //         + 'It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>'+
+                      //         '<a href="' + link + '?token=' + token1 + '">LINK TO RESET PASSWORD </a><br/>' +
+                      //         'You can contact us via contact@aimedis.com or WhatApp if you have difficulties contacting your doctor.<br/></br>' +
+                      //         '<b>Your Aimedis team </b>'
+                      // };
+                      // var sendmail = transporter.sendMail(mailOptions1)
+                      User.findOneAndUpdate(
+                        { _id: user_data._id },
+                        { $set: { logWrongPass: count, isblock: true } },
+                        { new: true },
+                        (err, doc1) => { }
+                      );
+                    } else {
+                      User.findOneAndUpdate(
+                        { _id: user_data._id },
+                        { $set: { logWrongPass: count } },
+                        { new: true },
+                        (err, doc1) => { }
+                      );
+                    }
+
+                    res.json({
+                      status: 450,
+                      message: "Wrong password",
+                      hassuccessed: false,
+                    });
+                  } else {
+                    res.json({
+                      status: 450,
+                      message: "User does not exist",
+                      hassuccessed: false,
+                    });
+                  }
                 }
-              }
+              });
+            }
+          } else {
+            res.json({
+              status: 450,
+              message: "User does not exist",
+              hassuccessed: false,
             });
           }
-        } else {
-          res.json({
-            status: 450,
-            message: "User does not exist",
-            hassuccessed: false,
-          });
-        }
-      });
+        });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
   }
 });
 
 router.post("/UserLoginAdmin", function (req, res, next) {
-  if (req.body.email == "" || req.body.password == "") {
-    res.json({
-      status: 450,
-      message: "Email and password fields should not be empty",
-      hassuccessed: false,
-    });
-  } else {
-    const email = req.body.email;
-    const messageToSearchWith = new User({ email });
-    messageToSearchWith.encryptFieldsSync();
-    const messageToSearchWith1 = new User({
-      email: req.body.email.toLowerCase(),
-    });
-    messageToSearchWith1.encryptFieldsSync();
-    const messageToSearchWith2 = new User({
-      email: req.body.email.toUpperCase(),
-    });
-    messageToSearchWith2.encryptFieldsSync();
-    User.findOne({
-      $or: [
-        { email: { $regex: req.body.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith1.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith2.email, $options: "i" } },
-      ],
-    })
-      .exec()
-      .then((user_data) => {
-        if (user_data) {
-          if (user_data.isblock === true) {
-            res.json({
-              status: 450,
-              hassuccessed: false,
-              message: "User is blocked",
-            });
-          } else {
-            let promise = new Promise(function (resolve, reject) {
-              if (
-                req.body.logintoken != "" &&
-                req.body.logintoken != undefined
-              ) {
-                if (req.body.logintoken == user_data.usertoken) {
-                  User.findOneAndUpdate(
-                    { _id: user_data._id },
-                    { $set: { verified: "true" } },
-                    { new: true },
-                    (err, doc1) => {
-                      if (err && !doc1) {
-                        res.json({
-                          status: 450,
-                          hassuccessed: false,
-                          message: "Verification Failed",
-                          error: err,
-                        });
-                      } else {
-                        user_data = doc1;
-                      }
-                    }
-                  );
-                } else {
-                  res.json({
-                    status: 450,
-                    hassuccessed: false,
-                    message: "Verification Failed",
-                  });
-                }
-              }
-              setTimeout(() => resolve(), 500);
-            });
-            promise.then(() => {
-              var decodes = base64.decode(user_data.password);
-              if (
-                decodes === req.body.password ||
-                decrypt(parseReturn(decodes)) === req.body.password
-              ) {
-                if (user_data.verified === "true") {
-                  if (!user_data.is2fa || user_data.is2fa === false) {
-                    let payload = {
-                      email: user_data.email,
-                      name: user_data.first_name + " " + user_data.last_name,
-                      id: user_data._id,
-                      type: user_data.type,
-                    };
-                    var token = jwtconfig.sign(payload);
-                    if (user_data.type === "superadmin") {
-                      User.findOneAndUpdate(
-                        { _id: user_data._id },
-                        { $set: { logWrongPass: 0 } },
-                        { new: true },
-                        (err, doc1) => { }
-                      );
-                      res.json({
-                        status: 200,
-                        message: "Succefully fetched",
-                        hassuccessed: true,
-                        user: user_data,
-                        token: token,
-                      });
-                    } else {
-                      res.json({
-                        status: 450,
-                        message: "User does not exist",
-                        hassuccessed: false,
-                      });
-                    }
-                  } else {
-                    if (user_data.authyId) {
-                      authy.requestSms(
-                        { authyId: user_data.authyId },
-                        { force: true },
-                        function (err, smsRes) {
-                          if (err) {
-                            res.json({
-                              status: 450,
-                              hassuccessed: false,
-                              message: "request not send",
-                              error: err,
-                            });
-                          }
+  try {
+    if (req.body.email == "" || req.body.password == "") {
+      res.json({
+        status: 450,
+        message: "Email and password fields should not be empty",
+        hassuccessed: false,
+      });
+    } else {
+      const email = req.body.email;
+      const messageToSearchWith = new User({ email });
+      messageToSearchWith.encryptFieldsSync();
+      const messageToSearchWith1 = new User({
+        email: req.body.email.toLowerCase(),
+      });
+      messageToSearchWith1.encryptFieldsSync();
+      const messageToSearchWith2 = new User({
+        email: req.body.email.toUpperCase(),
+      });
+      messageToSearchWith2.encryptFieldsSync();
+      User.findOne({
+        $or: [
+          { email: { $regex: req.body.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith1.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith2.email, $options: "i" } },
+        ],
+      })
+        .exec()
+        .then((user_data) => {
+          if (user_data) {
+            if (user_data.isblock === true) {
+              res.json({
+                status: 450,
+                hassuccessed: false,
+                message: "User is blocked",
+              });
+            } else {
+              let promise = new Promise(function (resolve, reject) {
+                if (
+                  req.body.logintoken != "" &&
+                  req.body.logintoken != undefined
+                ) {
+                  if (req.body.logintoken == user_data.usertoken) {
+                    User.findOneAndUpdate(
+                      { _id: user_data._id },
+                      { $set: { verified: "true" } },
+                      { new: true },
+                      (err, doc1) => {
+                        if (err && !doc1) {
+                          res.json({
+                            status: 450,
+                            hassuccessed: false,
+                            message: "Verification Failed",
+                            error: err,
+                          });
+                        } else {
+                          user_data = doc1;
                         }
-                      );
-
+                      }
+                    );
+                  } else {
+                    res.json({
+                      status: 450,
+                      hassuccessed: false,
+                      message: "Verification Failed",
+                    });
+                  }
+                }
+                setTimeout(() => resolve(), 500);
+              });
+              promise.then(() => {
+                var decodes = base64.decode(user_data.password);
+                if (
+                  decodes === req.body.password ||
+                  decrypt(parseReturn(decodes)) === req.body.password
+                ) {
+                  if (user_data.verified === "true") {
+                    if (!user_data.is2fa || user_data.is2fa === false) {
                       let payload = {
                         email: user_data.email,
                         name: user_data.first_name + " " + user_data.last_name,
@@ -614,7 +602,6 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                         type: user_data.type,
                       };
                       var token = jwtconfig.sign(payload);
-
                       if (user_data.type === "superadmin") {
                         User.findOneAndUpdate(
                           { _id: user_data._id },
@@ -637,114 +624,167 @@ router.post("/UserLoginAdmin", function (req, res, next) {
                         });
                       }
                     } else {
-                      res.json({
-                        status: 450,
-                        message:
-                          "Can not get Mobile number for the notification",
-                        hassuccessed: false,
-                      });
-                    }
-                  }
-                } else {
-                  res.json({
-                    status: 450,
-                    message:
-                      "Your Account is not verified, please check your email account.",
-                    hassuccessed: false,
-                  });
-                }
-              } else {
-                if (user_data.type === "superadmin") {
-                  var count =
-                    user_data.logWrongPass && user_data.logWrongPass < 5
-                      ? user_data.logWrongPass + 1
-                      : 1;
-                  if (count == 5) {
-                    let payload1 = {
-                      email: user_data.email,
-                      id: user_data._id,
-                      type: user_data.type,
-                    };
-                    token1 = jwtconfig.sign(payload1);
-                    var lan1 = getMsgLang(user_data._id);
-
-                    lan1.then((result) => {
-                      let link = "https://aidoc.io/admin/change-password";
-                      var sendData =
-                        "<div>Admin Aimedis Please reset Your Password immediately.</br>" +
-                        "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
-                        '<a href="' +
-                        link +
-                        "?token=" +
-                        token1 +
-                        '">LINK TO RESET PASSWORD </a><br/>';
-
-                      generateTemplate(
-                        EMAIL.generalEmail.createTemplate(result, {
-                          title: "",
-                          content: sendData,
-                        }),
-                        (error, html) => {
-                          if (!error) {
-                            let mailOptions = {
-                              from: "contact@aimedis.com",
-                              to: req.body.email,
-                              subject: "Reset Your Password immediately!!",
-                              html: html,
-                            };
-                            let sendmail = transporter.sendMail(mailOptions);
-                            if (sendmail) {
-                              console.log("Mail is sent ");
+                      if (user_data.authyId) {
+                        authy.requestSms(
+                          { authyId: user_data.authyId },
+                          { force: true },
+                          function (err, smsRes) {
+                            if (err) {
+                              res.json({
+                                status: 450,
+                                hassuccessed: false,
+                                message: "request not send",
+                                error: err,
+                              });
                             }
                           }
+                        );
+
+                        let payload = {
+                          email: user_data.email,
+                          name: user_data.first_name + " " + user_data.last_name,
+                          id: user_data._id,
+                          type: user_data.type,
+                        };
+                        var token = jwtconfig.sign(payload);
+
+                        if (user_data.type === "superadmin") {
+                          User.findOneAndUpdate(
+                            { _id: user_data._id },
+                            { $set: { logWrongPass: 0 } },
+                            { new: true },
+                            (err, doc1) => { }
+                          );
+                          res.json({
+                            status: 200,
+                            message: "Succefully fetched",
+                            hassuccessed: true,
+                            user: user_data,
+                            token: token,
+                          });
+                        } else {
+                          res.json({
+                            status: 450,
+                            message: "User does not exist",
+                            hassuccessed: false,
+                          });
                         }
-                      );
-
-                      // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-                      // trans(sendData, { source: "en", target: result }).then((res) => {
-
-                      //     var mailOptions1 = {
-                      //         from: "contact@aimedis.com",
-                      //         to: "aakash.webnexus@gmail.com",
-                      //         subject: 'Admin - Reset Your Password immediately!!',
-                      //     html: res.replace(/ @ /g, '@')
-                      //     };
-                      //     var sendmail = transporter.sendMail(mailOptions1)
-
-                      // });
+                      } else {
+                        res.json({
+                          status: 450,
+                          message:
+                            "Can not get Mobile number for the notification",
+                          hassuccessed: false,
+                        });
+                      }
+                    }
+                  } else {
+                    res.json({
+                      status: 450,
+                      message:
+                        "Your Account is not verified, please check your email account.",
+                      hassuccessed: false,
                     });
-                    // var sendmail = transporter.sendMail(mailOptions1)
                   }
-                  User.findOneAndUpdate(
-                    { _id: user_data._id },
-                    { $set: { logWrongPass: count } },
-                    { new: true },
-                    (err, doc1) => { }
-                  );
-                  res.json({
-                    status: 450,
-                    message: "Wrong password",
-                    hassuccessed: false,
-                  });
                 } else {
-                  res.json({
-                    status: 450,
-                    message: "User does not exist",
-                    hassuccessed: false,
-                  });
+                  if (user_data.type === "superadmin") {
+                    var count =
+                      user_data.logWrongPass && user_data.logWrongPass < 5
+                        ? user_data.logWrongPass + 1
+                        : 1;
+                    if (count == 5) {
+                      let payload1 = {
+                        email: user_data.email,
+                        id: user_data._id,
+                        type: user_data.type,
+                      };
+                      token1 = jwtconfig.sign(payload1);
+                      var lan1 = getMsgLang(user_data._id);
+
+                      lan1.then((result) => {
+                        let link = "https://aidoc.io/admin/change-password";
+                        var sendData =
+                          "<div>Admin Aimedis Please reset Your Password immediately.</br>" +
+                          "It is for security purpose, there are many login attempt from your email with wrong Password, We suggest go to link and reset the password.<br/>" +
+                          '<a href="' +
+                          link +
+                          "?token=" +
+                          token1 +
+                          '">LINK TO RESET PASSWORD </a><br/>';
+
+                        generateTemplate(
+                          EMAIL.generalEmail.createTemplate(result, {
+                            title: "",
+                            content: sendData,
+                          }),
+                          (error, html) => {
+                            if (!error) {
+                              let mailOptions = {
+                                from: "contact@aimedis.com",
+                                to: req.body.email,
+                                subject: "Reset Your Password immediately!!",
+                                html: html,
+                              };
+                              let sendmail = transporter.sendMail(mailOptions);
+                              if (sendmail) {
+                                console.log("Mail is sent ");
+                              }
+                            }
+                          }
+                        );
+
+                        // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                        // trans(sendData, { source: "en", target: result }).then((res) => {
+
+                        //     var mailOptions1 = {
+                        //         from: "contact@aimedis.com",
+                        //         to: "aakash.webnexus@gmail.com",
+                        //         subject: 'Admin - Reset Your Password immediately!!',
+                        //     html: res.replace(/ @ /g, '@')
+                        //     };
+                        //     var sendmail = transporter.sendMail(mailOptions1)
+
+                        // });
+                      });
+                      // var sendmail = transporter.sendMail(mailOptions1)
+                    }
+                    User.findOneAndUpdate(
+                      { _id: user_data._id },
+                      { $set: { logWrongPass: count } },
+                      { new: true },
+                      (err, doc1) => { }
+                    );
+                    res.json({
+                      status: 450,
+                      message: "Wrong password",
+                      hassuccessed: false,
+                    });
+                  } else {
+                    res.json({
+                      status: 450,
+                      message: "User does not exist",
+                      hassuccessed: false,
+                    });
+                  }
                 }
-              }
+              });
+            }
+          } else {
+            res.json({
+              status: 450,
+              message: "User does not exist",
+              hassuccessed: false,
             });
           }
-        } else {
-          res.json({
-            status: 450,
-            message: "User does not exist",
-            hassuccessed: false,
-          });
-        }
-      });
+        });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
   }
 });
 
@@ -772,70 +812,78 @@ router.post("/verifyLogin", function (req, res, next) {
 });
 // for NFT User Check
 router.post("/UserntfCheck", function (req, res, next) {
-  if (
-    !req.body.email ||
-    !req.body.password ||
-    req.body.email == "" ||
-    req.body.password == ""
-  ) {
-    res.json({
-      status: 200,
-      message: "Email and password fields should not be empty",
-      hassuccessed: false,
-    });
-  } else {
-    const email = req.body.email;
-    const messageToSearchWith = new User({ email });
-    messageToSearchWith.encryptFieldsSync();
-    const messageToSearchWith1 = new User({
-      email: req.body.email.toLowerCase(),
-    });
-    messageToSearchWith1.encryptFieldsSync();
-    const messageToSearchWith2 = new User({
-      email: req.body.email.toUpperCase(),
-    });
-    messageToSearchWith2.encryptFieldsSync();
-    User.findOne({
-      $or: [
-        { email: { $regex: req.body.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith1.email, $options: "i" } },
-        { email: { $regex: messageToSearchWith2.email, $options: "i" } },
-      ],
-    })
-      .exec()
-      .then((user_data) => {
-        if (user_data) {
-          if (user_data.isblock === true || user_data.verified === "false") {
-            res.json({
-              status: 200,
-              message: "User is blocked or not verified yet",
-              hassuccessed: false,
-              approveMinting: false,
-            });
-          } else if (user_data.type !== "patient") {
-            res.json({
-              status: 200,
-              message: "User is authenticated",
-              hassuccessed: true,
-              approveMinting: true,
-            });
+  try {
+    if (
+      !req.body.email ||
+      !req.body.password ||
+      req.body.email == "" ||
+      req.body.password == ""
+    ) {
+      res.json({
+        status: 200,
+        message: "Email and password fields should not be empty",
+        hassuccessed: false,
+      });
+    } else {
+      const email = req.body.email;
+      const messageToSearchWith = new User({ email });
+      messageToSearchWith.encryptFieldsSync();
+      const messageToSearchWith1 = new User({
+        email: req.body.email.toLowerCase(),
+      });
+      messageToSearchWith1.encryptFieldsSync();
+      const messageToSearchWith2 = new User({
+        email: req.body.email.toUpperCase(),
+      });
+      messageToSearchWith2.encryptFieldsSync();
+      User.findOne({
+        $or: [
+          { email: { $regex: req.body.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith1.email, $options: "i" } },
+          { email: { $regex: messageToSearchWith2.email, $options: "i" } },
+        ],
+      })
+        .exec()
+        .then((user_data) => {
+          if (user_data) {
+            if (user_data.isblock === true || user_data.verified === "false") {
+              res.json({
+                status: 200,
+                message: "User is blocked or not verified yet",
+                hassuccessed: false,
+                approveMinting: false,
+              });
+            } else if (user_data.type !== "patient") {
+              res.json({
+                status: 200,
+                message: "User is authenticated",
+                hassuccessed: true,
+                approveMinting: true,
+              });
+            } else {
+              res.json({
+                status: 200,
+                message: "User is authenticated",
+                hassuccessed: true,
+                approveMinting: false,
+              });
+            }
           } else {
             res.json({
               status: 200,
-              message: "User is authenticated",
-              hassuccessed: true,
-              approveMinting: false,
+              message: "User does not exist",
+              hassuccessed: false,
             });
           }
-        } else {
-          res.json({
-            status: 200,
-            message: "User does not exist",
-            hassuccessed: false,
-          });
-        }
-      });
+        });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
   }
 });
 /*-----------------------F-O-R---A-D-D-I-N-G---U-S-E-R-Ss-------------------------*/
@@ -1576,76 +1624,92 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
 });
 
 router.put("/Bookservice", (req, res) => {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  var paymentData = {
-    created: moment(new Date()).format("MM/DD/YYYY"),
-    description: req.body.description,
-    payment_info: JSON.stringify(req.body.payment_info),
-    subscription_info: req.body.subscription_info,
-  };
-  User.updateOne(
-    { _id: legit.id },
-    { $push: { paid_services: paymentData } },
-    { safe: true, upsert: true },
-    function (err, doc) {
-      if (err && !doc) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "something went wrong",
-          error: err,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "booked successfully",
-          data: doc,
-        });
-      }
-    }
-  );
-});
-
-router.delete("/Bookservice/:description", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
+  try {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    var paymentData = {
+      created: moment(new Date()).format("MM/DD/YYYY"),
+      description: req.body.description,
+      payment_info: JSON.stringify(req.body.payment_info),
+      subscription_info: req.body.subscription_info,
+    };
     User.updateOne(
       { _id: legit.id },
-      { $pull: { paid_services: { description: req.params.description } } },
-      { multi: true },
+      { $push: { paid_services: paymentData } },
+      { safe: true, upsert: true },
       function (err, doc) {
         if (err && !doc) {
           res.json({
             status: 200,
             hassuccessed: false,
-            msg: "Something went wrong",
+            message: "something went wrong",
             error: err,
           });
         } else {
-          if (doc.nModified == "0") {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Services not deactivate",
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "services is deactivated",
-            });
-          }
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "booked successfully",
+            data: doc,
+          });
         }
       }
     );
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Authentication required.",
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.delete("/Bookservice/:description", function (req, res, next) {
+  try {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+      User.updateOne(
+        { _id: legit.id },
+        { $pull: { paid_services: { description: req.params.description } } },
+        { multi: true },
+        function (err, doc) {
+          if (err && !doc) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+              error: err,
+            });
+          } else {
+            if (doc.nModified == "0") {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                msg: "Services not deactivate",
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "services is deactivated",
+              });
+            }
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1687,34 +1751,42 @@ function emptyBucket(bucketName, foldername) {
 router.delete("/Users/:User_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findByIdAndRemove(req.params.User_id, function (err, data) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        if (req.query.bucket) {
-          var buck = req.query.bucket;
+  try {
+    if (legit) {
+      User.findByIdAndRemove(req.params.User_id, function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
         } else {
-          var buck = "aimedisfirstbucket";
+          if (req.query.bucket) {
+            var buck = req.query.bucket;
+          } else {
+            var buck = "aimedisfirstbucket";
+          }
+          emptyBucket(buck, data.profile_id);
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "User is Deleted Successfully",
+          });
         }
-        emptyBucket(buck, data.profile_id);
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "User is Deleted Successfully",
-        });
-      }
-    });
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1724,38 +1796,46 @@ router.delete("/Users/:User_id", function (req, res, next) {
 router.get("/existorblock/:User_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: req.params.User_id })
-      .select("-password")
-      .exec(function (err, Userinfo) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          if (Userinfo) {
-            if (Userinfo.isblock) {
-              res.json({ status: 200, hassuccessed: false });
-            } else {
-              res.json({ status: 200, hassuccessed: true });
-            }
-          } else {
+  try {
+    if (legit) {
+      User.findOne({ _id: req.params.User_id })
+        .select("-password")
+        .exec(function (err, Userinfo) {
+          if (err) {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "User not found",
+              message: "Something went wrong.",
+              error: err,
             });
+          } else {
+            if (Userinfo) {
+              if (Userinfo.isblock) {
+                res.json({ status: 200, hassuccessed: false });
+              } else {
+                res.json({ status: 200, hassuccessed: true });
+              }
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "User not found",
+              });
+            }
           }
-        }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
       });
-  } else {
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1763,64 +1843,72 @@ router.get("/existorblock/:User_id", function (req, res, next) {
 router.get("/Users/:User_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: req.params.User_id })
-      .select("-password -track_record")
-      .exec(function (err, Userinfo) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          if (Userinfo) {
-            if (
-              Userinfo.organ_donor &&
-              Userinfo.organ_donor.length > 0 &&
-              Userinfo.organ_donor[0].OptionData &&
-              Userinfo.organ_donor[0]._enc_OptionData === true
-            ) {
-              if (
-                Userinfo.organ_donor[0].OptionData &&
-                Userinfo.organ_donor[0].OptionData.iv
-              ) {
-                if (
-                  decrypt(Userinfo.organ_donor[0].OptionData).indexOf("{") !==
-                  -1
-                ) {
-                  Userinfo.organ_donor[0].OptionData = JSON.parse(
-                    decrypt(Userinfo.organ_donor[0].OptionData)
-                  );
-                } else {
-                  Userinfo.organ_donor[0].OptionData = decrypt(
-                    Userinfo.organ_donor[0].OptionData
-                  );
-                }
-              } else {
-                Userinfo.organ_donor[0].OptionData =
-                  Userinfo.organ_donor[0].OptionData;
-              }
-            }
-            res.json({ status: 200, hassuccessed: true, data: Userinfo });
-          } else {
+  try {
+    if (legit) {
+      User.findOne({ _id: req.params.User_id })
+        .select("-password -track_record")
+        .exec(function (err, Userinfo) {
+          if (err) {
             res.json({
               status: 200,
               hassuccessed: false,
-              message: "User not found",
+              message: "Something went wrong.",
+              error: err,
             });
+          } else {
+            if (Userinfo) {
+              if (
+                Userinfo.organ_donor &&
+                Userinfo.organ_donor.length > 0 &&
+                Userinfo.organ_donor[0].OptionData &&
+                Userinfo.organ_donor[0]._enc_OptionData === true
+              ) {
+                if (
+                  Userinfo.organ_donor[0].OptionData &&
+                  Userinfo.organ_donor[0].OptionData.iv
+                ) {
+                  if (
+                    decrypt(Userinfo.organ_donor[0].OptionData).indexOf("{") !==
+                    -1
+                  ) {
+                    Userinfo.organ_donor[0].OptionData = JSON.parse(
+                      decrypt(Userinfo.organ_donor[0].OptionData)
+                    );
+                  } else {
+                    Userinfo.organ_donor[0].OptionData = decrypt(
+                      Userinfo.organ_donor[0].OptionData
+                    );
+                  }
+                } else {
+                  Userinfo.organ_donor[0].OptionData =
+                    Userinfo.organ_donor[0].OptionData;
+                }
+              }
+              res.json({ status: 200, hassuccessed: true, data: Userinfo });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "User not found",
+              });
+            }
           }
-        }
-      });
-    // User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
+        });
+      // User.findOne({ _id: req.params.User_id }, function (err, Userinfo) {
 
-    // });
-  } else {
+      // });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1884,46 +1972,54 @@ router.get("/Users/:User_id", function (req, res, next) {
 router.put("/Users/changePass", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: legit.id }, function (err, changeStatus) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        if (req.body.password) {
-          var enpassword = base64.encode(
-            JSON.stringify(encrypt(req.body.password))
-          );
-          req.body.password = enpassword;
-        }
-
-        User.findByIdAndUpdate(
-          { _id: changeStatus._id },
-          req.body,
-          function (err, doc) {
-            if (err && !doc) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "update data failed",
-                error: err,
-              });
-            } else {
-              res.json({ status: 200, hassuccessed: true, message: "Updated" });
-            }
+  try {
+    if (legit) {
+      User.findOne({ _id: legit.id }, function (err, changeStatus) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          if (req.body.password) {
+            var enpassword = base64.encode(
+              JSON.stringify(encrypt(req.body.password))
+            );
+            req.body.password = enpassword;
           }
-        );
-      }
-    });
-  } else {
+
+          User.findByIdAndUpdate(
+            { _id: changeStatus._id },
+            req.body,
+            function (err, doc) {
+              if (err && !doc) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "update data failed",
+                  error: err,
+                });
+              } else {
+                res.json({ status: 200, hassuccessed: true, message: "Updated" });
+              }
+            }
+          );
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1939,28 +2035,37 @@ const parseReturn = (code) => {
 router.post("/Users/checkPass", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: legit.id }, function (err, changeStatus) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      } else {
-        if (changeStatus) {
-          var decodes = base64.decode(changeStatus.password);
-          if (
-            decodes === req.body.password ||
-            decrypt(parseReturn(decodes)) === req.body.password
-          ) {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Password matched",
-              data: true,
-            });
+  try {
+    if (legit) {
+      User.findOne({ _id: legit.id }, function (err, changeStatus) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          if (changeStatus) {
+            var decodes = base64.decode(changeStatus.password);
+            if (
+              decodes === req.body.password ||
+              decrypt(parseReturn(decodes)) === req.body.password
+            ) {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Password matched",
+                data: true,
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Password not matched",
+                data: false,
+              });
+            }
           } else {
             res.json({
               status: 200,
@@ -1969,21 +2074,20 @@ router.post("/Users/checkPass", function (req, res, next) {
               data: false,
             });
           }
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Password not matched",
-            data: false,
-          });
         }
-      }
-    });
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1993,287 +2097,303 @@ router.post("/Users/checkPass", function (req, res, next) {
 router.put("/Users/update", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: legit.id }, function (err, changeStatus) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      }
-      if (changeStatus) {
-        // if (req.body.password) {
-        //     var enpassword = base64.encode(req.body.password);
-        //     req.body.password = enpassword;
-        // }
-        var patient = {}
+  try {
+    if (legit) {
+      User.findOne({ _id: legit.id }, function (err, changeStatus) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        }
+        if (changeStatus) {
+          // if (req.body.password) {
+          //     var enpassword = base64.encode(req.body.password);
+          //     req.body.password = enpassword;
+          // }
+          var patient = {}
 
-        if (req.body.first_name && req.body.first_name !== changeStatus.first_name) {
-          patient['patient.first_name'] = req.body.first_name
-          patient['patient.__enc_first_name'] = false
-        }
-        if (req.body.last_name && req.body.last_name !== changeStatus.last_name) {
-          patient['patient.last_name'] = req.body.last_name
-          patient['patient.__enc_last_name'] = false
-        }
-        if (req.body.image && req.body.image !== changeStatus.image) {
-          patient['patient.image'] = req.body.image
-          patient['patient.__enc_image'] = false
-        }
-        if (req.body.alies_id && req.body.alies_id !== changeStatus.alies_id) {
-          patient['patient.alies_id'] = req.body.alies_id
-          patient['patient.__enc_alies_id'] = false
-        }
-        
-
-        if (req.body.mobile) {
-          var country_code = "";
-          var mob = req.body.mobile && req.body.mobile.split("-");
-          var mob1 = mob.pop();
-          if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
-            country_code = mob[0];
-            if (country_code && country_code === "") {
-              let tt = changeStatus.mobile.split("-");
-              if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
-                country_code === tt[0];
-              }
-            }
+          if (req.body.first_name && req.body.first_name !== changeStatus.first_name) {
+            patient['patient.first_name'] = req.body.first_name
+            patient['patient.__enc_first_name'] = false
           }
-          authy
-            .registerUser({
-              countryCode: country_code,
-              email: changeStatus.email,
-              phone: mob1,
-            })
-            .catch((err) =>
-              res.json({
-                status: 200,
-                message: "Phone is not verified",
-                error: err,
-                hassuccessed: false,
-              })
-            )
-            .then((regRes) => {
-              if (regRes && regRes.success) {
-                var authyId = { authyId: regRes.user.id };
-                datas = { ...authyId, ...req.body };
-                User.findByIdAndUpdate(
-                  { _id: changeStatus._id },
-                  datas,
-                  function (err, doc) {
-                    if (err && !doc) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "update data failed",
-                        error: err,
-                      });
-                    } else {
-                      if (typeof patient == 'object' && Object.keys(patient).length > 0) {
-                        AllUpdate(legit.id,patient)
-                      }
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        message: "updated",
+          if (req.body.last_name && req.body.last_name !== changeStatus.last_name) {
+            patient['patient.last_name'] = req.body.last_name
+            patient['patient.__enc_last_name'] = false
+          }
+          if (req.body.image && req.body.image !== changeStatus.image) {
+            patient['patient.image'] = req.body.image
+            patient['patient.__enc_image'] = false
+          }
+          if (req.body.alies_id && req.body.alies_id !== changeStatus.alies_id) {
+            patient['patient.alies_id'] = req.body.alies_id
+            patient['patient.__enc_alies_id'] = false
+          }
 
-                      });
-                    }
-                  }
-                );
-              }
-            });
-        } else {
-          User.findByIdAndUpdate(
-            { _id: changeStatus._id },
-            req.body,
-            function (err, doc) {
-              if (err && !doc) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "update data failed",
-                  error: err,
-                });
-              } else {
-                console.log("test", Object.keys(patient).length)
-                if (typeof patient == 'object' && Object.keys(patient).length > 0) {
-                  AllUpdate(legit.id,patient)
+
+          if (req.body.mobile) {
+            var country_code = "";
+            var mob = req.body.mobile && req.body.mobile.split("-");
+            var mob1 = mob.pop();
+            if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
+              country_code = mob[0];
+              if (country_code && country_code === "") {
+                let tt = changeStatus.mobile.split("-");
+                if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
+                  country_code === tt[0];
                 }
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "updated",
-                });
               }
             }
-          );
+            authy
+              .registerUser({
+                countryCode: country_code,
+                email: changeStatus.email,
+                phone: mob1,
+              })
+              .catch((err) =>
+                res.json({
+                  status: 200,
+                  message: "Phone is not verified",
+                  error: err,
+                  hassuccessed: false,
+                })
+              )
+              .then((regRes) => {
+                if (regRes && regRes.success) {
+                  var authyId = { authyId: regRes.user.id };
+                  datas = { ...authyId, ...req.body };
+                  User.findByIdAndUpdate(
+                    { _id: changeStatus._id },
+                    datas,
+                    function (err, doc) {
+                      if (err && !doc) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "update data failed",
+                          error: err,
+                        });
+                      } else {
+                        if (typeof patient == 'object' && Object.keys(patient).length > 0) {
+                          AllUpdate(legit.id, patient)
+                        }
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "updated",
+
+                        });
+                      }
+                    }
+                  );
+                }
+              });
+          } else {
+            User.findByIdAndUpdate(
+              { _id: changeStatus._id },
+              req.body,
+              function (err, doc) {
+                if (err && !doc) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "update data failed",
+                    error: err,
+                  });
+                } else {
+                  console.log("test", Object.keys(patient).length)
+                  if (typeof patient == 'object' && Object.keys(patient).length > 0) {
+                    AllUpdate(legit.id, patient)
+                  }
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "updated",
+                  });
+                }
+              }
+            );
+          }
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "No user Found"
+          });
         }
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "No user Found"
-        });
-      }
-    });
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
 
-function AllUpdate( id,patient) {
+function AllUpdate(id, patient) {
   const patient_id = id
   const messageToSearchWith1 = new virtual_Task({ patient_id });
   messageToSearchWith1.encryptFieldsSync();
-    virtual_Task.updateMany
-      ({
-        $or: [
-          { patient_id: patient_id },
-          { patient_id: messageToSearchWith1.patient_id },
-        ],
-      },
-        { $set: patient }).exec(function (err, doc3) {
-          if (err) {
-            console.log("err", err)
-          } else {
-            console.log("data")
-          }
-        })
-    const messageToSearchWith2 = new virtual_Case({ patient_id });
-    messageToSearchWith2.encryptFieldsSync();
-    virtual_Case.updateMany
-      ({
-        $or: [
-          { patient_id: patient_id },
-          { patient_id: messageToSearchWith2.patient_id },
-        ],
-      },
-        { $set: patient }).exec(function (err, doc3) {
-          if (err) {
-            console.log("err", err)
-          } else {
-            console.log("data")
-          }
-        })
-    const messageToSearchWith3 = new virtual_Case({ patient_id });
-    messageToSearchWith3.encryptFieldsSync();
-    virtual_Invoice.updateMany
-      ({ "patient.patient_id": { $in: [patient_id, messageToSearchWith3.patient_id] } }, { $set: patient }
-      ).exec(function (err, doc3) {
+  virtual_Task.updateMany
+    ({
+      $or: [
+        { patient_id: patient_id },
+        { patient_id: messageToSearchWith1.patient_id },
+      ],
+    },
+      { $set: patient }).exec(function (err, doc3) {
         if (err) {
           console.log("err", err)
         } else {
-          console.log("doc3")
+          console.log("data")
         }
       })
+  const messageToSearchWith2 = new virtual_Case({ patient_id });
+  messageToSearchWith2.encryptFieldsSync();
+  virtual_Case.updateMany
+    ({
+      $or: [
+        { patient_id: patient_id },
+        { patient_id: messageToSearchWith2.patient_id },
+      ],
+    },
+      { $set: patient }).exec(function (err, doc3) {
+        if (err) {
+          console.log("err", err)
+        } else {
+          console.log("data")
+        }
+      })
+  const messageToSearchWith3 = new virtual_Case({ patient_id });
+  messageToSearchWith3.encryptFieldsSync();
+  virtual_Invoice.updateMany
+    ({ "patient.patient_id": { $in: [patient_id, messageToSearchWith3.patient_id] } }, { $set: patient }
+    ).exec(function (err, doc3) {
+      if (err) {
+        console.log("err", err)
+      } else {
+        console.log("doc3")
+      }
+    })
 }
 
 
 router.put("/Users/update/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: req.params.user_id }, function (err, changeStatus) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      }
-      if (changeStatus) {
-        if (req.body.mobile) {
-          var country_code = "";
-          var mob = req.body.mobile && req.body.mobile.split("-");
-          var mob1 = mob.pop();
-          if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
-            country_code = mob[0];
-            if (country_code && country_code === "") {
-              let tt = changeStatus.mobile.split("-");
-              if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
-                country_code === tt[0];
-              }
-            }
-          }
-
-          authy
-            .registerUser({
-              countryCode: country_code,
-              email: changeStatus.email,
-              phone: mob1,
-            })
-            .catch((err) =>
-              res.json({
-                status: 200,
-                message: "Phone is not verified",
-                error: err,
-                hassuccessed: false,
-              })
-            )
-            .then((regRes) => {
-              if (regRes && regRes.success) {
-                var authyId = { authyId: regRes.user.id };
-                datas = { ...authyId, ...req.body };
-                User.findByIdAndUpdate(
-                  { _id: changeStatus._id },
-                  datas,
-                  function (err, doc) {
-                    if (err && !doc) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "update data failed",
-                        error: err,
-                      });
-                    } else {
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        message: "Updated",
-                      });
-                    }
-                  }
-                );
-              }
-            });
-        } else {
-          User.findByIdAndUpdate(
-            { _id: changeStatus._id },
-            req.body,
-            function (err, doc) {
-              if (err && !doc) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "update data failed",
-                  error: err,
-                });
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Updated",
-                });
-              }
-            }
-          );
+  try {
+    if (legit) {
+      User.findOne({ _id: req.params.user_id }, function (err, changeStatus) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
         }
-      }
-    });
-  } else {
+        if (changeStatus) {
+          if (req.body.mobile) {
+            var country_code = "";
+            var mob = req.body.mobile && req.body.mobile.split("-");
+            var mob1 = mob.pop();
+            if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
+              country_code = mob[0];
+              if (country_code && country_code === "") {
+                let tt = changeStatus.mobile.split("-");
+                if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
+                  country_code === tt[0];
+                }
+              }
+            }
+
+            authy
+              .registerUser({
+                countryCode: country_code,
+                email: changeStatus.email,
+                phone: mob1,
+              })
+              .catch((err) =>
+                res.json({
+                  status: 200,
+                  message: "Phone is not verified",
+                  error: err,
+                  hassuccessed: false,
+                })
+              )
+              .then((regRes) => {
+                if (regRes && regRes.success) {
+                  var authyId = { authyId: regRes.user.id };
+                  datas = { ...authyId, ...req.body };
+                  User.findByIdAndUpdate(
+                    { _id: changeStatus._id },
+                    datas,
+                    function (err, doc) {
+                      if (err && !doc) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "update data failed",
+                          error: err,
+                        });
+                      } else {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "Updated",
+                        });
+                      }
+                    }
+                  );
+                }
+              });
+          } else {
+            User.findByIdAndUpdate(
+              { _id: changeStatus._id },
+              req.body,
+              function (err, doc) {
+                if (err && !doc) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "update data failed",
+                    error: err,
+                  });
+                } else {
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "Updated",
+                  });
+                }
+              }
+            );
+          }
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2282,13 +2402,54 @@ router.put("/Users/update/:user_id", function (req, res, next) {
 router.put("/updateSetting", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    // Find the document
-    Settings.updateOne(
-      { user_id: req.body.user_id },
-      req.body,
-      { upsert: true, new: true, setDefaultsOnInsert: true },
-      function (error, result) {
+  try {
+    if (legit) {
+      // Find the document
+      Settings.updateOne(
+        { user_id: req.body.user_id },
+        req.body,
+        { upsert: true, new: true, setDefaultsOnInsert: true },
+        function (error, result) {
+          if (error) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: error,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Setting Updated",
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//For get setting
+router.get("/updateSetting", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      // Find the document
+      Settings.findOne({ user_id: legit.id }, function (error, result) {
         if (error) {
           res.json({
             status: 200,
@@ -2300,48 +2461,23 @@ router.put("/updateSetting", function (req, res, next) {
           res.json({
             status: 200,
             hassuccessed: true,
-            message: "Setting Updated",
+            message: "get Settings",
+            data: result,
           });
         }
-      }
-    );
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-//For get setting
-router.get("/updateSetting", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    // Find the document
-    Settings.findOne({ user_id: legit.id }, function (error, result) {
-      if (error) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: error,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "get Settings",
-          data: result,
-        });
-      }
-    });
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2350,30 +2486,38 @@ router.get("/updateSetting", function (req, res, next) {
 router.get("/updateSetting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    // Find the document
-    Settings.findOne({ user_id: req.params.user_id }, function (error, result) {
-      if (error) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: error,
-        });
-      } else {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          message: "get Settings",
-          data: result,
-        });
-      }
-    });
-  } else {
+  try {
+    if (legit) {
+      // Find the document
+      Settings.findOne({ user_id: req.params.user_id }, function (error, result) {
+        if (error) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: error,
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "get Settings",
+            data: result,
+          });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2382,43 +2526,51 @@ router.get("/updateSetting/:user_id", function (req, res, next) {
 router.get("/checkAlies", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.find(
-      {
-        $or: [
-          { alies_id: req.query.alies_id },
-          { profile_id: req.query.alies_id },
-        ],
-      },
-      function (err, changeStatus) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
+  try {
+    if (legit) {
+      User.find(
+        {
+          $or: [
+            { alies_id: req.query.alies_id },
+            { profile_id: req.query.alies_id },
+          ],
+        },
+        function (err, changeStatus) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          }
+          if (changeStatus && changeStatus.length > 0) {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Already exist",
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No Data exist",
+            });
+          }
         }
-        if (changeStatus && changeStatus.length > 0) {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Already exist",
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "No Data exist",
-          });
-        }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2426,40 +2578,48 @@ router.get("/checkAlies", function (req, res, next) {
 router.put("/Users/updateImage", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    var patient={}
-    if (req.body.image) {
-      patient['patient.image'] = req.body.image
-      patient['patient.__enc_image'] = false
-    }
-    User.findOneAndUpdate(
-      { _id: legit.id },
-      { $set: { image: req.body.image } },
-      { new: true },
-      (err, doc1) => {
-        if (err && !doc1) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "update data failed",
-            error: err,
-          });
-        } else {
-          AllUpdate(legit.id,patient)
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Updated",
-            data: doc1,
-          });
-        }
+  try {
+    if (legit) {
+      var patient = {}
+      if (req.body.image) {
+        patient['patient.image'] = req.body.image
+        patient['patient.__enc_image'] = false
       }
-    );
-  } else {
+      User.findOneAndUpdate(
+        { _id: legit.id },
+        { $set: { image: req.body.image } },
+        { new: true },
+        (err, doc1) => {
+          if (err && !doc1) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "update data failed",
+              error: err,
+            });
+          } else {
+            AllUpdate(legit.id, patient)
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Updated",
+              data: doc1,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2467,54 +2627,78 @@ router.put("/Users/updateImage", function (req, res, next) {
 /*-----------M-E-T-E-D-A-T-A----------*/
 
 router.post("/Metadata", function (req, res, next) {
-  var Metadatas = new Metadata(req.body);
-  Metadatas.save(function (err, user_data) {
-    if (err && !user_data) {
-      res.json({ status: 200, message: "Something went wrong.", error: err });
-    } else {
-      res.json({
-        status: 200,
-        message: "User is added Successfully",
-        hassuccessed: true,
-        data: user_data,
-      });
-    }
-  });
-});
-
-router.put("/Metdata/:Metdata_id", function (req, res, next) {
-  Metadata.findByIdAndUpdate(
-    { _id: req.params.Metadata_id },
-    { $push: { speciality: req.body.speciality } },
-    { safe: true, upsert: true },
-    function (err, updatedata) {
-      if (err && !updatedata) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "something went wrong",
-          error: err,
-        });
+  try {
+    var Metadatas = new Metadata(req.body);
+    Metadatas.save(function (err, user_data) {
+      if (err && !user_data) {
+        res.json({ status: 200, message: "Something went wrong.", error: err });
       } else {
         res.json({
           status: 200,
+          message: "User is added Successfully",
           hassuccessed: true,
-          message: "user updated",
-          data: userdata,
+          data: user_data,
         });
       }
-    }
-  );
+    });
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.put("/Metdata/:Metdata_id", function (req, res, next) {
+  try {
+    Metadata.findByIdAndUpdate(
+      { _id: req.params.Metadata_id },
+      { $push: { speciality: req.body.speciality } },
+      { safe: true, upsert: true },
+      function (err, updatedata) {
+        if (err && !updatedata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: true,
+            message: "user updated",
+            data: userdata,
+          });
+        }
+      }
+    );
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 router.get("/Metadata", function (req, res, next) {
-  Metadata.find(function (err, Metadatas) {
-    if (err) {
-      next(err);
-    } else {
-      res.json(Metadatas);
-    }
-  });
+  try {
+    Metadata.find(function (err, Metadatas) {
+      if (err) {
+        next(err);
+      } else {
+        res.json(Metadatas);
+      }
+    });
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 /*---------R-I-S-K---M-A-N-A-G-E-M-E-N-T----------*/
@@ -2522,459 +2706,20 @@ router.get("/Metadata", function (req, res, next) {
 router.put("/Rigt_management", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: legit.id }, function (err, userdata) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "user not found",
-          error: err,
-        });
-      } else {
-        User.findByIdAndUpdate(
-          { _id: userdata._id },
-          { $set: { Rigt_management: req.body } },
-          function (err, updatedata) {
-            if (err && !updatedata) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "something went wrong",
-                error: err,
-              });
-            } else {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "user updated",
-                data: userdata,
-              });
-            }
-          }
-        );
-      }
-    });
-  }
-});
-/*----------O-R-G-A-N---D-O-N-O-R----------*/
-
-router.put("/organDonor", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: legit.id }, function (err, userdata) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "user not found",
-          error: err,
-        });
-      } else {
-        if (req.body.OptionData) {
-          if (typeof req.body.OptionData === "string") {
-            var optionData = encrypt(req.body.OptionData);
-          } else {
-            var optionData = encrypt(JSON.stringify(req.body.OptionData));
-          }
-
-          req.body.OptionData = optionData;
-          req.body._enc_OptionData = true;
-        }
-
-        User.findByIdAndUpdate(
-          { _id: userdata._id },
-          { $set: { organ_donor: req.body } },
-          function (err, updatedata) {
-            if (err && !updatedata) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "something went wrong",
-                error: err,
-              });
-            } else {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                message: "user updated",
-                data: userdata,
-              });
-            }
-          }
-        );
-      }
-    });
-  }
-});
-
-/*----------O-R-G-A-N---D-O-N-O-R---E-N-D-S----------*/
-
-/*----------P-R-E-S-C-C-R-I-P-T-I-O-N----------*/
-
-router.post("/Prescription", function (req, res, next) {
-  var prescriptions = new Prescription(req.body);
-  prescriptions.save(function (err, data) {
-    if (err && !data) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "something went wrong",
-        error: err,
-      });
-    } else {
-      var lan1 = getMsgLang(req.body.patient_id);
-      var lan2 = getMsgLang(req.body.doctor_id);
-
-      lan1.then((result) => {
-        generateTemplate(
-          EMAIL.patientEmail.prescriptionSystem(result, {
-            patient_name:
-              req.body.patient_info.first_name +
-              " " +
-              req.body.patient_info.last_name,
-            doctor_name:
-              req.body.docProfile.first_name +
-              " " +
-              req.body.docProfile.last_name,
-          }),
-          (error, html) => {
-            if (!error) {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.patient_info.email,
-                subject: getSubject(
-                  result,
-                  SUBJECT_KEY.aimedis_prescription_system
-                ),
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
-                console.log("Mail is sent ");
-              }
-            }
-          }
-        );
-        // var sendData='You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-        //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
-        //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
-        //         'Your Aimedis team';
-
-        // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-        // trans(sendData, { source: "en", target: result }).then((res) => {
-        //     var mailOptions = {
-        //         from: "contact@aimedis.com",
-        //         to: req.body.patient_info.email,
-        //         subject: 'Prescription Request',
-        //         html: res.replace(/ @ /g, '@')
-        //     };
-        //     var sendmail = transporter.sendMail(mailOptions)
-        //   });
-      });
-      lan2.then((result) => {
-        generateTemplate(
-          EMAIL.doctorEmail.prescriptionSystem(result, {
-            doctor_name:
-              req.body.docProfile.first_name +
-              " " +
-              req.body.docProfile.last_name,
-            patient_id: req.body.patient_info.patient_id,
-            patient_name:
-              req.body.patient_info.first_name +
-              " " +
-              req.body.patient_info.last_name,
-            date:
-              getDate(
-                moment(req.body.send_on).format("YYYY/MM/DD"),
-                "YYYY/MM/DD"
-              ) || "",
-            time: getTime(moment(req.body.send_on).format("YYYY/MM/DD"), "24"),
-            patient_email: req.body.patient_info.email,
-            patient_phone: req.body.patient_info.phone,
-          }),
-          (error, html) => {
-            if (!error) {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: getSubject(
-                  result,
-                  SUBJECT_KEY.aimedis_prescription_system
-                ),
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
-                console.log("Mail is sent ");
-              }
-            }
-          }
-        );
-        // var sendData= 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
-        //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
-        //         'Your Aimedis team ';
-        // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-        // trans(sendData, { source: "en", target: result }).then((res) => {
-        //     var mailOptions = {
-        //         from: "contact@aimedis.com",
-        //         to: req.body.docProfile.email,
-        //         subject: 'Prescription Request',
-        //         html: res.replace(/ @ /g, '@')
-        //     };
-        //     var sendmail = transporter.sendMail(mailOptions)
-        //   });
-      });
-      // if (req.body.lan === 'de') {
-      //     var dhtml = 'Sie haben ein Rezept (prescription) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
-      //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
-      //         'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
-      //         '<b>Ihr Aimedis Team </b>'
-
-      // }
-      // else {
-      //     var dhtml = 'You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-      //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
-      //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
-      //         '<b>Your Aimedis team </b>'
-      // }
-      // if (req.body.lan === 'de') {
-      //     var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
-      //         'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
-      //         '<b>Ihr Aimedis Team </b>'
-      // }
-      // else {
-      //     var dhtml2 = 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
-      //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
-      //         '<b>Your Aimedis team </b>'
-      // }
-      // var mailOptions = {
-      //     from: "contact@aimedis.com",
-      //     to: req.body.patient_info.email,
-      //     subject: 'Prescription Request',
-      //     html: dhtml
-      // };
-      // var mailOptions2 = {
-      //     from: "contact@aimedis.com",
-      //     to: req.body.docProfile.email,
-      //     subject: 'Prescription Request',
-      //     html: dhtml2
-      // };
-      // var sendmail = transporter.sendMail(mailOptions)
-      // var sendmail2 = transporter.sendMail(mailOptions2)
-
-      res.json({ status: 200, hassuccessed: true, message: "success" });
-    }
-  });
-});
-
-router.get("/Prescription/:Prescription_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    Prescription.findOne(
-      { _id: req.params.Prescription_id },
-      function (err, data) {
+  try {
+    if (legit) {
+      User.findOne({ _id: legit.id }, function (err, userdata) {
         if (err) {
           res.json({
             status: 200,
             hassuccessed: false,
-            message: "Something went wrong.",
+            message: "user not found",
             error: err,
           });
         } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.delete("/Prescription/:Prescription_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    Prescription.findByIdAndRemove(
-      req.params.Prescription_id,
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Prescription is Deleted Successfully",
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/GetPrescription", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const doctor_id = legit.id;
-    const messageToSearchWith = new Prescription({ doctor_id });
-    messageToSearchWith.encryptFieldsSync();
-    Prescription.find(
-      {
-        $or: [
-          { doctor_id: messageToSearchWith.doctor_id },
-          { doctor_id: legit.id },
-        ],
-        status: { $ne: "remove" },
-      },
-      function (err, Userinfo) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: Userinfo });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.get("/GetPrescription", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const doctor_id = legit.id;
-    const messageToSearchWith = new Prescription({ doctor_id });
-    messageToSearchWith.encryptFieldsSync();
-    Prescription.find(
-      {
-        $or: [
-          { doctor_id: messageToSearchWith.doctor_id },
-          { doctor_id: legit.id },
-        ],
-        status: { $ne: "remove" },
-      },
-      function (err, Userinfo) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: Userinfo });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-//Added by Ankita to get the Second opinion of the doctor
-router.get("/GetSecondOpinion", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const doctor_id = legit.id;
-    const messageToSearchWith = new Second_opinion({ doctor_id });
-    messageToSearchWith.encryptFieldsSync();
-
-    Second_opinion.find(
-      {
-        $or: [
-          { doctor_id: messageToSearchWith.doctor_id },
-          { doctor_id: legit.id },
-        ],
-        status: { $ne: "remove" },
-      },
-      function (err, Userinfo) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: Userinfo });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.put("/GetPrescription/:Prescription_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    Prescription.findOne(
-      { _id: req.params.Prescription_id },
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: " not found",
-            error: err,
-          });
-        } else {
-          var dt = dateTime.create();
-          if (userdata && typeof userdata == "object")
-            userdata = userdata.toObject();
-
-          if (req.body.status === "accept" && userdata.attachfile.length == 0) {
-            req.body.status = "pending";
-          }
-          Prescription.findOneAndUpdate(
+          User.findByIdAndUpdate(
             { _id: userdata._id },
-            {
-              $set: {
-                status: req.body.status,
-                accept_datetime: dt.format("Y-m-d H:M:S"),
-              },
-            },
-            { new: true },
+            { $set: { Rigt_management: req.body } },
             function (err, updatedata) {
               if (err && !updatedata) {
                 res.json({
@@ -2984,540 +2729,299 @@ router.put("/GetPrescription/:Prescription_id", function (req, res, next) {
                   error: err,
                 });
               } else {
-                if (
-                  updatedata.status == "accept" &&
-                  updatedata.attachfile.length > 0
-                ) {
-                  var ids = { track_id: uuidv1() };
-                  var type = { type: req.body.type };
-                  var datetime_on = { datetime_on: updatedata.accept_datetime };
-                  var created_by = { created_by: updatedata.doctor_id };
-                  var created_by_temp = {
-                    created_by_temp: req.body.doctor_name,
-                  };
-                  var created_on = { created_on: dt.format("Y-m-d") };
-                  var event_date = { event_date: dt.format("Y-m-d") };
-                  var created_at = { created_at: dt.format("H:M") };
-                  var attachfile = { attachfile: updatedata.attachfile };
-
-                  if (req.body.send_to_timeline) {
-                    var full_record = {
-                      ...ids,
-                      ...type,
-                      ...created_by,
-                      ...created_on,
-                      ...event_date,
-                      ...created_at,
-                      ...datetime_on,
-                      ...created_by_temp,
-                      ...attachfile,
-                    };
-                    User.updateOne(
-                      { _id: updatedata.patient_id },
-                      { $push: { track_record: full_record } },
-                      { safe: true, upsert: true },
-                      function (err, doc) {
-                        if (err && !doc) {
-                          res.json({
-                            status: 200,
-                            hassuccessed: false,
-                            msg: "Something went wrong",
-                            error: err,
-                          });
-                        } else {
-                          if (doc.nModified == "0") {
-                            res.json({
-                              status: 200,
-                              hassuccessed: false,
-                              msg: "User is not found",
-                            });
-                          } else {
-                            var lan1 = getMsgLang(userdata.patient_id);
-                            lan1.then((result) => {
-                              var sendData =
-                                "Your Prescription Request Accepted.<br/>" +
-                                "And prescription added in to your timeline.<br/><br>";
-
-                              generateTemplate(
-                                EMAIL.generalEmail.createTemplate(result, {
-                                  title: "",
-                                  content: sendData,
-                                }),
-                                (error, html) => {
-                                  if (!error) {
-                                    let mailOptions = {
-                                      from: "contact@aimedis.com",
-                                      to: updatedata.patient_email,
-                                      subject: "Prescription Accepted",
-                                      html: html,
-                                    };
-                                    let sendmail =
-                                      transporter.sendMail(mailOptions);
-                                    if (sendmail) {
-                                      console.log("Mail is sent ");
-                                    }
-                                  }
-                                }
-                              );
-
-                              // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-                              // trans(sendData, { source: "en", target: result }).then((res) => {
-                              //     var mailOptions = {
-                              //     from: "contact@aimedis.com",
-                              //     to: updatedata.patient_email,
-                              //     subject: 'Prescription Accepted',
-                              //    html: res.replace(/ @ /g, '@')
-                              //     };
-                              //     var sendmail = transporter.sendMail(mailOptions)
-                              //   });
-                            });
-                            // var dhtml = 'Your Prescription Request Accepted.<br/>' +
-                            //     'And prescription added in to your timeline.<br/>' +
-                            //     '<b>Your Aimedis team </b>'
-                            // var mailOptions = {
-                            //     from: "contact@aimedis.com",
-                            //     to: updatedata.patient_email,
-                            //     subject: 'Prescription Accepted',
-                            //     html: dhtml
-                            // };
-                            // var sendmail = transporter.sendMail(mailOptions)
-                            if (req.body.sendPharmacy) {
-                              const messageToSearchWith = new User({
-                                profile_id: req.body.sendPharmacy,
-                              });
-                              messageToSearchWith.encryptFieldsSync();
-                              var patient_id2 = {
-                                patient_id: updatedata.patient_profile_id,
-                              };
-                              var full_record1 = {
-                                ...patient_id2,
-                                ...ids,
-                                ...type,
-                                ...created_by,
-                                ...created_on,
-                                ...event_date,
-                                ...created_at,
-                                ...datetime_on,
-                                ...created_by_temp,
-                                ...attachfile,
-                              };
-                              User.updateOne(
-                                {
-                                  $or: [
-                                    { profile_id: req.body.sendPharmacy },
-                                    {
-                                      profile_id:
-                                        messageToSearchWith.profile_id,
-                                    },
-                                  ],
-                                },
-                                { $push: { track_record: full_record1 } },
-                                { safe: true, upsert: true },
-                                function (err, doc) {
-                                  if (err && !doc) {
-                                    res.json({
-                                      status: 200,
-                                      hassuccessed: false,
-                                      msg: "Something went wrong",
-                                      error: err,
-                                    });
-                                  } else {
-                                    if (doc.nModified == "0") {
-                                      res.json({
-                                        status: 200,
-                                        hassuccessed: false,
-                                        msg: "Pharmacy is not found",
-                                      });
-                                    } else {
-                                      res.json({
-                                        status: 200,
-                                        hassuccessed: true,
-                                        msg: "track is updated",
-                                      });
-                                    }
-                                  }
-                                }
-                              );
-                            } else {
-                              res.json({
-                                status: 200,
-                                hassuccessed: true,
-                                msg: "track is updated",
-                              });
-                            }
-                          }
-                        }
-                      }
-                    );
-                  } else {
-                    res.json({
-                      status: 200,
-                      hassuccessed: true,
-                      msg: "track is updated",
-                    });
-                  }
-                } else {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    msg: "File is not attached",
-                  });
-                }
-                // res.json({ status: 200 , hassuccessed: true , message: "user updated" , data: userdata })
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "user updated",
+                  data: userdata,
+                });
               }
             }
           );
         }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-/*----------S-I-C-K---C-E-R-T-I-F-I-C-A-T-E----------*/
-
-router.post("/SickCertificate", function (req, res, next) {
-  var SickCertificate = new Sick_certificate(req.body);
-  SickCertificate.save(function (err, data) {
-    if (err && !data) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "something went wrong",
-        error: err,
       });
-    } else {
-      var lan1 = getMsgLang(req.body.patient_id);
-      var lan2 = getMsgLang(req.body.doctor_id);
-
-      lan1.then((result) => {
-        generateTemplate(
-          EMAIL.patientEmail.sickCeritificateSystem(result, {
-            patient_name:
-              req.body.patient_info.first_name +
-              " " +
-              req.body.patient_info.last_name,
-            doctor_name:
-              req.body.docProfile.first_name +
-              " " +
-              req.body.docProfile.last_name,
-          }),
-          (error, html) => {
-            if (!error) {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.patient_info.email,
-                subject: getSubject(
-                  result,
-                  SUBJECT_KEY.aimedis_sick_cert_system
-                ),
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
-                console.log("Mail is sent ");
-              }
-            }
-          }
-        );
-      });
-      lan2.then((result) => {
-        generateTemplate(
-          EMAIL.doctorEmail.sickCertificateSystem(result, {
-            doctor_name:
-              req.body.docProfile.first_name +
-              " " +
-              req.body.docProfile.last_name,
-            patient_id: req.body.patient_info.patient_id,
-            patient_name:
-              req.body.patient_info.first_name +
-              " " +
-              req.body.patient_info.last_name,
-            date:
-              getDate(
-                moment(req.body.send_on).format("YYYY/MM/DD"),
-                "YYYY/MM/DD"
-              ) || "",
-            time: getTime(moment(req.body.send_on).format("YYYY/MM/DD"), "24"),
-            patient_email: req.body.patient_info.email,
-            patient_phone: req.body.patient_info.phone,
-          }),
-          (error, html) => {
-            if (!error) {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: req.body.docProfile.email,
-                subject: getSubject(
-                  result,
-                  SUBJECT_KEY.aimedis_sick_cert_system
-                ),
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
-                console.log("Mail is sent ");
-              }
-            }
-          }
-        );
-      });
-
-      // lan1.then((result)=>{
-      //     var sendData='You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-      //             req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
-      //             'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
-      //             'Your Aimedis team';
-
-      //     result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-      //     trans(sendData, { source: "en", target: result }).then((res) => {
-      //         var mailOptions = {
-      //             from: "contact@aimedis.com",
-      //             to: req.body.patient_info.email,
-      //             subject: 'Sick Certificate Request',
-      //             html: res.replace(/ @ /g, '@')
-      //         };
-      //         var sendmail = transporter.sendMail(mailOptions)
-      //       });
-      // })
-      // lan2.then((result)=>{
-      //     var sendData= 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
-      //             'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
-      //             'Your Aimedis team';
-      //     result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-
-      //     trans(sendData, { source: "en", target: result }).then((res) => {
-      //         var mailOptions = {
-      //             from: "contact@aimedis.com",
-      //             to: req.body.docProfile.email,
-      //             subject: 'Sick Certificate Request',
-      //             html: res.replace(/ @ /g, '@')
-      //         };
-      //         var sendmail = transporter.sendMail(mailOptions)
-      //       });
-      // })
-      // if (req.body.lan === 'de') {
-      //     var dhtml = 'Sie haben eine AU (sick certificate) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
-      //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
-      //         'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
-      //         '<b>Ihr Aimedis Team </b>'
-
-      // }
-      // else {
-      //     var dhtml = 'You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
-      //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
-      //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
-      //         '<b>Your Aimedis team </b>'
-      // }
-      // if (req.body.lan === 'de') {
-      //     var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
-      //         'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
-      //         '<b>Ihr Aimedis Team </b>'
-      // }
-      // else {
-      //     var dhtml2 = 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
-      //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
-      //         '<b>Your Aimedis team </b>'
-      // }
-      // var mailOptions = {
-      //     from: "contact@aimedis.com",
-      //     to: req.body.patient_info.email,
-      //     subject: 'Sick Certificate Request',
-      //     html: dhtml
-      // };
-      // var mailOptions2 = {
-      //     from: "contact@aimedis.com",
-      //     to: req.body.docProfile.email,
-      //     subject: 'Sick Certificate Request',
-      //     html: dhtml2
-      // };
-      // var sendmail = transporter.sendMail(mailOptions)
-      // var sendmail2 = transporter.sendMail(mailOptions2)
-      res.json({ status: 200, hassuccessed: true, message: "success" });
     }
-  });
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
+/*----------O-R-G-A-N---D-O-N-O-R----------*/
 
-router.get("/SickCertificate/:sick_certificate_id", function (req, res, next) {
+router.put("/organDonor", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    Sick_certificate.findOne(
-      { _id: req.params.sick_certificate_id },
-      function (err, data) {
+  try {
+    if (legit) {
+      User.findOne({ _id: legit.id }, function (err, userdata) {
         if (err) {
           res.json({
             status: 200,
             hassuccessed: false,
-            message: "Something went wrong.",
+            message: "user not found",
             error: err,
           });
         } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
+          if (req.body.OptionData) {
+            if (typeof req.body.OptionData === "string") {
+              var optionData = encrypt(req.body.OptionData);
+            } else {
+              var optionData = encrypt(JSON.stringify(req.body.OptionData));
+            }
+
+            req.body.OptionData = optionData;
+            req.body._enc_OptionData = true;
+          }
+
+          User.findByIdAndUpdate(
+            { _id: userdata._id },
+            { $set: { organ_donor: req.body } },
+            function (err, updatedata) {
+              if (err && !updatedata) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "something went wrong",
+                  error: err,
+                });
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  message: "user updated",
+                  data: userdata,
+                });
+              }
+            }
+          );
         }
-      }
-    );
-  } else {
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
-router.get("/RequestedSickCertificate", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  getResult1 = [];
-  if (legit) {
-    const patient_id = legit.id;
-    const messageToSearchWith = new Sick_certificate({ patient_id });
-    messageToSearchWith.encryptFieldsSync();
-    Sick_certificate.find(
-      {
-        $or: [
-          { patient_id: messageToSearchWith.patient_id },
-          { patient_id: legit.id },
-        ],
-      },
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+/*----------O-R-G-A-N---D-O-N-O-R---E-N-D-S----------*/
 
-router.get("/RequestedAppointment", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  getResult3 = [];
-  if (legit) {
-    Appointment.find({ patient: legit.id }, function (err, data) {
-      if (err) {
+/*----------P-R-E-S-C-C-R-I-P-T-I-O-N----------*/
+
+router.post("/Prescription", function (req, res, next) {
+  try {
+    var prescriptions = new Prescription(req.body);
+    prescriptions.save(function (err, data) {
+      if (err && !data) {
         res.json({
           status: 200,
           hassuccessed: false,
-          message: "Something went wrong.",
+          message: "something went wrong",
           error: err,
         });
       } else {
-        res.json({ status: 200, hassuccessed: true, data: data });
+        var lan1 = getMsgLang(req.body.patient_id);
+        var lan2 = getMsgLang(req.body.doctor_id);
+
+        lan1.then((result) => {
+          generateTemplate(
+            EMAIL.patientEmail.prescriptionSystem(result, {
+              patient_name:
+                req.body.patient_info.first_name +
+                " " +
+                req.body.patient_info.last_name,
+              doctor_name:
+                req.body.docProfile.first_name +
+                " " +
+                req.body.docProfile.last_name,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_info.email,
+                  subject: getSubject(
+                    result,
+                    SUBJECT_KEY.aimedis_prescription_system
+                  ),
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
+                  console.log("Mail is sent ");
+                }
+              }
+            }
+          );
+          // var sendData='You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+          //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+          //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+          //         'Your Aimedis team';
+
+          // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+          // trans(sendData, { source: "en", target: result }).then((res) => {
+          //     var mailOptions = {
+          //         from: "contact@aimedis.com",
+          //         to: req.body.patient_info.email,
+          //         subject: 'Prescription Request',
+          //         html: res.replace(/ @ /g, '@')
+          //     };
+          //     var sendmail = transporter.sendMail(mailOptions)
+          //   });
+        });
+        lan2.then((result) => {
+          generateTemplate(
+            EMAIL.doctorEmail.prescriptionSystem(result, {
+              doctor_name:
+                req.body.docProfile.first_name +
+                " " +
+                req.body.docProfile.last_name,
+              patient_id: req.body.patient_info.patient_id,
+              patient_name:
+                req.body.patient_info.first_name +
+                " " +
+                req.body.patient_info.last_name,
+              date:
+                getDate(
+                  moment(req.body.send_on).format("YYYY/MM/DD"),
+                  "YYYY/MM/DD"
+                ) || "",
+              time: getTime(moment(req.body.send_on).format("YYYY/MM/DD"), "24"),
+              patient_email: req.body.patient_info.email,
+              patient_phone: req.body.patient_info.phone,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.docProfile.email,
+                  subject: getSubject(
+                    result,
+                    SUBJECT_KEY.aimedis_prescription_system
+                  ),
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
+                  console.log("Mail is sent ");
+                }
+              }
+            }
+          );
+          // var sendData= 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+          //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+          //         'Your Aimedis team ';
+          // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+          // trans(sendData, { source: "en", target: result }).then((res) => {
+          //     var mailOptions = {
+          //         from: "contact@aimedis.com",
+          //         to: req.body.docProfile.email,
+          //         subject: 'Prescription Request',
+          //         html: res.replace(/ @ /g, '@')
+          //     };
+          //     var sendmail = transporter.sendMail(mailOptions)
+          //   });
+        });
+        // if (req.body.lan === 'de') {
+        //     var dhtml = 'Sie haben ein Rezept (prescription) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+        //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+        //         'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+        //         '<b>Ihr Aimedis Team </b>'
+
+        // }
+        // else {
+        //     var dhtml = 'You have requested a prescription from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+        //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+        //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+        //         '<b>Your Aimedis team </b>'
+        // }
+        // if (req.body.lan === 'de') {
+        //     var dhtml2 = ' Sie haben ein Rezept (prescription) Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+        //         'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+        //         '<b>Ihr Aimedis Team </b>'
+        // }
+        // else {
+        //     var dhtml2 = 'You have received a prescription inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+        //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+        //         '<b>Your Aimedis team </b>'
+        // }
+        // var mailOptions = {
+        //     from: "contact@aimedis.com",
+        //     to: req.body.patient_info.email,
+        //     subject: 'Prescription Request',
+        //     html: dhtml
+        // };
+        // var mailOptions2 = {
+        //     from: "contact@aimedis.com",
+        //     to: req.body.docProfile.email,
+        //     subject: 'Prescription Request',
+        //     html: dhtml2
+        // };
+        // var sendmail = transporter.sendMail(mailOptions)
+        // var sendmail2 = transporter.sendMail(mailOptions2)
+
+        res.json({ status: 200, hassuccessed: true, message: "success" });
       }
     });
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
-router.get("/RequestedPrescription", function (req, res, next) {
+router.get("/Prescription/:Prescription_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  getResult2 = [];
-  if (legit) {
-    const patient_id = legit.id;
-    const messageToSearchWith = new Prescription({ patient_id });
-    messageToSearchWith.encryptFieldsSync();
-    Prescription.find(
-      {
-        $or: [
-          { patient_id: messageToSearchWith.patient_id },
-          { patient_id: legit.id },
-        ],
-      },
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-//For requested Second opinion
-router.get("/RequestedSecond", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  getResult2 = [];
-  if (legit) {
-    const patient_id = legit.id;
-    const messageToSearchWith = new Second_opinion({ patient_id });
-    messageToSearchWith.encryptFieldsSync();
-    Second_opinion.find(
-      {
-        $or: [
-          { patient_id: messageToSearchWith.patient_id },
-          { patient_id: legit.id },
-        ],
-      },
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: data });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
-
-router.delete(
-  "/SickCertificate/:sick_certificate_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
+  try {
     if (legit) {
-      Sick_certificate.findByIdAndRemove(
-        req.params.sick_certificate_id,
+      Prescription.findOne(
+        { _id: req.params.Prescription_id },
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.delete("/Prescription/:Prescription_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      Prescription.findByIdAndRemove(
+        req.params.Prescription_id,
         function (err, data) {
           if (err) {
             res.json({
@@ -3530,7 +3034,7 @@ router.delete(
             res.json({
               status: 200,
               hassuccessed: true,
-              message: "Certificate is Deleted Successfully",
+              message: "Prescription is Deleted Successfully",
             });
           }
         }
@@ -3542,54 +3046,159 @@ router.delete(
         message: "Authentication required.",
       });
     }
-  }
-);
-
-router.get("/GetSickCertificate", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const doctor_id = legit.id;
-    const messageToSearchWith = new Sick_certificate({ doctor_id });
-    messageToSearchWith.encryptFieldsSync();
-    Sick_certificate.find(
-      {
-        $or: [
-          { doctor_id: messageToSearchWith.doctor_id },
-          { doctor_id: legit.id },
-        ],
-        status: { $ne: "remove" },
-      },
-      function (err, Userinfo) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong.",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: Userinfo });
-        }
-      }
-    );
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
-router.put(
-  "/GetSickCertificate/:sick_certificate_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
+router.get("/GetPrescription", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
     if (legit) {
-      Sick_certificate.findOne(
-        { _id: req.params.sick_certificate_id },
+      const doctor_id = legit.id;
+      const messageToSearchWith = new Prescription({ doctor_id });
+      messageToSearchWith.encryptFieldsSync();
+      Prescription.find(
+        {
+          $or: [
+            { doctor_id: messageToSearchWith.doctor_id },
+            { doctor_id: legit.id },
+          ],
+          status: { $ne: "remove" },
+        },
+        function (err, Userinfo) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: Userinfo });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/GetPrescription", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const doctor_id = legit.id;
+      const messageToSearchWith = new Prescription({ doctor_id });
+      messageToSearchWith.encryptFieldsSync();
+      Prescription.find(
+        {
+          $or: [
+            { doctor_id: messageToSearchWith.doctor_id },
+            { doctor_id: legit.id },
+          ],
+          status: { $ne: "remove" },
+        },
+        function (err, Userinfo) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: Userinfo });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//Added by Ankita to get the Second opinion of the doctor
+router.get("/GetSecondOpinion", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const doctor_id = legit.id;
+      const messageToSearchWith = new Second_opinion({ doctor_id });
+      messageToSearchWith.encryptFieldsSync();
+
+      Second_opinion.find(
+        {
+          $or: [
+            { doctor_id: messageToSearchWith.doctor_id },
+            { doctor_id: legit.id },
+          ],
+          status: { $ne: "remove" },
+        },
+        function (err, Userinfo) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: Userinfo });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.put("/GetPrescription/:Prescription_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      Prescription.findOne(
+        { _id: req.params.Prescription_id },
         function (err, userdata) {
           if (err) {
             res.json({
@@ -3599,18 +3208,14 @@ router.put(
               error: err,
             });
           } else {
+            var dt = dateTime.create();
             if (userdata && typeof userdata == "object")
               userdata = userdata.toObject();
-            var dt = dateTime.create();
 
-            if (
-              req.body.status === "accept" &&
-              userdata.attachfile.length == 0
-            ) {
+            if (req.body.status === "accept" && userdata.attachfile.length == 0) {
               req.body.status = "pending";
             }
-
-            Sick_certificate.findOneAndUpdate(
+            Prescription.findOneAndUpdate(
               { _id: userdata._id },
               {
                 $set: {
@@ -3634,24 +3239,23 @@ router.put(
                   ) {
                     var ids = { track_id: uuidv1() };
                     var type = { type: req.body.type };
-                    var datetime_on = {
-                      datetime_on: updatedata.accept_datetime,
-                    };
-                    var event_date = { event_date: dt.format("Y-m-d") };
+                    var datetime_on = { datetime_on: updatedata.accept_datetime };
                     var created_by = { created_by: updatedata.doctor_id };
                     var created_by_temp = {
                       created_by_temp: req.body.doctor_name,
                     };
                     var created_on = { created_on: dt.format("Y-m-d") };
+                    var event_date = { event_date: dt.format("Y-m-d") };
                     var created_at = { created_at: dt.format("H:M") };
                     var attachfile = { attachfile: updatedata.attachfile };
+
                     if (req.body.send_to_timeline) {
                       var full_record = {
                         ...ids,
                         ...type,
                         ...created_by,
-                        ...event_date,
                         ...created_on,
+                        ...event_date,
                         ...created_at,
                         ...datetime_on,
                         ...created_by_temp,
@@ -3680,8 +3284,8 @@ router.put(
                               var lan1 = getMsgLang(userdata.patient_id);
                               lan1.then((result) => {
                                 var sendData =
-                                  "Your Sick certificate Request Accepted.<br/>" +
-                                  "And sick certificate added in to your timeline.<br/><br>";
+                                  "Your Prescription Request Accepted.<br/>" +
+                                  "And prescription added in to your timeline.<br/><br>";
 
                                 generateTemplate(
                                   EMAIL.generalEmail.createTemplate(result, {
@@ -3693,7 +3297,7 @@ router.put(
                                       let mailOptions = {
                                         from: "contact@aimedis.com",
                                         to: updatedata.patient_email,
-                                        subject: "Sick certificate Accepted",
+                                        subject: "Prescription Accepted",
                                         html: html,
                                       };
                                       let sendmail =
@@ -3704,28 +3308,912 @@ router.put(
                                     }
                                   }
                                 );
+
                                 // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
 
                                 // trans(sendData, { source: "en", target: result }).then((res) => {
                                 //     var mailOptions = {
                                 //     from: "contact@aimedis.com",
                                 //     to: updatedata.patient_email,
-                                //     subject: 'Sick certificate Accepted',
+                                //     subject: 'Prescription Accepted',
                                 //    html: res.replace(/ @ /g, '@')
                                 //     };
                                 //     var sendmail = transporter.sendMail(mailOptions)
                                 //   });
                               });
-                              // var dhtml = 'Your Sick certificate Request Accepted.<br/>' +
-                              //     'And sick certificate added in to your timeline.<br/>' +
+                              // var dhtml = 'Your Prescription Request Accepted.<br/>' +
+                              //     'And prescription added in to your timeline.<br/>' +
                               //     '<b>Your Aimedis team </b>'
                               // var mailOptions = {
                               //     from: "contact@aimedis.com",
                               //     to: updatedata.patient_email,
-                              //     subject: 'Sick certificate Accepted',
+                              //     subject: 'Prescription Accepted',
                               //     html: dhtml
                               // };
                               // var sendmail = transporter.sendMail(mailOptions)
+                              if (req.body.sendPharmacy) {
+                                const messageToSearchWith = new User({
+                                  profile_id: req.body.sendPharmacy,
+                                });
+                                messageToSearchWith.encryptFieldsSync();
+                                var patient_id2 = {
+                                  patient_id: updatedata.patient_profile_id,
+                                };
+                                var full_record1 = {
+                                  ...patient_id2,
+                                  ...ids,
+                                  ...type,
+                                  ...created_by,
+                                  ...created_on,
+                                  ...event_date,
+                                  ...created_at,
+                                  ...datetime_on,
+                                  ...created_by_temp,
+                                  ...attachfile,
+                                };
+                                User.updateOne(
+                                  {
+                                    $or: [
+                                      { profile_id: req.body.sendPharmacy },
+                                      {
+                                        profile_id:
+                                          messageToSearchWith.profile_id,
+                                      },
+                                    ],
+                                  },
+                                  { $push: { track_record: full_record1 } },
+                                  { safe: true, upsert: true },
+                                  function (err, doc) {
+                                    if (err && !doc) {
+                                      res.json({
+                                        status: 200,
+                                        hassuccessed: false,
+                                        msg: "Something went wrong",
+                                        error: err,
+                                      });
+                                    } else {
+                                      if (doc.nModified == "0") {
+                                        res.json({
+                                          status: 200,
+                                          hassuccessed: false,
+                                          msg: "Pharmacy is not found",
+                                        });
+                                      } else {
+                                        res.json({
+                                          status: 200,
+                                          hassuccessed: true,
+                                          msg: "track is updated",
+                                        });
+                                      }
+                                    }
+                                  }
+                                );
+                              } else {
+                                res.json({
+                                  status: 200,
+                                  hassuccessed: true,
+                                  msg: "track is updated",
+                                });
+                              }
+                            }
+                          }
+                        }
+                      );
+                    } else {
+                      res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        msg: "track is updated",
+                      });
+                    }
+                  } else {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      msg: "File is not attached",
+                    });
+                  }
+                  // res.json({ status: 200 , hassuccessed: true , message: "user updated" , data: userdata })
+                }
+              }
+            );
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+/*----------S-I-C-K---C-E-R-T-I-F-I-C-A-T-E----------*/
+
+router.post("/SickCertificate", function (req, res, next) {
+  try {
+    var SickCertificate = new Sick_certificate(req.body);
+    SickCertificate.save(function (err, data) {
+      if (err && !data) {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "something went wrong",
+          error: err,
+        });
+      } else {
+        var lan1 = getMsgLang(req.body.patient_id);
+        var lan2 = getMsgLang(req.body.doctor_id);
+
+        lan1.then((result) => {
+          generateTemplate(
+            EMAIL.patientEmail.sickCeritificateSystem(result, {
+              patient_name:
+                req.body.patient_info.first_name +
+                " " +
+                req.body.patient_info.last_name,
+              doctor_name:
+                req.body.docProfile.first_name +
+                " " +
+                req.body.docProfile.last_name,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.patient_info.email,
+                  subject: getSubject(
+                    result,
+                    SUBJECT_KEY.aimedis_sick_cert_system
+                  ),
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
+                  console.log("Mail is sent ");
+                }
+              }
+            }
+          );
+        });
+        lan2.then((result) => {
+          generateTemplate(
+            EMAIL.doctorEmail.sickCertificateSystem(result, {
+              doctor_name:
+                req.body.docProfile.first_name +
+                " " +
+                req.body.docProfile.last_name,
+              patient_id: req.body.patient_info.patient_id,
+              patient_name:
+                req.body.patient_info.first_name +
+                " " +
+                req.body.patient_info.last_name,
+              date:
+                getDate(
+                  moment(req.body.send_on).format("YYYY/MM/DD"),
+                  "YYYY/MM/DD"
+                ) || "",
+              time: getTime(moment(req.body.send_on).format("YYYY/MM/DD"), "24"),
+              patient_email: req.body.patient_info.email,
+              patient_phone: req.body.patient_info.phone,
+            }),
+            (error, html) => {
+              if (!error) {
+                let mailOptions = {
+                  from: "contact@aimedis.com",
+                  to: req.body.docProfile.email,
+                  subject: getSubject(
+                    result,
+                    SUBJECT_KEY.aimedis_sick_cert_system
+                  ),
+                  html: html,
+                };
+                let sendmail = transporter.sendMail(mailOptions);
+                if (sendmail) {
+                  console.log("Mail is sent ");
+                }
+              }
+            }
+          );
+        });
+
+        // lan1.then((result)=>{
+        //     var sendData='You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+        //             req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+        //             'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+        //             'Your Aimedis team';
+
+        //     result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+        //     trans(sendData, { source: "en", target: result }).then((res) => {
+        //         var mailOptions = {
+        //             from: "contact@aimedis.com",
+        //             to: req.body.patient_info.email,
+        //             subject: 'Sick Certificate Request',
+        //             html: res.replace(/ @ /g, '@')
+        //         };
+        //         var sendmail = transporter.sendMail(mailOptions)
+        //       });
+        // })
+        // lan2.then((result)=>{
+        //     var sendData= 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+        //             'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+        //             'Your Aimedis team';
+        //     result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+        //     trans(sendData, { source: "en", target: result }).then((res) => {
+        //         var mailOptions = {
+        //             from: "contact@aimedis.com",
+        //             to: req.body.docProfile.email,
+        //             subject: 'Sick Certificate Request',
+        //             html: res.replace(/ @ /g, '@')
+        //         };
+        //         var sendmail = transporter.sendMail(mailOptions)
+        //       });
+        // })
+        // if (req.body.lan === 'de') {
+        //     var dhtml = 'Sie haben eine AU (sick certificate) von ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' beantragt.<br/>' +
+        //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' ) ' + 'wird sich der Sache annehmen und Sie via E-Mail kontaktieren.<br/>' +
+        //         'Wir bitten um 24 bis 48 Stunden Geduld. Sollten Sie Rückfragen haben, bitten wir Sie sich via contact@aimedis.com oder WhatsApp bei uns zu melden.<br/><br/><br/>' +
+        //         '<b>Ihr Aimedis Team </b>'
+
+        // }
+        // else {
+        //     var dhtml = 'You have requested an AU (sick certificate) from ' + req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + '.<br/>' +
+        //         req.body.docProfile.first_name + ' ' + req.body.docProfile.last_name + ' ( ' + req.body.docProfile.email + ' )' + ' will take care of the matter and contact you via email.<br/>' +
+        //         'We ask for patience 24 to 48 hours. If you have any questions, please contact us via contact@aimedis.com or WhatsApp.<br/><br/><br/> ' +
+        //         '<b>Your Aimedis team </b>'
+        // }
+        // if (req.body.lan === 'de') {
+        //     var dhtml2 = ' Sie haben  eine AU (sick certificate)  Anfrage von ' + req.body.patient_info.patient_id + ' erhalten. ' +
+        //         'Bitte überprüfen Sie diese innerhalb des Systems. <br/><br/><br/>' +
+        //         '<b>Ihr Aimedis Team </b>'
+        // }
+        // else {
+        //     var dhtml2 = 'You have received an AU (sick certificate) inquiry from ' + req.body.patient_info.patient_id + '<br/>' +
+        //         'Please check the inquiry inside the Aimedis system. .<br/><br/><br/> ' +
+        //         '<b>Your Aimedis team </b>'
+        // }
+        // var mailOptions = {
+        //     from: "contact@aimedis.com",
+        //     to: req.body.patient_info.email,
+        //     subject: 'Sick Certificate Request',
+        //     html: dhtml
+        // };
+        // var mailOptions2 = {
+        //     from: "contact@aimedis.com",
+        //     to: req.body.docProfile.email,
+        //     subject: 'Sick Certificate Request',
+        //     html: dhtml2
+        // };
+        // var sendmail = transporter.sendMail(mailOptions)
+        // var sendmail2 = transporter.sendMail(mailOptions2)
+        res.json({ status: 200, hassuccessed: true, message: "success" });
+      }
+    });
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/SickCertificate/:sick_certificate_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      Sick_certificate.findOne(
+        { _id: req.params.sick_certificate_id },
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/RequestedSickCertificate", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  getResult1 = [];
+  try {
+    if (legit) {
+      const patient_id = legit.id;
+      const messageToSearchWith = new Sick_certificate({ patient_id });
+      messageToSearchWith.encryptFieldsSync();
+      Sick_certificate.find(
+        {
+          $or: [
+            { patient_id: messageToSearchWith.patient_id },
+            { patient_id: legit.id },
+          ],
+        },
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/RequestedAppointment", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  getResult3 = [];
+  try {
+    if (legit) {
+      Appointment.find({ patient: legit.id }, function (err, data) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: data });
+        }
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.get("/RequestedPrescription", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  getResult2 = [];
+  try {
+    if (legit) {
+      const patient_id = legit.id;
+      const messageToSearchWith = new Prescription({ patient_id });
+      messageToSearchWith.encryptFieldsSync();
+      Prescription.find(
+        {
+          $or: [
+            { patient_id: messageToSearchWith.patient_id },
+            { patient_id: legit.id },
+          ],
+        },
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//For requested Second opinion
+router.get("/RequestedSecond", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  getResult2 = [];
+  try {
+    if (legit) {
+      const patient_id = legit.id;
+      const messageToSearchWith = new Second_opinion({ patient_id });
+      messageToSearchWith.encryptFieldsSync();
+      Second_opinion.find(
+        {
+          $or: [
+            { patient_id: messageToSearchWith.patient_id },
+            { patient_id: legit.id },
+          ],
+        },
+        function (err, data) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: data });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.delete(
+  "/SickCertificate/:sick_certificate_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    try {
+      if (legit) {
+        Sick_certificate.findByIdAndRemove(
+          req.params.sick_certificate_id,
+          function (err, data) {
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: "Something went wrong.",
+                error: err,
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                message: "Certificate is Deleted Successfully",
+              });
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+    
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
+});
+
+router.get("/GetSickCertificate", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const doctor_id = legit.id;
+      const messageToSearchWith = new Sick_certificate({ doctor_id });
+      messageToSearchWith.encryptFieldsSync();
+      Sick_certificate.find(
+        {
+          $or: [
+            { doctor_id: messageToSearchWith.doctor_id },
+            { doctor_id: legit.id },
+          ],
+          status: { $ne: "remove" },
+        },
+        function (err, Userinfo) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: Userinfo });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.put(
+  "/GetSickCertificate/:sick_certificate_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    try {
+      if (legit) {
+        Sick_certificate.findOne(
+          { _id: req.params.sick_certificate_id },
+          function (err, userdata) {
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: " not found",
+                error: err,
+              });
+            } else {
+              if (userdata && typeof userdata == "object")
+                userdata = userdata.toObject();
+              var dt = dateTime.create();
+
+              if (
+                req.body.status === "accept" &&
+                userdata.attachfile.length == 0
+              ) {
+                req.body.status = "pending";
+              }
+
+              Sick_certificate.findOneAndUpdate(
+                { _id: userdata._id },
+                {
+                  $set: {
+                    status: req.body.status,
+                    accept_datetime: dt.format("Y-m-d H:M:S"),
+                  },
+                },
+                { new: true },
+                function (err, updatedata) {
+                  if (err && !updatedata) {
+                    res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      message: "something went wrong",
+                      error: err,
+                    });
+                  } else {
+                    if (
+                      updatedata.status == "accept" &&
+                      updatedata.attachfile.length > 0
+                    ) {
+                      var ids = { track_id: uuidv1() };
+                      var type = { type: req.body.type };
+                      var datetime_on = {
+                        datetime_on: updatedata.accept_datetime,
+                      };
+                      var event_date = { event_date: dt.format("Y-m-d") };
+                      var created_by = { created_by: updatedata.doctor_id };
+                      var created_by_temp = {
+                        created_by_temp: req.body.doctor_name,
+                      };
+                      var created_on = { created_on: dt.format("Y-m-d") };
+                      var created_at = { created_at: dt.format("H:M") };
+                      var attachfile = { attachfile: updatedata.attachfile };
+                      if (req.body.send_to_timeline) {
+                        var full_record = {
+                          ...ids,
+                          ...type,
+                          ...created_by,
+                          ...event_date,
+                          ...created_on,
+                          ...created_at,
+                          ...datetime_on,
+                          ...created_by_temp,
+                          ...attachfile,
+                        };
+                        User.updateOne(
+                          { _id: updatedata.patient_id },
+                          { $push: { track_record: full_record } },
+                          { safe: true, upsert: true },
+                          function (err, doc) {
+                            if (err && !doc) {
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                msg: "Something went wrong",
+                                error: err,
+                              });
+                            } else {
+                              if (doc.nModified == "0") {
+                                res.json({
+                                  status: 200,
+                                  hassuccessed: false,
+                                  msg: "User is not found",
+                                });
+                              } else {
+                                var lan1 = getMsgLang(userdata.patient_id);
+                                lan1.then((result) => {
+                                  var sendData =
+                                    "Your Sick certificate Request Accepted.<br/>" +
+                                    "And sick certificate added in to your timeline.<br/><br>";
+
+                                  generateTemplate(
+                                    EMAIL.generalEmail.createTemplate(result, {
+                                      title: "",
+                                      content: sendData,
+                                    }),
+                                    (error, html) => {
+                                      if (!error) {
+                                        let mailOptions = {
+                                          from: "contact@aimedis.com",
+                                          to: updatedata.patient_email,
+                                          subject: "Sick certificate Accepted",
+                                          html: html,
+                                        };
+                                        let sendmail =
+                                          transporter.sendMail(mailOptions);
+                                        if (sendmail) {
+                                          console.log("Mail is sent ");
+                                        }
+                                      }
+                                    }
+                                  );
+                                  // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+
+                                  // trans(sendData, { source: "en", target: result }).then((res) => {
+                                  //     var mailOptions = {
+                                  //     from: "contact@aimedis.com",
+                                  //     to: updatedata.patient_email,
+                                  //     subject: 'Sick certificate Accepted',
+                                  //    html: res.replace(/ @ /g, '@')
+                                  //     };
+                                  //     var sendmail = transporter.sendMail(mailOptions)
+                                  //   });
+                                });
+                                // var dhtml = 'Your Sick certificate Request Accepted.<br/>' +
+                                //     'And sick certificate added in to your timeline.<br/>' +
+                                //     '<b>Your Aimedis team </b>'
+                                // var mailOptions = {
+                                //     from: "contact@aimedis.com",
+                                //     to: updatedata.patient_email,
+                                //     subject: 'Sick certificate Accepted',
+                                //     html: dhtml
+                                // };
+                                // var sendmail = transporter.sendMail(mailOptions)
+                                res.json({
+                                  status: 200,
+                                  hassuccessed: true,
+                                  msg: "track is updated",
+                                });
+                              }
+                            }
+                          }
+                        );
+                      } else {
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          msg: "track is updated",
+                        });
+                      }
+                    } else {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        msg: "File is not attached",
+                      });
+                    }
+                    // res.json({ status: 200 , hassuccessed: true , message: "user updated" , data: userdata })
+                  }
+                }
+              );
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Some thing went wrong.",
+      });
+    }
+  }
+);
+
+//Add bY Ankita to update the Second opinion
+router.put("/GetSecondOpinion/:Prescription_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      Second_opinion.findOne(
+        { _id: req.params.Prescription_id },
+        function (err, userdata) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: " not found",
+              error: err,
+            });
+          } else {
+            var lan1 = getMsgLang(userdata.patient_id);
+            var dt = dateTime.create();
+            if (userdata && typeof userdata == "object")
+              userdata = userdata.toObject();
+            if (req.body.status === "decline") {
+            }
+            if (req.body.status === "accept" && userdata.attachfile.length == 0) {
+              req.body.status = "pending";
+            }
+            Second_opinion.findOneAndUpdate(
+              { _id: userdata._id },
+              {
+                $set: {
+                  status: req.body.status,
+                  accept_datetime: dt.format("Y-m-d H:M:S"),
+                },
+              },
+              { new: true },
+              function (err, updatedata) {
+                if (err && !updatedata) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "something went wrong",
+                    error: err,
+                  });
+                } else {
+                  if (
+                    updatedata.status == "accept" &&
+                    updatedata.attachfile.length > 0
+                  ) {
+                    var ids = { track_id: uuidv1() };
+                    var type = { type: req.body.type };
+                    var datetime_on = { datetime_on: dt.format("Y-m-d") };
+                    var created_by = { created_by: updatedata.doctor_id };
+                    var created_by_temp = {
+                      created_by_temp: req.body.doctor_name,
+                    };
+                    var created_on = { created_on: dt.format("Y-m-d") };
+                    var event_date = { event_date: dt.format("Y-m-d") };
+                    var created_at = { created_at: dt.format("H:M") };
+                    var attachfile = { attachfile: updatedata.attachfile };
+                    if (req.body.send_to_timeline) {
+                      var full_record = {
+                        ...ids,
+                        ...type,
+                        ...created_by,
+                        ...created_on,
+                        ...event_date,
+                        ...created_at,
+                        ...datetime_on,
+                        ...created_by_temp,
+                        ...attachfile,
+                      };
+                      User.updateOne(
+                        { _id: updatedata.patient_id },
+                        { $push: { track_record: full_record } },
+                        { safe: true, upsert: true },
+                        function (err, doc) {
+                          if (err && !doc) {
+                            res.json({
+                              status: 200,
+                              hassuccessed: false,
+                              msg: "Something went wrong",
+                              error: err,
+                            });
+                          } else {
+                            if (doc.nModified == "0") {
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                msg: "User is not found",
+                              });
+                            } else {
+                              lan1.then((result) => {
+                                var sendData =
+                                  "Your Second opinion Request Accepted.<br/>" +
+                                  "And  Second opinion added in to your timeline.<br/><br>";
+
+                                generateTemplate(
+                                  EMAIL.generalEmail.createTemplate(result, {
+                                    title: "",
+                                    content: sendData,
+                                  }),
+                                  (error, html) => {
+                                    if (!error) {
+                                      let mailOptions = {
+                                        from: "contact@aimedis.com",
+                                        to: req.body.email,
+                                        subject:
+                                          "Reset Your Password immediately!!",
+                                        html: html,
+                                      };
+                                      let sendmail =
+                                        transporter.sendMail(mailOptions);
+                                      if (sendmail) {
+                                        console.log("Mail is sent ");
+                                      }
+                                    }
+                                  }
+                                );
+                              });
+
                               res.json({
                                 status: 200,
                                 hassuccessed: true,
@@ -3763,163 +4251,11 @@ router.put(
         message: "Authentication required.",
       });
     }
-  }
-);
-
-//Add bY Ankita to update the Second opinion
-router.put("/GetSecondOpinion/:Prescription_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    Second_opinion.findOne(
-      { _id: req.params.Prescription_id },
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: " not found",
-            error: err,
-          });
-        } else {
-          var lan1 = getMsgLang(userdata.patient_id);
-          var dt = dateTime.create();
-          if (userdata && typeof userdata == "object")
-            userdata = userdata.toObject();
-          if (req.body.status === "decline") {
-          }
-          if (req.body.status === "accept" && userdata.attachfile.length == 0) {
-            req.body.status = "pending";
-          }
-          Second_opinion.findOneAndUpdate(
-            { _id: userdata._id },
-            {
-              $set: {
-                status: req.body.status,
-                accept_datetime: dt.format("Y-m-d H:M:S"),
-              },
-            },
-            { new: true },
-            function (err, updatedata) {
-              if (err && !updatedata) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "something went wrong",
-                  error: err,
-                });
-              } else {
-                if (
-                  updatedata.status == "accept" &&
-                  updatedata.attachfile.length > 0
-                ) {
-                  var ids = { track_id: uuidv1() };
-                  var type = { type: req.body.type };
-                  var datetime_on = { datetime_on: dt.format("Y-m-d") };
-                  var created_by = { created_by: updatedata.doctor_id };
-                  var created_by_temp = {
-                    created_by_temp: req.body.doctor_name,
-                  };
-                  var created_on = { created_on: dt.format("Y-m-d") };
-                  var event_date = { event_date: dt.format("Y-m-d") };
-                  var created_at = { created_at: dt.format("H:M") };
-                  var attachfile = { attachfile: updatedata.attachfile };
-                  if (req.body.send_to_timeline) {
-                    var full_record = {
-                      ...ids,
-                      ...type,
-                      ...created_by,
-                      ...created_on,
-                      ...event_date,
-                      ...created_at,
-                      ...datetime_on,
-                      ...created_by_temp,
-                      ...attachfile,
-                    };
-                    User.updateOne(
-                      { _id: updatedata.patient_id },
-                      { $push: { track_record: full_record } },
-                      { safe: true, upsert: true },
-                      function (err, doc) {
-                        if (err && !doc) {
-                          res.json({
-                            status: 200,
-                            hassuccessed: false,
-                            msg: "Something went wrong",
-                            error: err,
-                          });
-                        } else {
-                          if (doc.nModified == "0") {
-                            res.json({
-                              status: 200,
-                              hassuccessed: false,
-                              msg: "User is not found",
-                            });
-                          } else {
-                            lan1.then((result) => {
-                              var sendData =
-                                "Your Second opinion Request Accepted.<br/>" +
-                                "And  Second opinion added in to your timeline.<br/><br>";
-
-                              generateTemplate(
-                                EMAIL.generalEmail.createTemplate(result, {
-                                  title: "",
-                                  content: sendData,
-                                }),
-                                (error, html) => {
-                                  if (!error) {
-                                    let mailOptions = {
-                                      from: "contact@aimedis.com",
-                                      to: req.body.email,
-                                      subject:
-                                        "Reset Your Password immediately!!",
-                                      html: html,
-                                    };
-                                    let sendmail =
-                                      transporter.sendMail(mailOptions);
-                                    if (sendmail) {
-                                      console.log("Mail is sent ");
-                                    }
-                                  }
-                                }
-                              );
-                            });
-
-                            res.json({
-                              status: 200,
-                              hassuccessed: true,
-                              msg: "track is updated",
-                            });
-                          }
-                        }
-                      }
-                    );
-                  } else {
-                    res.json({
-                      status: 200,
-                      hassuccessed: true,
-                      msg: "track is updated",
-                    });
-                  }
-                } else {
-                  res.json({
-                    status: 200,
-                    hassuccessed: false,
-                    msg: "File is not attached",
-                  });
-                }
-                // res.json({ status: 200 , hassuccessed: true , message: "user updated" , data: userdata })
-              }
-            }
-          );
-        }
-      }
-    );
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3929,6 +4265,436 @@ router.put(
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
+    try {
+      if (legit) {
+        Second_opinion.updateOne(
+          { _id: req.params.sick_certificate_id },
+          req.body,
+          function (err, userdata) {
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: " not found",
+                error: err,
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "Second Opinion is updated",
+                data: userdata,
+              });
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Some thing went wrong.",
+      });
+    }
+  });
+//Add bY Ankita to update the Sick certificate
+router.put(
+  "/UpdateSickcertificate/:sick_certificate_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    try {
+      if (legit) {
+        Sick_certificate.updateOne(
+          { _id: req.params.sick_certificate_id },
+          req.body,
+          function (err, userdata) {
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: " not found",
+                error: err,
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "Sick certificate is updated",
+                data: userdata,
+              });
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Some thing went wrong.",
+      });
+    }
+  }
+);
+
+//Add bY Ankita to update the Prescription
+router.put(
+  "/UpdatePrescription/:sick_certificate_id",
+  function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    try {
+      if (legit) {
+        Prescription.updateOne(
+          { _id: req.params.sick_certificate_id },
+          req.body,
+          function (err, userdata) {
+            if (err) {
+              res.json({
+                status: 200,
+                hassuccessed: false,
+                message: " not found",
+                error: err,
+              });
+            } else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "Prescription is updated",
+                data: userdata,
+              });
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+    } catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Some thing went wrong.",
+      });
+    }
+  }
+);
+
+//Added by Ankita for Upcoming Appointment
+router.get("/UpcomingAppintmentDoc", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const doctor_id = legit.id;
+      const messageToSearchWith = new Appointment({ doctor_id });
+      messageToSearchWith.encryptFieldsSync();
+      var date = new Date();
+      date = date.setDate(date.getDate() - 1);
+      date = new Date(date);
+      Appointment.find(
+        {
+          $and: [
+            {
+              $or: [
+                { doctor_id: messageToSearchWith.doctor_id },
+                { doctor_id: legit.id },
+              ],
+            },
+            {
+              $or: [{ date: { $gte: date } }, { date: { $eq: date } }],
+              status: "free",
+            },
+          ],
+        },
+        function (err, results) {
+          if (err) {
+            res.json({
+              err: err,
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: results });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//Added by Ankita for Upcoming Appointment
+router.get("/UpcomingAppintmentPat", function (req, res, next) {
+  GetUpcomingAppoint1 = [];
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const patient = legit.id;
+      const messageToSearchWith = new Appointment({ patient });
+      messageToSearchWith.encryptFieldsSync();
+      var date = new Date();
+      date = date.setDate(date.getDate() - 1);
+      date = new Date(date);
+      Appointment.find(
+        {
+          $and: [
+            {
+              $or: [
+                { patient: messageToSearchWith.patient },
+                { patient: legit.id },
+              ],
+            },
+            {
+              $or: [{ date: { $gte: date } }, { date: { $eq: date } }],
+            },
+          ],
+        },
+        function (err, results) {
+          if (err) {
+            res.json({
+              err: err,
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
+          } else {
+            forEachPromise(results, GetUpcomingAppoint).then((result) => {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "User is found",
+                data: GetUpcomingAppoint1,
+              });
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//Added by Ankita for Upcoming Appointment
+router.get("/UpcomingAppintmentPat/:Userid", function (req, res, next) {
+  GetUpcomingAppoint1 = [];
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const patient = req.params.Userid;
+      const messageToSearchWith = new Appointment({ patient });
+      messageToSearchWith.encryptFieldsSync();
+      var date = new Date();
+      date = date.setDate(date.getDate() - 1);
+      date = new Date(date);
+      Appointment.find(
+        {
+          $and: [
+            {
+              $or: [
+                { patient: messageToSearchWith.patient },
+                { patient: req.params.Userid },
+              ],
+            },
+            {
+              $or: [{ date: { $gte: date } }, { date: { $eq: date } }],
+            },
+          ],
+        },
+        function (err, results) {
+          if (err) {
+            res.json({
+              err: err,
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
+          } else {
+            forEachPromise(results, GetUpcomingAppoint).then((result) => {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "User is found",
+                data: GetUpcomingAppoint1,
+              });
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//Added by Ankita for Upcoming Appointment
+router.get("/PastAppintmentPat", function (req, res, next) {
+  GetPastAppoint1 = [];
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const patient = legit.id;
+      const messageToSearchWith = new Appointment({ patient });
+      messageToSearchWith.encryptFieldsSync();
+      Appointment.find(
+        {
+          $and: [
+            {
+              $or: [
+                { patient: messageToSearchWith.patient },
+                { patient: legit.id },
+              ],
+            },
+            {
+              $or: [{ date: { $lte: new Date() } }],
+            },
+          ],
+        },
+        function (err, results) {
+          if (err) {
+            res.json({
+              err: err,
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
+          } else {
+            forEachPromise(results, GetPastAppoint).then((result) => {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "User is found",
+                data: GetPastAppoint1,
+              });
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//Added by Ankita for Upcoming Appointment
+router.get("/PastAppintmentDoc", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      const doctor_id = legit.id;
+      const messageToSearchWith = new Appointment({ doctor_id });
+      messageToSearchWith.encryptFieldsSync();
+      Appointment.find(
+        {
+          $and: [
+            {
+              $or: [
+                { doctor_id: messageToSearchWith.doctor_id },
+                { doctor_id: legit.id },
+              ],
+            },
+            {
+              $or: [{ date: { $lte: new Date() } }],
+            },
+          ],
+        },
+        function (err, results) {
+          if (err) {
+            res.json({
+              err: err,
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: results });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+//Add bY Ankita to update the Second Opinion
+router.put("/UpdateSecond/:sick_certificate_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
     if (legit) {
       Second_opinion.updateOne(
         { _id: req.params.sick_certificate_id },
@@ -3958,369 +4724,11 @@ router.put(
         message: "Authentication required.",
       });
     }
-  }
-);
-//Add bY Ankita to update the Sick certificate
-router.put(
-  "/UpdateSickcertificate/:sick_certificate_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-      Sick_certificate.updateOne(
-        { _id: req.params.sick_certificate_id },
-        req.body,
-        function (err, userdata) {
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: " not found",
-              error: err,
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "Sick certificate is updated",
-              data: userdata,
-            });
-          }
-        }
-      );
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Authentication required.",
-      });
-    }
-  }
-);
-
-//Add bY Ankita to update the Prescription
-router.put(
-  "/UpdatePrescription/:sick_certificate_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    if (legit) {
-      Prescription.updateOne(
-        { _id: req.params.sick_certificate_id },
-        req.body,
-        function (err, userdata) {
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: " not found",
-              error: err,
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "Prescription is updated",
-              data: userdata,
-            });
-          }
-        }
-      );
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Authentication required.",
-      });
-    }
-  }
-);
-
-//Added by Ankita for Upcoming Appointment
-router.get("/UpcomingAppintmentDoc", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const doctor_id = legit.id;
-    const messageToSearchWith = new Appointment({ doctor_id });
-    messageToSearchWith.encryptFieldsSync();
-    var date = new Date();
-    date = date.setDate(date.getDate() - 1);
-    date = new Date(date);
-    Appointment.find(
-      {
-        $and: [
-          {
-            $or: [
-              { doctor_id: messageToSearchWith.doctor_id },
-              { doctor_id: legit.id },
-            ],
-          },
-          {
-            $or: [{ date: { $gte: date } }, { date: { $eq: date } }],
-            status: "free",
-          },
-        ],
-      },
-      function (err, results) {
-        if (err) {
-          res.json({
-            err: err,
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: results });
-        }
-      }
-    );
-  } else {
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  }
-});
-
-//Added by Ankita for Upcoming Appointment
-router.get("/UpcomingAppintmentPat", function (req, res, next) {
-  GetUpcomingAppoint1 = [];
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const patient = legit.id;
-    const messageToSearchWith = new Appointment({ patient });
-    messageToSearchWith.encryptFieldsSync();
-    var date = new Date();
-    date = date.setDate(date.getDate() - 1);
-    date = new Date(date);
-    Appointment.find(
-      {
-        $and: [
-          {
-            $or: [
-              { patient: messageToSearchWith.patient },
-              { patient: legit.id },
-            ],
-          },
-          {
-            $or: [{ date: { $gte: date } }, { date: { $eq: date } }],
-          },
-        ],
-      },
-      function (err, results) {
-        if (err) {
-          res.json({
-            err: err,
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          forEachPromise(results, GetUpcomingAppoint).then((result) => {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "User is found",
-              data: GetUpcomingAppoint1,
-            });
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  }
-});
-
-//Added by Ankita for Upcoming Appointment
-router.get("/UpcomingAppintmentPat/:Userid", function (req, res, next) {
-  GetUpcomingAppoint1 = [];
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const patient = req.params.Userid;
-    const messageToSearchWith = new Appointment({ patient });
-    messageToSearchWith.encryptFieldsSync();
-    var date = new Date();
-    date = date.setDate(date.getDate() - 1);
-    date = new Date(date);
-    Appointment.find(
-      {
-        $and: [
-          {
-            $or: [
-              { patient: messageToSearchWith.patient },
-              { patient: req.params.Userid },
-            ],
-          },
-          {
-            $or: [{ date: { $gte: date } }, { date: { $eq: date } }],
-          },
-        ],
-      },
-      function (err, results) {
-        if (err) {
-          res.json({
-            err: err,
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          forEachPromise(results, GetUpcomingAppoint).then((result) => {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "User is found",
-              data: GetUpcomingAppoint1,
-            });
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  }
-});
-
-//Added by Ankita for Upcoming Appointment
-router.get("/PastAppintmentPat", function (req, res, next) {
-  GetPastAppoint1 = [];
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const patient = legit.id;
-    const messageToSearchWith = new Appointment({ patient });
-    messageToSearchWith.encryptFieldsSync();
-    Appointment.find(
-      {
-        $and: [
-          {
-            $or: [
-              { patient: messageToSearchWith.patient },
-              { patient: legit.id },
-            ],
-          },
-          {
-            $or: [{ date: { $lte: new Date() } }],
-          },
-        ],
-      },
-      function (err, results) {
-        if (err) {
-          res.json({
-            err: err,
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          forEachPromise(results, GetPastAppoint).then((result) => {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "User is found",
-              data: GetPastAppoint1,
-            });
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  }
-});
-
-//Added by Ankita for Upcoming Appointment
-router.get("/PastAppintmentDoc", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const doctor_id = legit.id;
-    const messageToSearchWith = new Appointment({ doctor_id });
-    messageToSearchWith.encryptFieldsSync();
-    Appointment.find(
-      {
-        $and: [
-          {
-            $or: [
-              { doctor_id: messageToSearchWith.doctor_id },
-              { doctor_id: legit.id },
-            ],
-          },
-          {
-            $or: [{ date: { $lte: new Date() } }],
-          },
-        ],
-      },
-      function (err, results) {
-        if (err) {
-          res.json({
-            err: err,
-            status: 200,
-            hassuccessed: false,
-            msg: "Something went wrong",
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: results });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  }
-});
-
-//Add bY Ankita to update the Second Opinion
-router.put("/UpdateSecond/:sick_certificate_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    Second_opinion.updateOne(
-      { _id: req.params.sick_certificate_id },
-      req.body,
-      function (err, userdata) {
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: " not found",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            msg: "Second Opinion is updated",
-            data: userdata,
-          });
-        }
-      }
-    );
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4329,41 +4737,49 @@ router.put("/UpdateSecond/:sick_certificate_id", function (req, res, next) {
 router.post("/AddtoPatientList/:id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    const profile_id = req.params.id;
-    const messageToSearchWith = new User({ profile_id });
-    messageToSearchWith.encryptFieldsSync();
-    User.findOneAndUpdate(
-      {
-        $or: [
-          { profile_id: req.params.id },
-          { profile_id: messageToSearchWith.profile_id },
-        ],
-      },
-      { $push: { myPatient: req.body } },
-      function (err2, updatedata) {
-        if (err2 && !updatedata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "something went wrong",
-            error: err2,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Add to Patient list",
-            data: updatedata,
-          });
+  try {
+    if (legit) {
+      const profile_id = req.params.id;
+      const messageToSearchWith = new User({ profile_id });
+      messageToSearchWith.encryptFieldsSync();
+      User.findOneAndUpdate(
+        {
+          $or: [
+            { profile_id: req.params.id },
+            { profile_id: messageToSearchWith.profile_id },
+          ],
+        },
+        { $push: { myPatient: req.body } },
+        function (err2, updatedata) {
+          if (err2 && !updatedata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "something went wrong",
+              error: err2,
+            });
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Add to Patient list",
+              data: updatedata,
+            });
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4372,39 +4788,47 @@ router.get("/Mypatients", function (req, res, next) {
   Mypat = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.find({ _id: legit.id }, function (err, doc) {
-      if (err && !doc) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "User is not found",
-          error: err,
-        });
-      } else {
-        if (doc && doc.length > 0) {
-          if (doc[0].myPatient.length > 0) {
-            forEachPromise(doc[0].myPatient, getMyPat).then((result) => {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                msg: "User is found",
-                data: Mypat,
+  try {
+    if (legit) {
+      User.find({ _id: legit.id }, function (err, doc) {
+        if (err && !doc) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "User is not found",
+            error: err,
+          });
+        } else {
+          if (doc && doc.length > 0) {
+            if (doc[0].myPatient.length > 0) {
+              forEachPromise(doc[0].myPatient, getMyPat).then((result) => {
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  msg: "User is found",
+                  data: Mypat,
+                });
               });
-            });
+            } else {
+              res.json({ status: 200, hassuccessed: false, msg: "No data" });
+            }
           } else {
             res.json({ status: 200, hassuccessed: false, msg: "No data" });
           }
-        } else {
-          res.json({ status: 200, hassuccessed: false, msg: "No data" });
         }
-      }
-    });
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4543,6 +4967,7 @@ function GetPastAppoint(item) {
 router.delete("/Mypatients/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findByIdAndRemove(req.params.patient_id, function (err, data) {
       if (err) {
@@ -4567,6 +4992,13 @@ router.delete("/Mypatients/:patient_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 /*----------A-P-P-O-I-N-T-M-E-N-T-S----------*/
@@ -4574,6 +5006,7 @@ router.delete("/Mypatients/:patient_id", function (req, res, next) {
 router.get("/Appointments", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Appointment.find({ doctor_id: legit.id }, function (err, userdata) {
       if (err && !userdata) {
@@ -4594,11 +5027,19 @@ router.get("/Appointments", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/PatientAcceptAppointments", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Appointment.find(
       { patient: legit.id, status: "accept" },
@@ -4622,9 +5063,17 @@ router.get("/PatientAcceptAppointments", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/second_opinion", function (req, res, next) {
+ try{
   var Second_opinions = new Second_opinion(req.body);
   Second_opinions.save(function (err, user_data) {
     if (err && !user_data) {
@@ -4777,6 +5226,13 @@ router.post("/second_opinion", function (req, res, next) {
       });
     }
   });
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 /*----------D-O-C-T-O-R---A-P-P-O-I-N-T-M-E-N-T---S-C-H-E-D-U-L-E----------*/
@@ -4784,6 +5240,7 @@ router.post("/second_opinion", function (req, res, next) {
 router.put("/private_appointments/:doctor_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOneAndUpdate(
       { _id: req.params.doctor_id },
@@ -4814,11 +5271,19 @@ router.put("/private_appointments/:doctor_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/DaysforPractices/:doctor_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOneAndUpdate(
       { _id: req.params.doctor_id },
@@ -4849,11 +5314,19 @@ router.put("/DaysforPractices/:doctor_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/onlineAppointments/:doctor_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOneAndUpdate(
       { _id: req.params.doctor_id },
@@ -4884,6 +5357,13 @@ router.put("/onlineAppointments/:doctor_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 /*----------E-N-D----------*/
@@ -4893,6 +5373,7 @@ router.put("/onlineAppointments/:doctor_id", function (req, res, next) {
 router.get("/DoctorUsers", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.find(
       { type: "doctor", first_name: { $exists: true } },
@@ -4916,10 +5397,19 @@ router.get("/DoctorUsers", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
+
 router.get("/PatientUsers", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+try{
   if (legit) {
     User.find(
       { type: "patient", first_name: { $exists: true } },
@@ -4943,10 +5433,19 @@ router.get("/PatientUsers", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
+
 router.get("/DoctorUsersChat", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+try{
   if (legit) {
     User.find({ type: "doctor" }, function (err, Userinfo) {
       if (err) {
@@ -4967,11 +5466,19 @@ router.get("/DoctorUsersChat", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/PatientUsersChat", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.find({ type: "patient" }, function (err, Userinfo) {
       if (err) {
@@ -4992,10 +5499,19 @@ router.get("/PatientUsersChat", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
+
 router.get("/NursePharmaChat", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+try{
   if (legit) {
     User.find(
       {
@@ -5021,9 +5537,17 @@ router.get("/NursePharmaChat", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/DoctorProfile/:doctor_id", function (req, res, next) {
+ try{
   User.findOne({ _id: req.params.doctor_id }, function (err, Userinfo) {
     if (err) {
       res.json({
@@ -5036,6 +5560,13 @@ router.get("/DoctorProfile/:doctor_id", function (req, res, next) {
       res.json({ status: 200, hassuccessed: true, data: Userinfo });
     }
   });
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 /*----------E-N-D----------*/
@@ -5045,6 +5576,7 @@ router.get("/DoctorProfile/:doctor_id", function (req, res, next) {
 router.put("/AddFavDoc", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOne({ _id: legit.id }, function (err, userdata) {
       if (err) {
@@ -5152,11 +5684,19 @@ router.put("/AddFavDoc", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/AddFavDoc1/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const profile_id = req.body.doctor;
     const messageToSearchWith = new User({ profile_id });
@@ -5275,11 +5815,19 @@ router.put("/AddFavDoc1/:user_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/AddRecDoc", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOne({ _id: legit.id }, function (err, userdata) {
       if (err) {
@@ -5376,11 +5924,19 @@ router.put("/AddRecDoc", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/AddFavTDoc/:id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOne({ _id: legit.id }, function (err, userdata) {
       if (err) {
@@ -5465,6 +6021,13 @@ router.put("/AddFavTDoc/:id", function (req, res, next) {
       message: "A uthentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 /*-----------------------D-E-L-E-T-E---F-A-V-O-U-R-I-T-E---D-O-C-T-O-R-------------------------*/
@@ -5472,6 +6035,7 @@ router.put("/AddFavTDoc/:id", function (req, res, next) {
 router.delete("/favDocs/:User_id/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const profile_id = req.params.User_id;
     const messageToSearchWith = new User({ profile_id });
@@ -5543,11 +6107,19 @@ router.delete("/favDocs/:User_id/:patient_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.delete("/favPatients/:User_id/:doctor_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.update(
       { profile_id: req.params.User_id },
@@ -5596,11 +6168,19 @@ router.delete("/favPatients/:User_id/:doctor_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/UpdatePrescription/:prescription_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Prescription.findOneAndUpdate(
       { _id: req.params.prescription_id },
@@ -5639,11 +6219,19 @@ router.put("/UpdatePrescription/:prescription_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/UpdateSickCertificate/:Sick_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Sick_certificate.findOneAndUpdate(
       { _id: req.params.Sick_id },
@@ -5682,11 +6270,19 @@ router.put("/UpdateSickCertificate/:Sick_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/GetAppointment", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Appointment.find(
       { doctor_id: legit.id, status: "free" },
@@ -5710,11 +6306,19 @@ router.get("/GetAppointment", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/GetAppointment/:GetAppointment_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     Appointment.findOne(
       { _id: req.params.GetAppointment_id },
@@ -5827,11 +6431,19 @@ router.put("/GetAppointment/:GetAppointment_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/abletocancel/:doctor_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOne({ _id: req.params.doctor_id }, function (err, Userinfo) {
       if (err) {
@@ -5878,6 +6490,13 @@ router.post("/abletocancel/:doctor_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 /*-----------------------G-E-T---L-O-C-A-T-I-O-N-------------------------*/
 
@@ -5901,6 +6520,7 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
 router.get("/DoctorAppointments", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.find(
       { type: "doctor", first_name: { $exists: true } },
@@ -6206,10 +6826,18 @@ router.get("/DoctorAppointments", function (req, res, next) {
       }
     );
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 router.get("/timeSuggest", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOne(
       {
@@ -6234,7 +6862,7 @@ router.get("/timeSuggest", function (req, res, next) {
           var user = [];
           var online_users = [];
           var Practices = [];
-          var Home =[];
+          var Home = [];
           var monday = [],
             tuesday = [],
             wednesday = [],
@@ -6627,18 +7255,18 @@ router.get("/timeSuggest", function (req, res, next) {
           }
 
           (monday = []),
-          (tuesday = []),
-          (wednesday = []),
-          (thursday = []),
-          (friday = []),
-          (saturday = []),
-          (sunday = []),
-          (custom_text = ""),
-          (breakslot_start = ""),
-          (breakslot_end = ""),
-          (holidays_start = ""),
-          (appointment_days = ""),
-          (holidays_end = "");
+            (tuesday = []),
+            (wednesday = []),
+            (thursday = []),
+            (friday = []),
+            (saturday = []),
+            (sunday = []),
+            (custom_text = ""),
+            (breakslot_start = ""),
+            (breakslot_end = ""),
+            (holidays_start = ""),
+            (appointment_days = ""),
+            (holidays_end = "");
           if (
             Userinfo.we_offer &&
             Userinfo.we_offer.offer_home_visit
@@ -6753,7 +7381,7 @@ router.get("/timeSuggest", function (req, res, next) {
                 holidays_end,
                 appointment_days,
               });
-              console.log("home",Home)
+              console.log("home", Home)
             }
           }
           if (Userinfo && getAvailable && getAvailable.length > 0) {
@@ -6762,7 +7390,7 @@ router.get("/timeSuggest", function (req, res, next) {
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
-              homevisit_appointment:Home
+              homevisit_appointment: Home
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           } else {
@@ -6779,7 +7407,7 @@ router.get("/timeSuggest", function (req, res, next) {
               appointments: [{ custom_text: custom_text }],
               online_appointment: [],
               practice_days: [],
-              homevisit_appointment:[]
+              homevisit_appointment: []
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           }
@@ -6793,9 +7421,17 @@ router.get("/timeSuggest", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/getLocation/:radius", function (req, res, next) {
+ try{
   if (req.query.doctor_id) {
     User.find({ _id: req.query.doctor_id }).find((error, Userinfo) => {
       if (error) {
@@ -6806,7 +7442,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
           var user = [];
           var online_users = [];
           var Practices = [];
-          var Home =[];
+          var Home = [];
           var monday = [],
             tuesday = [],
             wednesday = [],
@@ -7204,7 +7840,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
             Userinfo[i].we_offer &&
             Userinfo[i].we_offer.offer_home_visit
           ) {
-    
+
             (monday = []),
               (tuesday = []),
               (wednesday = []),
@@ -7336,7 +7972,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
             appointments: user,
             online_appointment: online_users,
             practice_days: Practices,
-            homevisit_appointment:Home
+            homevisit_appointment: Home
           });
         }
         res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -7363,7 +7999,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
             var user = [];
             var online_users = [];
             var Practices = [];
-            var Home=[];
+            var Home = [];
             var monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], custom_text = "", breakslot_start = "", breakslot_end = "", holidays_end = "", holidays_start = "", appointment_days = "";
             if (Userinfo[i].we_offer && Userinfo[i].we_offer.Offer_office_prescription) {
               for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
@@ -7543,7 +8179,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
-              homevisit_appointment:Home
+              homevisit_appointment: Home
             })
           }
           res.json({ status: 200, hassuccessed: true, data: finalArray });
@@ -7571,7 +8207,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
             var user = [];
             var online_users = [];
             var Practices = [];
-            var Home =[];
+            var Home = [];
             var monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [], custom_text = "", breakslot_start = "", breakslot_end = "", holidays_end = "", holidays_start = "", appointment_days = "";
             for (let j = 0; j < Userinfo[i].private_appointments.length; j++) {
               if (Userinfo[i].private_appointments[j].custom_text) {
@@ -7740,7 +8376,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
-              homevisit_appointment:Home
+              homevisit_appointment: Home
             })
           }
 
@@ -7749,6 +8385,13 @@ router.get("/getLocation/:radius", function (req, res, next) {
       })
     }
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
@@ -7756,6 +8399,7 @@ router.get("/getLocation/:radius", function (req, res, next) {
 router.get("/allusers", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     // User.find({ $or: [{type: 'hospitaladmin'}, {type: 'pharmacy'},{type: 'superadmin'},{type: 'doctor'},{type: 'therepist'}]}, function (err, Userinfo) {
     //     if (err) {
@@ -7783,12 +8427,20 @@ router.get("/allusers", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/setpassword", function (req, res, next) {
   const token = req.headers.token;
 
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     var enpassword = base64.encode(JSON.stringify(encrypt(req.query.password)));
     User.findOneAndUpdate(
@@ -7810,6 +8462,13 @@ router.put("/setpassword", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 //Added by Ankita
@@ -7817,6 +8476,7 @@ router.put("/setpassword", function (req, res, next) {
 router.post("/GetUserInfo/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const profile_id = req.params.UserId;
     const alies_id = req.params.UserId;
@@ -8006,9 +8666,17 @@ router.post("/GetUserInfo/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/forgotPassword", function (req, res, next) {
+ try{
   var token;
   let promise = new Promise(function (resolve, reject) {
     const email = req.query.email;
@@ -8078,11 +8746,19 @@ router.post("/forgotPassword", function (req, res, next) {
         }
       });
   });
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/AskPatient1/:id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     if (req.body.lan === "de") {
       var dhtml =
@@ -8130,11 +8806,19 @@ router.post("/AskPatient1/:id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/AskPatientProfile", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const profile_id = req.body.id;
     const alies_id = req.body.id;
@@ -8180,11 +8864,19 @@ router.post("/AskPatientProfile", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/AskPatient/:id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     const profile_id = req.params.id;
     const alies_id = req.params.id;
@@ -8300,6 +8992,13 @@ router.post("/AskPatient/:id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 ///Add by Ankita (17-04-2020)
@@ -8307,6 +9006,7 @@ router.post("/AskPatient/:id", function (req, res, next) {
 //Add by Ankita (01-07-2020)
 // For landing pages
 router.post("/requireCSV", function (req, res, next) {
+ try{
   const todos = req.body.Content;
   // convert JSON array to CSV string
   var config1 = {
@@ -8505,10 +9205,18 @@ router.post("/requireCSV", function (req, res, next) {
         msg: "Something went wrong3",
       });
     });
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 router.post("/downloadPdf", function (req, res, next) {
   // Custom handlebar helper
+  try{
   handlebars.registerHelper("ifCond", function (v1, v2, options) {
     if (v1 === v2) {
       return options.fn(this);
@@ -8657,9 +9365,17 @@ router.post("/downloadPdf", function (req, res, next) {
   //     .catch(error => {
   //         res.json({ status: 200, hassuccessed: true, filename: filename });
   //     });
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/downloadfullPdf", function (req, res, next) {
+ try{
   // Custom handlebar helper
   handlebars.registerHelper("ifCond", function (v1, v2, options) {
     if (v1 === v2) {
@@ -8733,6 +9449,13 @@ router.post("/downloadfullPdf", function (req, res, next) {
   //     .catch(error => {
   //         res.json({ status: 200, hassuccessed: true, filename: filename });
   //     });
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 function getReminder(reminder, timeFormat) {
@@ -8809,6 +9532,7 @@ function getDate(date, dateFormat) {
 //API to get the
 //Added by Ankita for Upcoming Appointment
 router.post("/MailSendToDr", function (req, res) {
+ try{
   let email = req.body.email;
   var patient_infos = req.body.patient_infos;
   var sendData = `<div> Dear Doctor,
@@ -8897,9 +9621,17 @@ router.post("/MailSendToDr", function (req, res) {
       }
     }
   );
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/MailSendToPatient", function (req, res) {
+ try{
   User.findOne({ _id: req.body.user_id }, function (err, data) {
     if (err) {
       res.json({ status: 200, message: "Something went wrong.", error: err });
@@ -8934,11 +9666,19 @@ router.post("/MailSendToPatient", function (req, res) {
       );
     }
   });
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.put("/SuggestTimeSlot", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     let email = req.body.email,
       apppinment_id = req.body._id,
@@ -8949,11 +9689,11 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
       .exec()
       .then((chnageData) => {
         var lan1 = getMsgLang(req.body.patient_id);
-        if(legit.type=="nurse"){
+        if (legit.type == "nurse") {
           lan1.then((result) => {
             var sendData = `<div>The appoinment with ${doctorProfile.first_name + " " + doctorProfile.last_name
               } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
-  
+
             generateTemplate(
               EMAIL.generalEmail.createTemplate(result, {
                 title: "",
@@ -8974,9 +9714,9 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
                 }
               }
             );
-  
+
             // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
-  
+
             // trans(sendData, { source: "en", target: result }).then((res) => {
             //     var mailOptions = {
             //         from: "contact@aimedis.com",
@@ -8988,45 +9728,45 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
             //   });
           });
         }
-        else{
-        lan1.then((result) => {
-          var sendData = `<div>The appoinment with Dr. ${doctorProfile.first_name + " " + doctorProfile.last_name
-            } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
+        else {
+          lan1.then((result) => {
+            var sendData = `<div>The appoinment with Dr. ${doctorProfile.first_name + " " + doctorProfile.last_name
+              } on ${oldSchedule} is cancelled due to appoinment time, This is the suggested time ${timeslot}, on which you can send request appoinment.</div><br/><br/><br/>`;
 
-          generateTemplate(
-            EMAIL.generalEmail.createTemplate(result, {
-              title: "",
-              content: sendData,
-            }),
-            (error, html) => {
-              if (!error) {
-                let mailOptions = {
-                  from: "contact@aimedis.com",
-                  to: email,
-                  subject: "Appoinment Cancel And New Time Suggestion",
-                  html: html,
-                };
-                let sendmail = transporter.sendMail(mailOptions);
-                if (sendmail) {
-                  console.log("Mail is sent ");
+            generateTemplate(
+              EMAIL.generalEmail.createTemplate(result, {
+                title: "",
+                content: sendData,
+              }),
+              (error, html) => {
+                if (!error) {
+                  let mailOptions = {
+                    from: "contact@aimedis.com",
+                    to: email,
+                    subject: "Appoinment Cancel And New Time Suggestion",
+                    html: html,
+                  };
+                  let sendmail = transporter.sendMail(mailOptions);
+                  if (sendmail) {
+                    console.log("Mail is sent ");
+                  }
                 }
               }
-            }
-          );
+            );
 
-          // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
+            // result = result === 'ch' ? 'zh' : result=== 'sp' ? 'es' : result=== 'rs' ? 'ru' : result;
 
-          // trans(sendData, { source: "en", target: result }).then((res) => {
-          //     var mailOptions = {
-          //         from: "contact@aimedis.com",
-          //         to : email,
-          //         subject: 'Appoinment Cancel And New Time Suggestion',
-          //         html: res.replace(/ @ /g, '@')
-          //     };
-          //     var sendmail = transporter.sendMail(mailOptions)
-          //   });
-        });
-      }
+            // trans(sendData, { source: "en", target: result }).then((res) => {
+            //     var mailOptions = {
+            //         from: "contact@aimedis.com",
+            //         to : email,
+            //         subject: 'Appoinment Cancel And New Time Suggestion',
+            //         html: res.replace(/ @ /g, '@')
+            //     };
+            //     var sendmail = transporter.sendMail(mailOptions)
+            //   });
+          });
+        }
         // let mailOptions = {
         //     from:'contact@aimedis.com',
         //     to : email,
@@ -9056,9 +9796,17 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/verifyStripe", (req, res) => {
+ try{
   const evironment = req.body.env ? req.body.env : "sandbox";
   if (req.body.from == "ios") {
     appleReceiptVerify.config({
@@ -9107,11 +9855,19 @@ router.post("/verifyStripe", (req, res) => {
       });
     }
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.delete("/marketing_user/:email", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     var email = req.params.email && req.params.email.toLowerCase();
     const messageToSearchWith = new marketing_user({ email: email });
@@ -9148,10 +9904,18 @@ router.delete("/marketing_user/:email", function (req, res) {
       message: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
 router.post("/marketing_user", function (req, res, next) {
+ try{
   var email = req.body.email.toLowerCase();
   req.body.email = email;
 
@@ -9173,7 +9937,7 @@ router.post("/marketing_user", function (req, res, next) {
           hassuccessed: false
         });
       }
-      else{
+      else {
         var marketing_users = new marketing_user(datas);
         marketing_users.save(function (err, user_data1) {
           if (err && !user_data1) {
@@ -9189,16 +9953,23 @@ router.post("/marketing_user", function (req, res, next) {
         });
       }
     })
-
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 router.post("/marketing_user2", function (req, res, next) {
-  let email =  base64.decode(req.body.email);
-  if(req.body.first_name && req.body.last_name){
-      var first_name =  base64.decode(req.body.first_name);
-      var last_name =  base64.decode(req.body.last_name);
+  try{
+  let email = base64.decode(req.body.email);
+  if (req.body.first_name && req.body.last_name) {
+    var first_name = base64.decode(req.body.first_name);
+    var last_name = base64.decode(req.body.last_name);
   }
-  
+
   email = email.toLowerCase();
   req.body.email = email;
   req.body.first_name = first_name;
@@ -9223,7 +9994,7 @@ router.post("/marketing_user2", function (req, res, next) {
           hassuccessed: false
         });
       }
-      else{
+      else {
         var marketing_users = new marketing_user(datas);
         marketing_users.save(function (err, user_data1) {
           if (err && !user_data1) {
@@ -9239,84 +10010,127 @@ router.post("/marketing_user2", function (req, res, next) {
         });
       }
     })
-
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
-router.post("/MarketingSub",function(req,res){
-var email = req.body.email.toLowerCase();
-req.body.email = email;
-
-const messageToSearchWith = new marketing_user({ email: req.body.email });
-messageToSearchWith.encryptFieldsSync();
-marketing_user.findOne({
-  $or: [
-  { email: { $regex: req.body.email, $options: "i" } },
-  { email: { $regex: messageToSearchWith.email, $options: "i" } },
-  ],
-})
-  .exec()
-  .then((user_data) => {
-  if (user_data) {
-      res.json({
-      status: 200,
-      message: "Already added",
-      hassuccessed: false
-      });
-  }
-  else{
-  let emails =  base64.encode(req.body.email);
-
-  let url = ``;
-
-  if(req.body.first_name && req.body.last_name){
-  let first_name = base64.encode(req.body.first_name) ;
-  let last_name= base64.encode(req.body.last_name);
-     url= `first_name=${first_name}&last_name=${last_name}&email=${emails}`
-  }
-  else{
-    url= `email=${emails}`
-  }
-  console.log('email', email)
-  sendData = `Dear User,<br/>
-  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
-  generateTemplate(
-      EMAIL.generalEmail.createTemplate("en", {
-      title: "",
-      content: sendData,
-      }),
-      (error, html) => {
-      if (email !== "") {
-          let mailOptions = {
-          from: "contact@aimedis.com",
-          to: email,
-          subject: "Aimedis Newletter Subscription",
-          html: html,
-          };
-          let sendmail = transporter.sendMail(mailOptions);
-          if (sendmail) {
-          res.json({
-              status: 200,
-              msg: "Mail is sent",
-              hassuccessed: true,
-          });
-          } else {
-          res.json({
-              status: 200,
-              msg: "Mail is not sent",
+router.post("/MarketingSub", function (req, res) {
+  try{
+    const response_key = req.body.token;
+    // Making POST request to verify captcha
+    var config = {
+      method: "post",
+      url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+    };
+    axios(config)
+      .then(function (google_response) {
+        if (google_response.data.success == true) {
+          if (
+            req.body.email == "" ||
+            req.body.email == undefined ) {
+            res.json({
+              status: 450,
+              message: "Email fields should not be empty",
               hassuccessed: false,
-          });
+            });
           }
-      } else {
-          res.json({
-          status: 200,
-          msg: "Mail is not sent",
-          hassuccessed: false,
-          });
-      }
-      }
-  );
-  }
+          else {
+  var email = req.body.email.toLowerCase();
+  req.body.email = email;
+
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
   })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else {
+        let emails = base64.encode(req.body.email);
+
+        let url = ``;
+
+        if (req.body.first_name && req.body.last_name) {
+          let first_name = base64.encode(req.body.first_name);
+          let last_name = base64.encode(req.body.last_name);
+          url = `first_name=${first_name}&last_name=${last_name}&email=${emails}`
+        }
+        else {
+          url = `email=${emails}`
+        }
+        console.log('email', email)
+        sendData = `Dear User,<br/>
+  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
+        generateTemplate(
+          EMAIL.generalEmail.createTemplate("en", {
+            title: "",
+            content: sendData,
+          }),
+          (error, html) => {
+            if (email !== "") {
+              let mailOptions = {
+                from: "contact@aimedis.com",
+                to: email,
+                subject: "Aimedis Newletter Subscription",
+                html: html,
+              };
+              let sendmail = transporter.sendMail(mailOptions);
+              if (sendmail) {
+                res.json({
+                  status: 200,
+                  msg: "Mail is sent",
+                  hassuccessed: true,
+                });
+              } else {
+                res.json({
+                  status: 200,
+                  msg: "Mail is not sent",
+                  hassuccessed: false,
+                });
+              }
+            } else {
+              res.json({
+                status: 200,
+                msg: "Mail is not sent",
+                hassuccessed: false,
+              });
+            }
+          }
+        );
+      }
+    })
+  }
+}
+else {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Authentication required.",
+  });
+}
+})
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 })
 
 module.exports = router;

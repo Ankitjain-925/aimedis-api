@@ -3,9 +3,7 @@ let router = express.Router();
 var nodemailer = require("nodemailer");
 const mailchimp = require("@mailchimp/mailchimp_marketing")
 const md5 = require("md5")
-
-
-
+var marketing_users = require('../schema/marketing_user')
 
 var transporter = nodemailer.createTransport({
 
@@ -215,6 +213,22 @@ router.post("/avalonMail2", function (req, res) {
 });
 
 
+// router.post("/MarketingUser", function (req, res) {
+//   marketing_users.find({},function(err,data){
+//     if(err){
+//       res.json({
+//         status: 200,
+//         hassuccessed: false,
+//         message: "questionaire not found",
+//         error: err,
+//     });
+//     }else{ 
+//       res.json({ status: 200, hassuccessed: true, data: data.length });
+
+//     }
+//   })
+ 
+// });
 
 module.exports = router;
 

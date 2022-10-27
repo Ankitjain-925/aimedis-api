@@ -65,33 +65,6 @@ const io = require("socket.io")(server, {
 });
 ////////////admin+main+end/////////////
 
-io.on("connection", (socket) => {
-  console.log("A user is connected");
-
-  socket.on("update", (data) => {
-    console.log("data", data);
-    socket.broadcast.emit("data_shown", data);
-  });
-  socket.on("addpatient", (data) => {
-    console.log("addpatient", data);
-    socket.broadcast.emit("email_accept", data);
-  });
-  socket.on("decline", (data) => {
-    console.log("decline", data);
-    socket.broadcast.emit("email_decline", data);
-  });
-  socket.on('nurse',(data)=>{
-    socket.broadcast.emit("displaynurse", data);
-  })
-  socket.on('doctor',(data)=>{
-    socket.broadcast.emit("displaydoctor", data);
-  })
-  socket.on('adminstaff',(data)=>{
-    socket.broadcast.emit("displayadmin", data);
-  })
-});
-
-
 // cron.schedule('0 0 */12 * * *', function(){
 //   getData();
 //   var DatEtIME = new Date().getTime();
@@ -723,11 +696,16 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+<<<<<<< HEAD
+=======
+  //  return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+>>>>>>> 9051b26256cfa93e80ad45f285dc615b69bc8633
   console.log("err", err);
    return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
   
 });
 
+<<<<<<< HEAD
 
 app.listen(5001, () => {
   console.log("Server started on port 5001")
@@ -735,3 +713,9 @@ app.listen(5001, () => {
 
 
 // module.exports = app;
+=======
+// app.listen(5000, () => {
+//   console.log("Server started on port 5001")
+// });
+ module.exports = app;
+>>>>>>> 9051b26256cfa93e80ad45f285dc615b69bc8633

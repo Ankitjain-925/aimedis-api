@@ -11,18 +11,29 @@ var jwtconfig = require("../jwttoken");
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
-    var bookdata = new CareModel(req.body)
-    bookdata.save(function (err, user_data) {
-      if (err && !user_data) {
-        res.json({ status: 200, message: "Something went wrong.", error: err });
-      } else {
-        res.json({
-          status: 200,
-          message: "Added Successfully",
-          hassuccessed: true,
+      try{
+        var bookdata = new CareModel(req.body)
+        bookdata.save(function (err, user_data) {
+          if (err && !user_data) {
+            res.json({ status: 200, message: "Something went wrong.", error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "Added Successfully",
+              hassuccessed: true,
+            });
+          }
         });
+
       }
-    });
+        catch{
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+          });
+        }
+      
     }else{
       res.json({
         status: 200,
@@ -37,6 +48,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      try{
       let house_id =req.params.house_id
       const messageToSearchWith = new VirtualModel({house_id });
       console.log(messageToSearchWith)
@@ -57,6 +69,13 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
           }
         }
       );
+      }catch{
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
     } else {
       res.json({
         status: 200,   
@@ -71,6 +90,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      try{
       let nurse_id =req.params.nurse_id
       const messageToSearchWith = new CareModel({nurse_id });
       messageToSearchWith.encryptFieldsSync();
@@ -89,6 +109,13 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
           }
         }
       );
+      }catch{
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
     } else {
       res.json({
         status: 200,
@@ -103,6 +130,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      try{
       let patient_id =req.params.patient_id
       const messageToSearchWith = new CareModel({patient_id });
       messageToSearchWith.encryptFieldsSync();
@@ -121,6 +149,13 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
           }
         }
       );
+      }catch{
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
     } else {
       res.json({
         status: 200,
@@ -134,6 +169,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
+      try{
         const house_id = req.params.house_id;
         const messageToSearchWith = new CareModel({ house_id });
         messageToSearchWith.encryptFieldsSync();
@@ -152,6 +188,13 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
                 }
             }
         );
+     }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
     } else {
         res.json({
             status: 200,

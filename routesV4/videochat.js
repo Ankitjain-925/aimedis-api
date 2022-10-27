@@ -16,9 +16,6 @@ const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
 const { encrypt, decrypt } = require("./Cryptofile.js");
-const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
-const Video_chat_Account = require("../schema/vid_chat_account.js");
-var base64 = require('base-64');
 
 const moment = require("moment");
 
@@ -78,40 +75,48 @@ function getDate(date, dateFormat) {
 router.post("/getuserchat", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  console.log(legit)
-  if (legit) {
 
-    const messageToSearchWith = new vidchat({ patient_id: req.body._id });
-    messageToSearchWith.encryptFieldsSync();
-    vidchat.find(
-      {
-        patient_id: { $in: [req.body._id, messageToSearchWith.patient_id] }
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Information not found",
-            error: err,
-          });
-        } else {
-          if (userdata.length > 0) {
-            console.log(userdata.length)
-
-            res.json({ status: 200, hassuccessed: true, data: true, message: "user exists" })
+  try {
+    if (legit) {
+      const messageToSearchWith = new vidchat({ email: req.body.email });
+      messageToSearchWith.encryptFieldsSync();
+      vidchat.find(
+        {
+          email: { $in: [req.body.email, messageToSearchWith.email] }
+        },
+        function (err, userdata) {
+          if (err && !userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Information not found",
+              error: err,
+            });
           } else {
-            res.json({ status: 200, hassuccessed: false, message: "Users Not Exists", data: false })
-          }
+            if (userdata.length > 0) {
+              console.log(userdata.length)
 
+              res.json({ status: 200, hassuccessed: true, data: true, message: "user exists" })
+            } else {
+              res.json({ status: 200, hassuccessed: false, message: "Users Not Exists", data: false })
+            }
+
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch (err) {
+
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -121,77 +126,87 @@ router.post("/getuserchat", function (req, res, next) {
 router.post("/AddVideoUserAccount", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  console.log(legit)
-  if (legit) {
-    var email = req.body.email
-    const VirtualtToSearchWith1 = new vidchat({ email });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    vidchat.find({ $or: [{ email: req.body.email }, { email: VirtualtToSearchWith1.email }] },
-      function (err, data1) {
 
-        if (err) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Information not found",
-            error: err,
-          })
-        } else {
-          if (data1.length > 0) {
-            res.json({ status: 200, hassuccessed: true, data: "User Already Register" })
+  try {
+    if (legit) {
+      var email = req.body.email
+      const VirtualtToSearchWith1 = new vidchat({ email });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      vidchat.find({ $or: [{ email: req.body.email }, { email: VirtualtToSearchWith1.email }] },
+        function (err, data1) {
+
+
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Information not found",
+              error: err,
+            })
           } else {
-            if(req.body.payment_data){
-            const data = {
-              email: legit.email || req.body.email,
-              patient_id: legit.patient_id || req.body.patient_id,
-              reg_amount: legit.reg_amount || req.body.reg_amount,
-              password: legit.password || req.body.password,
-              username: legit.username || req.body.username,
-              is_payment: legit.is_payment || req.body.is_payment,
-              prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
-              status: legit.stauts || req.body.status,
-              type: "video_conference",
-              payment_data: encrypt(JSON.stringify(req.body.payment_data))
+            if (data1.length > 0) {
+              res.json({ status: 200, hassuccessed: false, data: "User Already Register" })
+            } else {
+              if (req.body.payment_data) {
+                const data = {
+                  email: legit.email || req.body.email,
+                  patient_id: legit.patient_id || req.body.patient_id,
+                  reg_amount: legit.reg_amount || req.body.reg_amount,
+                  password: legit.password || req.body.password,
+                  username: legit.username || req.body.username,
+                  is_payment: legit.is_payment || req.body.is_payment,
+                  prepaid_talktime: legit.prepaid_talktime || req.body.prepaid_talktime,
+                  status: legit.stauts || req.body.status,
+                  type: "video_conference",
+                  payment_data: encrypt(JSON.stringify(req.body.payment_data)),
+                  _enc_payment_data: true
+                }
+                const Videodata = new vidchat(data)
+                Videodata.save()
+                  .then(result => {
+                    res.json({
+                      status: 200,
+                      msg: 'User Register Successfully',
+                      data: result,
+                      hassuccessed: true
 
-            }
-            const Videodata = new vidchat(data)
-            Videodata.save()
-              .then(result => {
+                    })
+                  })
+                  .catch(err => {
+                    console.log(err);
+                    res.json({
+                      status: 200,
+                      msg: 'someting went wrong',
+                      data: err,
+                      hassuccessed: false
+                    })
+                  })
+              }
+              else {
                 res.json({
                   status: 200,
-                  msg: 'User Register Successfully',
-                  data: result,
-                  hassuccessed: true
-
+                  msg: 'payment is pending so can not add',
+                  data: 'payment is pending so can not add',
+                  hassuccessed: false
                 })
-              })
-                .catch(err => {
-                  console.log(err);
-                  res.json({
-                    status: 200,
-                    msg: 'someting went wrong',
-                    data: err,
-                    hassuccessed: true
-                  })
-                })
-            }
-            else{
-              res.json({
-                status: 200,
-                msg: 'payment is pending so can not add',
-                data: 'payment is pending so can not add',
-                hassuccessed: true
-              })
+              }
             }
           }
         }
-      }
-    )
-  } else {
+
+      )
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication Required.",
+      });
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication Required.",
+      msg: "Some thing went wrong.",
     });
   }
 })
@@ -201,101 +216,116 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
 router.post("/AppointmentBook", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  console.log(legit)
-  if (legit) {
-    const Videodata = new Cappointment(req.body)
-    Videodata.save()
-      .then(result => {
-        res.json({
-          status: 200,
-          msg: 'Appointment Book Successfully',
-          data: result,
-          hassuccessed: true
+  // console.log(legit)
+  try {
+    if (legit) {
+      const Videodata = new Cappointment(req.body)
+      Videodata.save()
+        .then(result => {
+          res.json({
+            status: 200,
+            msg: 'Appointment Book Successfully',
+            data: result,
+            hassuccessed: true
+          })
         })
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).json({
-          reeor: err
+        .catch(err => {
+          console.log(err);
+          res.status(500).json({
+            reeor: err
+          })
         })
-      })
-  } else {
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication Required.",
+      });
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication Required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
+
 
 router.get("/Get_Doctor/:data", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    user.find({
-      type: "doctor",
-      $or: [
-        { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
-        ]
-    }, function (err, data1) {
-      console.log(err)
-      if (err) {
-        res.json({ status: 200, hassuccessed: true, error: err });
-      } else {
-        res.json({ status: 200, hassuccessed: true, data: data1 });
+  var final
+  try {
+    if (legit) {
+      user.find({ type: "doctor", houses: { $exists: true, $not: { $size: 0 } }, institute_id: { $exists: true, $not: { $size: 0 } } }, function (err, data1) {
+        if (err) {
+          console.log("err", err)
+          res.json({ status: 200, hassuccessed: true, error: err });
+        } else {
+          var final = data1.filter((element) => {
+            if (element.first_name.includes(req.params.data) || element.last_name.includes(req.params.data) || element.alies_id.includes(req.params.data) || element.profile_id.includes(req.params.data) || element.speciality.includes(req.params.data) || element.email.includes(req.params.data)) {
+              return element
+            }
+          })
+          console.log("data1", final)
+          res.json({ status: 200, hassuccessed: true, data: final })
+        }
       }
+      )
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
     }
-    )
-  } else {
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
+
 router.post("/MailtoDrandPatient", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
+  try {
+    if (legit) {
+      sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
     You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${req.body.date} at ${req.body.start_time}.
     That you have requested from the Video conference system. Here is your access key to join call via system - ${req.body.access_key}
     you can contact via email or mobile number.
     Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
-    sendData2 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
+      sendData2 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
     You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${req.body.date} at ${req.body.start_time}.
     Here is your access key to join call via system - ${req.body.access_key}`
-    generateTemplate(
-      EMAIL.generalEmail.createTemplate("en", {
-        title: "",
-        content: sendData,
-      }),
-      (error, html) => {
-        if (req.body.patient_info.email !== "") {
-          let mailOptions = {
-            from: "contact@aimedis.com",
-            to: req.body.patient_info.email,
-            subject: "Approve sick leave request by Doctor",
-            html: html,
-          };
-          let sendmail = transporter.sendMail(mailOptions);
-          if (sendmail) {
+      generateTemplate(
+        EMAIL.generalEmail.createTemplate("en", {
+          title: "",
+          content: sendData,
+        }),
+        (error, html) => {
+          if (req.body.patient_info.email !== "") {
+            let mailOptions = {
+              from: "contact@aimedis.com",
+              to: req.body.patient_info.email,
+              subject: "Approve sick leave request by Doctor",
+              html: html,
+            };
+            let sendmail = transporter.sendMail(mailOptions);
+            if (sendmail) {
 
+            } else {
+              res.json({
+                status: 200,
+                msg: "Mail is not sent",
+                hassuccessed: false,
+              });
+            }
           } else {
             res.json({
               status: 200,
@@ -303,31 +333,31 @@ router.post("/MailtoDrandPatient", function (req, res) {
               hassuccessed: false,
             });
           }
-        } else {
-          res.json({
-            status: 200,
-            msg: "Mail is not sent",
-            hassuccessed: false,
-          });
         }
-      }
-    );
-    generateTemplate(
-      EMAIL.generalEmail.createTemplate("en", {
-        title: "",
-        content: sendData2,
-      }),
-      (error, html) => {
-        if (req.body.docProfile.email !== "") {
-          let mailOptions = {
-            from: "contact@aimedis.com",
-            to: req.body.docProfile.email,
-            subject: "Appointment System",
-            html: html,
-          };
-          let sendmail = transporter.sendMail(mailOptions);
-          if (sendmail) {
+      );
+      generateTemplate(
+        EMAIL.generalEmail.createTemplate("en", {
+          title: "",
+          content: sendData2,
+        }),
+        (error, html) => {
+          if (req.body.docProfile.email !== "") {
+            let mailOptions = {
+              from: "contact@aimedis.com",
+              to: req.body.docProfile.email,
+              subject: "Appointment System",
+              html: html,
+            };
+            let sendmail = transporter.sendMail(mailOptions);
+            if (sendmail) {
 
+            } else {
+              res.json({
+                status: 200,
+                msg: "Mail is not sent",
+                hassuccessed: false,
+              });
+            }
           } else {
             res.json({
               status: 200,
@@ -335,25 +365,25 @@ router.post("/MailtoDrandPatient", function (req, res) {
               hassuccessed: false,
             });
           }
-        } else {
-          res.json({
-            status: 200,
-            msg: "Mail is not sent",
-            hassuccessed: false,
-          });
         }
-      }
-    );
-    res.json({
-      status: 200,
-      message: "Mail sent Successfully",
-      hassuccessed: true,
-    });
-  } else {
+      );
+      res.json({
+        status: 200,
+        message: "Mail sent Successfully",
+        hassuccessed: true,
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 })
@@ -677,44 +707,44 @@ router.post("/DownloadbillVC", function (req, res) {
 // })
 
 
-router.get("/Get_Doctor/:data", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    user.find({
-      type: "doctor",
-      $or: [
-        { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
-        { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
-        ]
-    }, function (err, data1) {
-      if (err) {
-        res.json({ status: 200, hassuccessed: true, error: err });
-      } else {
-        res.json({ status: 200, hassuccessed: true, data: data1 });
-      }
-    }
-    )
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
-});
+// router.get("/Get_Doctor/:data", function (req, res) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//     const VirtualtToSearchWith1 = new user({ alies_id: req.params.data, email: req.params.data, profile_id: req.params.data, speciality: req.params.data, first_name: req.params.data, last_name: req.params.data });
+//     VirtualtToSearchWith1.encryptFieldsSync();
+//     user.find({
+//       type: "doctor",
+//       $or: [
+//         { alies_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { alies_id: { $regex: '.*' + VirtualtToSearchWith1.alies_id + '.*', $options: 'i' } },
+//         { email: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { email: { $regex: '.*' + VirtualtToSearchWith1.email + '.*', $options: 'i' } },
+//         { profile_id: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { profile_id: { $regex: '.*' + VirtualtToSearchWith1.profile_id + '.*', $options: 'i' } },
+//         { speciality: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { speciality: { $regex: '.*' + VirtualtToSearchWith1.speciality + '.*', $options: 'i' } },
+//         { first_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { first_name: { $regex: '.*' + VirtualtToSearchWith1.first_name + '.*', $options: 'i' } },
+//         { last_name: { $regex: '.*' + req.params.data + '.*', $options: 'i' } },
+//         { last_name: { $regex: '.*' + VirtualtToSearchWith1.last_name + '.*', $options: 'i' } }
+//         ]
+//     }, function (err, data1) {
+//       if (err) {
+//         res.json({ status: 200, hassuccessed: true, error: err });
+//       } else {
+//         res.json({ status: 200, hassuccessed: true, data: data1 });
+//       }
+//     }
+//     )
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       message: "Authentication required.",
+//     });
+//   }
+// });
 
 router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
   const token = req.headers.token;
@@ -777,7 +807,7 @@ router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
 //         console.log('data',data.total_amount)
 
 //        if(data.total_amount>req.body.amount){
-      
+
 //         virtual_invoice.updateOne({ _id: req.body._id },
 //          { $inc: {total_amount: Number(-req.body.amount) }}, function (err, updt) {
 //             if (err) {
@@ -797,7 +827,7 @@ router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
 //           message:"Low Balance"
 //         });
 //        }
-       
+
 //       }
 
 //     })
@@ -857,39 +887,47 @@ router.get("/GetConferencePatient/:patient_id", function (req, res, next) {
 router.post("/givefeedback", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
+  try {
     if (legit) {
-      var type = "video_conference",
-        datas = {
-          ...req.body,
-          type,
-        }
-      var bookdata = new Video_Conference(datas)
-      bookdata.save(function (err, user_data) {
-        if (err && !user_data) {
-          res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err });
-        } else {
-          res.json({
-            status: 200,
-            message: "Added Successfully",
-            hassuccessed: true,
-          });
-        }
-      });
+      const token = req.headers.token;
+      let legit = jwtconfig.verify(token);
+      if (legit) {
+        var type = "video_conference",
+          datas = {
+            ...req.body,
+            type,
+          }
+        var bookdata = new Video_Conference(datas)
+        bookdata.save(function (err, user_data) {
+          if (err && !user_data) {
+            res.json({ status: 200, message: "Something went wrong.", hassuccessed: false, error: err });
+          } else {
+            res.json({
+              status: 200,
+              message: "Added Successfully",
+              hassuccessed: true,
+            });
+          }
+        });
+      } else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something wnet Wrong",
+        });
+      }
     } else {
       res.json({
         status: 200,
         hassuccessed: false,
-        message: "Something wnet Wrong",
+        message: "Authentication required.",
       });
     }
-  } else {
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -897,101 +935,128 @@ router.post("/givefeedback", function (req, res) {
 router.get("/getfeedbackfordoctor/:doctor_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    var doctor_id = req.params.doctor_id
-    const VirtualtToSearchWith1 = new Video_Conference({ doctor_id });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    Video_Conference
-      .find({ doctor_id: {$in: [req.params.doctor_id, VirtualtToSearchWith1.doctor_id]}})
-      .limit(10)
-      .sort({ _id: -1 })
-      .exec(function (err, data) {
-        if (err && !data) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-            hassuccessed: false,
-          });
-        } else {
-          res.json({
-            status: 200,
-            message: "data fetch",
-            hassuccessed: true,
-            data: data,
-          });
-        }
+  try {
+    if (legit) {
+      var doctor_id = req.params.doctor_id
+      const VirtualtToSearchWith1 = new Video_Conference({ doctor_id });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      Video_Conference
+        .find({ doctor_id: { $in: [req.params.doctor_id, VirtualtToSearchWith1.doctor_id] } })
+        .limit(10)
+        .sort({ _id: -1 })
+        .exec(function (err, data) {
+          if (err && !data) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+              hassuccessed: false,
+            });
+          } else {
+            res.json({
+              status: 200,
+              message: "data fetch",
+              hassuccessed: true,
+              data: data,
+            });
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
       });
-  } else {
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
 router.post("/UsernameLogin", function (req, res, next) {
-  var username = req.body.username.toLowerCase();
-  var password = req.body.password;
-  const VirtualtToSearchWith1 = new vidchat({ username, password });
-  VirtualtToSearchWith1.encryptFieldsSync();
-  if (req.body.username == "" || req.body.password == "") {
-    res.json({
-      status: 400,
-      message: "username and password fields should not be empty",
-      hassuccessed: false,
-    });
-  } else {
-    vidchat
-      .findOne({ username: { $in: [req.body.username, VirtualtToSearchWith1.username] } })
-      .exec()
-      .then((user_data) => {
-        if (!user_data) {
-          res.json({
-            status: 400,
-            hassuccessed: false,
-            message: "Username not match",
-          });
-        } else {
-          if (user_data.password !== req.body.password) {
+  try {
+    var username = req.body.username.toLowerCase();
+    var password = req.body.password;
+    var email = req.body.email;
+    const VirtualtToSearchWith1 = new vidchat({ username, password, email });
+    VirtualtToSearchWith1.encryptFieldsSync();
+    if (req.body.username == "" || req.body.password == "") {
+      res.json({
+        status: 400,
+        message: "username and password fields should not be empty",
+        hassuccessed: false,
+      });
+    } else {
+      vidchat
+        .findOne({ username: { $in: [req.body.username, VirtualtToSearchWith1.username] }, email: { $in: [req.body.email, VirtualtToSearchWith1.email] } })
+        .exec()
+        .then((user_data) => {
+          if (!user_data) {
             res.json({
               status: 400,
               hassuccessed: false,
-              message: "Password not match",
+              message: "Username not match",
             });
           } else {
-            res.json({ status: 200, hassuccessed: true, data: user_data });
+            if (user_data.password !== req.body.password) {
+              res.json({
+                status: 400,
+                hassuccessed: false,
+                message: "Password not match",
+              });
+            } else {
+              res.json({ status: 200, hassuccessed: true, data: user_data });
+            }
           }
-        }
-      });
+        });
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
   }
 });
 
 router.post("/managePrepaid", async (req, res) => {
-  const { manage_for, _id, prepaid_min, paid_amount_data, used_talktime_data } = req.body;
-  if (manage_for == "add") {
-    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "paid_amount_obj": encrypt(JSON.stringify(paid_amount_data)) } })
-    if (response) {
-      res.json({ status: 200, hassuccessed: true, data: response });
-    } else {
-      res.json({
-        status: 400,
-        hassuccessed: false,
-        message: "Something went wrong",
-      });
+  try {
+    const { manage_for, _id, prepaid_talktime_min, paid_amount_obj, used_talktime } = req.body;
+    if (manage_for == "add") {
+      let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_talktime_min, $push: { "paid_amount_obj": paid_amount_obj } })
+      if (response) {
+        let response3 = await vidchat.findOne({ _id })
+        res.json({ status: 200, hassuccessed: true, data: response3 });
+      } else {
+        res.json({
+          status: 400,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      }
+    } else if (manage_for == 'use') {
+      let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_talktime_min, $push: { "used_talktime": used_talktime } })
+      if (response) {
+        let response3 = await vidchat.findOne({ _id })
+        res.json({ status: 200, hassuccessed: true, data: response3 });
+      } else {
+        res.json({
+          status: 400,
+          hassuccessed: false,
+          message: "Something went wrong",
+        });
+      }
     }
-  } else if (manage_for == 'use') {
-    let response = await vidchat.findByIdAndUpdate({ _id }, { "prepaid_talktime_min": prepaid_min, $push: { "used_talktime": encrypt(JSON.stringify(used_talktime_data)) } })
-    if (response) {
-      res.json({ status: 200, hassuccessed: true, data: response });
-    } else {
-      res.json({
-        status: 400,
-        hassuccessed: false,
-        message: "Something went wrong",
-      });
-    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
   }
 })
 
@@ -1042,156 +1107,164 @@ router.delete('/userdelete/:_id', function (req, res, next) {
 router.post("/DynamicSlots", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      User.find({ _id: req.body._id }, function (err, userdata) {
+        if (err) {
+          res.json({
+            status: 200,
+            message: "Something went wrong.",
+            error: err,
+            hassuccessed: false,
+          })
+        } else {
 
-  if (legit) {
-    User.find({ _id: req.body._id }, function (err, userdata) {
-      if (err) {
-        res.json({
-          status: 200,
-          message: "Something went wrong.",
-          error: err,
-          hassuccessed: false,
-        })
-      } else {
-
-        var finalArray = [];
-        for (let i = 0; i < userdata.length; i++) {
-          let Monday,
-            Tuesday,
-            Wednesday,
-            Thursday,
-            Friday,
-            Saturday,
-            Sunday,
-            custom_text;
-          var user = [];
-          console.log("user", userdata[0].online_appointment)
-          for (
-            let j = 0;
-            j < userdata[i].online_appointment.length;
-            j++
-          ) {
-            if (userdata[i].online_appointment[j].custom_text) {
-              custom_text =
-                userdata[i].online_appointment[j].custom_text;
-            }
-            if (
-              (userdata[i].online_appointment[j].monday_start,
-                userdata[i].online_appointment[j].monday_end
-              )
-            ) {
-              Monday = getTimeStops(
-                userdata[i].online_appointment[j].monday_start,
-                userdata[i].online_appointment[j].monday_end,
-                req.body.duration_of_timeslots
-              );
-            }
-            if (
-              (userdata[i].online_appointment[j].tuesday_start,
-                userdata[i].online_appointment[j].tuesday_end
-              )
-            ) {
-              Tuesday = getTimeStops(
-                userdata[i].online_appointment[j].tuesday_start,
-                userdata[i].online_appointment[j].tuesday_end,
-                req.body.duration_of_timeslots
-              );
-            }
-            if (
-              (userdata[i].online_appointment[j].wednesday_start,
-                userdata[i].online_appointment[j].wednesday_end
-              )
-            ) {
-              Wednesday = getTimeStops(
-                userdata[i].online_appointment[j].wednesday_start,
-                userdata[i].online_appointment[j].wednesday_end,
-                req.body.duration_of_timeslots
-
-              );
-            }
-            if (
-              (userdata[i].online_appointment[j].thursday_start,
-                userdata[i].online_appointment[j].thursday_end
-              )
-            ) {
-              Thursday = getTimeStops(
-                userdata[i].online_appointment[j].thursday_start,
-                userdata[i].online_appointment[j].thursday_end,
-                req.body.duration_of_timeslots
-              );
-            }
-            if (
-              (userdata[i].online_appointment[j].friday_start,
-                userdata[i].online_appointment[j].friday_end
-              )
-            ) {
-              Friday = getTimeStops(
-                userdata[i].online_appointment[j].friday_start,
-                userdata[i].online_appointment[j].friday_end,
-                req.body.duration_of_timeslots
-
-              );
-            }
-            if (
-              (userdata[i].online_appointment[j].saturday_start,
-                userdata[i].online_appointment[j].saturday_end
-              )
-            ) {
-              Saturday = getTimeStops(
-                userdata[i].online_appointment[j].saturday_start,
-                userdata[i].online_appointment[j].saturday_end,
-                req.body.duration_of_timeslots
-
-              );
-            }
-            if (
-              (userdata[i].online_appointment[j].sunday_start,
-                userdata[i].online_appointment[j].sunday_end
-              )
-            ) {
-              Sunday = getTimeStops(
-                userdata[i].online_appointment[j].sunday_start,
-                userdata[i].online_appointment[j].sunday_end,
-                req.body.duration_of_timeslots
-
-              );
-            }
-            user.push({
-              Monday,
+          var finalArray = [];
+          for (let i = 0; i < userdata.length; i++) {
+            let Monday,
               Tuesday,
               Wednesday,
               Thursday,
               Friday,
               Saturday,
               Sunday,
-              custom_text,
+              custom_text;
+            var user = [];
+            console.log("user", userdata[0].online_appointment)
+            for (
+              let j = 0;
+              j < userdata[i].online_appointment.length;
+              j++
+            ) {
+              if (userdata[i].online_appointment[j].custom_text) {
+                custom_text =
+                  userdata[i].online_appointment[j].custom_text;
+              }
+              if (
+                (userdata[i].online_appointment[j].monday_start,
+                  userdata[i].online_appointment[j].monday_end
+                )
+              ) {
+                Monday = getTimeStops(
+                  userdata[i].online_appointment[j].monday_start,
+                  userdata[i].online_appointment[j].monday_end,
+                  req.body.duration_of_timeslots
+                );
+              }
+              if (
+                (userdata[i].online_appointment[j].tuesday_start,
+                  userdata[i].online_appointment[j].tuesday_end
+                )
+              ) {
+                Tuesday = getTimeStops(
+                  userdata[i].online_appointment[j].tuesday_start,
+                  userdata[i].online_appointment[j].tuesday_end,
+                  req.body.duration_of_timeslots
+                );
+              }
+              if (
+                (userdata[i].online_appointment[j].wednesday_start,
+                  userdata[i].online_appointment[j].wednesday_end
+                )
+              ) {
+                Wednesday = getTimeStops(
+                  userdata[i].online_appointment[j].wednesday_start,
+                  userdata[i].online_appointment[j].wednesday_end,
+                  req.body.duration_of_timeslots
+
+                );
+              }
+              if (
+                (userdata[i].online_appointment[j].thursday_start,
+                  userdata[i].online_appointment[j].thursday_end
+                )
+              ) {
+                Thursday = getTimeStops(
+                  userdata[i].online_appointment[j].thursday_start,
+                  userdata[i].online_appointment[j].thursday_end,
+                  req.body.duration_of_timeslots
+                );
+              }
+              if (
+                (userdata[i].online_appointment[j].friday_start,
+                  userdata[i].online_appointment[j].friday_end
+                )
+              ) {
+                Friday = getTimeStops(
+                  userdata[i].online_appointment[j].friday_start,
+                  userdata[i].online_appointment[j].friday_end,
+                  req.body.duration_of_timeslots
+
+                );
+              }
+              if (
+                (userdata[i].online_appointment[j].saturday_start,
+                  userdata[i].online_appointment[j].saturday_end
+                )
+              ) {
+                Saturday = getTimeStops(
+                  userdata[i].online_appointment[j].saturday_start,
+                  userdata[i].online_appointment[j].saturday_end,
+                  req.body.duration_of_timeslots
+
+                );
+              }
+              if (
+                (userdata[i].online_appointment[j].sunday_start,
+                  userdata[i].online_appointment[j].sunday_end
+                )
+              ) {
+                Sunday = getTimeStops(
+                  userdata[i].online_appointment[j].sunday_start,
+                  userdata[i].online_appointment[j].sunday_end,
+                  req.body.duration_of_timeslots
+
+                );
+              }
+              user.push({
+                Monday,
+                Tuesday,
+                Wednesday,
+                Thursday,
+                Friday,
+                Saturday,
+                Sunday,
+                custom_text,
+              });
+            }
+
+            finalArray.push({
+              data: userdata[i],
+              slot: user,
             });
+
           }
 
-          finalArray.push({
-            data: userdata[i],
-            slot: user,
-          });
-
         }
+        res.json({ status: 200, hassuccessed: true, data: finalArray })
 
-      }
-      res.json({ status: 200, hassuccessed: true, data: finalArray })
-
-    })
+      })
 
 
-  }
-  else {
+    }
+    else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
 
 function getTimeStops(start, end, timeslots, breakstart, breakend) {
+
   var startTime = moment(start, "HH:mm");
   var endTime = moment(end, "HH:mm");
   var timeslot = parseInt(timeslots, 10);
@@ -1208,62 +1281,76 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
   }
   console.log("timestops", timeStops)
   return timeStops;
+
 }
 
 router.post("/getSlotTime", function (req, res) {
   const token = req.headers.token;
   var finalArray = []
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    const messageToSearchWith = new Appointment({ doctor_id:req.body.doctor_id  });
-    messageToSearchWith.encryptFieldsSync();
-    Appointment.find({ doctor_id:{$in:[ req.body.doctor_id,messageToSearchWith.doctor_id]}, date: req.body.date })
-      .exec(function (err, data) {
-        if (err && !data) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-            hassuccessed: false,
-          });
-        } else {
-          virtual_Task.find({ "assinged_to.user_id": req.body.doctor_id, date: req.body.date }, function (err, data2) {
-            if (err) {
-              res.json({
-                status: 200,
-                message: "Something went wrong.",
-                error: err,
-                hassuccessed: false,
-              });
-            } else {
-              data.map((element) => {
-                finalArray.push({
-                  starttime : element.start_time,
-                  endtime : element.end_time
-
+  try {
+    if (legit) {
+      const messageToSearchWith = new Appointment({ doctor_id: req.body.doctor_id });
+      messageToSearchWith.encryptFieldsSync();
+      Appointment.find({ doctor_id: { $in: [req.body.doctor_id, messageToSearchWith.doctor_id] } })
+        .exec(function (err, data) {
+          if (err && !data) {
+            res.json({
+              status: 200,
+              message: "Something went wrong.",
+              error: err,
+              hassuccessed: false,
+            });
+          } else {
+            virtual_Task.find({ "assinged_to.user_id": req.body.doctor_id }, function (err, data2) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  message: "Something went wrong.",
+                  error: err,
+                  hassuccessed: false,
+                });
+              } else {
+                data.map((element) => {
+                  if (moment(req.body.date).format("DD/MM/YYYY") == moment(element.date).format("DD/MM/YYYY")) {
+                    finalArray.push({
+                      starttime: element.start_time,
+                      endtime: element.end_time
+                    })
+                  }
                 })
-              })
-              data2.forEach((element) => {
-                finalArray.push({
-                starttime : element.start,
-                endtime : element.end
-              })
-              })
-              res.json({
-                stayus:200,
-                messaage:"TIme slots",
-                data:finalArray
-              })
+                data2.map((element) => {
+                  if (moment(req.body.date).format("DD/MM/YYYY") == moment(element.date).format("DD/MM/YYYY")) {
+                    finalArray.push({
+                      starttime: element.start,
+                      endtime: element.end
+                    })
+                  }
+                })
 
-            }
-          })
-        }
+                res.json({
+                  status: 200,
+                  messaage: "Time slots",
+                  data: finalArray,
+                  hassuccessed: true
+                })
+
+              }
+            })
+          }
+        });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
       });
-  } else {
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -1271,44 +1358,55 @@ router.post("/getSlotTime", function (req, res) {
 router.get("/GetVideoTask/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    let patient_id = req.params.patient_id;
-    var VirtualtToSearchWith = new virtual_Task({ patient_id });
-    VirtualtToSearchWith.encryptFieldsSync();
-    const VirtualtToSearchWith1 = new virtual_Task({ task_type: "video_conference" });
-    VirtualtToSearchWith1.encryptFieldsSync();
-    virtual_Task.find(
-      {
-        patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
-        $or: [
-          { task_type: { $eq: "video_conference" } },
-          { task_type: { $eq: VirtualtToSearchWith1.task_type } },
-        ],
-        $or:[
-          {archived: { $eq: true }},
-          {archived:{$exists: false} },
-         ]
-      },
-      function (err, userdata) {
-        if (err && !userdata) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "Something went wrong",
-            error: err,
-          });
-        } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
+  // var full_data;
+  try {
+    if (legit) {
+      let patient_id = req.params.patient_id;
+      var VirtualtToSearchWith = new virtual_Task({ patient_id });
+      VirtualtToSearchWith.encryptFieldsSync();
+      const VirtualtToSearchWith1 = new virtual_Task({ task_type: "video_conference" });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      virtual_Task.find(
+        {
+          $and: [{
+            patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] },
+            $or: [
+              { task_type: { $eq: "video_conference" } },
+              { task_type: { $eq: VirtualtToSearchWith1.task_type } },
+            ],
+            archived: { $ne: true }
+          }]
+        },
+        function (err, userdata) {
+
+          // full_data=userdata.filter((item)=>item.task_type==="video_conference")}
+          if (!userdata) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong",
+              error: err,
+            });
+          } else {
+            res.json({ status: 200, hassuccessed: true, data: userdata });
+          }
         }
-      }
-    );
-  } else {
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
+
 
 module.exports = router;                                                                            

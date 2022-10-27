@@ -16,6 +16,7 @@ router.get("/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var diagnosis = [];
     var medication = [];
     var allergy = [];
@@ -560,6 +561,13 @@ router.get("/:UserId", function (req, res, next) {
         }
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -574,6 +582,7 @@ router.get("/getTrack/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     user.find({ _id: req.params.UserId }, function (err, doc) {
       if (err && !doc) {
         res.json({
@@ -602,6 +611,13 @@ router.get("/getTrack/:UserId", function (req, res, next) {
         }
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -616,6 +632,7 @@ router.get("/ArchivegetTrack/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     user.find({ _id: req.params.UserId }, function (err, doc) {
       if (err && !doc) {
         res.json({
@@ -646,6 +663,13 @@ router.get("/ArchivegetTrack/:UserId", function (req, res, next) {
         }
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -659,6 +683,7 @@ router.put("/AddstoredPre/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     var ids = { track_id: uuidv1() };
     var full_record = { ...ids, ...req.body.data };
     if (req.query.addtopatient && req.query.addtopatient === "true") {
@@ -725,6 +750,13 @@ router.put("/AddstoredPre/:UserId", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,
@@ -735,6 +767,7 @@ router.put("/AddstoredPre/:UserId", function (req, res, next) {
 });
 
 router.get("/getLocationPharmacy/:radius", function (req, res, next) {
+  try{
   user
     .find({
       area: {
@@ -758,12 +791,20 @@ router.get("/getLocationPharmacy/:radius", function (req, res, next) {
         res.json({ status: 200, hassuccessed: false, data: Userinfo });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
 });
 
 router.get("/getPharmacy/search/:name", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     user.find({ type: "pharmacy" }, function (err, doc) {
       if (err && !doc) {
         res.json({
@@ -783,6 +824,13 @@ router.get("/getPharmacy/search/:name", function (req, res, next) {
         });
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -830,6 +878,7 @@ router.get("/pharmacyPrescription/:UserId", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    try{
     trackrecord331 = [];
     user.findOne({ _id: req.params.UserId }, function (err, doc) {
       if (err && !doc) {
@@ -860,6 +909,13 @@ router.get("/pharmacyPrescription/:UserId", function (req, res, next) {
         }
       }
     });
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -1123,6 +1179,7 @@ function forEachPromises(items, created_by, fn) {
 }
 
 router.get("/getSentPrescription/:UserId", function (req, res, next) {
+  try{
   trackrecord1 = [];
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1187,6 +1244,13 @@ router.get("/getSentPrescription/:UserId", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+}catch{
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    message: "Something went wrong.",
+  });
+}
 });
 
 module.exports = router;

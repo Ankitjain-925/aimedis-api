@@ -28,6 +28,11 @@ const ProfessionalInfo = new mongoose.Schema({
         type: String,
         required: false,
         unique: false
+    },
+    patient_id:{
+        type: String,
+        required: false,
+        unique: false
     }
 },{ strict: false });
 

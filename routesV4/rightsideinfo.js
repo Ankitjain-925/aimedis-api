@@ -16,18 +16,19 @@ router.get("/patient", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var respiration,
-    upcoming_appointment,
-    blood_sugar,
-    last_dia,
-    info,
-    last_dv,
-    last_con,
-    weight_bmi,
-    sick_certificates,
-    prescriptions,
-    laboratory_result,
-    blood_pressure;
+  upcoming_appointment,
+  blood_sugar,
+  last_dia,
+  info,
+  last_dv,
+  last_con,
+  weight_bmi,
+  sick_certificates,
+  prescriptions,
+  laboratory_result,
+  blood_pressure;
   if (legit) {
+    try{
     user.find(
       {
         _id: legit.id,
@@ -215,6 +216,13 @@ router.get("/patient", function (req, res, next) {
         }
       }
     );
+  }catch{
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Something went wrong.",
+    });
+  }
   } else {
     res.json({
       status: 200,
@@ -241,6 +249,7 @@ router.get("/patient/:patient_id", function (req, res, next) {
     laboratory_result,
     blood_pressure;
   if (legit) {
+    try{
     user.find(
       {
         _id: req.params.patient_id,
@@ -428,6 +437,13 @@ router.get("/patient/:patient_id", function (req, res, next) {
         }
       }
     );
+    }catch{
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong.",
+      });
+    }
   } else {
     res.json({
       status: 200,

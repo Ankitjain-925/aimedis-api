@@ -117,7 +117,7 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
 router.post("/SelectDocforSickleave2", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  
+  try{
   if (legit) {
     
     const VirtualtToSearchWith = new virtual_Task({ task_type: "sick_leave" });
@@ -190,12 +190,20 @@ router.post("/SelectDocforSickleave2", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/SelectDocforSickleave", function (req, res, next) { 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = process.env.institute_id;
+ try{
   if (legit) {
     User.find({ current_available: true, institute_id: institute_id })
       .countDocuments()
@@ -366,11 +374,19 @@ router.get("/SelectDocforSickleave", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/PatientTask/:profile_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     virtual_Task.find(
       { "assinged_to.profile_id": req.params.profile_id },
@@ -394,11 +410,19 @@ router.get("/PatientTask/:profile_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     let patient_id = req.params.patient_id;
     var VirtualtToSearchWith = new virtual_Task({ patient_id });
@@ -444,9 +468,17 @@ router.get("/GetAllPatientData/:patient_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/DoctorMail", function (req, res) {
+ try{
   var sendData = `<div>Dear Doctor <br/>
     Here is the new Sick leave certificate request from the 
       ${req.body.first_name + "" + req.body.last_name + "" + req.body.profile_id
@@ -487,6 +519,13 @@ router.post("/DoctorMail", function (req, res) {
       }
     }
   );
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
@@ -494,6 +533,7 @@ router.post("/DoctorMail", function (req, res) {
 router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     sick_meeting.findByIdAndRemove(
       { _id: req.params.meeting_id },
@@ -521,6 +561,13 @@ router.delete("/AddMeeting/:meeting_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.post("/approvedrequest", function (req, res) {
@@ -682,31 +729,43 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
           res.json({ status: 200, message: "Something went wrong.", error: err });
         } else {
           var meetingDate = getDate(req.body.date, "YYYY/MM/DD");
-          // var start_date = new Date(req.body.start_time);
-          // var end_date = new Date(req.body.end_time);
-          // var start_time = start_date.getHours()+':'+ start_date.getMinutes();
-          // var end_time = end_date.getHours()+':'+ end_date.getMinutes();
-
           var start_time = req.params.start_time;
           var end_time = req.params.end_time;
-          var sendData = `Dear Patient,
 
-    Your payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at ${meetingDate} from the time slot  ${start_time
-            } to ${end_time} 
-    Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : "Not mentioned"
-            }
-    Please remind the date and timing as alloted.`;
+          var sendData =  ``;
+          var sendData1 = ``;
+          var subject = req.body.task_type === 'video_conference' ? "Access key for Video conference": "Link for the Sick leave certificate";
+          
+          if(req.body.task_type === 'video_conference'){
+            sendData = `Dear ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name}<br/>
+            You have online video conference appointment with Dr. ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name} on ${meetingDate} at ${start_time}.
+            That you have requested from the Video conference system. Here is your access key to join call via system - <b>${req.body.sesion_id}</b>.
+            you can contact via email or mobile number.
+            Alternatively, you can contact us via contact@aimedis.com.com or the Aimedis support chat if you have difficulties contacting your doctor.`
+            sendData1 = `Dear ${req.body.docProfile.first_name + " " + req.body.docProfile.last_name}<br/>
+            You have got an online video conference appointment with ${req.body.patient_info.first_name + " " + req.body.patient_info.last_name} on ${meetingDate} at ${start_time}.
+            Here is your access key to join call via system - <b>${req.body.sesion_id}</b>`
+          }
+          else {
+            sendData = `Dear Patient,
 
-          var sendData1 = `Dear Doctor,
+            Your payment process for sick leave certificate application is completed successfully.
+            Please do join the Video call at ${meetingDate} from the time slot  ${start_time
+                    } to ${end_time} 
+            Your Video call joining link is  ${req.body.link ? req.body.link.patient_link : "Not mentioned"
+                    }
+            Please remind the date and timing as alloted.`;
 
-    The payment process for sick leave certificate application is completed successfully.
-    Please do join the Video call at  ${meetingDate} from the time slot ${start_time
-            } to ${end_time}
-    Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : "Not mentioned"
-            }
-    Please remind the date and timing as alloted.</div>`;
+            sendData1 =  `Dear Doctor,
 
+            The payment process for sick leave certificate application is completed successfully.
+            Please do join the Video call at  ${meetingDate} from the time slot ${start_time
+                    } to ${end_time}
+            Your Video call joining link is  ${req.body.link ? req.body.link.doctor_link : "Not mentioned"
+                    }
+            Please remind the date and timing as alloted.</div>`;
+          }
+          
           if (req.body.patient_mail !== "") {
             generateTemplate(
               EMAIL.generalEmail.createTemplate("en", {
@@ -718,7 +777,7 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
                   let mailOptions = {
                     from: "contact@aimedis.com",
                     to: req.body.patient_mail,
-                    subject: "Link for the Sick leave certificate",
+                    subject: subject,
                     html: html,
                   };
 
@@ -747,7 +806,7 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
                       let mailOptions1 = {
                         from: "contact@aimedis.com",
                         to: userdata.email,
-                        subject: "Link for the sick leave certificate",
+                        subject:subject,
                         html: html,
                       };
                       let sendmail1 = transporter.sendMail(mailOptions1);
@@ -1308,6 +1367,7 @@ function GetDatafromAws1(element, comming2) {
 }
 
 router.post("/SickleaveCretificateToPatient", function (req, res) {
+  try{
   var sendData = `<div>Dear Doctor <br/>
   Here is the new Sick leave certificate request from the 
     ${req.body.first_name + " " + req.body.last_name + " " + req.body.profile_id},
@@ -1347,6 +1407,13 @@ router.post("/SickleaveCretificateToPatient", function (req, res) {
       }
     }
   );
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/Linktime/:sesion_id", function (req, res, next) {
@@ -1354,6 +1421,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   // let legit = jwtconfig.verify(token);
   // if (legit) {
   try {
+    var doctor_info={}
     const VirtualtToSearchWith = new sick_meeting({
       sesion_id: req.params.sesion_id,
     });
@@ -1406,6 +1474,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                       });
                     } else {
                       if (userdata !== null) {
+                        console.log("2")
                         User.findOne({ _id: userdata.patient_id }, function (err, result) {
                           if(err && !result){
                             res.json({
@@ -1416,28 +1485,49 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
                             });
                           }
                           else{
-                            if(result !== null){
-                              var patient_info = userdata.patient;
-                              patient_info['image'] = result.image;
-                              userdata.patient = patient_info
-                              res.json({
-                                status: 200,
-                                hassuccessed: true,
-                                message: "link active",
-                                data: { Task: userdata, Session: data, gender: result.sex},
-                              });
-                            }
-                            else{
-                              var patient_info = userdata.patient;
-                              patient_info['image'] = 'insidenull.jpg';
-                              userdata.patient = patient_info
-                              res.json({
-                                status: 200,
-                                hassuccessed: true,
-                                message: "link active",
-                                data: { Task: userdata, Session: data, },
-                              });
-                            }
+                            User.findOne({_id:userdata.assinged_to[0].user_id},function(err,result2){
+                              console.log("1",result.image)
+                              if(err){
+                                res.json({
+                                  status: 200,
+                                  hassuccessed: false,
+                                  message: "Something went wrong",
+                                  error: err,
+                                });
+                              }else{
+                                doctor_info['first_name']=result2.first_name
+                                doctor_info['last_name']=result2.last_name
+                                doctor_info['user_id']=result2._id
+                                doctor_info['profile_id']=result2.profile_id
+                                doctor_info['alies_id']=result2.alies_id
+                                doctor_info['email']=result2.email
+                                doctor_info['image']=result2.image
+                                if(result !== null){
+                                  var patient_info = userdata.patient;
+                                  patient_info['image'] = result.image;
+                                  userdata.patient = patient_info
+                                  res.json({
+                                    status: 200,
+                                    hassuccessed: true,
+                                    message: "link active",
+                                    data: { Task: userdata, Session: data, gender: result.sex,doctor_info:doctor_info},
+                                  });
+                                }
+                                else{
+                                  var patient_info = userdata.patient;
+                                  patient_info['image'] = 'insidenull.jpg';
+                                  userdata.patient = patient_info
+                                  res.json({
+                                    status: 200,
+                                    hassuccessed: true,
+                                    message: "link active",
+                                    data: { Task: userdata, Session: data,doctor_info:doctor_info },
+                                  });
+                                }
+
+                              }
+                              
+                            })
                          
                           }
                         })
@@ -1567,7 +1657,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
                   let mailOptions = {
                     from: "contact@aimedis.com",
                     to: req.body.patient_mail,
-                    subject: "Sick leave certificate request",
+                    subject: "Video Conference Request",
                     html: html,
                   };
                   let sendmail = transporter.sendMail(mailOptions);
@@ -1595,7 +1685,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
                       let mailOptions1 = {
                         from: "contact@aimedis.com",
                         to: userdata.email,
-                        subject: "Sick leave certificate request",
+                        subject: "Video conference request",
                         html: html,
                       };
                       let sendmail1 = transporter.sendMail(mailOptions1);
@@ -1631,6 +1721,7 @@ router.post("/AddMeeting/:user_id", function (req, res, next) {
 });
 
 router.put("/joinmeeting/:task_id", function (req, res, next) {
+ try{
   virtual_Task.findOneAndUpdate(
     { _id: req.params.task_id },
     { $set: { meetingjoined: true } },
@@ -1660,6 +1751,13 @@ router.put("/joinmeeting/:task_id", function (req, res, next) {
       }
     }
   );
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
@@ -1714,6 +1812,7 @@ router.post("/sickarchive", function (req, res) {
 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     task_type = "sick_leave"
     const VirtualtToSearchWith = new virtual_Task({
@@ -1760,6 +1859,13 @@ router.post("/sickarchive", function (req, res) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 })
 
 
@@ -1769,6 +1875,7 @@ router.get("/GetAmount/:house_id", function (req, res) {
   let house_name = "";
   let userdata = "";
   let sickleave_certificate_amount = "";
+ try{
   if (legit) {
     Institute.findOne({
       "institute_groups.houses.house_id": req.params.house_id,
@@ -1786,10 +1893,7 @@ router.get("/GetAmount/:house_id", function (req, res) {
             item.houses.map((item2) => {
  
               if (item2.house_id == req.params.house_id) {
-
-
                 if (item2.sickleave_certificate_amount !== "") {
-
                   userdata = item2.sickleave_certificate_amount;
                 }
                 else {
@@ -1810,12 +1914,20 @@ router.get("/GetAmount/:house_id", function (req, res) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 
 router.put("/AddAmount/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     // var track_id = {track_id : req.params.TrackId}
 
@@ -1872,11 +1984,19 @@ router.put("/AddAmount/:house_id", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/Task/:patient_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
 
     let patient_id = req.params.patient_id;
@@ -1913,6 +2033,13 @@ router.get("/Task/:patient_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 

@@ -529,7 +529,7 @@ router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, 
     // const VirtualtToSearchWith1 = new virtual_Task({ task_type: "sick_leave" });
     // VirtualtToSearchWith1.encryptFieldsSync();
     const VirtualtToSearchWith2 = new virtual_Task({ task_type: "picture_evaluation" });
-    VirtualtToSearchWith2.encryptlFieldsSync();
+    VirtualtToSearchWith2.encryptFieldsSync();
 
     virtual_Task.find(
       {

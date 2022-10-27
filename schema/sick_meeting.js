@@ -51,7 +51,12 @@ var SickSchema = new Schema(
 
     link: {
       type: Object,
-      required: true,
+      required: false,
+      unique: false,
+    },
+    access_key: {
+      type: String,
+      required: false,
       unique: false,
     },
     task_id: {
