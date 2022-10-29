@@ -26,7 +26,7 @@ const {
 } = require("../emailTemplate/index.js");
 var nodemailer = require("nodemailer");
 var CareQuentionaire = require("../schema/care_questionnaire");
-
+var CheckRole = require("./../middleware/middleware")
 
 var transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
@@ -297,7 +297,7 @@ router.get(
 
 var arr1 = [];
 
-router.get("/infoOfPatients/:house_id",CheckRole("get_spacemanagement"), function (req, res, next) {
+router.get("/infoOfPatients/:house_id",CheckRole("external_space_managemnet"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     arr = []
