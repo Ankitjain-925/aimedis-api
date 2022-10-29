@@ -131,7 +131,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     }
   });
 
-  router.get("/GetCareQuestionaire/:house_id",CheckRole("get_questionaire"), function (req, res, next) {
+  router.get("/GetCareQuestionaire/:house_id",CheckRole("show_care_questionnary"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {

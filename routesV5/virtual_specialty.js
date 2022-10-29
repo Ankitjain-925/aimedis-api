@@ -195,8 +195,14 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let house_id = req.params.house_id;
+    const VirtualtToSearchWith = new Virtual_Specialty({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
     Virtual_Specialty.find(
-      { house_id: req.params.house_id },
+      {  $or: [
+        { house_id: req.params.house_id },
+        { house_id: VirtualtToSearchWith.house_id },
+      ]},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({

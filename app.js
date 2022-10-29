@@ -58,10 +58,71 @@ app.use(express.static(path.join(__dirname, "build/main")));
 
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
-  transports: ["polling"],
+  transports: ["polling","websocket"],
   cors: {
     origin: "*",
+   
   },
+ 
+});
+
+io.on("connection", (socket) => {
+  console.log("A user is connected");
+
+  socket.on("update", (data) => {
+    socket.broadcast.emit("data_shown", data);
+  });
+  socket.on("addpatient", (data) => {
+    socket.broadcast.emit("email_accept", data);
+  });
+  socket.on("decline", (data) => {
+    socket.broadcast.emit("email_decline", data);
+  });
+  socket.on('nurse',(data)=>{
+    socket.broadcast.emit("displaynurse", data);
+    // socket.destroy();
+  })
+  socket.on('doctor',(data)=>{
+    socket.broadcast.emit("displaydoctor", data);
+    // socket.destroy();
+  })
+  socket.on("delete",(data)=>{
+    socket.broadcast.emit("deletedata",data)
+    // socket.destroy();
+  })
+  socket.on("Updated",(data)=>{
+    socket.broadcast.emit("Updateddata",data)
+    // socket.destroy();
+  })
+
+  socket.on("deleteN",(data)=>{
+    socket.broadcast.emit("deletedataN",data)
+    // socket.destroy();
+  })
+  socket.on("UpdateN",(data)=>{
+    socket.broadcast.emit("UpdateddataN",data)
+    // socket.destroy();
+  })
+
+  socket.on("deleteA",(data)=>{
+    socket.broadcast.emit("deletedataA",data)
+    // socket.destroy();
+  })
+  socket.on("UpdateA",(data)=>{
+    socket.broadcast.emit("UpdateddataA",data)
+    // socket.destroy();
+  })
+
+  socket.on('adminstaff',(data)=>{
+    socket.broadcast.emit("displayadmin", data);
+    // socket.destroy();
+    // socket.disconnect()
+  })
+
+  // socket.on('disconnect', () => {
+  //   console.log(`socket disconnected`);
+
+  // })
 });
 ////////////admin+main+end/////////////
 
@@ -542,6 +603,7 @@ var vactive5 = require("./routesV5/virtual_active")
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
 var vcare5 = require("./routesV5/virtual_care");
 
+
 // app.use("/api/v1/User", UserData);
 // app.use("/api/v1/UserProfile", UserProfile);
 // app.use("/api/v1/SaveCSV", SaveCSV);
@@ -580,7 +642,6 @@ var vcare5 = require("./routesV5/virtual_care");
 // app.use("/api/v3/aws", Uploadcerts3);
 // app.use("/api/v3/blockchain", bloackchain3);
 // app.use("/api/v3/cron", cronPrecess3);
-
 
 app.use("/api/v4/",UserData4)
 app.use("/api/v4/User", UserData4);
@@ -634,6 +695,7 @@ app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
 app.use("/api/v5/cquestionnaire", cquestionnaire5);
 app.use("/api/v5/vc", vcare5);
+
 // app.use("/api/v4/bk", bk)
 
 // app.use("/api/v4/vh",CheckRole,vspecialty4);
@@ -699,7 +761,7 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-// app.listen(5000, () => {
-//   console.log("Server started on port 5001")
-// });
+//server.listen(5000, () => {
+ // console.log("Server started on port 5001")
+//});
  module.exports = app;
