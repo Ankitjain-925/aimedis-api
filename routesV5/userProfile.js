@@ -2035,104 +2035,145 @@ router.post("/Users/checkPass", function (req, res, next) {
 router.put("/Users/update", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOne({ _id: legit.id }, function (err, changeStatus) {
-      if (err) {
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Something went wrong.",
-          error: err,
-        });
-      }
-      if (changeStatus) {
-        // if (req.body.password) {
-        //     var enpassword = base64.encode(req.body.password);
-        //     req.body.password = enpassword;
-        // }
-        if (req.body.mobile) {
-          var country_code = "";
-          var mob = req.body.mobile && req.body.mobile.split("-");
-          var mob1 = mob.pop();
-          if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
-            country_code = mob[0];
-            if (country_code && country_code === "") {
-              let tt = changeStatus.mobile.split("-");
-              if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
-                country_code === tt[0];
-              }
-            }
+  try {
+    if (legit) {
+      User.findOne({ _id: legit.id }, function (err, changeStatus) {
+        if (err) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong.",
+            error: err,
+          });
+        }
+        if (changeStatus) {
+          // if (req.body.password) {
+          //     var enpassword = base64.encode(req.body.password);
+          //     req.body.password = enpassword;
+          // }
+          var patient = {}
+
+          if (req.body.first_name && req.body.first_name !== changeStatus.first_name) {
+            patient['patient.first_name'] = req.body.first_name
+            patient['patient.__enc_first_name'] = false
+          }
+          if (req.body.last_name && req.body.last_name !== changeStatus.last_name) {
+            patient['patient.last_name'] = req.body.last_name
+            patient['patient.__enc_last_name'] = false
+          }
+          if (req.body.image && req.body.image !== changeStatus.image) {
+            patient['patient.image'] = req.body.image
+            patient['patient.__enc_image'] = false
+          }
+          if (req.body.alies_id && req.body.alies_id !== changeStatus.alies_id) {
+            patient['patient.alies_id'] = req.body.alies_id
+            patient['patient.__enc_alies_id'] = false
           }
 
-          authy
-            .registerUser({
-              countryCode: country_code,
-              email: changeStatus.email,
-              phone: mob1,
-            })
-            .catch((err) =>
-              res.json({
-                status: 200,
-                message: "Phone is not verified",
-                error: err,
-                hassuccessed: false,
-              })
-            )
-            .then((regRes) => {
-              if (regRes && regRes.success) {
-                var authyId = { authyId: regRes.user.id };
-                datas = { ...authyId, ...req.body };
-                User.findByIdAndUpdate(
-                  { _id: changeStatus._id },
-                  datas,
-                  function (err, doc) {
-                    if (err && !doc) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "update data failed",
-                        error: err,
-                      });
-                    } else {
-                      res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        message: "Updated",
-                      });
-                    }
-                  }
-                );
-              }
-            });
-        } else {
-          User.findByIdAndUpdate(
-            { _id: changeStatus._id },
-            req.body,
-            function (err, doc) {
-              if (err && !doc) {
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: "update data failed",
-                  error: err,
-                });
-              } else {
-                res.json({
-                  status: 200,
-                  hassuccessed: true,
-                  message: "Updated",
-                });
+
+          if (req.body.mobile) {
+            var country_code = "";
+            var mob = req.body.mobile && req.body.mobile.split("-");
+            var mob1 = mob.pop();
+            if (mob && mob.length > 0 && mob[0] && mob[0].length == 2) {
+              country_code = mob[0];
+              if (country_code && country_code === "") {
+                let tt = changeStatus.mobile.split("-");
+                if (tt && tt.length > 0 && tt[0] && tt[0].length == 2) {
+                  country_code === tt[0];
+                }
               }
             }
-          );
+            authy
+              .registerUser({
+                countryCode: country_code,
+                email: changeStatus.email,
+                phone: mob1,
+              })
+              .catch((err) =>
+                res.json({
+                  status: 200,
+                  message: "Phone is not verified",
+                  error: err,
+                  hassuccessed: false,
+                })
+              )
+              .then((regRes) => {
+                if (regRes && regRes.success) {
+                  var authyId = { authyId: regRes.user.id };
+                  datas = { ...authyId, ...req.body };
+                  User.findByIdAndUpdate(
+                    { _id: changeStatus._id },
+                    datas,
+                    function (err, doc) {
+                      if (err && !doc) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "update data failed",
+                          error: err,
+                        });
+                      } else {
+                        if (typeof patient == 'object' && Object.keys(patient).length > 0) {
+                          AllUpdate(legit.id, patient)
+                        }
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "updated",
+
+                        });
+                      }
+                    }
+                  );
+                }
+              });
+          } else {
+            User.findByIdAndUpdate(
+              { _id: changeStatus._id },
+              req.body,
+              function (err, doc) {
+                if (err && !doc) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "update data failed",
+                    error: err,
+                  });
+                } else {
+                  console.log("test", Object.keys(patient).length)
+                  if (typeof patient == 'object' && Object.keys(patient).length > 0) {
+                    AllUpdate(legit.id, patient)
+                  }
+                  res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "updated",
+                  });
+                }
+              }
+            );
+          }
+        } else {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "No user Found"
+          });
         }
-      }
-    });
-  } else {
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -2445,34 +2486,48 @@ router.get("/checkAlies", function (req, res, next) {
 router.put("/Users/updateImage", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  if (legit) {
-    User.findOneAndUpdate(
-      { _id: legit.id },
-      { $set: { image: req.body.image } },
-      { new: true },
-      (err, doc1) => {
-        if (err && !doc1) {
-          res.json({
-            status: 200,
-            hassuccessed: false,
-            message: "update data failed",
-            error: err,
-          });
-        } else {
-          res.json({
-            status: 200,
-            hassuccessed: true,
-            message: "Updated",
-            data: doc1,
-          });
-        }
+  try {
+    if (legit) {
+      var patient = {}
+      if (req.body.image) {
+        patient['patient.image'] = req.body.image
+        patient['patient.__enc_image'] = false
       }
-    );
-  } else {
+      User.findOneAndUpdate(
+        { _id: legit.id },
+        { $set: { image: req.body.image } },
+        { new: true },
+        (err, doc1) => {
+          if (err && !doc1) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "update data failed",
+              error: err,
+            });
+          } else {
+            AllUpdate(legit.id, patient)
+            res.json({
+              status: 200,
+              hassuccessed: true,
+              message: "Updated",
+              data: doc1,
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -4447,6 +4502,9 @@ function getMyPat(data) {
         .exec()
         .then(function (doc3) {
           if (doc3) {
+            console.log('data.byhospital', data.byhospital)
+            doc3['byhospital'] = data.byhospital
+            console.log('here1111', doc3.byhospital)
             Mypat.push(doc3);
             resolve(Mypat);
           } else {
@@ -9150,7 +9208,7 @@ router.put("/SuggestTimeSlot", function (req, res, next) {
       oldSchedule = req.body.oldSchedule,
       doctorProfile = req.body.docProfile,
       timeslot = req.body.timeslot;
-    return Appointment.update({ _id: apppinment_id }, { status: "cancel" })
+    return Appointment.updateOne({ _id: apppinment_id }, { status: "cancel" })
       .exec()
       .then((chnageData) => {
         var lan1 = getMsgLang(req.body.patient_id);
@@ -9409,81 +9467,209 @@ router.post("/marketing_user2", function (req, res, next) {
 
 });
 
-router.post("/MarketingSub",function(req,res){
-var email = req.body.email.toLowerCase();
-req.body.email = email;
-
-const messageToSearchWith = new marketing_user({ email: req.body.email });
-messageToSearchWith.encryptFieldsSync();
-marketing_user.findOne({
-  $or: [
-  { email: { $regex: req.body.email, $options: "i" } },
-  { email: { $regex: messageToSearchWith.email, $options: "i" } },
-  ],
-})
-  .exec()
-  .then((user_data) => {
-  if (user_data) {
-      res.json({
-      status: 200,
-      message: "Already added",
-      hassuccessed: false
-      });
-  }
-  else{
-  let emails =  base64.encode(req.body.email);
-
-  let url = ``;
-
-  if(req.body.first_name && req.body.last_name){
-  let first_name = base64.encode(req.body.first_name) ;
-  let last_name= base64.encode(req.body.last_name);
-     url= `first_name=${first_name}&last_name=${last_name}&email=${emails}`
-  }
-  else{
-    url= `email=${emails}`
-  }
-  console.log('email', email)
-  sendData = `Dear User,<br/>
-  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
-  generateTemplate(
-      EMAIL.generalEmail.createTemplate("en", {
-      title: "",
-      content: sendData,
-      }),
-      (error, html) => {
-      if (email !== "") {
-          let mailOptions = {
-          from: "contact@aimedis.com",
-          to: email,
-          subject: "Aimedis Newletter Subscription",
-          html: html,
-          };
-          let sendmail = transporter.sendMail(mailOptions);
-          if (sendmail) {
-          res.json({
-              status: 200,
-              msg: "Mail is sent",
-              hassuccessed: true,
-          });
-          } else {
-          res.json({
-              status: 200,
-              msg: "Mail is not sent",
+router.post("/MarketingSub", function (req, res) {
+  try{
+    const response_key = req.body.token;
+    // Making POST request to verify captcha
+    var config = {
+      method: "post",
+      url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+    };
+    axios(config)
+      .then(function (google_response) {
+        if (google_response.data.success == true) {
+          if (
+            req.body.email == "" ||
+            req.body.email == undefined ) {
+            res.json({
+              status: 450,
+              message: "Email fields should not be empty",
               hassuccessed: false,
-          });
+            });
           }
-      } else {
-          res.json({
-          status: 200,
-          msg: "Mail is not sent",
-          hassuccessed: false,
-          });
-      }
-      }
-  );
-  }
+          else {
+  var email = req.body.email.toLowerCase();
+  req.body.email = email;
+
+  const messageToSearchWith = new marketing_user({ email: req.body.email });
+  messageToSearchWith.encryptFieldsSync();
+  marketing_user.findOne({
+    $or: [
+      { email: { $regex: req.body.email, $options: "i" } },
+      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+    ],
   })
+    .exec()
+    .then((user_data) => {
+      if (user_data) {
+        res.json({
+          status: 200,
+          message: "Already added",
+          hassuccessed: false
+        });
+      }
+      else {
+        let emails = base64.encode(req.body.email);
+
+        let url = ``;
+
+        if (req.body.first_name && req.body.last_name) {
+          let first_name = base64.encode(req.body.first_name);
+          let last_name = base64.encode(req.body.last_name);
+          url = `first_name=${first_name}&last_name=${last_name}&email=${emails}`
+        }
+        else {
+          url = `email=${emails}`
+        }
+        console.log('email', email)
+        sendData = `Dear User,<br/>
+  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
+        generateTemplate(
+          EMAIL.generalEmail.createTemplate("en", {
+            title: "",
+            content: sendData,
+          }),
+          (error, html) => {
+            if (email !== "") {
+              let mailOptions = {
+                from: "contact@aimedis.com",
+                to: email,
+                subject: "Aimedis Newletter Subscription",
+                html: html,
+              };
+              let sendmail = transporter.sendMail(mailOptions);
+              if (sendmail) {
+                res.json({
+                  status: 200,
+                  msg: "Mail is sent",
+                  hassuccessed: true,
+                });
+              } else {
+                res.json({
+                  status: 200,
+                  msg: "Mail is not sent",
+                  hassuccessed: false,
+                });
+              }
+            } else {
+              res.json({
+                status: 200,
+                msg: "Mail is not sent",
+                hassuccessed: false,
+              });
+            }
+          }
+        );
+      }
+    })
+  }
+}
+else {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Authentication required.",
+  });
+}
 })
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+})
+
+router.get("/DocNurses", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  let count = 0;
+  finaldata = []
+  try {
+    if (legit) {
+
+      User.find(
+        {
+          _id: legit.id
+        },
+        function (err, changeStatus) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
+            });
+          }
+          if (changeStatus && changeStatus.length > 0) {
+
+            changeStatus.map(function (content) {
+              let counting = content.fav_doctor.length
+              content.fav_doctor.map(function (content) {
+                const messageToSearchWith = new User({ profile_id: content.profile_id });
+                messageToSearchWith.encryptFieldsSync();
+                User.findOne(
+                  { profile_id: { $in: [content.profile_id, messageToSearchWith.profile_id] } },
+
+                  function (err, userdata1) {
+                    if (err) {
+                      res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Something went wrong.",
+                        error: err,
+                      });
+                    }
+                    else {
+                      data = {
+                        first_name: userdata1.first_name,
+                        last_name: userdata1.last_name,
+                        image: userdata1.image,
+                        profile_id: userdata1.profile_id,
+                        alies_id: userdata1.alies_id
+                      }
+                      count++
+                      finaldata.push(data)
+                      if (counting == count) (
+                        res.json({
+                          status: 200,
+                          hassuccessed: true,
+                          message: "Successfully Fetched",
+                          data: finaldata
+                        })
+                      )
+
+                    }
+                  }
+                );
+              });
+
+            });
+
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "No Data exist",
+            });
+          }
+        }
+      );
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
 
 module.exports = router;

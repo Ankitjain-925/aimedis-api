@@ -195,8 +195,14 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let house_id = req.params.house_id;
+    const VirtualtToSearchWith = new Virtual_Specialty({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
     Virtual_Specialty.find(
-      { house_id: req.params.house_id },
+      {  $or: [
+        { house_id: req.params.house_id },
+        { house_id: VirtualtToSearchWith.house_id },
+      ]},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -2194,7 +2200,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
 
           "https://aidoc.io/approveHospital/" +
 
-          req.body.case_id +
+          req.body.case_id + "/"+ req.body.house_id+
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
 
@@ -2238,7 +2244,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
           " https://aidoc.io/approveHospital/" +
 
-          req.body.case_id;
+          req.body.case_id+  "/"+ req.body.house_id+ "."
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
           sendSms(req.body.mobile, res1)

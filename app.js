@@ -58,10 +58,71 @@ app.use(express.static(path.join(__dirname, "build/main")));
 
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
-  transports: ["polling"],
+  transports: ["polling","websocket"],
   cors: {
     origin: "*",
+   
   },
+ 
+});
+
+io.on("connection", (socket) => {
+  console.log("A user is connected");
+
+  socket.on("update", (data) => {
+    socket.broadcast.emit("data_shown", data);
+  });
+  socket.on("addpatient", (data) => {
+    socket.broadcast.emit("email_accept", data);
+  });
+  socket.on("decline", (data) => {
+    socket.broadcast.emit("email_decline", data);
+  });
+  socket.on('nurse',(data)=>{
+    socket.broadcast.emit("displaynurse", data);
+    // socket.destroy();
+  })
+  socket.on('doctor',(data)=>{
+    socket.broadcast.emit("displaydoctor", data);
+    // socket.destroy();
+  })
+  socket.on("delete",(data)=>{
+    socket.broadcast.emit("deletedata",data)
+    // socket.destroy();
+  })
+  socket.on("Updated",(data)=>{
+    socket.broadcast.emit("Updateddata",data)
+    // socket.destroy();
+  })
+
+  socket.on("deleteN",(data)=>{
+    socket.broadcast.emit("deletedataN",data)
+    // socket.destroy();
+  })
+  socket.on("UpdateN",(data)=>{
+    socket.broadcast.emit("UpdateddataN",data)
+    // socket.destroy();
+  })
+
+  socket.on("deleteA",(data)=>{
+    socket.broadcast.emit("deletedataA",data)
+    // socket.destroy();
+  })
+  socket.on("UpdateA",(data)=>{
+    socket.broadcast.emit("UpdateddataA",data)
+    // socket.destroy();
+  })
+
+  socket.on('adminstaff',(data)=>{
+    socket.broadcast.emit("displayadmin", data);
+    // socket.destroy();
+    // socket.disconnect()
+  })
+
+  // socket.on('disconnect', () => {
+  //   console.log(`socket disconnected`);
+
+  // })
 });
 ////////////admin+main+end/////////////
 
@@ -451,44 +512,44 @@ if (err && !doc1) {
 
 
 
-var UserData = require("./routes/UserTrack");
-var UserProfile = require("./routes/userProfile");
-var SaveCSV = require("./routes/saveCsv");
-var emergency_record = require("./routes/emergencyrecord");
-var rightinfo = require("./routes/rightsideinfo");
-var stripeCheckout = require("./routes/stripeCheckout");
-var lms_stripeCheckout = require("./routes/lms_stripeCheckout");
-var lms = require("./routes/lms");
-var certificate = require("./routes/certificate");
-var adminse = require("./routes/superadmin");
+// var UserData = require("./routes/UserTrack");
+// var UserProfile = require("./routes/userProfile");
+// var SaveCSV = require("./routes/saveCsv");
+// var emergency_record = require("./routes/emergencyrecord");
+// var rightinfo = require("./routes/rightsideinfo");
+// var stripeCheckout = require("./routes/stripeCheckout");
+// var lms_stripeCheckout = require("./routes/lms_stripeCheckout");
+// var lms = require("./routes/lms");
+// var certificate = require("./routes/certificate");
+// var adminse = require("./routes/superadmin");
 
-var UserData2 = require("./routesV2/UserTrack");
-var UserProfile2 = require("./routesV2/userProfile");
-var SaveCSV2 = require("./routesV2/saveCsv");
-var emergency_record2 = require("./routesV2/emergencyrecord");
-var rightinfo2 = require("./routesV2/rightsideinfo");
-var stripeCheckout2 = require("./routesV2/stripeCheckout");
-var lms_stripeCheckout2 = require("./routesV2/lms_stripeCheckout");
-var lms2 = require("./routesV2/lms");
-var certificate2 = require("./routesV2/certificate");
-var adminse2 = require("./routesV2/superadmin");
-var Uploadcerts = require("./routesV2/uploadcerts");
-var bloackchain = require("./routesV2/blockchain");
-var cronPrecess = require("./routesV2/cron");
+// var UserData2 = require("./routesV2/UserTrack");
+// var UserProfile2 = require("./routesV2/userProfile");
+// var SaveCSV2 = require("./routesV2/saveCsv");
+// var emergency_record2 = require("./routesV2/emergencyrecord");
+// var rightinfo2 = require("./routesV2/rightsideinfo");
+// var stripeCheckout2 = require("./routesV2/stripeCheckout");
+// var lms_stripeCheckout2 = require("./routesV2/lms_stripeCheckout");
+// var lms2 = require("./routesV2/lms");
+// var certificate2 = require("./routesV2/certificate");
+// var adminse2 = require("./routesV2/superadmin");
+// var Uploadcerts = require("./routesV2/uploadcerts");
+// var bloackchain = require("./routesV2/blockchain");
+// var cronPrecess = require("./routesV2/cron");
 
-var UserData3 = require("./routesV4/UserTrack");
-var UserProfile3 = require("./routesV4/userProfile");
-var SaveCSV3 = require("./routesV4/saveCsv");
-var emergency_record3 = require("./routesV4/emergencyrecord");
-var rightinfo3 = require("./routesV4/rightsideinfo");
-var stripeCheckout3 = require("./routesV4/stripeCheckout");
-var lms_stripeCheckout3 = require("./routesV4/lms_stripeCheckout");
-var lms3 = require("./routesV4/lms");
-var certificate3 = require("./routesV4/certificate");
-var adminse3 = require("./routesV4/superadmin");
-var Uploadcerts3 = require("./routesV4/uploadcerts");
-var bloackchain3 = require("./routesV4/blockchain");
-var cronPrecess3 = require("./routesV4/cron");
+// var UserData3 = require("./routesV4/UserTrack");
+// var UserProfile3 = require("./routesV4/userProfile");
+// var SaveCSV3 = require("./routesV4/saveCsv");
+// var emergency_record3 = require("./routesV4/emergencyrecord");
+// var rightinfo3 = require("./routesV4/rightsideinfo");
+// var stripeCheckout3 = require("./routesV4/stripeCheckout");
+// var lms_stripeCheckout3 = require("./routesV4/lms_stripeCheckout");
+// var lms3 = require("./routesV4/lms");
+// var certificate3 = require("./routesV4/certificate");
+// var adminse3 = require("./routesV4/superadmin");
+// var Uploadcerts3 = require("./routesV4/uploadcerts");
+// var bloackchain3 = require("./routesV4/blockchain");
+// var cronPrecess3 = require("./routesV4/cron");
 // var bk = require("./routesV4/bk");
 
 var UserData4 = require("./routesV4/UserTrack");
@@ -540,46 +601,50 @@ var hadmin5 = require("./routesV5/h_admin");
 var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
+
+var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
+var vcare5 = require("./routesV5/virtual_care");
 var teammember5 = require("./routesV5/staffgroup.js");
 
-app.use("/api/v1/User", UserData);
-app.use("/api/v1/UserProfile", UserProfile);
-app.use("/api/v1/SaveCSV", SaveCSV);
-app.use("/api/v1/stripeCheckout", stripeCheckout);
-app.use("/api/v1/lms_stripeCheckout", lms_stripeCheckout);
-app.use("/api/v1/emergency_record", emergency_record);
-app.use("/api/v1/rightinfo", rightinfo);
-app.use("/api/v1/lms", lms);
-app.use("/api/v1/certificate", certificate);
-app.use("/api/v1/admin", adminse);
 
-app.use("/api/v2/User", UserData2);
-app.use("/api/v2/UserProfile", UserProfile2);
-app.use("/api/v2/SaveCSV", SaveCSV2);
-app.use("/api/v2/stripeCheckout", stripeCheckout2);
-app.use("/api/v2/lms_stripeCheckout", lms_stripeCheckout2);
-app.use("/api/v2/emergency_record", emergency_record2);
-app.use("/api/v2/rightinfo", rightinfo2);
-app.use("/api/v2/lms", lms2);
-app.use("/api/v2/certificate", certificate2);
-app.use("/api/v2/admin", adminse2);
-app.use("/api/v2/aws", Uploadcerts);
-app.use("/api/v2/blockchain", bloackchain);
-app.use("/api/v2/cron", cronPrecess);
+// app.use("/api/v1/User", UserData);
+// app.use("/api/v1/UserProfile", UserProfile);
+// app.use("/api/v1/SaveCSV", SaveCSV);
+// app.use("/api/v1/stripeCheckout", stripeCheckout);
+// app.use("/api/v1/lms_stripeCheckout", lms_stripeCheckout);
+// app.use("/api/v1/emergency_record", emergency_record);
+// app.use("/api/v1/rightinfo", rightinfo);
+// app.use("/api/v1/lms", lms);
+// app.use("/api/v1/certificate", certificate);
+// app.use("/api/v1/admin", adminse);
 
-app.use("/api/v3/User", UserData3);
-app.use("/api/v3/UserProfile", UserProfile3);
-app.use("/api/v3/SaveCSV", SaveCSV3);
-app.use("/api/v3/stripeCheckout", stripeCheckout3);
-app.use("/api/v3/lms_stripeCheckout", lms_stripeCheckout3);
-app.use("/api/v3/emergency_record", emergency_record3);
-app.use("/api/v3/rightinfo", rightinfo3);
-app.use("/api/v3/lms", lms3);
-app.use("/api/v3/certificate", certificate3);
-app.use("/api/v3/admin", adminse3);
-app.use("/api/v3/aws", Uploadcerts3);
-app.use("/api/v3/blockchain", bloackchain3);
-app.use("/api/v3/cron", cronPrecess3);
+// app.use("/api/v2/User", UserData2);
+// app.use("/api/v2/UserProfile", UserProfile2);
+// app.use("/api/v2/SaveCSV", SaveCSV2);
+// app.use("/api/v2/stripeCheckout", stripeCheckout2);
+// app.use("/api/v2/lms_stripeCheckout", lms_stripeCheckout2);
+// app.use("/api/v2/emergency_record", emergency_record2);
+// app.use("/api/v2/rightinfo", rightinfo2);
+// app.use("/api/v2/lms", lms2);
+// app.use("/api/v2/certificate", certificate2);
+// app.use("/api/v2/admin", adminse2);
+// app.use("/api/v2/aws", Uploadcerts);
+// app.use("/api/v2/blockchain", bloackchain);
+// app.use("/api/v2/cron", cronPrecess);
+
+// app.use("/api/v3/User", UserData3);
+// app.use("/api/v3/UserProfile", UserProfile3);
+// app.use("/api/v3/SaveCSV", SaveCSV3);
+// app.use("/api/v3/stripeCheckout", stripeCheckout3);
+// app.use("/api/v3/lms_stripeCheckout", lms_stripeCheckout3);
+// app.use("/api/v3/emergency_record", emergency_record3);
+// app.use("/api/v3/rightinfo", rightinfo3);
+// app.use("/api/v3/lms", lms3);
+// app.use("/api/v3/certificate", certificate3);
+// app.use("/api/v3/admin", adminse3);
+// app.use("/api/v3/aws", Uploadcerts3);
+// app.use("/api/v3/blockchain", bloackchain3);
+// app.use("/api/v3/cron", cronPrecess3);
 
 
 app.use("/api/v4/",UserData4)
@@ -634,6 +699,9 @@ app.use("/api/v5/assignservice", assignservice);
 app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
 app.use("/api/v5/teammember",teammember5)
+app.use("/api/v5/cquestionnaire", cquestionnaire5);
+app.use("/api/v5/vc", vcare5);
+
 
 // app.use("/api/v4/bk", bk)
 
@@ -696,15 +764,13 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   console.log("err", err);
+
    return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  
+  // console.log("err", err);
 });
 
+//server.listen(5000, () => {
+ // console.log("Server started on port 5001")
+//});
+ module.exports = app;
 
-app.listen(5001, () => {
-  console.log("Server started on port 5001")
-});
-
-
-// module.exports = app;

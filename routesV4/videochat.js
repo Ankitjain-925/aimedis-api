@@ -263,12 +263,14 @@ router.get("/Get_Doctor/:data", function (req, res) {
           console.log("err", err)
           res.json({ status: 200, hassuccessed: true, error: err });
         } else {
+          
           var final = data1.filter((element) => {
-            if (element.first_name.includes(req.params.data) || element.last_name.includes(req.params.data) || element.alies_id.includes(req.params.data) || element.profile_id.includes(req.params.data) || element.speciality.includes(req.params.data) || element.email.includes(req.params.data)) {
+            var name = element.first_name.toUpperCase() + element.last_name.toUpperCase()
+            if (name.includes(req.params.data.toUpperCase().split(" ").join("")) || (element.alies_id.toUpperCase()).includes(req.params.data.toUpperCase())  || (element.profile_id.toUpperCase()).includes(req.params.data.toUpperCase()) || element.speciality.includes(req.params.data) || (element.email == req.params.data.toLowerCase()) ) {
               return element
             }
           })
-          console.log("data1", final)
+          
           res.json({ status: 200, hassuccessed: true, data: final })
         }
       }
