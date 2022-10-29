@@ -1,7 +1,35 @@
 require('dotenv').config();
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
-const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
+const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption
+
+const teamgroup = new mongoose.Schema({
+
+  staff: {
+    type: Array,
+    required: false,
+    unique: false
+  },
+  team_name: {
+    type: String,
+    required: false,
+    unique: false
+  },
+  staff_id: {
+    type: String,
+    required: false,
+    unique: false
+  }
+
+}, { strict: false });
+
+teamgroup.plugin(mongooseFieldEncryption, {
+  fields: [],
+  secret: process.env.SOME_32BYTE_BASE64_STRING,
+  saltGenerator: function (secret) {
+    return "1234567890123456"; // should ideally use the secret to return a string of length 16
+  }
+});
 
 const Houses = new mongoose.Schema({
   house_name:{
@@ -19,6 +47,7 @@ sickleave_certificate_amount:{
   required: false,
   unique: false
 },
+teammember:[teamgroup]
 },{ strict: false });
 
 Houses.plugin(mongooseFieldEncryption, {
