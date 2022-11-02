@@ -511,6 +511,7 @@ var market = require("./routesV4/marketing");
 var cquestionnaire = require("./routesV4/care_questionnaires.js");
 var assignservice = require("./routesV4/assign_services.js");
 var vcare4 = require("./routesV4/virtual_care");
+var teammember = require("./routesV4/staffgroup.js");
 
 var UserData5 = require("./routesV5/UserTrack");
 var UserProfile5 = require("./routesV5/userProfile");
@@ -533,8 +534,10 @@ var hadmin5 = require("./routesV5/h_admin");
 var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
+
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
 var vcare5 = require("./routesV5/virtual_care");
+var teammember5 = require("./routesV5/staffgroup.js");
 
 
 // app.use("/api/v1/User", UserData);
@@ -576,7 +579,7 @@ var vcare5 = require("./routesV5/virtual_care");
 // app.use("/api/v3/blockchain", bloackchain3);
 // app.use("/api/v3/cron", cronPrecess3);
 
-app.use("/api/v4/",UserData4)
+
 app.use("/api/v4/User", UserData4);
 app.use("/api/v4/UserProfile", UserProfile4);
 app.use("/api/v4/SaveCSV", SaveCSV4);
@@ -602,6 +605,7 @@ app.use("/api/v4/assignservice", assignservice);
 app.use("/api/v4/vactive", vactive);
 app.use("/api/v4/vchat", Videochat);
 app.use("/api/v4/vc", vcare4);
+app.use("/api/v4/teammember",teammember)
 
 
 app.use("/api/v5/User", UserData5);
@@ -626,8 +630,10 @@ app.use("/api/v5/cometUserList", comet5);
 app.use("/api/v5/assignservice", assignservice);
 app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
+app.use("/api/v5/teammember",teammember5)
 app.use("/api/v5/cquestionnaire", cquestionnaire5);
 app.use("/api/v5/vc", vcare5);
+
 
 // app.use("/api/v4/bk", bk)
 
@@ -698,3 +704,4 @@ app.use(function (err, req, res, next) {
  // console.log("Server started on port 5001")
 //});
  module.exports = app;
+

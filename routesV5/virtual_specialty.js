@@ -85,7 +85,7 @@ function getDate(date, dateFormat) {
 }
 
 router.delete(
-  "/AddSpecialty/:specialty_id",
+  "/AddSpecialty/:specialty_id/:house_id",
   CheckRole("delete_speciality"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -380,7 +380,7 @@ function ApproveReq(doc, start, end, date) {
 }
 
 router.delete(
-  "/AddTask/:task_id",
+  "/AddTask/:task_id/:house_id",
   CheckRole("delete_task"),
   function (req, res, next) {
     const token = req.headers.token;

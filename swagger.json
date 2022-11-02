@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "https://virtualhospital.aidoc.io",
+    "host": "virtualhospital.aidoc.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -39,6 +39,10 @@
         {
             "name": "sick",
             "description": "API for cases"
+        },
+        {
+            "name":"Team_Group",
+            "description": "API for Team_Group"
         },
         {
             "name":"Video_Conference",
@@ -82,7 +86,7 @@
         
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -3874,6 +3878,130 @@
                 }
             }
         },
+        "/teammember/AddTeam/{house_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Team_Group"
+                ],
+                "parameters": [
+                    {
+                        "name": "Team_Group",
+                        "in": "body",
+                        "description": "Team_Group",
+                        "schema": {
+                            "$ref": "#/definitions/Team_Group"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get doctor list",
+                "responses": {
+                    "200": {
+                        "description": "Team Group"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/teammember/UpdateTeam/{house_id}/{team_name}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "description": "ID",
+                    "type": "string"
+                },
+                {
+                    "name": "team_name",
+                    "in": "path",
+                    "description": "Team_Name",
+                    "type": "string"
+                }
+                
+             ],
+           "put": {
+                "tags": [
+                    "Team_Group"
+                ],
+                "parameters": [
+                    {
+                        "name": "Update",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Team_Group"
+                        }
+                    }
+                ],
+                "summary": "update with given Id",
+                "responses": {
+                    "200": {
+                        "description": "successfully update"
+                    }
+                }
+            }
+        },
+        "/teammember/DeleteTeam/{house_id}/{staff_id}": {
+            "delete": {
+                    "parameters": [
+                        {
+                        "name": "staff_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID",
+                        "type": "string"
+                        },
+                        {
+                            "name": "house_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"                          
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+                "tags": [
+                    "Team_Group"
+                ],
+                "summary": "Delete Team",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete Team"
+                       
+                    }
+                }
+            }
+        },
         "/vchat/Get_Doctor": {
             "parameters": [
                 {
@@ -5371,6 +5499,32 @@
                     "uniqueItems": false
                 },
                 "houses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": false
+                }
+            }
+        },
+        "Team_Group":{
+            "required": [
+                "house_id"
+            ],
+            "properties": {
+                "team_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "speciality_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "ward_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "staff": {
                     "type": "array",
                     "items": {
                         "type": "object"

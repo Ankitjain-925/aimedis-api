@@ -9609,6 +9609,7 @@ router.get("/DocNurses", function (req, res, next) {
               content.fav_doctor.map(function (content) {
                 const messageToSearchWith = new User({ profile_id: content.profile_id });
                 messageToSearchWith.encryptFieldsSync();
+                console.log('content', content)
                 User.findOne(
                   { profile_id: { $in: [content.profile_id, messageToSearchWith.profile_id] } },
 
@@ -9627,7 +9628,9 @@ router.get("/DocNurses", function (req, res, next) {
                         last_name: userdata1.last_name,
                         image: userdata1.image,
                         profile_id: userdata1.profile_id,
-                        alies_id: userdata1.alies_id
+                        alies_id: userdata1.alies_id,
+                        byhospital: content.byhospital,
+                        user_type: content.user_type
                       }
                       count++
                       finaldata.push(data)
