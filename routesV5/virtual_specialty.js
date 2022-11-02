@@ -919,7 +919,7 @@ router.delete(
 );
 
 router.delete(
-  "/AddService/:service_id",
+  "/AddService/:service_id/:house_id",
   CheckRole("delete_service"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -1054,7 +1054,7 @@ router.get("/GetService/:house_id", function (req, res, next) {
   }
 });
 router.delete(
-  "/AddInvoice/:bill_id",
+  "/AddInvoice/:bill_id/:house_id",
   CheckRole("delete_invoice"),
   function (req, res, next) {
     const token = req.headers.token;
