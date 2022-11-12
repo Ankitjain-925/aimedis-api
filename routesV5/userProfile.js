@@ -6293,6 +6293,7 @@ router.get("/DoctorAppointments", function (req, res, next) {
 router.get("/timeSuggest", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+ try{
   if (legit) {
     User.findOne(
       {
@@ -6317,6 +6318,7 @@ router.get("/timeSuggest", function (req, res, next) {
           var user = [];
           var online_users = [];
           var Practices = [];
+          var Home = [];
           var monday = [],
             tuesday = [],
             wednesday = [],
@@ -6707,6 +6709,7 @@ router.get("/timeSuggest", function (req, res, next) {
               });
             }
           }
+
           (monday = []),
             (tuesday = []),
             (wednesday = []),
@@ -6843,6 +6846,7 @@ router.get("/timeSuggest", function (req, res, next) {
               appointments: user,
               online_appointment: online_users,
               practice_days: Practices,
+              homevisit_appointment: Home
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           } else {
@@ -6859,6 +6863,7 @@ router.get("/timeSuggest", function (req, res, next) {
               appointments: [{ custom_text: custom_text }],
               online_appointment: [],
               practice_days: [],
+              homevisit_appointment: []
             };
             res.json({ status: 200, hassuccessed: true, data: finalArray });
           }
@@ -6872,6 +6877,13 @@ router.get("/timeSuggest", function (req, res, next) {
       msg: "Authentication required.",
     });
   }
+} catch {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 });
 
 router.get("/getLocation/:radius", function (req, res, next) {
