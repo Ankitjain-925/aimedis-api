@@ -738,8 +738,7 @@ router.get(
 );
 
 router.get(
-  "/ProfessionalTask/:patient_profile_id/:house_id",
-  CheckRole("show_task"),
+  "/ProfessionalTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);

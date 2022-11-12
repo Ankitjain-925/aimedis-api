@@ -1207,15 +1207,9 @@ router.post("/AddUser", function (req, res, next) {
 });
 
 router.post("/AddNewUseradiitional", function (req, res, next) {
-  // const response_key = req.body.token;
-  // Making POST request to verify captcha
-  // var config = {
-  //   method: "post",
-  //   url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
-  // };
-  // axios(config)
-  // .then(function (google_response) {
-  // if (google_response.data.success) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
   if (
     req.body.email == "" ||
     req.body.email == undefined ||
@@ -1605,13 +1599,13 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
         }
       });
   }
-  // } else {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     msg: "Authentication required.",
-  //   });
-  // }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
   // })
   //   .catch(function (error) {
   //     res.json({

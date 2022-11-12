@@ -15,7 +15,6 @@ const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
 var jwtconfig = require("../jwttoken");
 const { encrypt, decrypt } = require("./Cryptofile.js");
-const { constructFromObject } = require("@mailchimp/mailchimp_marketing/src/ApiClient.js");
 const Video_chat_Account = require("../schema/vid_chat_account.js");
 var base64 = require('base-64');
 

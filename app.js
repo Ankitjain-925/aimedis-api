@@ -51,7 +51,7 @@ const appAdmin2  = express();
 const appAdmin3 = express();
 
 appAdmin.use(express.static(path.join(__dirname, "build/admin")));
-appAdmin1.use(express.static(path.join(__dirname, "build/eval")));
+appAdmin1.use(express.static(path.join(__dirname, "build/authority")));
 appAdmin2.use(express.static(path.join(__dirname, "build/sickleave")));
 appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
@@ -534,6 +534,7 @@ var hadmin5 = require("./routesV5/h_admin");
 var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
+var Videochat5 = require("./routesV4/videochat");
 
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
 var vcare5 = require("./routesV5/virtual_care");
@@ -633,7 +634,7 @@ app.use("/api/v5/vactive", vactive5);
 app.use("/api/v5/teammember",teammember5)
 app.use("/api/v5/cquestionnaire", cquestionnaire5);
 app.use("/api/v5/vc", vcare5);
-
+app.use("/api/v5/vchat", Videochat5);
 
 // app.use("/api/v4/bk", bk)
 
@@ -672,9 +673,9 @@ appAdmin1.use(function (req, res, next) {
   next(err);
 });
 appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/authority' , 'index.html'));
 });
-app.use("/sys-n-eval", appAdmin1);
+app.use("/sys-n-authority", appAdmin1);
 
 appAdmin2.use(function (req, res, next) {
   var err = new Error("Not Found");

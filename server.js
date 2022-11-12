@@ -4,7 +4,6 @@ const http = require('http');
 
 var server = http.createServer(app);
 const io = require("socket.io")(server, {
-  transports: ["polling","websocket"],
   cors: {
     origin: "*",
    

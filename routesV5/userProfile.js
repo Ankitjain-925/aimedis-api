@@ -374,7 +374,7 @@ router.post("/UserLogin", function (req, res, next) {
                     let payload1 = {
                       email: user_data.email,
                       id: user_data._id,
-                      type: user_data.type,
+                        type: user_data.type,
                     };
                     token1 = jwtconfig.sign(payload1);
                     var lan1 = getMsgLang(user_data._id);
@@ -1165,16 +1165,19 @@ router.post(
   "/AddNewUseradiitional",
   CheckRole("add_user"),
   function (req, res, next) {
-    const response_key = req.body.token;
-    console.log("resp", response_key);
-    // Making POST request to verify captcha
-    var config = {
-      method: "post",
-      url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
-    };
-    axios(config)
-      .then(function (google_response) {
-        if (google_response.data.success == false) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+    // const response_key = req.body.token;
+    // console.log("resp", response_key);
+    // // Making POST request to verify captcha
+    // var config = {
+    //   method: "post",
+    //   url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+    // };
+    // axios(config)
+    //   .then(function (google_response) {
+    //     if (google_response.data.success == false) {
           if (
             req.body.email == "" ||
             req.body.email == undefined ||
@@ -1606,15 +1609,15 @@ router.post(
             msg: "Authentication required.",
           });
         }
-      })
-      .catch(function (error) {
-        console.log("err", error);
-        res.json({
-          status: 200,
-          hassuccessed: false,
-          msg: "Authentication required.",
-        });
-      });
+      // })
+      // .catch(function (error) {
+      //   console.log("err", error);
+      //   res.json({
+      //     status: 200,
+      //     hassuccessed: false,
+      //     msg: "Authentication required.",
+      //   });
+      // });
   }
 );
 router.put("/Bookservice", (req, res) => {
@@ -9588,8 +9591,7 @@ router.get("/DocNurses", function (req, res, next) {
   finaldata = []
   try {
     if (legit) {
-
-      User.find(
+      User.findOne(
         {
           _id: legit.id
         },
@@ -9602,63 +9604,91 @@ router.get("/DocNurses", function (req, res, next) {
               error: err,
             });
           }
-          if (changeStatus && changeStatus.length > 0) {
-
-            changeStatus.map(function (content) {
-              let counting = content.fav_doctor.length
-              content.fav_doctor.map(function (content) {
-                const messageToSearchWith = new User({ profile_id: content.profile_id });
-                messageToSearchWith.encryptFieldsSync();
-                console.log('content', content)
-                User.findOne(
-                  { profile_id: { $in: [content.profile_id, messageToSearchWith.profile_id] } },
-
-                  function (err, userdata1) {
-                    if (err) {
-                      res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "Something went wrong.",
-                        error: err,
-                      });
-                    }
-                    else {
-                      data = {
-                        first_name: userdata1.first_name,
-                        last_name: userdata1.last_name,
-                        image: userdata1.image,
-                        profile_id: userdata1.profile_id,
-                        alies_id: userdata1.alies_id,
-                        byhospital: content.byhospital,
-                        user_type: content.user_type
-                      }
-                      count++
-                      finaldata.push(data)
-                      if (counting == count) (
+          else{
+          if (changeStatus) {
+            if(changeStatus.fav_doctor && changeStatus.fav_doctor.length>0){
+              var counting = changeStatus.fav_doctor && changeStatus.fav_doctor.length;
+              console.log('counting', counting)
+              changeStatus.fav_doctor.map(function (content) {
+                if(content && content.profile_id){
+                  const messageToSearchWith = new User({ profile_id: content.profile_id });
+                  messageToSearchWith.encryptFieldsSync();
+                  User.findOne(
+                    { profile_id: { $in: [content.profile_id, messageToSearchWith.profile_id] } },
+                    function (err, userdata1) {
+                      if (err) {
                         res.json({
                           status: 200,
-                          hassuccessed: true,
-                          message: "Successfully Fetched",
-                          data: finaldata
-                        })
-                      )
-
+                          hassuccessed: false,
+                          message: "Something went wrong.",
+                          error: err,
+                        });
+                      }
+                      else {
+                        console.log('userdata1', userdata1)
+                        if(userdata1){
+                          data = {
+                            first_name: userdata1.first_name,
+                            last_name: userdata1.last_name,
+                            image: userdata1.image,
+                            profile_id: userdata1.profile_id,
+                            alies_id: userdata1.alies_id,
+                            byhospital: content.byhospital,
+                            user_type: content.user_type
+                          }
+                          count++
+                          finaldata.push(data)
+                          console.log('counting', counting, 'count', count)
+                           if (counting == count) {
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "Successfully Fetched",
+                              data: finaldata
+                            })
+                          }
+                        }
+                        else{
+                          count++
+                          if (counting == count) {
+                            console.log('counting1', counting, 'count1', count)
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "Successfully Fetched",
+                              data: finaldata
+                            })
+                          }
+                        }
+                      }
                     }
-                  }
-                );
+                  );
+                }
+                else{
+                  count++
+                  console.log('counting2', counting, 'count2', count)
+                   if (counting == count) (
+                    res.json({
+                      status: 200,
+                      hassuccessed: true,
+                      message: "Successfully Fetched",
+                      data: finaldata
+                    })
+                   )
+                }
+                })
+              }
+              }
+            else{
+              res.json({
+                status: 200,
+                data: [],
+                hassuccessed: true,
+                message: "No favourite doctors in list",
               });
-
-            });
-
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "No Data exist",
-            });
+            }
           }
-        }
-      );
+        })
     } else {
       res.json({
         status: 200,
@@ -9670,7 +9700,7 @@ router.get("/DocNurses", function (req, res, next) {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Some thing went wrong.",
+      msg: "Something went wrong.",
     });
   }
 });
