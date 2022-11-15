@@ -51,79 +51,12 @@ const appAdmin2  = express();
 const appAdmin3 = express();
 
 appAdmin.use(express.static(path.join(__dirname, "build/admin")));
-appAdmin1.use(express.static(path.join(__dirname, "build/eval")));
+appAdmin1.use(express.static(path.join(__dirname, "build/authority")));
 appAdmin2.use(express.static(path.join(__dirname, "build/sickleave")));
 appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
-  transports: ["polling","websocket"],
-  cors: {
-    origin: "*",
-   
-  },
- 
-});
 
-io.on("connection", (socket) => {
-  console.log("A user is connected");
-
-  socket.on("update", (data) => {
-    socket.broadcast.emit("data_shown", data);
-  });
-  socket.on("addpatient", (data) => {
-    socket.broadcast.emit("email_accept", data);
-  });
-  socket.on("decline", (data) => {
-    socket.broadcast.emit("email_decline", data);
-  });
-  socket.on('nurse',(data)=>{
-    socket.broadcast.emit("displaynurse", data);
-    // socket.destroy();
-  })
-  socket.on('doctor',(data)=>{
-    socket.broadcast.emit("displaydoctor", data);
-    // socket.destroy();
-  })
-  socket.on("delete",(data)=>{
-    socket.broadcast.emit("deletedata",data)
-    // socket.destroy();
-  })
-  socket.on("Updated",(data)=>{
-    socket.broadcast.emit("Updateddata",data)
-    // socket.destroy();
-  })
-
-  socket.on("deleteN",(data)=>{
-    socket.broadcast.emit("deletedataN",data)
-    // socket.destroy();
-  })
-  socket.on("UpdateN",(data)=>{
-    socket.broadcast.emit("UpdateddataN",data)
-    // socket.destroy();
-  })
-
-  socket.on("deleteA",(data)=>{
-    socket.broadcast.emit("deletedataA",data)
-    // socket.destroy();
-  })
-  socket.on("UpdateA",(data)=>{
-    socket.broadcast.emit("UpdateddataA",data)
-    // socket.destroy();
-  })
-
-  socket.on('adminstaff',(data)=>{
-    socket.broadcast.emit("displayadmin", data);
-    // socket.destroy();
-    // socket.disconnect()
-  })
-
-  // socket.on('disconnect', () => {
-  //   console.log(`socket disconnected`);
-
-  // })
-});
 ////////////admin+main+end/////////////
 
 // cron.schedule('0 0 */12 * * *', function(){
@@ -601,6 +534,7 @@ var hadmin5 = require("./routesV5/h_admin");
 var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
+var Videochat5 = require("./routesV4/videochat");
 
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
 var vcare5 = require("./routesV5/virtual_care");
@@ -647,7 +581,6 @@ var teammember5 = require("./routesV5/staffgroup.js");
 // app.use("/api/v3/cron", cronPrecess3);
 
 
-app.use("/api/v4/",UserData4)
 app.use("/api/v4/User", UserData4);
 app.use("/api/v4/UserProfile", UserProfile4);
 app.use("/api/v4/SaveCSV", SaveCSV4);
@@ -701,7 +634,7 @@ app.use("/api/v5/vactive", vactive5);
 app.use("/api/v5/teammember",teammember5)
 app.use("/api/v5/cquestionnaire", cquestionnaire5);
 app.use("/api/v5/vc", vcare5);
-
+app.use("/api/v5/vchat", Videochat5);
 
 // app.use("/api/v4/bk", bk)
 
@@ -740,9 +673,9 @@ appAdmin1.use(function (req, res, next) {
   next(err);
 });
 appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/eval' , 'index.html'));
+  return res.sendFile(path.resolve( __dirname, 'build/authority' , 'index.html'));
 });
-app.use("/sys-n-eval", appAdmin1);
+app.use("/sys-n-authority", appAdmin1);
 
 appAdmin2.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -764,7 +697,6 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-
    return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
   // console.log("err", err);
 });

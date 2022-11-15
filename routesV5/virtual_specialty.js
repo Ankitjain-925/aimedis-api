@@ -85,7 +85,7 @@ function getDate(date, dateFormat) {
 }
 
 router.delete(
-  "/AddSpecialty/:specialty_id",
+  "/AddSpecialty/:specialty_id/:house_id",
   CheckRole("delete_speciality"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -380,8 +380,7 @@ function ApproveReq(doc, start, end, date) {
 }
 
 router.delete(
-  "/AddTask/:task_id",
-  CheckRole("delete_task"),
+  "/AddTask/:task_id/:house_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -738,8 +737,7 @@ router.get(
 );
 
 router.get(
-  "/ProfessionalTask/:patient_profile_id/:house_id",
-  CheckRole("show_task"),
+  "/ProfessionalTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -2198,7 +2196,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
 
-          "https://aidoc.io/approveHospital/" +
+          "https://virtualhospital.aidoc.io/sys-n-authority/approveHospital/" +
 
           req.body.case_id + "/"+ req.body.house_id+
           "'>LINK</a></b>";
@@ -2218,13 +2216,20 @@ router.post("/linkforAccepthospital", function (req, res, next) {
                 html: html,
               };
               let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
+              sendmail.then(()=>{
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   message: "Mail is sent",
                 });
-              }
+              })
+              .catch((err)=>{
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: err,
+                });
+              })
             }
           }
         );
@@ -2242,7 +2247,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://aidoc.io/approveHospital/" +
+          "https://virtualhospital.aidoc.io/sys-n-authority/approveHospital/" +
 
           req.body.case_id+  "/"+ req.body.house_id+ "."
 
