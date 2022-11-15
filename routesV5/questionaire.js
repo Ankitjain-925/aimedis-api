@@ -213,46 +213,38 @@ router.post("/AddQuestionaire", function (req, res, next) {
   }
 });
 
-router.put("/Question/:questionaire_id", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-    try {
-      questionaire.updateOne(
-        { _id: req.params.questionaire_id },
-        req.body,
-        function (err, userdata) {
-          if (err) {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              message: "Something went wrong",
-              error: err,
-            });
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              message: "Questionaire is updated",
-              data: userdata,
-            });
-          }
-        }
-      );
-    } catch {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        message: "Something went wrong.",
-      });
+router.put("/Question/:questionaire_id/:house_id", CheckRole("edit_questionnaire"), function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    if (legit) {
+        questionaire.updateOne(
+            { _id: req.params.questionaire_id },
+            req.body,
+            function (err, userdata) {
+                if (err) {
+                    res.json({
+                        status: 200,
+                        hassuccessed: false,
+                        message: "Something went wrong",
+                        error: err,
+                    });
+                } else {
+                    res.json({
+                        status: 200,
+                        hassuccessed: true,
+                        message: "Questionaire is updated",
+                        data: userdata,
+                    });
+                }
+            }
+        );
+    } else {
+        res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Authentication required.",
+        });
     }
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
-  }
 });
 
 router.get("/GetQuestionaire/:house_id", function (req, res, next) {
