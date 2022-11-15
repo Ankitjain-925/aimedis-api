@@ -184,7 +184,7 @@ router.post("/AddQuestionaire", CheckRole("add_questionnaire"), function (req, r
     }
 });
 
-router.put("/Question/:questionaire_id", CheckRole("edit_questionnaire"), function (req, res, next) {
+router.put("/Question/:questionaire_id/:house_id", CheckRole("edit_questionnaire"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {
