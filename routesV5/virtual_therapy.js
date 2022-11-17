@@ -87,6 +87,44 @@ router.get("/Gettherapy/:house_id", function (req, res, next) {
     }
 });
 
+router.get("/Gettherapy_search/:house_id/:disease_name", function (req, res) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    var final
+
+    if (legit) {
+        let house_id = req.params.house_id;
+        const VirtualtToSearchWith = new virtual_therapys({ house_id });
+        virtual_therapys.find({
+            $or: [
+
+                { house_id: req.params.house_id },
+                { house_id: VirtualtToSearchWith.house_id },
+
+            ],
+        }, function (err, data1) {
+            if (err) {
+                res.json({ status: 200, hassuccessed: true, error: err });
+            } else {
+                var final = data1.filter((element) => {
+                    if (element.disease_name.includes(req.params.disease_name)) {
+                        return element
+                    }
+                })
+                res.json({ status: 200, hassuccessed: true, data: final })
+            }
+        }
+        )
+    } else {
+        res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Authentication required.",
+        });
+    }
+
+});
+
 router.put("/Updatetherapy/:_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -142,7 +180,7 @@ router.delete('/Deletetherapy/:_id', function (req, res, next) {
 router.post("/Addtherapy", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
-    if (!legit) {
+    if (legit) {
         var adddata = new virtual_therapys(req.body)
         adddata.save(function (err, user_data) {
             if (err && !user_data) {
