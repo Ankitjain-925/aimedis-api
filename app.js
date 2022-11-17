@@ -605,6 +605,8 @@ var vactive5 = require("./routesV5/virtual_active")
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
 var vcare5 = require("./routesV5/virtual_care");
 var teammember5 = require("./routesV5/staffgroup.js");
+var vtherapy5 = require("./routesV5/virtual_therapy.js");
+
 
 
 // app.use("/api/v1/User", UserData);
@@ -701,6 +703,8 @@ app.use("/api/v5/vactive", vactive5);
 app.use("/api/v5/teammember",teammember5)
 app.use("/api/v5/cquestionnaire", cquestionnaire5);
 app.use("/api/v5/vc", vcare5);
+app.use("/api/v5/vt", vtherapy5);
+
 
 
 // app.use("/api/v4/bk", bk)
@@ -769,8 +773,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-//server.listen(5000, () => {
- // console.log("Server started on port 5001")
-//});
+// server.listen(5000, () => {
+//  console.log("Server started on port 5001")
+// });
  module.exports = app;
 
