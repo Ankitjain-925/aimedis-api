@@ -1,10 +1,9 @@
 var express = require("express");
 let router = express.Router();
+const axios = require("axios");
 var nodemailer = require("nodemailer");
 const mailchimp = require("@mailchimp/mailchimp_marketing")
 const md5 = require("md5")
-
-
 
 
 var transporter = nodemailer.createTransport({
@@ -19,209 +18,342 @@ var transporter = nodemailer.createTransport({
 });
 
 router.post("/MarketingMail", function (req, res) {
-  if (req.body.email !== "") {
-    let mailOptions = {
-      from: req.body.email,
-      to: "vaibhav.webnexus@gmail.com",
-      subject: "Contact and Support Message",
-      html:
-        "<div><b>Name -</b>&nbsp;" +
-        req.body.first_name +
-        "&nbsp;" +
-        req.body.last_name +
-        "</div><div><b>Company Name-</b>&nbsp;" +
-        req.body.company_name +
-        "</div><div><b>Option:-</b>&nbsp;" +
-        req.body.option +
-        "<div>"
-    };
+  const response_key = req.body.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      if (req.body.email !== "") {
+        let mailOptions = {
+          from: req.body.email,
+          to: "contact@aimedis.com",
+          subject: "Contact and Support Message",
+          html:
+            "<div><b>Name -</b>&nbsp;" +
+            req.body.first_name +
+            "&nbsp;" +
+            req.body.last_name +
+            "</div><div><b>Company Name-</b>&nbsp;" +
+            req.body.company_name +
+            "</div><div><b>Option:-</b>&nbsp;" +
+            req.body.option +
+            "<div>"
+        };
 
-    let sendmail = transporter.sendMail(mailOptions);
-    if (sendmail) {
-      console.log("emailsend")
+        transporter.sendMail(mailOptions).then(() => {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }).catch((err) => {
+          res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false, data: err });
+        });
+
+      } else {
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    }
+    else {
       res.json({
         status: 200,
-        message: "Mail sent Successfully",
-        hassuccessed: true,
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-    } else {
-      console.log("err")
-      res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
-  } else {
-    console.log("no email")
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-
-  }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
 });
 
-
-
 router.post("/MarketingMail2", function (req, res) {
-  if (req.body.email !== "") {
+  const response_key = req.body.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      if (req.body.email !== "") {
 
-    let mailOptions = {
-      from: req.body.email,
-      to: "vaibhav.webnexus@gmail.com",
-      subject: "Investor Relation Request",
-      html:
+        let mailOptions = {
+          from: req.body.email,
+          to: "investorrelations@aimedis.com ",
+          subject: "Investor Relation Request",
+          html:
 
-        "<div><b>Name:-</b>&nbsp" +
+            "<div><b>Name:-</b>&nbsp" +
 
-        req.body.first_name +
-        "&nbsp;" +
-        req.body.last_name +
-        "</div>"
-    };
+            req.body.first_name +
+            "&nbsp;" +
+            req.body.last_name +
+            "</div>"
+        };
 
 
-    let sendmail = transporter.sendMail(mailOptions);
-    if (sendmail) {
+        transporter.sendMail(mailOptions).then(() => {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }).catch((err) => {
+          res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false, data: err });
+        });
+
+      } else {
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    }
+    else {
       res.json({
         status: 200,
-        message: "Mail sent Successfully",
-        hassuccessed: true,
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-    } else {
-      res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
-  } else {
-    console.log("no email")
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-  }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
 });
 
 router.post("/MarketingMail3", function (req, res) {
-  if (req.body.email != "") {
-    let mailOptions = {
-      from: req.body.email,
-      to: "vaibhav.webnexus@gmail.com",
-      subject: "Contact and Support Message",
-      html:
-        "<div><b>Name:-</b>&nbsp;" +
-        req.body.first_name +
-        "&nbsp;" +
-        req.body.last_name +
-        "</div><div><b>Option:-&nbsp;</b>" +
-        req.body.option +
-        "</div>"
-    };
+  const response_key = req.body.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      if (req.body.email != "") {
+        let mailOptions = {
+          from: req.body.email,
+          to: "contact@aimedis.com",
+          subject: "Contact and Support Message",
+          html:
+            "<div><b>Name:-</b>&nbsp;" +
+            req.body.first_name +
+            "&nbsp;" +
+            req.body.last_name +
+            "</div><div><b>Option:-&nbsp;</b>" +
+            req.body.option +
+            "</div>"
+        };
 
-    let sendmail = transporter.sendMail(mailOptions);
-    if (sendmail) {
+        transporter.sendMail(mailOptions).then(() => {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }).catch((err) => {
+          res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false, data: err });
+        });
+
+      } else {
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    }
+    else {
       res.json({
         status: 200,
-        message: "Mail sent Successfully",
-        hassuccessed: true,
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-    } else {
-      res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
     }
-  } else {
-    console.log("no email")
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-  }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
 });
 
-
-
 router.post('/subscribe', (req, res) => {
+  const response_key = req.body.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      mailchimp.setConfig({
+        apiKey: 'cdc28513af7095e5fe5a349065cd58a3-us20',
+        server: 'us20',
+      });
 
-  mailchimp.setConfig({
-    apiKey: 'cdc28513af7095e5fe5a349065cd58a3-us20',
-    server: 'us20',
-  });
+      const { email } = req.body
+      if (email != "") {
+        const subscriberHash = md5(email.toLowerCase());
+        const listId = '8f2e5a6770';
 
-  const { email } = req.body
-  if (email != "") {
-    const subscriberHash = md5(email.toLowerCase());
-    const listId = '8f2e5a6770';
-
-    const response = mailchimp.lists.setListMember(
-      listId,
-      subscriberHash,
-      {
-        email_address: email,
-        status_if_new: 'subscribed',
+        const response = mailchimp.lists.setListMember(
+          listId,
+          subscriberHash,
+          {
+            email_address: email,
+            status_if_new: 'subscribed',
+          }
+        );
+        res.json({
+          status: 200,
+          message: "New Subscription",
+          hassuccessed: true,
+        });
       }
-    );
-    res.json({
-      status: 200,
-      message: "New Subscription",
-      hassuccessed: true,
-    });
-  }
-  else {
-    res.json({
-      status: 200,
-      message: "Email required",
-      hassuccessed: false,
-    });
-  }
-})
-
-
-router.post("/avalonMail1", function (req, res) {
-  if (req.body.email != "") {
-    let mailOptions = {
-      from: req.body.email,
-      to: 'inquiries@aimedis.com, steve.ambrose@aimedis.com, rupalii.webnexus@gmail.com',
-      subject: "New Inquiry - Avalon",
-      html:
-      "<div><b>Interested :-&nbsp;</b>" +
-      req.body.interested +
-      "</div><div><b>Represent :-&nbsp;</b>" +
-      req.body.represent +
-      "</div>"
-    };
-
-    transporter.sendMail(mailOptions).then(()=>{
+      else {
+        res.json({
+          status: 200,
+          message: "Email required",
+          hassuccessed: false,
+        });
+      }
+    } else {
       res.json({
         status: 200,
-        message: "Mail sent Successfully",
-        hassuccessed: true,
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-     }).catch((err)=>{
-      res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false , data: err});
-     }); 
-     
-  } else {
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-  }
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
+})
+
+router.post("/avalonMail1", function (req, res) {
+  const response_key = req.body.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      if (req.body.email != "") {
+        let mailOptions = {
+          from: 'inquiries@aimedis.com',
+          to: 'steve.ambrose@aimedis.com, michael.kaldasch@aimedis.com, ben.elidrissi@aimedis.com',
+          subject: "New Inquiry - Avalon",
+          html:
+            "<div><b>Interested :-&nbsp;</b>" +
+            req.body.interested +
+            "</div><div><b>Represent :-&nbsp;</b>" +
+            req.body.represent +
+            "</div><div><b>E-mail :-&nbsp;</b>" +
+            req.body.email +
+            "</div>"
+        };
+
+        transporter.sendMail(mailOptions).then(() => {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }).catch((err) => {
+          res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false, data: err });
+        });
+
+      } else {
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
 });
 
 router.post("/avalonMail2", function (req, res) {
-  if (req.body.email != "") {
-    let mailOptions = {
-      from: req.body.email,
-      to: 'inquiries@aimedis.com, steve.ambrose@aimedis.com, rupalii.webnexus@gmail.com',
-      subject: "New Inquiry - Avalon",
-      html:
-        "<div><b>Name:-</b>&nbsp;" +
-        req.body.first_name +
-        "&nbsp;" +
-        req.body.last_name +
-        "</div><div><b>Interested :-&nbsp;</b>" +
-        req.body.interested +
-        "</div><div><b>Represent :-&nbsp;</b>" +
-        req.body.represent +
-        "</div><div><b>Company Name :-&nbsp;</b>" +
-        req.body.company_name +
-        "</div>"
-    };
+  const response_key = req.body.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      if (req.body.email != "") {
+        let mailOptions = {
+          from: 'inquiries@aimedis.com',
+          to: 'steve.ambrose@aimedis.com,  michael.kaldasch@aimedis.com, ben.elidrissi@aimedis.com',
+          subject: "New Inquiry - Avalon",
+          html:
+            "<div><b>Name:-</b>&nbsp;" +
+            req.body.first_name +
+            "&nbsp;" +
+            req.body.last_name +
+            "</div><div><b>Interested :-&nbsp;</b>" +
+            req.body.interested +
+            "</div><div><b>Represent :-&nbsp;</b>" +
+            req.body.represent +
+            "</div><div><b>Company Name :-&nbsp;</b>" +
+            req.body.company_name +
+            "</div><div><b>E-mail :-&nbsp;</b>" +
+            req.body.email +
+            "</div>"
+        };
 
-   transporter.sendMail(mailOptions).then(()=>{
-    res.json({
-      status: 200,
-      message: "Mail sent Successfully",
-      hassuccessed: true,
+        transporter.sendMail(mailOptions).then(() => {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }).catch((err) => {
+          res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false, data: err });
+        });
+      } else {
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
     });
-   }).catch((err)=>{
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false , data: err});
-   });
-  } else {
-    res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
-  }
 });
 
 module.exports = router;

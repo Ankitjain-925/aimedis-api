@@ -195,11 +195,12 @@ router.put("/verifiedbyPatient/:case_id", function (req, res, next) {
  }
 })
 
-router.put("/addmypatient/:case_id", function (req, res, next) {
+router.put("/addmypatient/:case_id/:house_id", function (req, res, next) {
   try{
     virtual_cases.findOne({ _id: req.params.case_id},
       function (err, user_data) {
         if(err){
+          console.log('err61', err)
           res.json({
             status: 200,
             hassuccessed: false,
@@ -212,9 +213,10 @@ router.put("/addmypatient/:case_id", function (req, res, next) {
             console.log('I am here11111', req.body.users_id)
           user.updateMany(
             { _id: {$in: req.body.users_id} },
-            {$push: {mypatient: {profile_id: user_data.patient.profile_id, byhospital: true}}},
+            {$push: {myPatient: {profile_id: user_data.patient.profile_id, byhospital: req.params.house_id}}},
             function (err, userdata) {
               if (err) {
+                console.log('err62', err)
                 res.json({
                   status: 200,
                   hassuccessed: false,
@@ -226,6 +228,7 @@ router.put("/addmypatient/:case_id", function (req, res, next) {
                   { _id: user_data.patient_id },
                   {$push: {fav_doctor: req.body.fav_doctor}},
                   function (err, userdata) {
+                    console.log('err63', err)
                     if (err) {
                       res.json({
                         status: 200,
@@ -257,7 +260,8 @@ router.put("/addmypatient/:case_id", function (req, res, next) {
    
     });
   } catch(e){
-    res.json({ status: 200, message: "Something went wrong.", error: err });
+    console.log('err65', e)
+    res.json({ status: 200, message: "Something went wrong.", error: e });
   }
   
   
@@ -277,7 +281,7 @@ function favdoc_del(idf) {
                 profile_id: element,
               },
               {
-                byhospital: true,
+                byhospital:  {$exists: true},
               },
             ],
           },
@@ -670,7 +674,7 @@ router.get('/patient/:patient_id', function (req, res, next) {
 })
 
 
-router.delete("/removemypatientdischarge", function (req, res, next) {
+router.post("/removemypatientdischarge", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   let finaldata = [];
@@ -686,7 +690,7 @@ router.delete("/removemypatientdischarge", function (req, res, next) {
                   profile_id: req.body.profile_id,
                 },
                 {
-                  byhospital: true,
+                  byhospital: {$exists: true},
                 },
               ],
             },

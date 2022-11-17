@@ -1207,15 +1207,9 @@ router.post("/AddUser", function (req, res, next) {
 });
 
 router.post("/AddNewUseradiitional", function (req, res, next) {
-  // const response_key = req.body.token;
-  // Making POST request to verify captcha
-  // var config = {
-  //   method: "post",
-  //   url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`
-  // };
-  // axios(config)
-  // .then(function (google_response) {
-  // if (google_response.data.success) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
   if (
     req.body.email == "" ||
     req.body.email == undefined ||
@@ -1605,13 +1599,13 @@ router.post("/AddNewUseradiitional", function (req, res, next) {
         }
       });
   }
-  // } else {
-  //   res.json({
-  //     status: 200,
-  //     hassuccessed: false,
-  //     msg: "Authentication required.",
-  //   });
-  // }
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Authentication required.",
+    });
+  }
   // })
   //   .catch(function (error) {
   //     res.json({
@@ -9864,273 +9858,431 @@ router.post("/verifyStripe", (req, res) => {
 }
 });
 
+router.put('/EmailVeri', function (req, res, next) {
+  if (req.body.email == '' || req.body.password == '') {
+      res.json({ status: 450, message: "Email and password fields should not be empty", hassuccessed: false })
+  } else {
+      const email = req.body.email;
+      const messageToSearchWith = new User({ email });
+      messageToSearchWith.encryptFieldsSync();
+      const messageToSearchWith1 = new User({ email: req.body.email.toLowerCase() });
+      messageToSearchWith1.encryptFieldsSync();
+      const messageToSearchWith2 = new User({ email: req.body.email.toUpperCase() });
+      messageToSearchWith2.encryptFieldsSync();
+      User.updateOne({ $or: [{ email: { $regex: req.body.email, $options: "i" } }, { email: { $regex: messageToSearchWith.email, $options: "i" } }, { email: { $regex: messageToSearchWith1.email, $options: "i" } }, { email: { $regex: messageToSearchWith2.email, $options: "i" } }] }, { verified: 'true' }, (err, doc1) => {
+          if (err && !doc1) {
+              res.json({ status: 450, hassuccessed: false, message: 'Verification Failed', error: err })
+          } else {
+              if (doc1.nModified == '0') {
+                  res.json({ status: 200, hassuccessed: true, msg: 'User is not found' })
+              }
+              else {
+                  res.json({ status: 450, hassuccessed: true, message: 'Successfull verified' })
+              }
+
+          }
+      })
+  }
+})
+
+
 router.delete("/marketing_user/:email", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
- try{
   if (legit) {
-    var email = req.params.email && req.params.email.toLowerCase();
-    const messageToSearchWith = new marketing_user({ email: email });
-    messageToSearchWith.encryptFieldsSync();
-    marketing_user.deleteOne(
-      {
-        $or: [
-          { email: messageToSearchWith.email },
-          { email: req.params.email },
-        ],
-      },
-      function (err, data) {
-        if (err) {
-          res.json({
-            status: 200,
-            message: "Something went wrong.",
-            error: err,
-            hassuccessed: false,
-          });
-        } else {
-          res.json({
-            status: 200,
-            message: "Deleted",
-            hassuccessed: true,
-          });
-        }
+      var email = req.params.email && req.params.email.toLowerCase();
+      const messageToSearchWith = new marketing_user({ email: email });
+      messageToSearchWith.encryptFieldsSync();
+      marketing_user.deleteOne(
+          {
+              $or: [
+                  { email: messageToSearchWith.email },
+                  { email: req.params.email },
+              ],
+          },
+          function (err, data) {
+              if (err) {
+                  console.log("err", err);
+                  res.json({
+                      status: 200,
+                      message: "Something went wrong.",
+                      error: err,
+                      hassuccessed: false,
+                  });
+              } else {
+                  res.json({
+                      status: 200,
+                      message: "Deleted",
+                      hassuccessed: true,
+                  });
+              }
 
-      }
-    );
+          }
+      );
   } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      message: "Authentication required.",
-    });
+      res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+      });
   }
-} catch {
-  res.json({
-    status: 200,
-    hassuccessed: false,
-    msg: "Some thing went wrong.",
-  });
-}
 });
 
 
 router.post("/marketing_user", function (req, res, next) {
- try{
-  var email = req.body.email.toLowerCase();
-  req.body.email = email;
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (legit) {
+      var email = req.body.email.toLowerCase();
+      req.body.email = email;
 
-  datas = { ...req.body };
-  const messageToSearchWith = new marketing_user({ email: req.body.email });
-  messageToSearchWith.encryptFieldsSync();
-  marketing_user.findOne({
-    $or: [
-      { email: { $regex: req.body.email, $options: "i" } },
-      { email: { $regex: messageToSearchWith.email, $options: "i" } },
-    ],
-  })
-    .exec()
-    .then((user_data) => {
-      if (user_data) {
-        res.json({
-          status: 200,
-          message: "Already added",
-          hassuccessed: false
-        });
-      }
-      else {
-        var marketing_users = new marketing_user(datas);
-        marketing_users.save(function (err, user_data1) {
-          if (err && !user_data1) {
-            res.json({ status: 200, message: "Something went wrong.", error: err });
-          } else {
-            res.json({
-              status: 200,
-              message: "User is added Successfully",
-              hassuccessed: true,
-              data: user_data1,
-            });
-          }
-        });
-      }
-    })
-  } catch {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Some thing went wrong.",
-    });
+      datas = { ...req.body };
+
+      // var email = req.params.email && req.params.email.toLowerCase();
+      // var email = req.params.email && req.params.email.toLowerCase();
+      const messageToSearchWith = new marketing_user({ email: req.body.email });
+      messageToSearchWith.encryptFieldsSync();
+      marketing_user.findOne({
+          $or: [
+              { email: { $regex: req.body.email, $options: "i" } },
+              { email: { $regex: messageToSearchWith.email, $options: "i" } },
+          ],
+      })
+          .exec()
+          .then((user_data) => {
+              if (user_data) {
+                  res.json({
+                      status: 200,
+                      message: "Already added",
+                      hassuccessed: false
+                  });
+              }
+              else {
+                  var marketing_users = new marketing_user(datas);
+                  marketing_users.save(function (err, user_data1) {
+                      if (err && !user_data1) {
+                          res.json({ status: 200, message: "Something went wrong.", error: err });
+                      } else {
+                          res.json({
+                              status: 200,
+                              message: "User is added Successfully",
+                              hassuccessed: true,
+                              data: user_data1,
+                          });
+                      }
+                  });
+              }
+          })
+  }
+  else {
+      res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
   }
 });
 
 router.post("/marketing_user2", function (req, res, next) {
-  try{
-  let email = base64.decode(req.body.email);
-  if (req.body.first_name && req.body.last_name) {
-    var first_name = base64.decode(req.body.first_name);
-    var last_name = base64.decode(req.body.last_name);
-  }
+  const response_key = req.body.token;
+  console.log('response_key', response_key)
+  // Making POST request to verify captcha
+  var config = {
+      method: "post",
+      url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config)
+      .then(function (google_response) {
+          if (google_response.data.success == true) {
+              console.log('456')
+              let email = base64.decode(req.body.email);
+              if (req.body.first_name && req.body.last_name) {
+                  var first_name = base64.decode(req.body.first_name);
+                  var last_name = base64.decode(req.body.last_name);
+              }
 
-  email = email.toLowerCase();
-  req.body.email = email;
-  req.body.first_name = first_name;
-  req.body.last_name = last_name;
-  console.log('req.body', req.body)
-  datas = { ...req.body };
-  // var email = req.params.email && req.params.email.toLowerCase();
-  const messageToSearchWith = new marketing_user({ email: req.body.email });
-  messageToSearchWith.encryptFieldsSync();
-  marketing_user.findOne({
-    $or: [
-      { email: { $regex: req.body.email, $options: "i" } },
-      { email: { $regex: messageToSearchWith.email, $options: "i" } },
-    ],
-  })
-    .exec()
-    .then((user_data) => {
-      if (user_data) {
-        res.json({
-          status: 200,
-          message: "Already added",
-          hassuccessed: false
-        });
-      }
-      else {
-        var marketing_users = new marketing_user(datas);
-        marketing_users.save(function (err, user_data1) {
-          if (err && !user_data1) {
-            res.json({ status: 200, message: "Something went wrong.", error: err });
-          } else {
-            res.json({
-              status: 200,
-              message: "User is added Successfully",
-              hassuccessed: true,
-              data: user_data1,
-            });
+              email = email.toLowerCase();
+              req.body.email = email;
+              req.body.first_name = first_name;
+              req.body.last_name = last_name;
+              console.log('req.body', req.body)
+              datas = { ...req.body };
+              // var email = req.params.email && req.params.email.toLowerCase();
+              const messageToSearchWith = new marketing_user({ email: req.body.email });
+              messageToSearchWith.encryptFieldsSync();
+              marketing_user.findOne({
+                  $or: [
+                      { email: { $regex: req.body.email, $options: "i" } },
+                      { email: { $regex: messageToSearchWith.email, $options: "i" } },
+                  ],
+              })
+              .exec()
+              .then((user_data) => {
+                  if (user_data) {
+                      res.json({
+                          status: 200,
+                          message: "Already added",
+                          hassuccessed: false
+                      });
+                  }
+                  else {
+                      var marketing_users = new marketing_user(datas);
+                      marketing_users.save(function (err, user_data1) {
+                          if (err && !user_data1) {
+                              res.json({ status: 200, message: "Something went wrong.", error: err });
+                          } else {
+                              res.json({
+                                  status: 200,
+                                  message: "User is added Successfully",
+                                  hassuccessed: true,
+                                  data: user_data1,
+                              });
+                          }
+                      });
+                  }
+              })
+
           }
-        });
-      }
-    })
-  } catch {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Some thing went wrong.",
-    });
-  }
+          else {
+              console.log('123')
+              res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Authentication required.",
+              });
+          }
+      })
 });
 
 router.post("/MarketingSub", function (req, res) {
-  try{
-    const response_key = req.body.token;
-    // Making POST request to verify captcha
-    var config = {
-      method: "post",
-      url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
-    };
-    axios(config)
-      .then(function (google_response) {
-        if (google_response.data.success == true) {
-          if (
-            req.body.email == "" ||
-            req.body.email == undefined ) {
+  try {
+      const response_key = req.body.token;
+      // Making POST request to verify captcha
+      var config = {
+          method: "post",
+          url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+      };
+      axios(config)
+          .then(function (google_response) {
+              if (google_response.data.success == true) {
+                  if (
+                      req.body.email == "" ||
+                      req.body.email == undefined) {
+                      res.json({
+                          status: 450,
+                          message: "Email fields should not be empty",
+                          hassuccessed: false,
+                      });
+                  }
+                  else {
+                      var email = req.body.email.toLowerCase();
+                      req.body.email = email;
+
+                      const messageToSearchWith = new marketing_user({ email: req.body.email });
+                      messageToSearchWith.encryptFieldsSync();
+                      marketing_user.findOne({
+                          $or: [
+                              { email: { $regex: req.body.email, $options: "i" } },
+                              { email: { $regex: messageToSearchWith.email, $options: "i" } },
+                          ],
+                      })
+                          .exec()
+                          .then((user_data) => {
+                              if (user_data) {
+                                  res.json({
+                                      status: 200,
+                                      message: "Already added",
+                                      hassuccessed: false
+                                  });
+                              }
+                              else {
+                                  let emails = base64.encode(req.body.email);
+
+                                  let url = ``;
+
+                                  if (req.body.first_name && req.body.last_name) {
+                                      let first_name = base64.encode(req.body.first_name);
+                                      let last_name = base64.encode(req.body.last_name);
+                                      url = `first_name=${first_name}&last_name=${last_name}&email=${emails}`
+                                  }
+                                  else {
+                                      url = `email=${emails}`
+                                  }
+                                  console.log('email', email)
+                                  sendData = `Dear user,<br/>
+        you registered for the newsletter. Please click this  <a style="color: #00abaf!important; font-weight: 700" href="https://aimedis.io/newsletter-approval?${url}" >LINK </a> to complete the subscription.`;
+                                  generateTemplate(
+                                      EMAIL.generalEmail.createTemplate("en", {
+                                          title: "",
+                                          content: sendData,
+                                      }),
+                                      (error, html) => {
+                                          if (email !== "") {
+                                              let mailOptions = {
+                                                  from: "contact@aimedis.com",
+                                                  to: email,
+                                                  subject: "Aimedis Newletter Subscription",
+                                                  html: html,
+                                              };
+                                              let sendmail = transporter.sendMail(mailOptions);
+                                              if (sendmail) {
+                                                  res.json({
+                                                      status: 200,
+                                                      msg: "Mail is sent",
+                                                      hassuccessed: true,
+                                                  });
+                                              } else {
+                                                  res.json({
+                                                      status: 200,
+                                                      msg: "Mail is not sent",
+                                                      hassuccessed: false,
+                                                  });
+                                              }
+                                          } else {
+                                              res.json({
+                                                  status: 200,
+                                                  msg: "Mail is not sent",
+                                                  hassuccessed: false,
+                                              });
+                                          }
+                                      }
+                                  );
+                              }
+                          })
+                  }
+              }
+              else {
+                  res.json({
+                      status: 200,
+                      hassuccessed: false,
+                      msg: "Authentication required.",
+                  });
+              }
+          })
+  } catch {
+      res.json({
+          status: 200,
+          hassuccessed: false,
+          msg: "Some thing went wrong.",
+      });
+  }
+})
+
+router.get("/DocNurses", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  let count = 0;
+  finaldata = []
+  try {
+    if (legit) {
+      User.findOne(
+        {
+          _id: legit.id
+        },
+        function (err, changeStatus) {
+          if (err) {
             res.json({
-              status: 450,
-              message: "Email fields should not be empty",
+              status: 200,
               hassuccessed: false,
+              message: "Something went wrong.",
+              error: err,
             });
           }
-          else {
-  var email = req.body.email.toLowerCase();
-  req.body.email = email;
-
-  const messageToSearchWith = new marketing_user({ email: req.body.email });
-  messageToSearchWith.encryptFieldsSync();
-  marketing_user.findOne({
-    $or: [
-      { email: { $regex: req.body.email, $options: "i" } },
-      { email: { $regex: messageToSearchWith.email, $options: "i" } },
-    ],
-  })
-    .exec()
-    .then((user_data) => {
-      if (user_data) {
-        res.json({
-          status: 200,
-          message: "Already added",
-          hassuccessed: false
-        });
-      }
-      else {
-        let emails = base64.encode(req.body.email);
-
-        let url = ``;
-
-        if (req.body.first_name && req.body.last_name) {
-          let first_name = base64.encode(req.body.first_name);
-          let last_name = base64.encode(req.body.last_name);
-          url = `first_name=${first_name}&last_name=${last_name}&email=${emails}`
-        }
-        else {
-          url = `email=${emails}`
-        }
-        console.log('email', email)
-        sendData = `Dear User,<br/>
-  You registered as a newsletter subscription, So for getting updates related to us. Please go to the <a style="color: #00abaf!important; font-weight: 700" href="https://avalon.aidoc.io/newsletter-approval?${url}" >LINK </a>,  and do final step for the substcription.`;
-        generateTemplate(
-          EMAIL.generalEmail.createTemplate("en", {
-            title: "",
-            content: sendData,
-          }),
-          (error, html) => {
-            if (email !== "") {
-              let mailOptions = {
-                from: "contact@aimedis.com",
-                to: email,
-                subject: "Aimedis Newletter Subscription",
-                html: html,
-              };
-              let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
-                res.json({
-                  status: 200,
-                  msg: "Mail is sent",
-                  hassuccessed: true,
-                });
-              } else {
-                res.json({
-                  status: 200,
-                  msg: "Mail is not sent",
-                  hassuccessed: false,
-                });
+          else{
+          if (changeStatus) {
+            if(changeStatus.fav_doctor && changeStatus.fav_doctor.length>0){
+              var counting = changeStatus.fav_doctor && changeStatus.fav_doctor.length;
+              console.log('counting', counting)
+              changeStatus.fav_doctor.map(function (content) {
+                if(content && content.profile_id){
+                  const messageToSearchWith = new User({ profile_id: content.profile_id });
+                  messageToSearchWith.encryptFieldsSync();
+                  User.findOne(
+                    { profile_id: { $in: [content.profile_id, messageToSearchWith.profile_id] } },
+                    function (err, userdata1) {
+                      if (err) {
+                        res.json({
+                          status: 200,
+                          hassuccessed: false,
+                          message: "Something went wrong.",
+                          error: err,
+                        });
+                      }
+                      else {
+                        console.log('userdata1', userdata1)
+                        if(userdata1){
+                          data = {
+                            first_name: userdata1.first_name,
+                            last_name: userdata1.last_name,
+                            image: userdata1.image,
+                            profile_id: userdata1.profile_id,
+                            alies_id: userdata1.alies_id,
+                            byhospital: content.byhospital,
+                            user_type: content.user_type
+                          }
+                          count++
+                          finaldata.push(data)
+                          console.log('counting', counting, 'count', count)
+                           if (counting == count) {
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "Successfully Fetched",
+                              data: finaldata
+                            })
+                          }
+                        }
+                        else{
+                          count++
+                          if (counting == count) {
+                            console.log('counting1', counting, 'count1', count)
+                            res.json({
+                              status: 200,
+                              hassuccessed: true,
+                              message: "Successfully Fetched",
+                              data: finaldata
+                            })
+                          }
+                        }
+                      }
+                    }
+                  );
+                }
+                else{
+                  count++
+                  console.log('counting2', counting, 'count2', count)
+                   if (counting == count) (
+                    res.json({
+                      status: 200,
+                      hassuccessed: true,
+                      message: "Successfully Fetched",
+                      data: finaldata
+                    })
+                   )
+                }
+                })
               }
-            } else {
+              }
+            else{
               res.json({
                 status: 200,
-                msg: "Mail is not sent",
-                hassuccessed: false,
+                data: [],
+                hassuccessed: true,
+                message: "No favourite doctors in list",
               });
             }
           }
-        );
-      }
-    })
-  }
-}
-else {
-  res.json({
-    status: 200,
-    hassuccessed: false,
-    msg: "Authentication required.",
-  });
-}
-})
+        })
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
   } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Some thing went wrong.",
+      msg: "Something went wrong.",
     });
   }
-})
+});
 
 module.exports = router;
