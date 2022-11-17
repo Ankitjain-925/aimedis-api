@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5001",
+    "host": "virtualhospital.aidoc.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -86,7 +86,7 @@
         
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -4433,6 +4433,107 @@
                     }
                 }
             }
+        },
+        "/vchat/UpdateVideoAccount/{_id}":{
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "description": "ID",
+                    "type": "string"
+                } 
+             ],
+           "put": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "Update",
+                        "in": "body",
+                        "description": ""
+                    }
+                ],
+                "summary": "update with given Id",
+                "responses": {
+                    "200": {
+                        "description": "successfully update"
+                    }
+                }
+            }
+        },
+        "/vchat/AddRefundInfo": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Video_Conference"
+                ],
+                "parameters": [
+                    {
+                        "name": "Doctor",
+                        "in": "body",
+                        "description": "Video_Conference",
+                        "schema": {
+                            "$ref": "#/definitions/VideoRefund"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Account details",
+                "responses": {
+                    "200": {
+                        "description": "Add account information for refund amount"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/vchat/deleteRefundForm/{FormId}": {
+            "delete": {
+                    "parameters": [
+                        {
+                            "name": "FormId",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"                          
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+                "tags": [
+                    "Video_Conference"
+                ],
+                "summary": "Delete Refund Form with _id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete account details"
+
+                    }
+                }
+            }
+
         }
     },
     "definitions": {
@@ -4647,6 +4748,80 @@
                     "type": "string",
                     "uniqueItems": false
                 }
+            }
+        },
+        "VideoRefund": {
+            "required": [
+                "username",
+                "Patient_id",
+                "is_payment",
+                "email"
+            ],
+            "properties": {
+            "AccountOwner":{
+                "type": "string",
+                "uniqueItems": false
+
+            },
+
+             "user_id":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "email": {
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "BankAccountNumber": {
+                "type": "string",
+                "uniqueItems": false
+            },
+             "NameOfBank":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "VideoChatAccountId":{
+                "type": "string",
+                "uniqueItems": false
+            },
+             "BankCountry":{
+               "type": "string",
+               "uniqueItems": false
+
+             }, 
+             "ABARoutingNumber":{
+                "type": "string",
+                "uniqueItems": false
+
+              }, 
+             "BankKey": {
+                "type": "string",
+                "uniqueItems": false
+            },
+             "IBAN": {
+                "type": "string",
+                "uniqueItems": false
+            },
+            "SWIFCode":{
+              "type": "string",
+               "unique": false
+            },
+             "ControlKey":{
+                "type": "string",
+                "uniqueItems": false
+             },
+             "Address":{
+                "type": "string",
+                "uniqueItems": false
+
+              }, 
+             "DUNSNumber":{
+               "type": "string",
+                "unique": false
+             }
             }
         },
         "Membership": {

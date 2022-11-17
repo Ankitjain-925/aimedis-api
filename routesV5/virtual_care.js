@@ -179,7 +179,7 @@ router.post("/UpdateAddress", function (req, res) {
 
 });
 
-router.get("/PresentFutureTask/:house_id",CheckRole('get_professional_activity'),
+router.get("/PresentFutureTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -235,7 +235,7 @@ router.get("/PresentFutureTask/:house_id",CheckRole('get_professional_activity')
 );
 
 router.get(
-  "/PastTask/:patient_profile_id/:house_id",CheckRole('get_earlier_activity'),
+  "/PastTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -1119,7 +1119,7 @@ router.get("/patientTaskandService/:patient_id", function (req, res) {
 
 
 router.get(
-  "/PastAppointmentServiceTask/:patient_profile_id/:house_id",CheckRole("get_earlier_activity"),
+  "/PastAppointmentServiceTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
