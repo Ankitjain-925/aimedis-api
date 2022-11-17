@@ -8,6 +8,7 @@ var config = require("./config/database");
 var user = require("./schema/user.js");
 let router = express.Router();
 var cors = require("cors");
+var useragent = require('express-useragent');
 var jwtconfig = require("./jwttoken");
 var swaggerUi = require("swagger-ui-express");
 var swaggerDocument = require("./swagger.json");
@@ -37,7 +38,9 @@ mongoose.set("debug", true);
 
 
 var app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:2879', 'https://aimedis.io', 'https://metaverse.aimedis.io']
+  }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -56,6 +59,18 @@ appAdmin2.use(express.static(path.join(__dirname, "build/sickleave")));
 appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
+
+app.use(function (req, res, next) {
+    var source = req.headers['user-agent']
+    var ua = useragent.parse(source);
+  if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
+  {
+    res.send(401, 'You are not authorized user. CORS- issue')
+  }
+  else{
+    next();
+  }
+});
 
 ////////////admin+main+end/////////////
 
