@@ -522,6 +522,19 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         error: err,
       });
     } else {
+      const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
+      messageToSearchWith.encryptFieldsSync();
+      vidchat.findOne(
+        {
+          patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
+        })
+        .exec(function (err, getdata) {
+          if (getdata) {
+            res.json({   status: 200,
+              hassuccessed: false,
+               messages: 'video chat account exists, deactivate that first' })
+          }
+          else {
       if (req.query.bucket) {
         var buck = req.query.bucket;
       } else {
@@ -609,7 +622,8 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
       res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
 
     }
-
+  });
+}
   });
 });
 

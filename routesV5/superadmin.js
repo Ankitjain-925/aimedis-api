@@ -8,6 +8,7 @@ var Institute = require("../schema/institute");
 const { encrypt, decrypt } = require("./Cryptofile.js");
 var Wishlist = require("../schema/wishlist_schema");
 var jwtconfig = require("../jwttoken");
+const vidchat = require("../schema/vid_chat_account.js")
 const uuidv1 = require("uuid/v1");
 const pdf = require("html-pdf");
 const { promisify } = require("util");
@@ -489,6 +490,17 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         error: err,
       });
     } else {
+      const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
+      messageToSearchWith.encryptFieldsSync();
+      vidchat.findOne(
+        {
+          patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
+        })
+        .exec(function (err, getdata) {
+          if (getdata.prepaid_talktime_min > 0) {
+            res.json({ status: 400, messages: `You can't not delete account, because you still have ${getdata.prepaid_talktime_min} minutes left. Please deactivate your account ` })
+          }
+          else {
       if (req.query.bucket) {
         var buck = req.query.bucket;
       } else {
@@ -559,6 +571,8 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
       })
       res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
     }
+  });
+}
   });
 });
 
