@@ -3,6 +3,20 @@ let router = express.Router();
 const institute = require("../schema/institute.js")
 var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
+// var nodemailer = require("nodemailer");
+// const {
+//   EMAIL,
+//   generateTemplate,
+// } = require("../emailTemplate/index.js");
+// var transporter = nodemailer.createTransport({
+//   host: process.env.MAIL_HOST,
+//   port: 25,
+//   secure: false,
+//   auth: {
+//     user: process.env.MAIL_USER,
+//     pass: process.env.MAIL_PASS,
+//   },
+// });
 
 router.post("/AddTeam/:house_id", function (req, res) {
   const token = req.headers.token;
@@ -175,5 +189,76 @@ router.delete("/DeleteTeam/:house_id/:staff_id", function (req, res, next) {
     });
   }
 });
+
+// router.post("/FormMail", function (req, res) {
+//   try {
+//     var sendData = "Dear Admin," + "<br/>";
+//     "Here is the new Aimedis Staff request from the " +
+//       req.body.type +
+//       req.body.first_name +
+//       req.body.last_name +
+//       // req.body.email +
+//       // req.body.dob +
+//       // req.body.address +
+//       // req.body.city +
+//       // req.body.country +
+//       // req.body.PlaceOfBirth +
+
+//       "<br/>" +
+//       "Please check the list of requests from the list page. Please update the status of request also accordingly.";
+//     generateTemplate(
+//       EMAIL.generalEmail.createTemplate("en", { title: "", content: sendData }),
+
+//       (error, html) => {
+//         if (req.body.email !== "") {
+//           let mailOptions = {
+//             from: "contact@aimedis.com",
+//             to: "suhel.webnexus@gmail.com",
+//             subject: "User Data",
+//             html: html,
+//           };
+//           let sendmail = transporter.sendMail(mailOptions);
+//           if (sendmail) {
+//             res.json({
+//               status: 200,
+//               message: "Mail sent Successfully",
+//               hassuccessed: true,
+//             });
+//           } else {
+//             res.json({
+//               status: 200,
+//               msg: "Mail is not sent",
+//               hassuccessed: false,
+//             });
+//           }
+//         } else {
+//           res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+//         }
+//       }
+//     );
+//   } catch (err) {
+//     assert.isNotOk(err, 'Promise error');
+//     done();
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       msg: "Some thing went wrong.",
+//     });
+//   }
+// });
+
+
+// router.get("/sv/:team_name", async(req, res, next)=> {
+//   try{
+//   console.log(req.params.id);
+//   const getdtata = await institute.findOne({'institute_groups.houses.teammember':{$elemMatch: {'institute_groups.houses.teammember.team_name': req.params.team_name}}}).pretty();
+//   res.status(200).send(getdtata)
+//   console.log(getdtata.length)
+//   }
+  
+// catch(err){
+//   res.status(400).send(err)
+// }
+// })
 
 module.exports = router;   

@@ -195,34 +195,41 @@ router.get("/PresentFutureTask/:patient_profile_id",
 
         virtual_Task.find(
           {
-            "assinged_to.profile_id": req.params.patient_profile_id,
-            $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+            $and: [
+              {
+                $or: [
+                  {"assinged_to.profile_id": req.params.patient_profile_id},
+                  {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                ],
+              },
+              { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
+              ]},
+             ],
           },
           function (err, userdata) {
-            if (err && !userdata) {
-              res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Something went wrong",
-                error: err,
-              });
-            } else {
-              for (i = 0; i < userdata.length; i++) {
-                if (userdata[i].task_type == "sick_leave") {
+              if (err && !userdata) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: "Something went wrong",
+                  error: err,
+              });               
+            } else { 
+                for (i = 0; i < userdata.length; i++) {
+                  if (userdata[i].task_type == "sick_leave") {
+                    let today = new Date().setHours(0, 0, 0, 0);
+                    let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
+                    if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+                      // userdata.sort(mySorter);
+                      arr.push(userdata[i])
+                    }
+                  }
                   let today = new Date().setHours(0, 0, 0, 0);
-                  let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
-                  if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-                    // userdata.sort(mySorter);
+                  let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
+                if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {  
                     arr.push(userdata[i])
                   }
-                }
-                let today = new Date().setHours(0, 0, 0, 0);
-                let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
-                if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
-
-                  arr.push(userdata[i])
-                }
-                if (moment(data_d).isBefore(today) && userdata[i].status !== "done") {
+                  if (moment(data_d).isBefore(today) && userdata[i].status !== "done") {
 
                   arr.push(userdata[i])
                 }
@@ -259,8 +266,16 @@ router.get(
 
         virtual_Task.find(
           {
-            "assinged_to.profile_id": req.params.patient_profile_id,
-            $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+            $and: [
+              {
+                $or: [
+                  {"assinged_to.profile_id": req.params.patient_profile_id},
+                  {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                ],
+              },
+              { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
+              ]},
+            ],
           },
           function (err, userdata) {
             if (err && !userdata) {

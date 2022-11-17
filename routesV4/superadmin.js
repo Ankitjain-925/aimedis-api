@@ -522,92 +522,105 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
         error: err,
       });
     } else {
-      if (req.query.bucket) {
-        var buck = req.query.bucket;
-      } else {
-        var buck = "aimedisfirstbucket";
-      }
-      emptyBucket(buck, data12.profile_id);
-      var patient_id = req.params.UserId
-      // const VirtualtToSearchWith3 = new vidchat({ patient_id });
-      // VirtualtToSearchWith3.encryptFieldsSync();
-      // vidchat.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith3.patient_id] }},
-      //   {
-      //     '$unset': {
-      //       'patient_id': ''
-      //     }
-      //   },function (err, data) {
-      //     if (err) {
-      //       console.log("err", err)
-      //     } else {
-      //       console.log("data", data)
-      //     }
-      //   }
-      // )
-      // var patient_id = req.params.UserId
-      const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
-      VirtualtToSearchWith1.encryptFieldsSync();
-      virtual_cases.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith1.patient_id] } },
+      const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
+      messageToSearchWith.encryptFieldsSync();
+      vidchat.findOne(
         {
-          '$unset': {
-            'patient.image': ''
-          }
-        }, function (err, data) {
-          if (err) {
-            console.log("err", err)
-          } else {
-            console.log("data", data)
-          }
+          patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
         })
-      var patient_id = req.params.UserId
-      const VirtualtToSearchWith = new virtual_tasks({ patient_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-      virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
-        {
-          '$unset': {
-            'patient.image': ""
+        .exec(function (err, getdata) {
+          if (getdata.prepaid_talktime_min > 0) {
+            res.json({ status: 400, messages: `You can't not delete account, because you still have ${getdata.prepaid_talktime_min} minutes left. Please deactivate your account ` })
           }
-        }, function (err, data2) {
-          if (err) {
-            console.log("err", err)
+          else {
+            if (req.query.bucket) {
+              var buck = req.query.bucket;
+            } else {
+              var buck = "aimedisfirstbucket";
+            }
+            emptyBucket(buck, data12.profile_id);
+            var patient_id = req.params.UserId
+            // const VirtualtToSearchWith3 = new vidchat({ patient_id });
+            // VirtualtToSearchWith3.encryptFieldsSync();
+            // vidchat.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith3.patient_id] }},
+            //   {
+            //     '$unset': {
+            //       'patient_id': ''
+            //     }
+            //   },function (err, data) {
+            //     if (err) {
+            //       console.log("err", err)
+            //     } else {
+            //       console.log("data", data)
+            //     }
+            //   }
+            // )
+            // var patient_id = req.params.UserId
+            const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
+            VirtualtToSearchWith1.encryptFieldsSync();
+            virtual_cases.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith1.patient_id] } },
+              {
+                '$unset': {
+                  'patient.image': ''
+                }
+              }, function (err, data) {
+                if (err) {
+                  console.log("err", err)
+                } else {
+                  console.log("data", data)
+                }
+              })
+            var patient_id = req.params.UserId
+            const VirtualtToSearchWith = new virtual_tasks({ patient_id });
+            VirtualtToSearchWith.encryptFieldsSync();
+            virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
+              {
+                '$unset': {
+                  'patient.image': ""
+                }
+              }, function (err, data2) {
+                if (err) {
+                  console.log("err", err)
 
-          } else {
-            console.log("data", data2)
+                } else {
+                  console.log("data", data2)
+                }
+              })
+
+            virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
+              {
+                '$unset': {
+                  'patient.image': ""
+                }
+              }, function (err, data3) {
+                if (err) {
+                  console.log("err3", err)
+                } else {
+                  console.log("data", data3)
+                }
+              })
+            var patient = req.params.UserId
+            const VirtualtToSearchWith2 = new Appointments({ patient });
+            VirtualtToSearchWith2.encryptFieldsSync();
+            Appointments.updateOne({
+              patient: { $in: [patient, VirtualtToSearchWith2.patient] }
+            }, {
+              '$unset': {
+                'patient_info.profile_image': ""
+              }
+            }, function (err, data4) {
+              if (err) {
+                console.log("err", err)
+
+              } else {
+                console.log("data", data4)
+              }
+
+            })
+            res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
           }
+
         })
-
-      virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
-        {
-          '$unset': {
-            'patient.image': ""
-          }
-        }, function (err, data3) {
-          if (err) {
-            console.log("err3", err)
-          } else {
-            console.log("data", data3)
-          }
-        })
-      var patient = req.params.UserId
-      const VirtualtToSearchWith2 = new Appointments({ patient });
-      VirtualtToSearchWith2.encryptFieldsSync();
-      Appointments.updateOne({
-        patient: { $in: [patient, VirtualtToSearchWith2.patient] }
-      }, {
-        '$unset': {
-          'patient_info.profile_image': ""
-        }
-      }, function (err, data4) {
-        if (err) {
-          console.log("err", err)
-
-        } else {
-          console.log("data", data4)
-        }
-
-      })
-      res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
-
     }
 
   });

@@ -4,6 +4,7 @@ let router = express.Router();
 const user = require("../schema/user.js");
 var Video_Conference = require("../schema/doctor_feedback");
 const vidchat = require("../schema/vid_chat_account.js")
+var refundform = require("../schema/refundform");
 const Appointment = require("../schema/appointments")
 const virtual_Task = require("../schema/virtual_tasks")
 const CareModel = require("../schema/care_questionnaire")
@@ -935,7 +936,93 @@ router.post("/UsernameLogin", function (req, res, next) {
   }
 });
 
+router.put('/UpdateVideoAccount/:_id', function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  if (!legit) {
+    vidchat.updateOne({ _id: req.params._id },  {$set: req.body}, { new: true }, function (err, userinfo) {
+      console.log(userinfo)
+          if (err) {
+              res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
+          } else {
+              res.json({ status: 200, hassuccessed: true, msg: 'VideoAccount is Updated Successfully' });
+          }
+      });
+  }
+  else {
+      res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+  }
+});
 
+router.post("/AddRefundInfo", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  try {
+    if (!legit) {
+      var VideoChatAccountId = req.body.VideoChatAccountId
+      const VirtualtToSearchWith1 = new refundform({ VideoChatAccountId });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      refundform.find({ $or: [{ VideoChatAccountId: req.body.VideoChatAccountId }, { VideoChatAccountId: VirtualtToSearchWith1.VideoChatAccountId }] },
+        function (err, data1) {
+          console.log(data1)
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              message: "Information not found",
+              error: err,
+            })
+          } else {
+            if (data1.length > 0) {
+              res.json({ status: 200, hassuccessed: false, data: "Account detail for refund Already exist" })
+            } else {
+              const Videodata = new refundform(req.body)
+              Videodata.save()
+                .then(result => {
+                  res.json({
+                    status: 200,
+                    msg: 'Account detail for refund add Successfully',
+                    data: result,
+                    hassuccessed: true
+                  })
+                })
+                .catch(err => {
+                  console.log(err);
+                  res.json({
+                    status: 200,
+                    msg: 'someting went wrong',
+                    data: err,
+                    hassuccessed: false
+                  })
+                })
+            }
+          }
+        })
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication Required.",
+      });
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+})
+
+router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
+  refundform.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
+    if (err) {
+      res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
+    } else {
+      res.json({ status: 200, hassuccessed: true, msg: 'Refund Form is Deleted' });
+    }
+  })
+})
 
 
 module.exports = router;                                                                            
