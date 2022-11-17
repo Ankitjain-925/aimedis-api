@@ -1368,7 +1368,7 @@ router.post("/AddRefundInfo", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       var VideoChatAccountId = req.body.VideoChatAccountId
       const VirtualtToSearchWith1 = new refundform({ VideoChatAccountId });
       VirtualtToSearchWith1.encryptFieldsSync();
@@ -1423,6 +1423,41 @@ router.post("/AddRefundInfo", function (req, res, next) {
     });
   }
 })
+router.get('/refundformdetail/:UserId', function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  try {
+    if (legit) {
+      var UserId = req.body.UserId
+      const VirtualtToSearchWith1 = new refundform({ UserId });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      refundform.find({ $or: [{ User_id: req.body.UserId }, { User_id: VirtualtToSearchWith1.UserId }] },
+        function (err, doc) {
+          if (err && !doc) {
+            res.json({ status: 200, hassuccessed: false, msg: 'Refund form detail is not found', error: err })
+          } else {
+            if (doc && doc.length > 0) {
+
+              res.json({ status: 200, hassuccessed: true, msg: 'Refund detail is found', data: doc })
+            }
+            else {
+              res.json({ status: 200, hassuccessed: false, msg: 'No data ' })
+            }
+
+          }
+        })
+    }
+    else {
+      res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
 
 router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
   refundform.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
