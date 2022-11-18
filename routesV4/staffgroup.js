@@ -4,11 +4,72 @@ const institute = require("../schema/institute.js")
 var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
 
+router.get("/GetTeam/:house_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  var final = []
+  try {
+    if (legit) {
+      institute.find({
+        'institute_groups.houses.house_id': req.params.house_id
+      })
+        .exec(function (err, data) {
+          if (data) {
+            data.forEach(function (dataa) {
+              dataa.institute_groups.forEach(function (data1) {
+                data1.houses.forEach(function (data2) {
+                  if (data2.house_id == req.params.house_id) {
+                    data2.teammember.forEach(function (data3) {
+                      data3.staff.forEach(function (data4) {
+                        final.push(data4)
+                      });
+                    });
+                  }
+                });
+
+              });
+            });
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Successfully Fetched",
+              data: final
+            });
+
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+              data: final
+            });
+          }
+        })
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+
+
+
+
 router.post("/AddTeam/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       institute.findOne({
         'institute_groups.houses.teammember.team_name': req.body.team_name
       })
@@ -78,7 +139,7 @@ router.put("/UpdateTeam/:house_id/:team_name", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       institute.updateOne(
         {
           'institute_groups.houses.teammember.team_name': req.params.team_name
@@ -130,7 +191,7 @@ router.delete("/DeleteTeam/:house_id/:staff_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       institute.updateOne(
         {
           'institute_groups.houses.teammember.staff_id': req.params.staff_id
