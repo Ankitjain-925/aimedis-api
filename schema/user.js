@@ -12,7 +12,7 @@ const PaitentList = new mongoose.Schema(
       unique: false,
     },
     byhospital: {
-      type: Boolean,
+      type: String,
       required: false,
       unique: false
   },
@@ -86,7 +86,7 @@ const FavDocList = new mongoose.Schema(
       unique: false,
     },
     byhospital: {
-      type: Boolean,
+      type: String,
       required: false,
       unique: false,
     }, 
@@ -412,7 +412,7 @@ var UserSchema = new Schema(
       unique: false,
     },
     byhospital: {
-      type: Boolean,
+      type: String,
       required: false,
       unique: false,
     },
