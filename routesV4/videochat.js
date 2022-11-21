@@ -3,6 +3,7 @@ var express = require("express");
 let router = express.Router();
 const user = require("../schema/user.js");
 var Video_Conference = require("../schema/doctor_feedback");
+var refundform = require("../schema/refundform");
 const vidchat = require("../schema/vid_chat_account.js")
 const Appointment = require("../schema/appointments")
 const virtual_Task = require("../schema/virtual_tasks")
@@ -1415,7 +1416,7 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
 router.put('/UpdateVideoAccount/:_id', function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
-  if (!legit) {
+  if (legit) {
     vidchat.updateOne({ _id: req.params._id },  {$set: req.body}, { new: true }, function (err, userinfo) {
       console.log(userinfo)
           if (err) {
@@ -1490,6 +1491,7 @@ router.post("/AddRefundInfo", function (req, res, next) {
   }
 })
 
+
 router.get('/refundformdetail/:UserId', function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
@@ -1527,6 +1529,8 @@ router.get('/refundformdetail/:UserId', function (req, res, next) {
 });
 
 router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
+  try {
+
   refundform.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
     if (err) {
       res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
@@ -1534,6 +1538,13 @@ router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
       res.json({ status: 200, hassuccessed: true, msg: 'Refund Form is Deleted' });
     }
   })
+} catch (err) {
+  res.json({
+    status: 200,
+    hassuccessed: false,
+    msg: "Some thing went wrong.",
+  });
+}
 })
 
 module.exports = router;                                                                            

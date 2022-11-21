@@ -571,6 +571,8 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
       })
       res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
     }
+  })
+  }
   });
 }
   });
