@@ -436,6 +436,16 @@ var UserSchema = new Schema(
       required: false,
       unique: false,
     },
+    Created_date: {
+      type: Date,
+      required: false,
+      unique: false
+  },
+  clientIP: {
+    type: String,
+    required: false,
+    unique: false
+  }
   },
   { strict: false },
   { timestamps: true },

@@ -3523,7 +3523,7 @@ router.get("/patientjourney/:patient_id", function (req, res) {
   let legit = jwtconfig.verify(token);
   let Array_flat = [];
   try {
-    if (!legit) {
+    if (legit) {
       flatArraya = [];
       Inhospital = [];
       InhopspitalInvoice = [];

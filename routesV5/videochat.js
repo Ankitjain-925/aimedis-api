@@ -1349,7 +1349,7 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
 router.put('/UpdateVideoAccount/:_id', function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
-  if (!legit) {
+  if (legit) {
     vidchat.updateOne({ _id: req.params._id },  {$set: req.body}, { new: true }, function (err, userinfo) {
       console.log(userinfo)
           if (err) {

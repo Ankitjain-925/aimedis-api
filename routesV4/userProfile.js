@@ -7,12 +7,14 @@ var virtual_Case = require("../schema/virtual_cases.js");
 var virtual_Task = require("../schema/virtual_tasks.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
 var Appointment = require("../schema/appointments");
+const requestIp = require('request-ip');
 var Prescription = require("../schema/prescription");
 var Second_opinion = require("../schema/second_option");
 var Sick_certificate = require("../schema/sick_certificate");
 var marketing_user = require("../schema/marketing_user");
 var Settings = require("../schema/settings");
 const sendSms = require("./sendSms");
+var ip = require('ip');
 const { encrypt, decrypt } = require("./Cryptofile.js");
 var jwtconfig = require("../jwttoken");
 var base64 = require("base-64");
@@ -958,6 +960,8 @@ router.post("/UserntfCheck", function (req, res, next) {
 
 router.post("/AddUser", function (req, res, next) {
   const response_key = req.body.token;
+  var google_response = false;
+  var dt = dateTime.create();
   // Making POST request to verify captcha
   var config = {
     method: "post",
@@ -965,7 +969,24 @@ router.post("/AddUser", function (req, res, next) {
   };
   axios(config)
     .then(function (google_response) {
-      if (google_response.data.success == true) {
+    User.find(
+      {
+        "clientIP":req.headers['x-forwarded-for'],
+          "Created_date": { 
+              "$eq": dt.format("Y-m-d")
+          }
+        })
+      .countDocuments()
+      .exec(function (err, total) {
+        if(err){
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+          });
+        }
+        else{
+        if (google_response.data.success === true && total<2) {
         if (
           req.body.email == "" ||
           req.body.email == undefined ||
@@ -1037,14 +1058,15 @@ router.post("/AddUser", function (req, res, next) {
                 if (req.body.type == "patient") {
                   isblock = { isblock: false };
                 }
-                var dt = dateTime.create();
-                var createdate = { createdate: dt.format("Y-m-d H:M:S") };
+                var createdate = { createdate: dt.format("Y-m-d H:M:S"),
+                   Created_date : dt.format("Y-m-d")};
                 var createdby = { pin: "1234" };
                 var enpassword = base64.encode(
                   JSON.stringify(encrypt(req.body.password))
                 );
                 var usertoken = { usertoken: uuidv1() };
                 var verified = { verified: "false" };
+
                 var profile_id = {
                   profile_id: profile_id,
                   alies_id: profile_id,
@@ -1084,6 +1106,9 @@ router.post("/AddUser", function (req, res, next) {
                           ...createdby,
                           ...usertoken,
                           ...verified,
+                          clientIP: req.headers['x-forwarded-for'] 
+                          
+                             
                         };
                         var users = new User(datas);
                         users.save(function (err, user_data) {
@@ -1193,429 +1218,439 @@ router.post("/AddUser", function (req, res, next) {
         res.json({
           status: 200,
           hassuccessed: false,
-          msg: "Authentication required.",
+          msg: "Authentication555 required.",
         });
       }
-    })
+    }
+      })
+      
+      })
     .catch(function (error) {
+      console.log('error', error)
       res.json({
         status: 200,
         hassuccessed: false,
-        msg: "Authentication required.",
+        msg: "Authentication66666 required.",
       });
     });
 });
 
-router.post("/AddNewUseradiitional", function (req, res, next) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  if (legit) {
-  if (
-    req.body.email == "" ||
-    req.body.email == undefined ||
-    req.body.password == "" ||
-    req.body.password == undefined
-  ) {
-    res.json({
-      status: 450,
-      message: "Email and password fields should not be empty",
-      hassuccessed: false,
-    });
-  } else {
-    const email = req.body.email;
-    const messageToSearchWith = new User({ email });
-    messageToSearchWith.encryptFieldsSync();
 
-    const messageToSearchWith1 = new User({
-      email: req.body.email.toLowerCase(),
-    });
-    messageToSearchWith1.encryptFieldsSync();
 
-    const messageToSearchWith2 = new User({
-      email: req.body.email.toUpperCase(),
-    });
-    messageToSearchWith2.encryptFieldsSync();
 
-    const first_name = req.body.first_name;
-    const messageToSearchWithFirst = new User({ first_name });
-    messageToSearchWithFirst.encryptFieldsSync();
 
-    const messageToSearchWithFirst1 = new User({
-      first_name: first_name && first_name.toLowerCase(),
-    });
-    messageToSearchWithFirst1.encryptFieldsSync();
 
-    const messageToSearchWithFirst2 = new User({
-      first_name: first_name && first_name.toUpperCase(),
-    });
-    messageToSearchWithFirst2.encryptFieldsSync();
 
-    const last_name = req.body.last_name;
-    const messageToSearchWithLast = new User({ last_name });
-    messageToSearchWithLast.encryptFieldsSync();
+// router.post("/AddNewUseradiitional", function (req, res, next) {
+//   const token = req.headers.token;
+//   let legit = jwtconfig.verify(token);
+//   if (legit) {
+//   if (
+//     req.body.email == "" ||
+//     req.body.email == undefined ||
+//     req.body.password == "" ||
+//     req.body.password == undefined
+//   ) {
+//     res.json({
+//       status: 450,
+//       message: "Email and password fields should not be empty",
+//       hassuccessed: false,
+//     });
+//   } else {
+//     const email = req.body.email;
+//     const messageToSearchWith = new User({ email });
+//     messageToSearchWith.encryptFieldsSync();
 
-    const messageToSearchWithLast1 = new User({
-      last_name: last_name && last_name.toLowerCase(),
-    });
-    messageToSearchWithLast1.encryptFieldsSync();
+//     const messageToSearchWith1 = new User({
+//       email: req.body.email.toLowerCase(),
+//     });
+//     messageToSearchWith1.encryptFieldsSync();
 
-    const messageToSearchWithLast2 = new User({
-      last_name: last_name && last_name.toUpperCase(),
-    });
-    messageToSearchWithLast2.encryptFieldsSync();
+//     const messageToSearchWith2 = new User({
+//       email: req.body.email.toUpperCase(),
+//     });
+//     messageToSearchWith2.encryptFieldsSync();
 
-    var mobile = false;
-    if (req.body.mobile) {
-      mobile = req.body.country_code.toUpperCase() + "-" + req.body.mobile;
-      var messageToSearchWithPhone = new User({ mobile });
-      messageToSearchWithPhone.encryptFieldsSync();
-    }
-    User.findOne({
-      $or: [
-        { email: messageToSearchWith1.email },
-        { email: messageToSearchWith.email },
-        { email: messageToSearchWith2.email },
-        { email: req.body.email },
-        { email: req.body.email && req.body.email.toLowerCase() },
-        { email: req.body.email && req.body.email.toUpperCase() },
-      ],
-    })
-      .exec()
-      .then((data1) => {
-        if (data1) {
-          res.json({
-            status: 200,
-            message: "Email is Already exist",
-            hassuccessed: false,
-          });
-        } else {
-          var condition = {};
-          if (first_name) {
-            condition.first_name = {
-              $in: [
-                first_name,
-                first_name.toLowerCase(),
-                first_name.toUpperCase(),
-                messageToSearchWithFirst.first_name,
-                messageToSearchWithFirst1.first_name,
-                messageToSearchWithFirst2.first_name,
-              ],
-            };
-          }
-          if (last_name) {
-            condition.last_name = {
-              $in: [
-                last_name,
-                last_name.toLowerCase(),
-                last_name.toUpperCase(),
-                messageToSearchWithLast.last_name,
-                messageToSearchWithLast1.last_name,
-                messageToSearchWithLast2.last_name,
-              ],
-            };
-          }
-          if (mobile) {
-            condition.mobile = {
-              $in: [mobile, messageToSearchWithPhone.mobile],
-            };
-          }
+//     const first_name = req.body.first_name;
+//     const messageToSearchWithFirst = new User({ first_name });
+//     messageToSearchWithFirst.encryptFieldsSync();
 
-          User.findOne(condition)
-            .exec()
-            .then((data2) => {
-              if (
-                data2 &&
-                new Date(req.body.birthday).setHours(0, 0, 0, 0) ===
-                new Date(data2 && data2.birthday).setHours(0, 0, 0, 0)
-              ) {
-                res.json({
-                  status: 200,
-                  message: "User is Already exist",
-                  hassuccessed: false,
-                });
-              } else {
-                var ids = shortid.generate();
-                let _language = req.body.lan || "en";
-                let _usertype = req.body.type;
+//     const messageToSearchWithFirst1 = new User({
+//       first_name: first_name && first_name.toLowerCase(),
+//     });
+//     messageToSearchWithFirst1.encryptFieldsSync();
 
-                if (req.body.type == "patient") {
-                  var profile_id = "P_" + ids;
-                } else if (req.body.type == "nurse") {
-                  var profile_id = "N_" + ids;
-                } else if (req.body.type == "pharmacy") {
-                  var profile_id = "PH" + ids;
-                } else if (req.body.type == "paramedic") {
-                  var profile_id = "PA" + ids;
-                } else if (req.body.type == "insurance") {
-                  var profile_id = "I_" + ids;
-                } else if (req.body.type == "hospitaladmin") {
-                  var profile_id = "HA" + ids;
-                } else if (req.body.type == "doctor") {
-                  var profile_id = "D_" + ids;
-                } else if (req.body.type == "adminstaff") {
-                  var profile_id = "AS" + ids;
-                }
-                var isblock = { isblock: true };
+//     const messageToSearchWithFirst2 = new User({
+//       first_name: first_name && first_name.toUpperCase(),
+//     });
+//     messageToSearchWithFirst2.encryptFieldsSync();
 
-                if (req.body.type == "patient") {
-                  isblock = { isblock: false };
-                }
-                var dt = dateTime.create();
-                var createdate = { createdate: dt.format("Y-m-d H:M:S") };
-                var createdby = { pin: "1234" };
-                var enpassword = base64.encode(
-                  JSON.stringify(encrypt(req.body.password))
-                );
-                var usertoken = { usertoken: uuidv1() };
-                var verified = { verified: "false" };
-                var profile_id = {
-                  profile_id: profile_id,
-                  alies_id: profile_id,
-                };
-                req.body.password = enpassword;
+//     const last_name = req.body.last_name;
+//     const messageToSearchWithLast = new User({ last_name });
+//     messageToSearchWithLast.encryptFieldsSync();
 
-                var user_id;
-                if (req.body.country_code && req.body.mobile) {
-                  authy
-                    .registerUser({
-                      countryCode: req.body.country_code,
-                      email: req.body.email,
-                      phone: req.body.mobile,
-                    })
-                    .catch((err) =>
-                      res.json({
-                        status: 200,
-                        message: "Phone is not verified",
-                        error: err,
-                        hassuccessed: false,
-                      })
-                    )
-                    .then((regRes) => {
-                      if (regRes && regRes.success) {
-                        var authyId = { authyId: regRes.user.id };
-                        req.body.mobile =
-                          req.body.country_code.toUpperCase() +
-                          "-" +
-                          req.body.mobile;
-                        datas = {
-                          ...authyId,
-                          ...profile_id,
-                          ...req.body,
-                          ...isblock,
-                          ...createdate,
-                          ...createdby,
-                          ...usertoken,
-                          ...verified,
-                        };
-                        var users = new User(datas);
-                        users.save(function (err, user_data) {
-                          if (err && !user_data) {
-                            res.json({
-                              status: 200,
-                              message: "Something went wrong.",
-                              error: err,
-                              hassuccessed: false,
-                            });
-                          } else {
-                            user_id = user_data._id;
-                            let token = user_data.usertoken;
-                            //let link = 'http://localhost:3000/';
-                            let link = "https://aidoc.io/";
-                            var verifylink = `https://aidoc.io/?token=${token}`;
-                            let datacomposer = (lang, { verifylink }) => {
-                              return {};
-                            };
-                            switch (_usertype) {
-                              case UserType.patient:
-                                datacomposer = EMAIL.patientEmail.welcomeEmail;
-                                break;
-                              case UserType.doctor:
-                                datacomposer = EMAIL.doctorEmail.welcomeEmail;
-                                break;
-                              case UserType.pharmacy:
-                                datacomposer = EMAIL.pharmacyEmail.welcomeEmail;
-                                break;
-                              case UserType.insurance:
-                                datacomposer =
-                                  EMAIL.insuranceEmail.welcomeEmail;
-                                break;
-                              case UserType.paramedic:
-                                datacomposer =
-                                  EMAIL.insuranceEmail.welcomeEmail;
-                                break;
-                              case UserType.hospitaladmin:
-                                datacomposer = EMAIL.hospitalEmail.welcomeEmail;
-                                break;
-                              case UserType.nurse:
-                                datacomposer = EMAIL.nursetEmail.welcomeEmail;
-                                break;
-                            }
-                            generateTemplate(
-                              datacomposer(_language, {
-                                verifylink: verifylink,
-                              }),
-                              (error, html) => {
-                                if (!error) {
-                                  let mailOptions = {
-                                    from: "contact@aimedis.com",
-                                    to: req.body.email,
-                                    subject: getSubject(
-                                      _language,
-                                      SUBJECT_KEY.welcome_title_aimedis
-                                    ),
-                                    html: html,
-                                  };
-                                  let sendmail =
-                                    transporter.sendMail(mailOptions);
-                                  if (sendmail) {
-                                    console.log("Mail is sent ");
-                                  }
-                                }
-                              }
-                            );
+//     const messageToSearchWithLast1 = new User({
+//       last_name: last_name && last_name.toLowerCase(),
+//     });
+//     messageToSearchWithLast1.encryptFieldsSync();
 
-                            User.findOne({ _id: user_id }, function (err, doc) {
-                              if (err && !doc) {
-                                res.json({
-                                  status: 200,
-                                  hassuccessed: false,
-                                  message: "Something went wrong",
-                                  error: err,
-                                });
-                              } else {
-                                res.json({
-                                  status: 200,
-                                  message: "User is added Successfully",
-                                  hassuccessed: true,
-                                  data: doc,
-                                });
-                              }
-                            });
-                          }
-                        });
-                      } else {
-                        res.json({
-                          status: 200,
-                          message: "Phone is not verified",
-                          error: err,
-                          hassuccessed: false,
-                        });
-                      }
-                    });
-                } else {
-                  datas = {
-                    ...profile_id,
-                    ...req.body,
-                    ...isblock,
-                    ...createdate,
-                    ...createdby,
-                    ...usertoken,
-                    ...verified,
-                  };
-                  var users = new User(datas);
-                  users.save(function (err, user_data) {
-                    if (err && !user_data) {
-                      res.json({
-                        status: 200,
-                        message: "Something went wrong.",
-                        error: err,
-                        hassuccessed: false,
-                      });
-                    } else {
-                      user_id = user_data._id;
-                      let token = user_data.usertoken;
-                      //let link = 'http://localhost:3000/';
-                      let link = "https://aidoc.io/";
-                      var verifylink = `https://aidoc.io/?token=${token}`;
-                      let datacomposer = (lang, { verifylink }) => {
-                        return {};
-                      };
-                      switch (_usertype) {
-                        case UserType.patient:
-                          datacomposer = EMAIL.patientEmail.welcomeEmail;
-                          break;
-                        case UserType.doctor:
-                          datacomposer = EMAIL.doctorEmail.welcomeEmail;
-                          break;
-                        case UserType.pharmacy:
-                          datacomposer = EMAIL.pharmacyEmail.welcomeEmail;
-                          break;
-                        case UserType.insurance:
-                          datacomposer = EMAIL.insuranceEmail.welcomeEmail;
-                          break;
-                        case UserType.paramedic:
-                          datacomposer = EMAIL.insuranceEmail.welcomeEmail;
-                          break;
-                        case UserType.hospitaladmin:
-                          datacomposer = EMAIL.hospitalEmail.welcomeEmail;
-                          break;
-                        case UserType.nurse:
-                          datacomposer = EMAIL.nursetEmail.welcomeEmail;
-                          break;
-                      }
-                      generateTemplate(
-                        datacomposer(_language, { verifylink: verifylink }),
-                        (error, html) => {
-                          if (!error) {
-                            let mailOptions = {
-                              from: "contact@aimedis.com",
-                              to: req.body.email,
-                              subject: getSubject(
-                                _language,
-                                SUBJECT_KEY.welcome_title_aimedis
-                              ),
-                              html: html,
-                            };
-                            let sendmail = transporter.sendMail(mailOptions);
-                            if (sendmail) {
-                              console.log("Mail is sent ");
-                            }
-                          }
-                        }
-                      );
+//     const messageToSearchWithLast2 = new User({
+//       last_name: last_name && last_name.toUpperCase(),
+//     });
+//     messageToSearchWithLast2.encryptFieldsSync();
 
-                      User.findOne({ _id: user_id }, function (err, doc) {
-                        if (err && !doc) {
-                          res.json({
-                            status: 200,
-                            hassuccessed: false,
-                            message: "Something went wrong",
-                            error: err,
-                          });
-                        } else {
-                          res.json({
-                            status: 200,
-                            message: "User is added Successfully",
-                            hassuccessed: true,
-                            data: doc,
-                          });
-                        }
-                      });
-                    }
-                  });
-                }
-              }
-            });
-        }
-      });
-  }
-  } else {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Authentication required.",
-    });
-  }
-  // })
-  //   .catch(function (error) {
-  //     res.json({
-  //       status: 200,
-  //       hassuccessed: false,
-  //       msg: "Authentication required.",
-  //     });
+//     var mobile = false;
+//     if (req.body.mobile) {
+//       mobile = req.body.country_code.toUpperCase() + "-" + req.body.mobile;
+//       var messageToSearchWithPhone = new User({ mobile });
+//       messageToSearchWithPhone.encryptFieldsSync();
+//     }
+//     User.findOne({
+//       $or: [
+//         { email: messageToSearchWith1.email },
+//         { email: messageToSearchWith.email },
+//         { email: messageToSearchWith2.email },
+//         { email: req.body.email },
+//         { email: req.body.email && req.body.email.toLowerCase() },
+//         { email: req.body.email && req.body.email.toUpperCase() },
+//       ],
+//     })
+//       .exec()
+//       .then((data1) => {
+//         if (data1) {
+//           res.json({
+//             status: 200,
+//             message: "Email is Already exist",
+//             hassuccessed: false,
+//           });
+//         } else {
+//           var condition = {};
+//           if (first_name) {
+//             condition.first_name = {
+//               $in: [
+//                 first_name,
+//                 first_name.toLowerCase(),
+//                 first_name.toUpperCase(),
+//                 messageToSearchWithFirst.first_name,
+//                 messageToSearchWithFirst1.first_name,
+//                 messageToSearchWithFirst2.first_name,
+//               ],
+//             };
+//           }
+//           if (last_name) {
+//             condition.last_name = {
+//               $in: [
+//                 last_name,
+//                 last_name.toLowerCase(),
+//                 last_name.toUpperCase(),
+//                 messageToSearchWithLast.last_name,
+//                 messageToSearchWithLast1.last_name,
+//                 messageToSearchWithLast2.last_name,
+//               ],
+//             };
+//           }
+//           if (mobile) {
+//             condition.mobile = {
+//               $in: [mobile, messageToSearchWithPhone.mobile],
+//             };
+//           }
 
-  // })
-});
+//           User.findOne(condition)
+//             .exec()
+//             .then((data2) => {
+//               if (
+//                 data2 &&
+//                 new Date(req.body.birthday).setHours(0, 0, 0, 0) ===
+//                 new Date(data2 && data2.birthday).setHours(0, 0, 0, 0)
+//               ) {
+//                 res.json({
+//                   status: 200,
+//                   message: "User is Already exist",
+//                   hassuccessed: false,
+//                 });
+//               } else {
+//                 var ids = shortid.generate();
+//                 let _language = req.body.lan || "en";
+//                 let _usertype = req.body.type;
+
+//                 if (req.body.type == "patient") {
+//                   var profile_id = "P_" + ids;
+//                 } else if (req.body.type == "nurse") {
+//                   var profile_id = "N_" + ids;
+//                 } else if (req.body.type == "pharmacy") {
+//                   var profile_id = "PH" + ids;
+//                 } else if (req.body.type == "paramedic") {
+//                   var profile_id = "PA" + ids;
+//                 } else if (req.body.type == "insurance") {
+//                   var profile_id = "I_" + ids;
+//                 } else if (req.body.type == "hospitaladmin") {
+//                   var profile_id = "HA" + ids;
+//                 } else if (req.body.type == "doctor") {
+//                   var profile_id = "D_" + ids;
+//                 } else if (req.body.type == "adminstaff") {
+//                   var profile_id = "AS" + ids;
+//                 }
+//                 var isblock = { isblock: true };
+
+//                 if (req.body.type == "patient") {
+//                   isblock = { isblock: false };
+//                 }
+//                 var dt = dateTime.create();
+//                 var createdate = { createdate: dt.format("Y-m-d H:M:S") };
+//                 var createdby = { pin: "1234" };
+//                 var enpassword = base64.encode(
+//                   JSON.stringify(encrypt(req.body.password))
+//                 );
+//                 var usertoken = { usertoken: uuidv1() };
+//                 var verified = { verified: "false" };
+//                 var profile_id = {
+//                   profile_id: profile_id,
+//                   alies_id: profile_id,
+//                 };
+//                 req.body.password = enpassword;
+
+//                 var user_id;
+//                 if (req.body.country_code && req.body.mobile) {
+//                   authy
+//                     .registerUser({
+//                       countryCode: req.body.country_code,
+//                       email: req.body.email,
+//                       phone: req.body.mobile,
+//                     })
+//                     .catch((err) =>
+//                       res.json({
+//                         status: 200,
+//                         message: "Phone is not verified",
+//                         error: err,
+//                         hassuccessed: false,
+//                       })
+//                     )
+//                     .then((regRes) => {
+//                       if (regRes && regRes.success) {
+//                         var authyId = { authyId: regRes.user.id };
+//                         req.body.mobile =
+//                           req.body.country_code.toUpperCase() +
+//                           "-" +
+//                           req.body.mobile;
+//                         datas = {
+//                           ...authyId,
+//                           ...profile_id,
+//                           ...req.body,
+//                           ...isblock,
+//                           ...createdate,
+//                           ...createdby,
+//                           ...usertoken,
+//                           ...verified,
+//                         };
+//                         var users = new User(datas);
+//                         users.save(function (err, user_data) {
+//                           if (err && !user_data) {
+//                             res.json({
+//                               status: 200,
+//                               message: "Something went wrong.",
+//                               error: err,
+//                               hassuccessed: false,
+//                             });
+//                           } else {
+//                             user_id = user_data._id;
+//                             let token = user_data.usertoken;
+//                             //let link = 'http://localhost:3000/';
+//                             let link = "https://aidoc.io/";
+//                             var verifylink = `https://aidoc.io/?token=${token}`;
+//                             let datacomposer = (lang, { verifylink }) => {
+//                               return {};
+//                             };
+//                             switch (_usertype) {
+//                               case UserType.patient:
+//                                 datacomposer = EMAIL.patientEmail.welcomeEmail;
+//                                 break;
+//                               case UserType.doctor:
+//                                 datacomposer = EMAIL.doctorEmail.welcomeEmail;
+//                                 break;
+//                               case UserType.pharmacy:
+//                                 datacomposer = EMAIL.pharmacyEmail.welcomeEmail;
+//                                 break;
+//                               case UserType.insurance:
+//                                 datacomposer =
+//                                   EMAIL.insuranceEmail.welcomeEmail;
+//                                 break;
+//                               case UserType.paramedic:
+//                                 datacomposer =
+//                                   EMAIL.insuranceEmail.welcomeEmail;
+//                                 break;
+//                               case UserType.hospitaladmin:
+//                                 datacomposer = EMAIL.hospitalEmail.welcomeEmail;
+//                                 break;
+//                               case UserType.nurse:
+//                                 datacomposer = EMAIL.nursetEmail.welcomeEmail;
+//                                 break;
+//                             }
+//                             generateTemplate(
+//                               datacomposer(_language, {
+//                                 verifylink: verifylink,
+//                               }),
+//                               (error, html) => {
+//                                 if (!error) {
+//                                   let mailOptions = {
+//                                     from: "contact@aimedis.com",
+//                                     to: req.body.email,
+//                                     subject: getSubject(
+//                                       _language,
+//                                       SUBJECT_KEY.welcome_title_aimedis
+//                                     ),
+//                                     html: html,
+//                                   };
+//                                   let sendmail =
+//                                     transporter.sendMail(mailOptions);
+//                                   if (sendmail) {
+//                                     console.log("Mail is sent ");
+//                                   }
+//                                 }
+//                               }
+//                             );
+
+//                             User.findOne({ _id: user_id }, function (err, doc) {
+//                               if (err && !doc) {
+//                                 res.json({
+//                                   status: 200,
+//                                   hassuccessed: false,
+//                                   message: "Something went wrong",
+//                                   error: err,
+//                                 });
+//                               } else {
+//                                 res.json({
+//                                   status: 200,
+//                                   message: "User is added Successfully",
+//                                   hassuccessed: true,
+//                                   data: doc,
+//                                 });
+//                               }
+//                             });
+//                           }
+//                         });
+//                       } else {
+//                         res.json({
+//                           status: 200,
+//                           message: "Phone is not verified",
+//                           error: err,
+//                           hassuccessed: false,
+//                         });
+//                       }
+//                     });
+//                 } else {
+//                   datas = {
+//                     ...profile_id,
+//                     ...req.body,
+//                     ...isblock,
+//                     ...createdate,
+//                     ...createdby,
+//                     ...usertoken,
+//                     ...verified,
+//                   };
+//                   var users = new User(datas);
+//                   users.save(function (err, user_data) {
+//                     if (err && !user_data) {
+//                       res.json({
+//                         status: 200,
+//                         message: "Something went wrong.",
+//                         error: err,
+//                         hassuccessed: false,
+//                       });
+//                     } else {
+//                       user_id = user_data._id;
+//                       let token = user_data.usertoken;
+//                       //let link = 'http://localhost:3000/';
+//                       let link = "https://aidoc.io/";
+//                       var verifylink = `https://aidoc.io/?token=${token}`;
+//                       let datacomposer = (lang, { verifylink }) => {
+//                         return {};
+//                       };
+//                       switch (_usertype) {
+//                         case UserType.patient:
+//                           datacomposer = EMAIL.patientEmail.welcomeEmail;
+//                           break;
+//                         case UserType.doctor:
+//                           datacomposer = EMAIL.doctorEmail.welcomeEmail;
+//                           break;
+//                         case UserType.pharmacy:
+//                           datacomposer = EMAIL.pharmacyEmail.welcomeEmail;
+//                           break;
+//                         case UserType.insurance:
+//                           datacomposer = EMAIL.insuranceEmail.welcomeEmail;
+//                           break;
+//                         case UserType.paramedic:
+//                           datacomposer = EMAIL.insuranceEmail.welcomeEmail;
+//                           break;
+//                         case UserType.hospitaladmin:
+//                           datacomposer = EMAIL.hospitalEmail.welcomeEmail;
+//                           break;
+//                         case UserType.nurse:
+//                           datacomposer = EMAIL.nursetEmail.welcomeEmail;
+//                           break;
+//                       }
+//                       generateTemplate(
+//                         datacomposer(_language, { verifylink: verifylink }),
+//                         (error, html) => {
+//                           if (!error) {
+//                             let mailOptions = {
+//                               from: "contact@aimedis.com",
+//                               to: req.body.email,
+//                               subject: getSubject(
+//                                 _language,
+//                                 SUBJECT_KEY.welcome_title_aimedis
+//                               ),
+//                               html: html,
+//                             };
+//                             let sendmail = transporter.sendMail(mailOptions);
+//                             if (sendmail) {
+//                               console.log("Mail is sent ");
+//                             }
+//                           }
+//                         }
+//                       );
+
+//                       User.findOne({ _id: user_id }, function (err, doc) {
+//                         if (err && !doc) {
+//                           res.json({
+//                             status: 200,
+//                             hassuccessed: false,
+//                             message: "Something went wrong",
+//                             error: err,
+//                           });
+//                         } else {
+//                           res.json({
+//                             status: 200,
+//                             message: "User is added Successfully",
+//                             hassuccessed: true,
+//                             data: doc,
+//                           });
+//                         }
+//                       });
+//                     }
+//                   });
+//                 }
+//               }
+//             });
+//         }
+//       });
+//   }
+//   } else {
+//     res.json({
+//       status: 200,
+//       hassuccessed: false,
+//       msg: "Authentication required.",
+//     });
+//   }
+//   // })
+//   //   .catch(function (error) {
+//   //     res.json({
+//   //       status: 200,
+//   //       hassuccessed: false,
+//   //       msg: "Authentication required.",
+//   //     });
+
+//   // })
+// });
 
 router.put("/Bookservice", (req, res) => {
   try {
@@ -2679,13 +2714,9 @@ router.put("/Metdata/:Metdata_id", function (req, res, next) {
 
 router.get("/Metadata", function (req, res, next) {
   try {
-    Metadata.find(function (err, Metadatas) {
-      if (err) {
-        next(err);
-      } else {
-        res.json(Metadatas);
-      }
-    });
+    // const clientIp = requestIp.getClientIp(req); 
+      console.log('clientIp', req.headers['x-forwarded-for'])
+      res.json({ip:req.headers['x-forwarded-for']})
   } catch {
     res.json({
       status: 200,
@@ -10281,6 +10312,18 @@ router.get("/DocNurses", function (req, res, next) {
       status: 200,
       hassuccessed: false,
       msg: "Something went wrong.",
+    });
+  }
+});
+
+router.post("/trycaptcha", function (req, res, next) {
+  try {
+      
+  } catch {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
     });
   }
 });
