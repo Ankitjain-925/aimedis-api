@@ -12,6 +12,8 @@ const virtual_invoice = require("../schema/virtual_invoice")
 var sick_meeting = require("../schema/sick_meeting");
 var User = require("../schema/user")
 var handlebars = require("handlebars");
+var refundform = require("../schema/refundform");
+
 var fs = require("fs");
 const { join } = require("path");
 var bill3 = fs.readFileSync(join(`${__dirname}/bill2.html`), "utf8");
@@ -264,12 +266,14 @@ router.get("/Get_Doctor/:data", function (req, res) {
           console.log("err", err)
           res.json({ status: 200, hassuccessed: true, error: err });
         } else {
+          
           var final = data1.filter((element) => {
-            if (element.first_name.includes(req.params.data) || element.last_name.includes(req.params.data) || element.alies_id.includes(req.params.data) || element.profile_id.includes(req.params.data) || element.speciality.includes(req.params.data) || element.email.includes(req.params.data)) {
+            var name = element.first_name.toUpperCase() + element.last_name.toUpperCase()
+            if (name.includes(req.params.data.toUpperCase().split(" ").join("")) || (element.alies_id.toUpperCase()).includes(req.params.data.toUpperCase())  || (element.profile_id.toUpperCase()).includes(req.params.data.toUpperCase()) || element.speciality.includes(req.params.data) || (element.email == req.params.data.toLowerCase()) ) {
               return element
             }
           })
-          console.log("data1", final)
+          
           res.json({ status: 200, hassuccessed: true, data: final })
         }
       }
@@ -1412,18 +1416,18 @@ router.get("/GetVideoTask/:patient_id", function (req, res, next) {
 router.put('/UpdateVideoAccount/:_id', function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
-  if (!legit) {
-    vidchat.updateOne({ _id: req.params._id }, { $set: req.body }, { new: true }, function (err, userinfo) {
+  if (legit) {
+    vidchat.updateOne({ _id: req.params._id },  {$set: req.body}, { new: true }, function (err, userinfo) {
       console.log(userinfo)
-      if (err) {
-        res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
-      } else {
-        res.json({ status: 200, hassuccessed: true, msg: 'VideoAccount is Updated Successfully' });
-      }
-    });
+          if (err) {
+              res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
+          } else {
+              res.json({ status: 200, hassuccessed: true, msg: 'VideoAccount is Updated Successfully' });
+          }
+      });
   }
   else {
-    res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+      res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
   }
 });
 
@@ -1431,7 +1435,7 @@ router.post("/AddRefundInfo", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       var VideoChatAccountId = req.body.VideoChatAccountId
       const VirtualtToSearchWith1 = new refundform({ VideoChatAccountId });
       VirtualtToSearchWith1.encryptFieldsSync();
@@ -1487,8 +1491,46 @@ router.post("/AddRefundInfo", function (req, res, next) {
   }
 })
 
+
+router.get('/refundformdetail/:UserId', function (req, res, next) {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  try {
+    if (legit) {
+      var UserId = req.body.UserId
+      const VirtualtToSearchWith1 = new refundform({ UserId });
+      VirtualtToSearchWith1.encryptFieldsSync();
+      refundform.find({ $or: [{ User_id: req.body.UserId }, { User_id: VirtualtToSearchWith1.UserId }] },
+        function (err, doc) {
+          if (err && !doc) {
+            res.json({ status: 200, hassuccessed: false, msg: 'Refund form detail is not found', error: err })
+          } else {
+            if (doc && doc.length > 0) {
+
+              res.json({ status: 200, hassuccessed: true, msg: 'Refund detail is found', data: doc })
+            }
+            else {
+              res.json({ status: 200, hassuccessed: false, msg: 'No data ' })
+            }
+
+          }
+        })
+    }
+    else {
+      res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
 router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
   try {
+
   refundform.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
     if (err) {
       res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });

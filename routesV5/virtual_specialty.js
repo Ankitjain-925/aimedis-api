@@ -85,7 +85,7 @@ function getDate(date, dateFormat) {
 }
 
 router.delete(
-  "/AddSpecialty/:specialty_id",
+  "/AddSpecialty/:specialty_id/:house_id",
   CheckRole("delete_speciality"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -195,8 +195,14 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
+    let house_id = req.params.house_id;
+    const VirtualtToSearchWith = new Virtual_Specialty({ house_id });
+    VirtualtToSearchWith.encryptFieldsSync();
     Virtual_Specialty.find(
-      { house_id: req.params.house_id },
+      {  $or: [
+        { house_id: req.params.house_id },
+        { house_id: VirtualtToSearchWith.house_id },
+      ]},
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -374,8 +380,7 @@ function ApproveReq(doc, start, end, date) {
 }
 
 router.delete(
-  "/AddTask/:task_id",
-  CheckRole("delete_task"),
+  "/AddTask/:task_id/:house_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -732,8 +737,7 @@ router.get(
 );
 
 router.get(
-  "/ProfessionalTask/:patient_profile_id/:house_id",
-  CheckRole("show_task"),
+  "/ProfessionalTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -913,7 +917,7 @@ router.delete(
 );
 
 router.delete(
-  "/AddService/:service_id",
+  "/AddService/:service_id/:house_id",
   CheckRole("delete_service"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -1048,7 +1052,7 @@ router.get("/GetService/:house_id", function (req, res, next) {
   }
 });
 router.delete(
-  "/AddInvoice/:bill_id",
+  "/AddInvoice/:bill_id/:house_id",
   CheckRole("delete_invoice"),
   function (req, res, next) {
     const token = req.headers.token;
@@ -2192,9 +2196,9 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "</b><br/> " +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the <b><a style='color:black;' href='" +
 
-          "https://aidoc.io/approveHospital/" +
+          "https://virtualhospital.aidoc.io/sys-n-authority/approveHospital/" +
 
-          req.body.case_id +
+          req.body.case_id + "/"+ req.body.house_id+
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
 
@@ -2212,13 +2216,20 @@ router.post("/linkforAccepthospital", function (req, res, next) {
                 html: html,
               };
               let sendmail = transporter.sendMail(mailOptions);
-              if (sendmail) {
+              sendmail.then(()=>{
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   message: "Mail is sent",
                 });
-              }
+              })
+              .catch((err)=>{
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  message: err,
+                });
+              })
             }
           }
         );
@@ -2236,9 +2247,9 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
-          " https://aidoc.io/approveHospital/" +
+          "https://virtualhospital.aidoc.io/sys-n-authority/approveHospital/" +
 
-          req.body.case_id;
+          req.body.case_id+  "/"+ req.body.house_id+ "."
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
           sendSms(req.body.mobile, res1)

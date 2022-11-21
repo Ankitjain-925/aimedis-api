@@ -11,6 +11,12 @@ const PaitentList = new mongoose.Schema(
       required: false,
       unique: false,
     },
+    byhospital: {
+      type: String,
+      required: false,
+      unique: false
+  },
+
   },
   { strict: false }
 );
@@ -79,6 +85,16 @@ const FavDocList = new mongoose.Schema(
       required: false,
       unique: false,
     },
+    byhospital: {
+      type: String,
+      required: false,
+      unique: false,
+    }, 
+    user_type: {
+      type: String,
+      required: false,
+      unique: false,
+    }
   },
   { strict: false }
 );
@@ -392,6 +408,11 @@ var UserSchema = new Schema(
     },
     current_available: {
       type: Boolean,
+      required: false,
+      unique: false,
+    },
+    byhospital: {
+      type: String,
       required: false,
       unique: false,
     },

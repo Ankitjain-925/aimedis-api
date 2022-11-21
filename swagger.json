@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5000",
+    "host": "virtualhospital.aidoc.io",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -86,7 +86,7 @@
         
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -4529,11 +4529,11 @@
                 "responses": {
                     "200": {
                         "description": "Delete account details"
-                       
+
                     }
                 }
             }
-        
+
         }
     },
     "definitions": {
@@ -4748,6 +4748,80 @@
                     "type": "string",
                     "uniqueItems": false
                 }
+            }
+        },
+        "VideoRefund": {
+            "required": [
+                "username",
+                "Patient_id",
+                "is_payment",
+                "email"
+            ],
+            "properties": {
+            "AccountOwner":{
+                "type": "string",
+                "uniqueItems": false
+
+            },
+
+             "user_id":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "email": {
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "BankAccountNumber": {
+                "type": "string",
+                "uniqueItems": false
+            },
+             "NameOfBank":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "VideoChatAccountId":{
+                "type": "string",
+                "uniqueItems": false
+            },
+             "BankCountry":{
+               "type": "string",
+               "uniqueItems": false
+
+             }, 
+             "ABARoutingNumber":{
+                "type": "string",
+                "uniqueItems": false
+
+              }, 
+             "BankKey": {
+                "type": "string",
+                "uniqueItems": false
+            },
+             "IBAN": {
+                "type": "string",
+                "uniqueItems": false
+            },
+            "SWIFCode":{
+              "type": "string",
+               "unique": false
+            },
+             "ControlKey":{
+                "type": "string",
+                "uniqueItems": false
+             },
+             "Address":{
+                "type": "string",
+                "uniqueItems": false
+
+              }, 
+             "DUNSNumber":{
+               "type": "string",
+                "unique": false
+             }
             }
         },
         "Membership": {

@@ -5,6 +5,7 @@ var CareModel = require("../schema/care_questionnaire.js");
 var VirtualModel = require("../schema/virtual_cases.js")
 var User = require("../schema/user.js")
 var jwtconfig = require("../jwttoken");
+var CheckRole = require("./../middleware/middleware")
 
 
   router.post("/AddQuestionnaire",CheckRole("add_care_ques"), function (req, res, next) {
@@ -130,7 +131,7 @@ router.get("/GetCaredata/:house_id", function (req, res, next) {
     }
   });
 
-  router.get("/GetCareQuestionaire/:house_id",CheckRole("get_questionaire"), function (req, res, next) {
+  router.get("/GetCareQuestionaire/:house_id",CheckRole("show_care_questionnary"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {

@@ -26,6 +26,7 @@ const {
 } = require("../emailTemplate/index.js");
 var nodemailer = require("nodemailer");
 var CareQuentionaire = require("../schema/care_questionnaire");
+var CheckRole = require("./../middleware/middleware")
 
 
 var transporter = nodemailer.createTransport({
@@ -178,7 +179,7 @@ router.post("/UpdateAddress", function (req, res) {
 
 });
 
-router.get("/PresentFutureTask/:house_id",CheckRole('get_professional_activity'),
+router.get("/PresentFutureTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -242,7 +243,7 @@ router.get("/PresentFutureTask/:house_id",CheckRole('get_professional_activity')
 );
 
 router.get(
-  "/PastTask/:patient_profile_id/:house_id",CheckRole('get_earlier_activity'),
+  "/PastTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -313,7 +314,7 @@ router.get(
 
 var arr1 = [];
 
-router.get("/infoOfPatients/:house_id",CheckRole("get_spacemanagement"), function (req, res, next) {
+router.get("/infoOfPatients/:house_id",CheckRole("external_space_managemnet"), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     arr = []
@@ -1134,7 +1135,7 @@ router.get("/patientTaskandService/:patient_id", function (req, res) {
 
 
 router.get(
-  "/PastAppointmentServiceTask/:patient_profile_id/:house_id",CheckRole("get_earlier_activity"),
+  "/PastAppointmentServiceTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);

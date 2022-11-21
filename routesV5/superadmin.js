@@ -8,6 +8,7 @@ var Institute = require("../schema/institute");
 const { encrypt, decrypt } = require("./Cryptofile.js");
 var Wishlist = require("../schema/wishlist_schema");
 var jwtconfig = require("../jwttoken");
+const vidchat = require("../schema/vid_chat_account.js")
 const uuidv1 = require("uuid/v1");
 const pdf = require("html-pdf");
 const { promisify } = require("util");
@@ -572,6 +573,8 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
     }
   })
   }
+  });
+}
   });
 });
 
