@@ -1415,7 +1415,6 @@ router.put('/UpdateVideoAccount/:_id', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   if (legit) {
     vidchat.updateOne({ _id: req.params._id },  {$set: req.body}, { new: true }, function (err, userinfo) {
-      console.log(userinfo)
           if (err) {
               res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
           } else {

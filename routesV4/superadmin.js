@@ -46,7 +46,7 @@ router.post("/Addadminuser", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = { institute_id: 0 };
-  if (legit) {
+  if (legit && legit.type === 'superadmin') {
     try{
     const email = req.body.email;
     const messageToSearchWith = new User({ email });
@@ -513,28 +513,26 @@ function emptyBucket(bucketName, foldername) {
 }
 
 router.delete("/deleteUser/:UserId", function (req, res, next) {
-  User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
-    if (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Something went wrong.",
-        error: err,
-      });
-    } else {
-      const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
-      messageToSearchWith.encryptFieldsSync();
-      vidchat.findOne(
-        {
-          patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
-        })
-        .exec(function (err, getdata) {
-          if (getdata) {
-            res.json({   status: 200,
+  const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
+  messageToSearchWith.encryptFieldsSync();
+  vidchat.findOne(
+    {
+      patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
+    })
+    .exec(function (err, getdata) {
+      if (getdata) {
+        res.json({ status: 400, messages:  "video chat account exists, deactivate that first"  })
+      }
+      else {
+        User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
+          if (err) {
+            res.json({
+              status: 200,
               hassuccessed: false,
-               messages: 'video chat account exists, deactivate that first' })
-          }
-          else {
+              msg: "Something went wrong.",
+              error: err,
+            });
+          } else {
       if (req.query.bucket) {
         var buck = req.query.bucket;
       } else {
@@ -1031,6 +1029,7 @@ router.post("/topic", function (req, res, next) {
     });
   }
 });
+
 router.get("/topic", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);

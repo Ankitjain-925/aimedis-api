@@ -8,7 +8,7 @@ router.post("/AddTeam/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       institute.findOne({
         'institute_groups.houses.teammember.team_name': req.body.team_name
       })
@@ -73,12 +73,11 @@ router.post("/AddTeam/:house_id", function (req, res) {
   }
 });
 
-
 router.put("/UpdateTeam/:house_id/:team_name", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       institute.updateOne(
         {
           'institute_groups.houses.teammember.team_name': req.params.team_name
@@ -130,7 +129,7 @@ router.delete("/DeleteTeam/:house_id/:staff_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
-    if (!legit) {
+    if (legit) {
       institute.updateOne(
         {
           'institute_groups.houses.teammember.staff_id': req.params.staff_id

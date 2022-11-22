@@ -41,7 +41,7 @@ router.post("/Addadminuser", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = { institute_id: 0 };
-  if (legit) {
+  if (legit && legit.type === 'superadmin') {
     const email = req.body.email;
     const messageToSearchWith = new User({ email });
     messageToSearchWith.encryptFieldsSync();
@@ -481,26 +481,26 @@ function emptyBucket(bucketName, foldername) {
 }
 
 router.delete("/deleteUser/:UserId", function (req, res, next) {
-  User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
-    if (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Something went wrong.",
-        error: err,
-      });
-    } else {
-      const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
-      messageToSearchWith.encryptFieldsSync();
-      vidchat.findOne(
-        {
-          patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
-        })
-        .exec(function (err, getdata) {
-          if (getdata.prepaid_talktime_min > 0) {
-            res.json({ status: 400, messages: `You can't not delete account, because you still have ${getdata.prepaid_talktime_min} minutes left. Please deactivate your account ` })
-          }
-          else {
+  const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
+  messageToSearchWith.encryptFieldsSync();
+  vidchat.findOne(
+    {
+      patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
+    })
+    .exec(function (err, getdata) {
+      if (getdata) {
+        res.json({ status: 400, messages:  "video chat account exists, deactivate that first"  })
+      }
+      else {
+        User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
+          if (err) {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong.",
+              error: err,
+            });
+          } else {
       if (req.query.bucket) {
         var buck = req.query.bucket;
       } else {
