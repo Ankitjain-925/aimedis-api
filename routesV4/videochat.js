@@ -96,8 +96,6 @@ router.post("/getuserchat", function (req, res, next) {
             });
           } else {
             if (userdata.length > 0) {
-              console.log(userdata.length)
-
               res.json({ status: 200, hassuccessed: true, data: true, message: "user exists" })
             } else {
               res.json({ status: 200, hassuccessed: false, message: "Users Not Exists", data: false })
@@ -1275,8 +1273,6 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
     endTime.add(1, "day");
   }
   var timeStops = [];
-  console.log("startTime", startTime)
-  console.log("endtime", endTime)
   while (startTime <= endTime) {
     timeStops.push(new moment(startTime).format("HH:mm"));
     startTime.add(timeslot, "minutes");
@@ -1501,7 +1497,6 @@ router.get('/refundformdetail/:UserId', function (req, res, next) {
             res.json({ status: 200, hassuccessed: false, msg: 'Refund form detail is not found', error: err })
           } else {
             if (doc && doc.length > 0) {
-
               res.json({ status: 200, hassuccessed: true, msg: 'Refund detail is found', data: doc })
             }
             else {
@@ -1522,6 +1517,31 @@ router.get('/refundformdetail/:UserId', function (req, res, next) {
     });
   }
 });
+
+router.get("/refundformlist", (req, res, next) => {
+  const token = (req.headers.token)
+  let legit = jwtconfig.verify(token)
+  try {
+    if (legit) {
+      refundform.find({}, function (err, result) {
+        if (err) {
+          res.json({ status: 200, message: 'Something went wrong', hassuccessed: false, err: err });
+        } else {
+          res.json({ status: 200, message: 'Get all refund form ', hassuccessed: true, data: result });
+        }
+      });
+    }
+    else {
+      res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+})
 
 router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
   refundform.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
