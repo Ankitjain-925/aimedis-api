@@ -1488,10 +1488,10 @@ router.get('/refundformdetail/:UserId', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   try {
     if (legit) {
-      var UserId = req.body.UserId
-      const VirtualtToSearchWith1 = new refundform({ UserId });
+      var User_id = req.params.UserId
+      const VirtualtToSearchWith1 = new refundform({ User_id });
       VirtualtToSearchWith1.encryptFieldsSync();
-      refundform.find({ $or: [{ User_id: req.body.UserId }, { User_id: VirtualtToSearchWith1.UserId }] },
+      refundform.find({ $or: [{ User_id: req.params.UserId }, { User_id: VirtualtToSearchWith1.UserId }] },
         function (err, doc) {
           if (err && !doc) {
             res.json({ status: 200, hassuccessed: false, msg: 'Refund form detail is not found', error: err })

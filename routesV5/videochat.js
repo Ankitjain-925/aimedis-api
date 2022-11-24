@@ -96,8 +96,6 @@ router.post("/getuserchat", function (req, res, next) {
           });
         } else {
           if (userdata.length > 0) {
-            console.log(userdata.length)
-
             res.json({ status: 200, hassuccessed: true, data: true, message: "user exists" })
           } else {
             res.json({ status: 200, hassuccessed: false, message: "Users Not Exists", data: false })
@@ -355,7 +353,6 @@ router.post("/MailtoDrandPatient", function (req, res) {
 })
 
 router.post("/DownloadbillVC", function(req, res){
-
   try {
     handlebars.registerHelper("ifCond", function (v1, v2, options) {
       if (v1 === v2) {
@@ -515,8 +512,6 @@ router.post("/SaveQuestion", function (req, res) {
   }
 });
 
-
-
 router.get("/withdrawal", function (req, res) {
   stripe.balanceTransactions.retrieve(
     'txn_1032HU2eZvKYlo2CEPtcnUvl', function (err, data) {
@@ -644,6 +639,7 @@ router.post("/AddMeeting/:start_time/:end_time", function (req, res, next) {
     });
   }
 });
+
 router.get("/refund", function (req, res) {
   stripe.balanceTransactions.retrieve(
     { _id: 'txn_1032HU2eZvKYlo2CEPtcnUvl' }, function (err, data) {
@@ -767,8 +763,6 @@ router.post("/transfer", function(req, res){
           error: err,
         });
       } else {
-        console.log('data',data)
-        console.log('data',data.total_amount)
 
        if(data.total_amount>req.body.amount){
       
@@ -791,12 +785,8 @@ router.post("/transfer", function(req, res){
           message:"Low Balance"
         });
        }
-       
       }
-
     })
-
-
   } else {
     res.json({
       status: 200,
@@ -846,6 +836,7 @@ router.post("/PaymentWithWallet", function(req, res){
     });
   }
 });
+
 router.post("/givefeedback", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1429,16 +1420,15 @@ router.get('/refundformdetail/:UserId', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   try {
     if (legit) {
-      var UserId = req.body.UserId
-      const VirtualtToSearchWith1 = new refundform({ UserId });
+      var User_id = req.params.UserId
+      const VirtualtToSearchWith1 = new refundform({ User_id });
       VirtualtToSearchWith1.encryptFieldsSync();
-      refundform.find({ $or: [{ User_id: req.body.UserId }, { User_id: VirtualtToSearchWith1.UserId }] },
+      refundform.find({ $or: [{ User_id: req.params.UserId }, { User_id: VirtualtToSearchWith1.UserId }] },
         function (err, doc) {
           if (err && !doc) {
             res.json({ status: 200, hassuccessed: false, msg: 'Refund form detail is not found', error: err })
           } else {
             if (doc && doc.length > 0) {
-
               res.json({ status: 200, hassuccessed: true, msg: 'Refund detail is found', data: doc })
             }
             else {
