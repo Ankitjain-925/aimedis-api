@@ -121,8 +121,6 @@ router.post("/getuserchat", function (req, res, next) {
   }
 });
 
-
-
 router.post("/AddVideoUserAccount", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -209,8 +207,6 @@ router.post("/AddVideoUserAccount", function (req, res, next) {
   }
 })
 
-
-
 router.post("/AppointmentBook", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -248,7 +244,6 @@ router.post("/AppointmentBook", function (req, res, next) {
     });
   }
 });
-
 
 router.get("/Get_Doctor/:data", function (req, res) {
   const token = req.headers.token;
@@ -288,7 +283,6 @@ router.get("/Get_Doctor/:data", function (req, res) {
     });
   }
 });
-
 
 router.post("/MailtoDrandPatient", function (req, res) {
   const token = req.headers.token;
@@ -389,7 +383,6 @@ router.post("/MailtoDrandPatient", function (req, res) {
 })
 
 router.post("/DownloadbillVC", function (req, res) {
-
   try {
     handlebars.registerHelper("ifCond", function (v1, v2, options) {
       if (v1 === v2) {
@@ -1242,10 +1235,7 @@ router.post("/DynamicSlots", function (req, res, next) {
 
         }
         res.json({ status: 200, hassuccessed: true, data: finalArray })
-
       })
-
-
     }
     else {
       res.json({
@@ -1411,12 +1401,12 @@ router.put('/UpdateVideoAccount/:_id', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   if (legit) {
     vidchat.updateOne({ _id: req.params._id },  {$set: req.body}, { new: true }, function (err, userinfo) {
-          if (err) {
-              res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
-          } else {
-              res.json({ status: 200, hassuccessed: true, msg: 'VideoAccount is Updated Successfully' });
-          }
-      });
+        if (err) {
+            res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.' });
+        } else {
+            res.json({ status: 200, hassuccessed: true, msg: 'VideoAccount is Updated Successfully' });
+        }
+    });
   }
   else {
       res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
@@ -1488,10 +1478,10 @@ router.get('/refundformdetail/:UserId', function (req, res, next) {
   let legit = jwtconfig.verify(token)
   try {
     if (legit) {
-      var User_id = req.params.UserId
-      const VirtualtToSearchWith1 = new refundform({ User_id });
+      var user_id = req.params.UserId
+      const VirtualtToSearchWith1 = new refundform({ user_id });
       VirtualtToSearchWith1.encryptFieldsSync();
-      refundform.find({ $or: [{ User_id: req.params.UserId }, { User_id: VirtualtToSearchWith1.UserId }] },
+      refundform.find({ $or: [{ user_id: req.params.user_id }, { user_id: VirtualtToSearchWith1.user_id }] },
         function (err, doc) {
           if (err && !doc) {
             res.json({ status: 200, hassuccessed: false, msg: 'Refund form detail is not found', error: err })

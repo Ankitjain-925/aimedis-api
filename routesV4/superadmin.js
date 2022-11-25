@@ -520,9 +520,8 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
       patient_id: { $in: [req.params.UserId, messageToSearchWith.patient_id] }
     })
     .exec(function (err, getdata) {
-      console.log("getdata",getdata)
       if (getdata) {
-        res.json({ status: 400, messages:  "video chat account exists, deactivate that first"  })
+        res.json({ status: 200, hassuccessed: false, messages:  "video chat account exists, deactivate that first"  })
       }
       else {
         // 3res.json({ status: 200, hassuccessed: true, msg: "go to the user delete success part" });
@@ -556,7 +555,7 @@ router.delete("/deleteUser/:UserId", function (req, res, next) {
             //     } else {
             //       console.log("data", data)
             //     }
-            //   }
+            //   }[]
             // )
             // var patient_id = req.params.UserId
             const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
@@ -1169,7 +1168,6 @@ router.put("/topic/:id", function (req, res, next) {
   }
 });
 
-
 router.get("/allusers/:type", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1234,7 +1232,7 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
         })
       }
     }).catch((err) => {
-      res.json({ status: 200, hassuccessed: true, err: err })
+      res.json({ status: 200, hassuccessed: false, err: err })
 
     })
   }catch{
@@ -1393,13 +1391,11 @@ router.post("/allHospitalusers", function (req, res) {
 try{
     if (req.body.institue_id && req.body.type && req.body.search) {
       User.find({ institute_id: req.body.institue_id, type: req.body.type }).then((data) => {
-        console.log("data", data)
         let serach_value = SearchUser(req.body.search, data)
         res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
       })
     }
     else {
-
       res.json({
         status: 200,
         hassuccessed: false,
