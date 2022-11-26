@@ -18,6 +18,7 @@ var cron = require("node-cron");
 const { MongoTools, MTOptions } = require("node-mongotools");
 var mongoTools = new MongoTools();
 const axios = require("axios");
+var requestIp = require('request-ip');
 var CryptoJS = require("crypto-js");
 var sick_meeting = require("./schema/sick_meeting.js");
 var virtual_Task = require("./schema/virtual_tasks.js");
@@ -38,12 +39,12 @@ mongoose.set("debug", true);
 
 
 var app = express();
-app.use(cors({
-  origin: ['http://localhost:2879', 'https://aimedis.io', 'https://metaverse.aimedis.io']
-  }));
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(requestIp.mw())
 ////middleware///////
 // router.use(CheckRole)
 
@@ -60,17 +61,23 @@ appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 
-app.use(function (req, res, next) {
-    var source = req.headers['user-agent']
-    var ua = useragent.parse(source);
-  if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
-  {
-    res.send(401, 'You are not authorized user. CORS- issue')
-  }
-  else{
-    next();
-  }
-});
+// app.use(function (req, res, next) {
+//   if(req.headers.referer == 'http://localhost:2879/' || req.headers.referer == 'http://127.0.0.1:2879/'){
+//     next();
+//   }
+//   else{
+//     res.send(401, 'You are not authorized user. CORS- issue')
+//   }
+  //   var source = req.headers['user-agent']
+  //   var ua = useragent.parse(source);
+  // if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
+  // {
+  //   
+  // }
+  // else{
+  // 
+  // }
+// });
 
 ////////////admin+main+end/////////////
 

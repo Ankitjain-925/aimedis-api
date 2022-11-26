@@ -572,7 +572,6 @@ router.post("/AddStep", function (req, res, next) {
     });
   }
  
- 
 router.get('/GetStepV2/:house_id',function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
@@ -741,12 +740,12 @@ function getfullInfo1(data) {
   });
 } 
 
-  function forEachPromise(items, fn) {
+function forEachPromise(items, fn) {
     return items.reduce(function (promise, item) {
       return promise.then(function () {
         return fn(item);
       });
     }, Promise.resolve());
-  }
+}
 
 module.exports = router;

@@ -148,7 +148,6 @@ router.post("/AddTeam/:house_id", function (req, res) {
   }
 });
 
-
 router.put("/UpdateTeam/:house_id/:team_name", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);

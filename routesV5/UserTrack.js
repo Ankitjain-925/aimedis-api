@@ -576,7 +576,6 @@ router.put("/AddTrackAdmin", function (req, res, next) {
   }
 });
 
-
 //remove track record
 router.delete("/AddTrack/:UserId/:TrackId", function (req, res, next) {
   const token = req.headers.token;
@@ -737,7 +736,6 @@ router.get("/AppointmentByDate1", function (req, res, next) {
     });
   }
 });
-
 
 router.get("/AppointmentByDate", function (req, res, next) {
   const token = req.headers.token;
@@ -1008,6 +1006,7 @@ function getDate(date, dateFormat) {
     return month + " / " + day + " / " + year;
   }
 }
+
 function getTime(date, timeFormat) {
   date = new Date(date);
   if (timeFormat === "12") {
@@ -1217,6 +1216,7 @@ router.get("/AddTrack/:UserId", function (req, res, next) {
     });
   }
 });
+
 router.get("/ArchivedTrack/:UserId", function (req, res, next) {
   track2 = [];
   const token = req.headers.token;
@@ -1880,7 +1880,6 @@ router.get("/PatientListPromotion/:house_id/:institute_id", function (req, res, 
     });
   }
 });
-
 
 function mySorter(a, b) {
   var x = a.datetime_on.toLowerCase();
