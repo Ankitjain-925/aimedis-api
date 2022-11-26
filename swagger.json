@@ -3910,7 +3910,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get doctor list",
+                "summary": "Add team",
                 "responses": {
                     "200": {
                         "description": "Team Group"
@@ -5443,6 +5443,80 @@
              "is_payment":{
                 "type": "boolean",
                 "uniqueItems": false
+             }
+            }
+        },
+        "VideoRefund": {
+            "required": [
+                "username",
+                "Patient_id",
+                "is_payment",
+                "email"
+            ],
+            "properties": {
+            "AccountOwner":{
+                "type": "string",
+                "uniqueItems": false
+
+            },
+           
+             "user_id":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "email": {
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "BankAccountNumber": {
+                "type": "string",
+                "uniqueItems": false
+            },
+             "NameOfBank":{
+                "type": "string",
+                "uniqueItems": false
+
+             },
+             "VideoChatAccountId":{
+                "type": "string",
+                "uniqueItems": false
+            },
+             "BankCountry":{
+               "type": "string",
+               "uniqueItems": false
+
+             }, 
+             "ABARoutingNumber":{
+                "type": "string",
+                "uniqueItems": false
+ 
+              }, 
+             "BankKey": {
+                "type": "string",
+                "uniqueItems": false
+            },
+             "IBAN": {
+                "type": "string",
+                "uniqueItems": false
+            },
+            "SWIFCode":{
+              "type": "string",
+               "unique": false
+            },
+             "ControlKey":{
+                "type": "string",
+                "uniqueItems": false
+             },
+             "Address":{
+                "type": "string",
+                "uniqueItems": false
+ 
+              }, 
+             "DUNSNumber":{
+               "type": "string",
+                "unique": false
              }
             }
         },
