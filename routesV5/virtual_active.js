@@ -1244,6 +1244,7 @@ router.get("/Linktime/:sesion_id", function (req, res, next) {
   //   });
   // }
 });
+
 router.post("/AddMeeting/:user_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1441,7 +1442,6 @@ router.post("/sickarchive", function (req, res) {
   }
 })
 
-
 router.get("/GetAmount/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1490,7 +1490,6 @@ router.get("/GetAmount/:house_id", function (req, res) {
     });
   }
 });
-
 
 router.put("/AddAmount/:house_id", function (req, res, next) {
   const token = req.headers.token;
@@ -1593,4 +1592,5 @@ router.get("/Task/:patient_id", function (req, res, next) {
     });
   }
 });
+
 module.exports = router;

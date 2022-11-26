@@ -2491,22 +2491,29 @@ router.get("/getAppointTask1/:House_id", function (req, res, next) {
 router.get("/statisticstopinfo/:House_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  try {
+    if (legit) {
+      Promise.all([
+        virtualCase(req.params.House_id),
+        User_Case(req.params.House_id),
+        User_Case1(req.params.House_id),
+      ]).then((list1) => {
+        var flatArray = Array.prototype.concat.apply([], list1);
 
-  if (legit) {
-    Promise.all([
-      virtualCase(req.params.House_id),
-      User_Case(req.params.House_id),
-      User_Case1(req.params.House_id),
-    ]).then((list1) => {
-      var flatArray = Array.prototype.concat.apply([], list1);
-
-      res.json({ status: 200, hassuccessed: true, data: flatArray });
-    });
-  } else {
+        res.json({ status: 200, hassuccessed: true, data: flatArray });
+      });
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Authentication required.",
+      });
+    }
+  } catch {
     res.json({
       status: 200,
       hassuccessed: false,
-      message: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
@@ -3059,7 +3066,6 @@ router.get("/Getinstitutename/:house_id", function (req, res) {
           message: "Something went wrong",
         });
       } else {
-        console.log("data", data);
         if (data) {
           data.institute_groups.map((item) => {
             console.log("item", item);
@@ -4524,6 +4530,7 @@ router.get("/trackrecordsforappointment", function (req, res) {
     });
   }
 });
+
 router.post("/trackrecordsfordr", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -5333,7 +5340,6 @@ function User_Case1(House_id) {
           if (err) {
             reject(err);
           } else {
-            console.log("3", userdata);
             resolve(userdata);
           }
         }
@@ -5347,7 +5353,7 @@ function User_Case1(House_id) {
 function virtualCase(House_id) {
   return new Promise((resolve, reject) => {
     try {
-      const VirtualtToSearchWith = new virtual_cases({ house_id: House_id });
+      const VirtualtToSearchWith = new virtual_Case({ house_id: House_id });
       VirtualtToSearchWith.encryptFieldsSync();
       virtual_Case.countDocuments(
         {
@@ -5461,4 +5467,5 @@ function forEachPromise(items, fn) {
     });
   }, Promise.resolve());
 }
+
 module.exports = router;

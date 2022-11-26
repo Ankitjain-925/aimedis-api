@@ -4788,7 +4788,7 @@
                 "uniqueItems": false
             },
              "BankCountry":{
-               "type": "string",
+               "type": "object",
                "uniqueItems": false
 
              }, 

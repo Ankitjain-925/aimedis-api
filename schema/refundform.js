@@ -30,7 +30,7 @@ const refund = new mongoose.Schema({
         unique: false
     },
     BankCountry: {
-        type: String,
+        type: Object,
         required: true,
         unique: false,
     },
