@@ -7,14 +7,12 @@ var virtual_Case = require("../schema/virtual_cases.js");
 var virtual_Task = require("../schema/virtual_tasks.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
 var Appointment = require("../schema/appointments");
-const requestIp = require('request-ip');
 var Prescription = require("../schema/prescription");
 var Second_opinion = require("../schema/second_option");
 var Sick_certificate = require("../schema/sick_certificate");
 var marketing_user = require("../schema/marketing_user");
 var Settings = require("../schema/settings");
 const sendSms = require("./sendSms");
-var ip = require('ip');
 const { encrypt, decrypt } = require("./Cryptofile.js");
 var jwtconfig = require("../jwttoken");
 var base64 = require("base-64");
@@ -1236,11 +1234,6 @@ router.post("/AddUser", function (req, res, next) {
 });
 
 
-
-
-
-
-
 // router.post("/AddNewUseradiitional", function (req, res, next) {
 //   const token = req.headers.token;
 //   let legit = jwtconfig.verify(token);
@@ -1777,6 +1770,7 @@ function emptyBucket(bucketName, foldername) {
     }
   });
 }
+
 router.delete("/Users/:User_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -2061,6 +2055,7 @@ const parseReturn = (code) => {
     return code;
   }
 };
+
 router.post("/Users/checkPass", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -2713,17 +2708,13 @@ router.put("/Metdata/:Metdata_id", function (req, res, next) {
 });
 
 router.get("/Metadata", function (req, res, next) {
-  try {
-    // const clientIp = requestIp.getClientIp(req); 
-      console.log('clientIp', req.headers['x-forwarded-for'])
-      res.json({ip:req.headers['x-forwarded-for']})
-  } catch {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Some thing went wrong.",
-    });
-  }
+  Metadata.find(function (err, Metadatas) {
+    if (err) {
+      next(err);
+    } else {
+      res.json(Metadatas);
+    }
+  });
 });
 
 /*---------R-I-S-K---M-A-N-A-G-E-M-E-N-T----------*/

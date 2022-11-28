@@ -910,6 +910,8 @@ router.post("/UserntfCheck", function (req, res, next) {
 
 router.post("/AddUser", function (req, res, next) {
   const response_key = req.body.token;
+  var google_response = false;
+  var dt = dateTime.create();
   // Making POST request to verify captcha
   var config = {
     method: "post",
@@ -917,7 +919,24 @@ router.post("/AddUser", function (req, res, next) {
   };
   axios(config)
     .then(function (google_response) {
-      if (google_response.data.success == true) {
+    User.find(
+      {
+        "clientIP":req.headers['x-forwarded-for'],
+          "Created_date": { 
+              "$eq": dt.format("Y-m-d")
+          }
+        })
+      .countDocuments()
+      .exec(function (err, total) {
+        if(err){
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "Something went wrong",
+          });
+        }
+        else{
+        if (google_response.data.success === true && total<2) {
         if (
           req.body.email == "" ||
           req.body.email == undefined ||
@@ -989,14 +1008,15 @@ router.post("/AddUser", function (req, res, next) {
                 if (req.body.type == "patient") {
                   isblock = { isblock: false };
                 }
-                var dt = dateTime.create();
-                var createdate = { createdate: dt.format("Y-m-d H:M:S") };
+                var createdate = { createdate: dt.format("Y-m-d H:M:S"),
+                   Created_date : dt.format("Y-m-d")};
                 var createdby = { pin: "1234" };
                 var enpassword = base64.encode(
                   JSON.stringify(encrypt(req.body.password))
                 );
                 var usertoken = { usertoken: uuidv1() };
                 var verified = { verified: "false" };
+
                 var profile_id = {
                   profile_id: profile_id,
                   alies_id: profile_id,
@@ -1036,6 +1056,9 @@ router.post("/AddUser", function (req, res, next) {
                           ...createdby,
                           ...usertoken,
                           ...verified,
+                          clientIP: req.headers['x-forwarded-for'] 
+                          
+                             
                         };
                         var users = new User(datas);
                         users.save(function (err, user_data) {
@@ -1050,10 +1073,8 @@ router.post("/AddUser", function (req, res, next) {
                             user_id = user_data._id;
                             let token = user_data.usertoken;
                             //let link = 'http://localhost:3000/';
-
                             let link = "https://aidoc.io/";
                             var verifylink = `https://aidoc.io/?token=${token}`;
-
                             let datacomposer = (lang, { verifylink }) => {
                               return {};
                             };
@@ -1115,7 +1136,6 @@ router.post("/AddUser", function (req, res, next) {
                                   error: err,
                                 });
                               } else {
-                                console.log("doc", doc);
                                 res.json({
                                   status: 200,
                                   message: "User is added Successfully",
@@ -1148,15 +1168,19 @@ router.post("/AddUser", function (req, res, next) {
         res.json({
           status: 200,
           hassuccessed: false,
-          msg: "Authentication required.",
+          msg: "Authentication555 required.",
         });
       }
-    })
+    }
+      })
+      
+      })
     .catch(function (error) {
+      console.log('error', error)
       res.json({
         status: 200,
         hassuccessed: false,
-        msg: "Authentication required.",
+        msg: "Authentication66666 required.",
       });
     });
 });
