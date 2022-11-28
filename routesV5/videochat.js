@@ -1016,6 +1016,22 @@ router.post("/AddRefundInfo", function (req, res, next) {
             }
           }
         })
+      }else {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Authentication required.",
+        });
+      }
+    }
+    catch {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        message: "Something went wrong."
+      });
+    }
+  })
 
 router.post("/managePrepaid", async (req, res) => {
   try {
@@ -1549,6 +1565,5 @@ router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
     }
   })
 })
-
 
 module.exports = router;                                                                            
