@@ -4031,6 +4031,36 @@
                 }
             }
         },
+        "/teammember/GetTeamGroup/{house_id}/{staff_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "description": "Id of house"
+                },
+                {
+                    "name": "staff_id",
+                    "in": "path",
+                    "description": "disease_name of therapy"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Team_Group"
+                ],
+                "summary": "Get  group information from staff_id ",
+                "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
+        },
         "/vchat/Get_Doctor": {
             "parameters": [
                 {
