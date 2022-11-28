@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aidoc.io",
+    "host": "localhost:5000",
     "basePath": "/api/v4",
     "tags": [
         {
@@ -82,11 +82,15 @@
         {
             "name": "DoctorAppointments",
             "description": "Get Emergency record"
+        },
+        {
+            "name": "Therapy",
+            "description": "API for therapy"
         }
         
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -4002,6 +4006,61 @@
                 }
             }
         },
+        "/teammember/GetTeam/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "description": "Id of house"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Team_Group"
+                ],
+                "summary": "Get information from house_id ",
+                "responses": {
+                    "200": {
+                        "description": "staff is found"
+                    }
+                }
+            }
+        },
+        "/teammember/GetTeamGroup/{house_id}/{staff_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "description": "Id of house"
+                },
+                {
+                    "name": "staff_id",
+                    "in": "path",
+                    "description": "disease_name of therapy"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Team_Group"
+                ],
+                "summary": "Get  group information from staff_id ",
+                "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
+        },
         "/vchat/Get_Doctor": {
             "parameters": [
                 {
@@ -4434,7 +4493,7 @@
                 }
             }
         },
-        "/vchat/UpdateVideoAccount/{_id}":{
+        "/vchat/UpdateVideoAccount/{_id}": {
             "parameters": [
                 {
                     "name": "token",
@@ -4444,25 +4503,29 @@
                 {
                     "name": "_id",
                     "in": "path",
+                    "required": true,
                     "description": "ID",
                     "type": "string"
-                } 
-             ],
-           "put": {
+                }
+            ],
+            "put": {
                 "tags": [
                     "Video_Conference"
                 ],
                 "parameters": [
                     {
-                        "name": "Update",
+                        "name": "Video_Conference",
                         "in": "body",
-                        "description": ""
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/VideoConference"
+                        }
                     }
                 ],
-                "summary": "update with given Id",
+                "summary": "Update VideoConference with Given Id",
                 "responses": {
                     "200": {
-                        "description": "successfully update"
+                        "description": "VideoConference is updated"
                     }
                 }
             }
@@ -4534,6 +4597,191 @@
                 }
             }
 
+        },
+        "/vt/Addtherapy": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Therapy"
+                ],
+                "parameters": [
+                    {
+                        "name": "Doctor",
+                        "in": "body",
+                        "description": "Therapy",
+                        "schema": {
+                            "$ref": "#/definitions/therapy"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Account details",
+                "responses": {
+                    "200": {
+                        "description": "Add account information for refund amount"
+                    },               
+                    "500": {
+                        "description": "Something happened wrong"
+                    }
+                }
+            }
+        },
+        "/vt/GettherapyHouse/{house_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "description": "Id of house"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Therapy"
+                ],
+                "summary": "Get information from house_id ",
+                "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
+        },
+        "/vt/Gettherapy/{_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "description": "Id of house"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Therapy"
+                ],
+                "summary": "Get information from therapy_id ",
+                "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
+        },
+        "/vt/Gettherapy_search/{house_id}/{disease_name}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "house_id",
+                    "in": "path",
+                    "description": "Id of house"
+                },
+                {
+                    "name": "disease_name",
+                    "in": "path",
+                    "description": "disease_name of therapy"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Therapy"
+                ],
+                "summary": "Get information from therapy_id ",
+                "responses": {
+                    "200": {
+                        "description": "information is found"
+                    }
+                }
+            }
+        },
+        "/vt/Updatetherapy/{_id}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "header",
+                    "description": "JWT token User"
+                },
+                {
+                    "name": "_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Therapy"
+                ],
+                "parameters": [
+                    {
+                        "name": "Questions",
+                        "in": "body",
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/therapy"
+                        }
+                    }
+                ],
+                "summary": "Update therapy with Given Id",
+                "responses": {
+                    "200": {
+                        "description": "therapy is updated"
+                    }
+                }
+            }
+        },
+        "/vt/Deletetherapy/{_id}": {
+            "delete": {
+                    "parameters": [
+                        {
+                            "name": "_id",
+                            "in": "path",
+                            "required": true,
+                            "description": "ID",
+                            "type": "string"                          
+                        },
+                        {
+                            "name": "token",
+                            "in": "header",
+                            "description": "JWT token User"
+                        }
+                    ],
+                "tags": [
+                    "Therapy"
+                ],
+                "summary": "Delete therapy Form with _id",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete therapy details"
+
+                    }
+                }
+            }
+
         }
     },
     "definitions": {
@@ -4573,6 +4821,63 @@
                     "uniqueItems": false
                 },
                 "patient_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                }
+            }
+        },
+        "therapy": {
+            "required": [
+                "question_id",
+                "answers",
+                "house_id",
+                "Patient_id"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "sequence_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "uniqueItems": false
+                },
+                "first_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "profile_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "alies_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "user_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "last_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "therapy_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "disease_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "therapy_description": {
                     "type": "string",
                     "uniqueItems": false
                 }

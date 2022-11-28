@@ -533,6 +533,7 @@ var market = require("./routesV4/marketing");
 var cquestionnaire = require("./routesV4/care_questionnaires.js");
 var assignservice = require("./routesV4/assign_services.js");
 var vcare4 = require("./routesV4/virtual_care");
+var vtherapy4 = require("./routesV4/virtual_therapy.js");
 var teammember = require("./routesV4/staffgroup.js");
 
 var UserData5 = require("./routesV5/UserTrack");
@@ -630,6 +631,7 @@ app.use("/api/v4/assignservice", assignservice);
 app.use("/api/v4/vactive", vactive);
 app.use("/api/v4/vchat", Videochat);
 app.use("/api/v4/vc", vcare4);
+app.use("/api/v4/vt", vtherapy4);
 app.use("/api/v4/teammember",teammember)
 
 
@@ -726,8 +728,8 @@ app.use(function (err, req, res, next) {
 });
 
 
-// server.listen(5000, () => {
-//  console.log("Server started on port 5001")
-// });
- module.exports = app;
+app.listen(5000, () => {
+ console.log("Server started on port 5001")
+});
+ //module.exports = app;
 
