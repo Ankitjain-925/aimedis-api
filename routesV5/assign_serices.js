@@ -67,9 +67,6 @@ router.put("/Updateassignservice/:_id", function (req, res, next) {
   }
 });
 
-
-
-
 router.delete("/Deleteassignservice/:_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -102,7 +99,6 @@ router.delete("/Deleteassignservice/:_id", function (req, res, next) {
   }
 });
 
-  
 router.get("/getAssignedServices/:house_id",CheckRole("get_assignedservice"), function (req, res, next) {
       const token = req.headers.token;
       let legit = jwtconfig.verify(token);
@@ -142,28 +138,27 @@ router.get("/getAssignedServices/:house_id",CheckRole("get_assignedservice"), fu
           message: "Authentication required.",
         });
       }
-  });
+});
       
-
-  function mySorter(a, b) {
-    if (a.created_at && b.created_at) {
-      var x = a.created_at.toLowerCase();
-      var y = b.created_at.toLowerCase();
-      return x > y ? -1 : x < y ? 1 : 0;
-    } else {
-      return -1;
-    }
+function mySorter(a, b) {
+  if (a.created_at && b.created_at) {
+    var x = a.created_at.toLowerCase();
+    var y = b.created_at.toLowerCase();
+    return x > y ? -1 : x < y ? 1 : 0;
+  } else {
+    return -1;
   }
-  function mySorter1(a, b) {
-    if (a.date && b.date) {
-      return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
-    } else {
-      return -1;
-    }
-  }
+}
 
-router.get(
-  "/getAllactivities/:user_id",CheckRole('get_professsionalactivity'),
+function mySorter1(a, b) {
+  if (a.date && b.date) {
+    return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
+  } else {
+    return -1;
+  }
+}
+
+router.get("/getAllactivities/:user_id",CheckRole('get_professsionalactivity'),
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);

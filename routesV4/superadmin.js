@@ -46,7 +46,7 @@ router.post("/Addadminuser", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var institute_id = { institute_id: 0 };
-  if (legit) {
+  if (legit && legit.type === 'superadmin') {
     try{
     const email = req.body.email;
     const messageToSearchWith = new User({ email });
@@ -513,120 +513,119 @@ function emptyBucket(bucketName, foldername) {
 }
 
 router.delete("/deleteUser/:UserId", function (req, res, next) {
-  User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
-    if (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Something went wrong.",
-        error: err,
-      });
-    } else {
-      const messageToSearchWith = new vidchat({ UserId: req.params.UserId });
-      messageToSearchWith.encryptFieldsSync();
-      vidchat.findOne(
-        {
-          patient_id: { $in: [req.params.UserId, messageToSearchWith.UserId] }
-        })
-        .exec(function (err, getdata) {
-          if (getdata) {
-            res.json({   status: 200,
-              hassuccessed: false,
-               messages: 'video chat account exists, deactivate that first' })
-          }
-          else {
-      if (req.query.bucket) {
-        var buck = req.query.bucket;
-      } else {
-        var buck = "aimedisfirstbucket";
+  const messageToSearchWith = new vidchat({ patient_id: req.params.UserId });
+  messageToSearchWith.encryptFieldsSync();
+  vidchat.findOne(
+    {
+      patient_id: { $in: [req.params.UserId, messageToSearchWith.patient_id] }
+    })
+    .exec(function (err, getdata) {
+      if (getdata) {
+        res.json({ status: 200, hassuccessed: false, messages:  "video chat account exists, deactivate that first"  })
       }
-      emptyBucket(buck, data12.profile_id);
-      var patient_id = req.params.UserId
-      // const VirtualtToSearchWith3 = new vidchat({ patient_id });
-      // VirtualtToSearchWith3.encryptFieldsSync();
-      // vidchat.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith3.patient_id] }},
-      //   {
-      //     '$unset': {
-      //       'patient_id': ''
-      //     }
-      //   },function (err, data) {
-      //     if (err) {
-      //       console.log("err", err)
-      //     } else {
-      //       console.log("data", data)
-      //     }
-      //   }
-      // )
-      // var patient_id = req.params.UserId
-      const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
-      VirtualtToSearchWith1.encryptFieldsSync();
-      virtual_cases.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith1.patient_id] } },
-        {
-          '$unset': {
-            'patient.image': ''
+      else {
+        // 3res.json({ status: 200, hassuccessed: true, msg: "go to the user delete success part" });
+
+            User.findOneAndRemove({ _id: req.params.UserId }, function (err, data12) {
+              if (err) {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Something went wrong.",
+                  error: err,
+                });
+              } else {
+            if (req.query.bucket) {
+              var buck = req.query.bucket;
+            } else {
+              var buck = "aimedisfirstbucket";
+            }
+            emptyBucket(buck, data12.profile_id);
+            var patient_id = req.params.UserId
+            // const VirtualtToSearchWith3 = new vidchat({ patient_id });
+            // VirtualtToSearchWith3.encryptFieldsSync();
+            // vidchat.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith3.patient_id] }},
+            //   {
+            //     '$unset': {
+            //       'patient_id': ''
+            //     }
+            //   },function (err, data) {
+            //     if (err) {
+            //       console.log("err", err)
+            //     } else {
+            //       console.log("data", data)
+            //     }
+            //   }[]
+            // )
+            // var patient_id = req.params.UserId
+            const VirtualtToSearchWith1 = new virtual_cases({ patient_id });
+            VirtualtToSearchWith1.encryptFieldsSync();
+            virtual_cases.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith1.patient_id] } },
+              {
+                '$unset': {
+                  'patient.image': ''
+                }
+              }, function (err, data) {
+                if (err) {
+                  console.log("err", err)
+                } else {
+                  console.log("data", data)
+                }
+              })
+            var patient_id = req.params.UserId
+            const VirtualtToSearchWith = new virtual_tasks({ patient_id });
+            VirtualtToSearchWith.encryptFieldsSync();
+            virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
+              {
+                '$unset': {
+                  'patient.image': ""
+                }
+              }, function (err, data2) {
+                if (err) {
+                  console.log("err", err)
+
+                } else {
+                  console.log("data", data2)
+                }
+              })
+
+            virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
+              {
+                '$unset': {
+                  'patient.image': ""
+                }
+              }, function (err, data3) {
+                if (err) {
+                  console.log("err3", err)
+                } else {
+                  console.log("data", data3)
+                }
+              })
+            var patient = req.params.UserId
+            const VirtualtToSearchWith2 = new Appointments({ patient });
+            VirtualtToSearchWith2.encryptFieldsSync();
+            Appointments.updateOne({
+              patient: { $in: [patient, VirtualtToSearchWith2.patient] }
+            }, {
+              '$unset': {
+                'patient_info.profile_image': ""
+              }
+            }, function (err, data4) {
+              if (err) {
+                console.log("err", err)
+
+              } else {
+                console.log("data", data4)
+              }
+
+            })
+            res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
           }
-        }, function (err, data) {
-          if (err) {
-            console.log("err", err)
-          } else {
-            console.log("data", data)
-          }
+
         })
-      var patient_id = req.params.UserId
-      const VirtualtToSearchWith = new virtual_tasks({ patient_id });
-      VirtualtToSearchWith.encryptFieldsSync();
-      virtual_tasks.updateOne({ patient_id: { $in: [patient_id, VirtualtToSearchWith.patient_id] } },
-        {
-          '$unset': {
-            'patient.image': ""
-          }
-        }, function (err, data2) {
-          if (err) {
-            console.log("err", err)
-
-          } else {
-            console.log("data", data2)
-          }
-        })
-
-      virtual_Invoice.updateOne({ "patient.patient_id": req.params.UserId },
-        {
-          '$unset': {
-            'patient.image': ""
-          }
-        }, function (err, data3) {
-          if (err) {
-            console.log("err3", err)
-          } else {
-            console.log("data", data3)
-          }
-        })
-      var patient = req.params.UserId
-      const VirtualtToSearchWith2 = new Appointments({ patient });
-      VirtualtToSearchWith2.encryptFieldsSync();
-      Appointments.updateOne({
-        patient: { $in: [patient, VirtualtToSearchWith2.patient] }
-      }, {
-        '$unset': {
-          'patient_info.profile_image': ""
-        }
-      }, function (err, data4) {
-        if (err) {
-          console.log("err", err)
-
-        } else {
-          console.log("data", data4)
-        }
-
-      })
-      res.json({ status: 200, hassuccessed: true, msg: "User is Deleted" });
-
-    }
-  });
-}
-  });
+} 
+})
 });
-
 
 router.put("/BlockUser/:UserId", function (req, res, next) {
   const token = req.headers.token;
@@ -1031,6 +1030,7 @@ router.post("/topic", function (req, res, next) {
     });
   }
 });
+
 router.get("/topic", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1168,7 +1168,6 @@ router.put("/topic/:id", function (req, res, next) {
   }
 });
 
-
 router.get("/allusers/:type", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1233,7 +1232,7 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
         })
       }
     }).catch((err) => {
-      res.json({ status: 200, hassuccessed: true, err: err })
+      res.json({ status: 200, hassuccessed: false, err: err })
 
     })
   }catch{
@@ -1252,7 +1251,6 @@ router.get("/allusers/:type/:pagenumber", function (req, res) {
     });
   }
 });
-
 
 
 router.get("/allHospitalusers/:institute_id/:type/:pagenumber", function (req, res) {
@@ -1393,13 +1391,11 @@ router.post("/allHospitalusers", function (req, res) {
 try{
     if (req.body.institue_id && req.body.type && req.body.search) {
       User.find({ institute_id: req.body.institue_id, type: req.body.type }).then((data) => {
-        console.log("data", data)
         let serach_value = SearchUser(req.body.search, data)
         res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
       })
     }
     else {
-
       res.json({
         status: 200,
         hassuccessed: false,

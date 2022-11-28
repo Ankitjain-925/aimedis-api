@@ -35,6 +35,26 @@ const ProfessionalInfo = new mongoose.Schema(
       type: String,
       required: false,
       unique: false,
+    },
+    type: {
+      type: String,
+      required: false,
+      unique: false,
+    },
+    staff_id: {
+      type: String,
+      required: false,
+      unique: false,
+    },
+    teammember: {
+      type: Array,
+      required: false,
+      unique: false,
+    },
+    staff:{
+      type: Array,
+      required: false,
+      unique: false,
     }
   },
   { strict: false }

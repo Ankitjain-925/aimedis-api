@@ -3066,7 +3066,6 @@ router.get("/Getinstitutename/:house_id", function (req, res) {
           message: "Something went wrong",
         });
       } else {
-        console.log("data", data);
         if (data) {
           data.institute_groups.map((item) => {
             console.log("item", item);
@@ -4531,6 +4530,7 @@ router.get("/trackrecordsforappointment", function (req, res) {
     });
   }
 });
+
 router.post("/trackrecordsfordr", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -5467,4 +5467,5 @@ function forEachPromise(items, fn) {
     });
   }, Promise.resolve());
 }
+
 module.exports = router;

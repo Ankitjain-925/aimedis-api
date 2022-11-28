@@ -188,9 +188,17 @@ router.get("/PresentFutureTask/:patient_profile_id",
 
       virtual_Task.find(
         {
-          "assinged_to.profile_id": req.params.patient_profile_id,
-          $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
-        },
+          $and: [
+            {
+              $or: [
+                {"assinged_to.profile_id": req.params.patient_profile_id},
+                {'assinged_to.teammember.staff': req.params.patient_profile_id},
+              ],
+            },
+            { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
+            ]},
+          ],
+          },
         function (err, userdata) {
           if (err && !userdata) {
             res.json({
@@ -244,8 +252,16 @@ router.get(
 
       virtual_Task.find(
         {
-          "assinged_to.profile_id": req.params.patient_profile_id,
-          $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+          $and: [
+            {
+              $or: [
+                {"assinged_to.profile_id": req.params.patient_profile_id},
+                {'assinged_to.teammember.staff': req.params.patient_profile_id},
+              ],
+            },
+            { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
+            ]},
+          ],
         },
         function (err, userdata) {
           if (err && !userdata) {

@@ -9,7 +9,6 @@ const moment = require("moment");
 var jwtconfig = require("../jwttoken");
 
 router.post("/Addassignservice", function (req, res, next) {
-
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -39,8 +38,6 @@ router.post("/Addassignservice", function (req, res, next) {
       hassuccessed: false,
       message: "Authentication required.",
     });
-
-
   }
 });
 
@@ -85,8 +82,6 @@ router.put("/Updateassignservice/:_id", function (req, res, next) {
       message: "Authentication required.",
     });
   }
-
-
 });
 
 router.delete("/Deleteassignservice/:_id", function (req, res, next) {
@@ -136,7 +131,6 @@ router.get("/getAssignedServices/:house_id", function (req, res, next) {
     try {
       let house_id = req.params.house_id
       const messageToSearchWith = new assigned_Service({ house_id });
-      console.log(messageToSearchWith)
       messageToSearchWith.encryptFieldsSync();
       assigned_Service.find(
         { $or: [{ house_id: req.params.house_id }, { house_id: messageToSearchWith.house_id }] },
@@ -150,7 +144,6 @@ router.get("/getAssignedServices/:house_id", function (req, res, next) {
             });
           } else {
             res.json({ status: 200, hassuccessed: true, data: userdata });
-
           }
         }
       );
@@ -179,6 +172,7 @@ function mySorter(a, b) {
     return -1;
   }
 }
+
 function mySorter1(a, b) {
   if (a.date && b.date) {
     return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
@@ -187,8 +181,7 @@ function mySorter1(a, b) {
   }
 }
 
-router.get(
-  "/getAllactivities/:user_id",
+router.get("/getAllactivities/:user_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -216,8 +209,6 @@ router.get(
                 error: err,
               });
             } else {
-
-
               assigned_Service.find({ "assinged_to.user_id": doctor_id },
                 function (err, userdata2) {
                   if (err && !userdata2) {
@@ -245,7 +236,6 @@ router.get(
                             error: err,
                           });
                         } else {
-                          console.log("userdata3", userdata3.length)
                           for (i = 0; i < userdata1.length; i++) {
                             let today = new Date().setHours(0, 0, 0, 0);
                             let data_d = new Date(userdata1[i].date).setHours(0, 0, 0, 0);
@@ -264,7 +254,6 @@ router.get(
                               arr2.push(userdata2[i])
                             }
                           }
-
 
                           for (i = 0; i < userdata3.length; i++) {
                             // if (userdata3[i].task_type == "sick_leave") {
@@ -313,7 +302,5 @@ router.get(
     }
   }
 );
-
-
 
 module.exports = router;

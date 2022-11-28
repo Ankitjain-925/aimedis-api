@@ -38,12 +38,12 @@ mongoose.set("debug", true);
 
 
 var app = express();
-app.use(cors({
-  origin: ['http://localhost:2879', 'https://aimedis.io', 'https://metaverse.aimedis.io']
-  }));
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(requestIp.mw())
 ////middleware///////
 // router.use(CheckRole)
 
@@ -60,17 +60,23 @@ appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 
-app.use(function (req, res, next) {
-    var source = req.headers['user-agent']
-    var ua = useragent.parse(source);
-  if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
-  {
-    res.send(401, 'You are not authorized user. CORS- issue')
-  }
-  else{
-    next();
-  }
-});
+// app.use(function (req, res, next) {
+//   if(req.headers.referer == 'http://localhost:2879/' || req.headers.referer == 'http://127.0.0.1:2879/'){
+//     next();
+//   }
+//   else{
+//     res.send(401, 'You are not authorized user. CORS- issue')
+//   }
+  //   var source = req.headers['user-agent']
+  //   var ua = useragent.parse(source);
+  // if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
+  // {
+  //   
+  // }
+  // else{
+  // 
+  // }
+// });
 
 ////////////admin+main+end/////////////
 
@@ -526,6 +532,7 @@ var market = require("./routesV4/marketing");
 var cquestionnaire = require("./routesV4/care_questionnaires.js");
 var assignservice = require("./routesV4/assign_services.js");
 var vcare4 = require("./routesV4/virtual_care");
+var vtherapy4 = require("./routesV4/virtual_therapy.js");
 var teammember = require("./routesV4/staffgroup.js");
 
 var UserData5 = require("./routesV5/UserTrack");
@@ -623,6 +630,7 @@ app.use("/api/v4/assignservice", assignservice);
 app.use("/api/v4/vactive", vactive);
 app.use("/api/v4/vchat", Videochat);
 app.use("/api/v4/vc", vcare4);
+app.use("/api/v4/vt", vtherapy4);
 app.use("/api/v4/teammember",teammember)
 
 
@@ -715,12 +723,12 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
-  // console.log("err", err);
+   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));  
 });
 
-// server.listen(5000, () => {
-//  console.log("Server started on port 5001")
-// });
- module.exports = app;
+
+app.listen(5000, () => {
+ console.log("Server started on port 5001")
+});
+ //module.exports = app;
 
