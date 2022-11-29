@@ -216,6 +216,7 @@ router.delete('/Deletetherapy/:_id', function (req, res, next) {
 });
 
 router.post("/AddTherapy", function (req, res, next) {
+
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     try{
@@ -223,7 +224,7 @@ router.post("/AddTherapy", function (req, res, next) {
         var adddata = new virtual_therapys(req.body)
         adddata.save(function (err, user_data) {
             if (err && !user_data) {
-                res.json({ status: 200, message: "Something went wrong.", error: err });
+                res.json({ status: 200,  hassuccessed: false, message: "Something went wrong.", error: err });
             } else {
                 res.json({
                     status: 200,

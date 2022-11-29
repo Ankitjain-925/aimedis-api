@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5000",
+    "host": "virtualhospital.aidoc.io",
     "basePath": "/api/v5",
     "tags": [
         {
@@ -90,7 +90,7 @@
         
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -3883,6 +3883,7 @@
             }
         },
         "/teammember/AddGroup/{house_id}":{
+
             "parameters": [
                 {
                     "name": "token",
@@ -4599,6 +4600,7 @@
 
         },
         "/vt/AddTherapy": {
+
             "parameters": [
                 {
                     "name": "token",

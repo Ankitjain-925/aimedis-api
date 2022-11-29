@@ -5,6 +5,7 @@ var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
 
 router.post("/AddGroup/:house_id", function (req, res) {
+
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
