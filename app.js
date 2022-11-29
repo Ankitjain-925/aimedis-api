@@ -38,45 +38,46 @@ mongoose.set("debug", true);
 
 
 var app = express();
-app.use(cors());
+app.use(cors({
+origin: ['http://localhost:2879']
+}));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-app.use(requestIp.mw())
 ////middleware///////
 // router.use(CheckRole)
 
 ////////////admin+main/////////////
 const appAdmin = express();
-const appAdmin1 = express();
+//const appAdmin1 = express();
 const appAdmin2  = express();
 const appAdmin3 = express();
 
 appAdmin.use(express.static(path.join(__dirname, "build/admin")));
-appAdmin1.use(express.static(path.join(__dirname, "build/authority")));
+// appAdmin1.use(express.static(path.join(__dirname, "build/authority")));
 appAdmin2.use(express.static(path.join(__dirname, "build/sickleave")));
 appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 
-// app.use(function (req, res, next) {
-//   if(req.headers.referer == 'http://localhost:2879/' || req.headers.referer == 'http://127.0.0.1:2879/'){
-//     next();
-//   }
-//   else{
-//     res.send(401, 'You are not authorized user. CORS- issue')
-//   }
-  //   var source = req.headers['user-agent']
-  //   var ua = useragent.parse(source);
-  // if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
-  // {
-  //   
-  // }
-  // else{
-  // 
-  // }
-// });
+app.use(function (req, res, next) {
+  //console.log('req.headers.referer', req.headers.referer)
+  //if(req.headers.referer == 'http://localhost:2879/' || req.headers.referer == 'https://virtualhospital.aidoc.io/'){
+    //next();
+  //}
+  //else{
+   // res.send(401, 'You are not authorized user. CORS- issue')
+ // }
+     var source = req.headers['user-agent']
+     var ua = useragent.parse(source);
+   if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
+   {
+     res.send(401, 'You are not authorized user. CORS- issue');
+   }
+   else{
+     next();
+   }
+});
 
 ////////////admin+main+end/////////////
 
@@ -558,11 +559,11 @@ var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
 var Videochat5 = require("./routesV4/videochat");
 
+
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
 var vcare5 = require("./routesV5/virtual_care");
 var teammember5 = require("./routesV5/staffgroup.js");
 var vtherapy5 = require("./routesV5/virtual_therapy.js");
-
 
 
 // app.use("/api/v1/User", UserData);
@@ -634,6 +635,7 @@ app.use("/api/v4/vt", vtherapy4);
 app.use("/api/v4/teammember",teammember)
 
 
+
 app.use("/api/v5/User", UserData5);
 app.use("/api/v5/UserProfile", UserProfile5);
 app.use("/api/v5/SaveCSV", SaveCSV5);
@@ -693,15 +695,15 @@ appAdmin3.use((err, req, res, next) => {
 });
 app.use("/video-conference", appAdmin3);
 
-appAdmin1.use(function (req, res, next) {
-  var err = new Error("Not Found");
-  err.status = 404;
-  next(err);
-});
-appAdmin1.use((err, req, res, next) => {
-  return res.sendFile(path.resolve( __dirname, 'build/authority' , 'index.html'));
-});
-app.use("/sys-n-authority", appAdmin1);
+// appAdmin1.use(function (req, res, next) {
+//   var err = new Error("Not Found");
+//   err.status = 404;
+//   next(err);
+// });
+// appAdmin1.use((err, req, res, next) => {
+//   return res.sendFile(path.resolve( __dirname, 'build/authority' , 'index.html'));
+// });
+// app.use("/sys-n-authority", appAdmin1);
 
 appAdmin2.use(function (req, res, next) {
   var err = new Error("Not Found");
@@ -723,12 +725,12 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));  
+   return res.sendfile(path.resolve(__dirname,'build/main', 'index.html'));
+  // console.log("err", err);
 });
 
-
-app.listen(5000, () => {
- console.log("Server started on port 5001")
-});
- //module.exports = app;
+//server.listen(5000, () => {
+ // console.log("Server started on port 5001")
+//});
+ module.exports = app;
 

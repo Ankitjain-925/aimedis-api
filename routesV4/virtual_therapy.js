@@ -177,7 +177,7 @@ router.delete('/Deletetherapy/:_id', function (req, res, next) {
     }
 });
 
-router.post("/Addtherapy", function (req, res, next) {
+router.post("/Addtherapys", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     if (legit) {

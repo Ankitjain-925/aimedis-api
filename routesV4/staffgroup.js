@@ -131,7 +131,7 @@ router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
 
 
 
-router.post("/AddTeam/:house_id", function (req, res) {
+router.post("/AddTeams/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
