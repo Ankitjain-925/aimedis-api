@@ -9,11 +9,10 @@ var CheckRole = require("./../middleware/middleware")
 router.get("/Gettherapy/:_id/", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
+    try{
     if (legit) {
         virtual_therapys.findOne(
-
             { _id: req.params._id },
-
             function (err, userdata) {
                 if (err) {
                     res.json({
@@ -39,11 +38,19 @@ router.get("/Gettherapy/:_id/", function (req, res, next) {
             message: "Authentication required.",
         });
     }
+} catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 router.get("/GettherapyHouse/:house_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
+    try{
     if (legit) {
         let house_id = req.params.house_id;
         const VirtualtToSearchWith = new virtual_therapys({ house_id });
@@ -58,8 +65,6 @@ router.get("/GettherapyHouse/:house_id", function (req, res, next) {
                 ],
 
             },
-
-
             function (err, userdata) {
                 if (err) {
                     res.json({
@@ -85,13 +90,20 @@ router.get("/GettherapyHouse/:house_id", function (req, res, next) {
             message: "Authentication required.",
         });
     }
+} catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 router.get("/Gettherapy_search/:house_id/:disease_name", function (req, res) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     var final
-
+  try{
     if (legit) {
         let house_id = req.params.house_id;
         const VirtualtToSearchWith = new virtual_therapys({ house_id });
@@ -122,12 +134,19 @@ router.get("/Gettherapy_search/:house_id/:disease_name", function (req, res) {
             message: "Authentication required.",
         });
     }
-
+} catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 router.put("/Updatetherapy/:_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
+    try{
     if (legit) {
         virtual_therapys.updateOne(
             { _id: req.params._id },
@@ -157,12 +176,20 @@ router.put("/Updatetherapy/:_id", function (req, res, next) {
             message: "Authentication required.",
         });
     }
+} catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
 //remove track record
 router.delete('/Deletetherapy/:_id', function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
+    try{
     if (legit) {
         virtual_therapys.findOneAndRemove({ _id: req.params._id }, function (err, data12) {
             if (err) {
@@ -175,11 +202,19 @@ router.delete('/Deletetherapy/:_id', function (req, res, next) {
     else {
         res.json({ status: 200, hassuccessed: false, msg: 'Authentication required.' })
     }
+} catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
 
-router.post("/Addtherapy", function (req, res, next) {
+router.post("/AddTherapy", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
+    try{
     if (legit) {
         var adddata = new virtual_therapys(req.body)
         adddata.save(function (err, user_data) {
@@ -200,6 +235,15 @@ router.post("/Addtherapy", function (req, res, next) {
             message: "Authentication required.",
         });
     }
+} catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
 });
+
+
 
 module.exports = router;

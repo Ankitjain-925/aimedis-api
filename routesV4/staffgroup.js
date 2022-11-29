@@ -45,7 +45,7 @@ router.get("/GetTeam/:house_id", function (req, res) {
             });
             res.json({
               status: 200,
-              hassuccessed: false,
+              hassuccessed: true,
               msg: "Successfully Fetched",
               data: final
             });
@@ -99,7 +99,7 @@ router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
             });
             res.json({
               status: 200,
-              hassuccessed: false,
+              hassuccessed: true,
               msg: "Successfully Fetched",
               data: final
             });
@@ -131,7 +131,7 @@ router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
 
 
 
-router.post("/AddTeam/:house_id", function (req, res) {
+router.post("/AddGroup/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {

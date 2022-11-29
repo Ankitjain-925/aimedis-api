@@ -10,7 +10,7 @@
         }
     },
     "host": "localhost:5000",
-    "basePath": "/api/v4",
+    "basePath": "/api/v5",
     "tags": [
         {
             "name": "Patientflow",
@@ -3882,7 +3882,7 @@
                 }
             }
         },
-        "/teammember/AddTeam/{house_id}":{
+        "/teammember/AddGroup/{house_id}":{
             "parameters": [
                 {
                     "name": "token",
@@ -4598,7 +4598,7 @@
             }
 
         },
-        "/vt/Addtherapy": {
+        "/vt/AddTherapy": {
             "parameters": [
                 {
                     "name": "token",
