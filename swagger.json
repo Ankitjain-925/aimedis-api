@@ -3882,7 +3882,8 @@
                 }
             }
         },
-        "/teammember/AddTeams/{house_id}":{
+        "/teammember/AddGroup/{house_id}":{
+
             "parameters": [
                 {
                     "name": "token",
@@ -4598,7 +4599,8 @@
             }
 
         },
-        "/vt/Addtherapys": {
+        "/vt/AddTherapy": {
+
             "parameters": [
                 {
                     "name": "token",
