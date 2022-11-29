@@ -9,8 +9,8 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:5000",
-    "basePath": "/api/v4",
+    "host": "virtualhospital.aidoc.io",
+    "basePath": "/api/v5",
     "tags": [
         {
             "name": "Patientflow",
@@ -90,7 +90,7 @@
         
     ],
     "schemes": [
-        "http"
+        "https"
     ],
     "consumes": [
         "application/json"
@@ -3882,7 +3882,7 @@
                 }
             }
         },
-        "/teammember/AddTeam/{house_id}":{
+        "/teammember/AddTeams/{house_id}":{
             "parameters": [
                 {
                     "name": "token",
@@ -4598,7 +4598,7 @@
             }
 
         },
-        "/vt/Addtherapy": {
+        "/vt/Addtherapys": {
             "parameters": [
                 {
                     "name": "token",

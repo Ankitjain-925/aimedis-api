@@ -4,7 +4,7 @@ const institute = require("../schema/institute.js")
 var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
 
-router.post("/AddTeam/:house_id", function (req, res) {
+router.post("/AddTeams/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
