@@ -1,6 +1,7 @@
 var express = require("express");
 let router = express.Router();
 const institute = require("../schema/institute.js")
+var User = require("../schema/user.js");
 var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
 // var nodemailer = require("nodemailer");
@@ -22,6 +23,7 @@ router.get("/GetTeam/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var final = []
+  count = 0
   try {
     if (legit) {
       institute.find({
@@ -29,13 +31,46 @@ router.get("/GetTeam/:house_id", function (req, res) {
       })
         .exec(function (err, data) {
           if (data) {
+
             data.forEach(function (dataa) {
               dataa.institute_groups.forEach(function (data1) {
                 data1.houses.forEach(function (data2) {
                   if (data2.house_id == req.params.house_id) {
                     data2.teammember.forEach(function (data3) {
                       data3.staff.forEach(function (data4) {
-                        final.push(data4)
+
+                        const VirtualtToSearchWith = new User({ profile_id: data4 });
+                        VirtualtToSearchWith.encryptFieldsSync();
+                        User.findOne({
+                          $or: [
+
+                          { profile_id: data4 },
+                          { profile_id: VirtualtToSearchWith.profile_id },
+
+                        ],
+                      },
+                          function (err, userdata) {
+                            if (err && !userdata) {
+                              res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Something went wrong",
+                                error: err,
+                              });
+                            } else {
+                              count++
+                              final.push(userdata)
+                              if (data3.staff.length === count) {
+                                res.json({
+                                  status: 200,
+                                  hassuccessed: true,
+                                  msg: "Successfully Fetched",
+                                  data: final
+                                });
+                              }
+                            }
+                          }
+                        );
                       });
                     });
                   }
@@ -43,12 +78,8 @@ router.get("/GetTeam/:house_id", function (req, res) {
 
               });
             });
-            res.json({
-              status: 200,
-              hassuccessed: true,
-              msg: "Successfully Fetched",
-              data: final
-            });
+
+
 
           } else {
             res.json({
@@ -89,9 +120,9 @@ router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
             data.forEach(function (dataa) {
               dataa.institute_groups.forEach(function (data1) {
                 data1.houses.forEach(function (data2) {
-                  if (data2.house_id == req.params.house_id ) {
-                      let final_data2=data2.teammember.filter(item=>item.staff_id ==req.params.staff_id)                                           
-                        final.push(final_data2)
+                  if (data2.house_id == req.params.house_id) {
+                    let final_data2 = data2.teammember.filter(item => item.staff_id == req.params.staff_id)
+                    final.push(final_data2)
                   }
                 });
 
@@ -369,7 +400,7 @@ router.delete("/DeleteTeam/:house_id/:staff_id", function (req, res, next) {
 //   res.status(200).send(getdtata)
 //   console.log(getdtata.length)
 //   }
-  
+
 // catch(err){
 //   res.status(400).send(err)
 // }
