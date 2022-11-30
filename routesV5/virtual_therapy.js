@@ -5,6 +5,8 @@ var virtual_therapys = require("../schema/virtual_therapy.js");
 var jwtconfig = require("../jwttoken");
 var fullinfo = [], newDatafull = [];
 var CheckRole = require("./../middleware/middleware")
+const { encrypt, decrypt } = require("./Cryptofile.js");
+
 
 router.get("/Gettherapy/:_id/", function (req, res, next) {
     const token = req.headers.token;
