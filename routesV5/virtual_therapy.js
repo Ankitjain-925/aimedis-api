@@ -111,6 +111,10 @@ try{
     if (legit) {
         let house_id = req.params.house_id;
         const VirtualtToSearchWith = new virtual_therapys({ house_id });
+        VirtualtToSearchWith.encryptFieldsSync();
+        let disease_name = req.params.disease_name;
+        const VirtualtToSearchWith1 = new virtual_therapys({ disease_name });
+        VirtualtToSearchWith1.encryptFieldsSync(); 
         virtual_therapys.find({
             $or: [
 
@@ -123,7 +127,7 @@ try{
                 res.json({ status: 200, hassuccessed: true, error: err });
             } else {
                 var final = data1.filter((element) => {
-                    if (element.disease_name.includes(req.params.disease_name)) {
+                    if (element.disease_name.includes(req.params.disease_name) || element.disease_name.includes(VirtualtToSearchWith1.disease_name)) {                       
                         return element
                     }
                 })
