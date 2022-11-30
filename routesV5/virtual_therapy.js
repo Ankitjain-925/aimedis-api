@@ -105,7 +105,7 @@ router.get("/GettherapyHouse/:house_id", function (req, res, next) {
   }
 });
 
-router.get("/Gettherapy_search/:house_id/:disease_name", function (req, res) {
+router.get("/Gettherapy_search/:house_id/:data", function (req, res) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     var final
@@ -113,27 +113,30 @@ try{
     if (legit) {
         let house_id = req.params.house_id;
         const VirtualtToSearchWith = new virtual_therapys({ house_id });
-        VirtualtToSearchWith.encryptFieldsSync();
-        let disease_name = req.params.disease_name;
+        let disease_name = req.params.data;
         const VirtualtToSearchWith1 = new virtual_therapys({ disease_name });
-        VirtualtToSearchWith1.encryptFieldsSync();
-        virtual_therapys.find({
+        let therapy_name = req.params.data;
+        const VirtualtToSearchWith2 = new virtual_therapys({ therapy_name });
+        virtual_therapys.findOne(
+           {
+           house_id: { $in: [house_id, VirtualtToSearchWith.house_id] },
             $or: [
-
-                { house_id: req.params.house_id },
-                { house_id: VirtualtToSearchWith.house_id },
-
-            ],
-        }, function (err, data1) {
+                { disease_name: req.params.data },
+                { disease_name: VirtualtToSearchWith1.disease_name },
+                { therapy_name: req.params.data },
+                { therapy_name: VirtualtToSearchWith2.therapy_name },
+            ],},
+         function (err, data1) {
             if (err) {
                 res.json({ status: 200, hassuccessed: true, error: err });
             } else {
-                var final = data1.filter((element) => {
-                    if (element.disease_name.includes(req.params.disease_name) || element.disease_name.includes(VirtualtToSearchWith1.disease_name)) {
-                        return element
-                    }
-                })
-                res.json({ status: 200, hassuccessed: true, data: final })
+                console.log(data1)
+                // var final = data1.filter((element) => {
+                //     if (element.disease_name.includes(req.params.disease_name) || element.therapy_name.includes(req.params.therapy_name)) {
+                //         return element
+                //     }
+                // })
+                res.json({ status: 200, hassuccessed: true, data: data1 })
             }
         }
         )
@@ -231,6 +234,39 @@ router.post("/AddTherapy", function (req, res, next) {
         adddata.save(function (err, user_data) {
             if (err && !user_data) {
                 res.json({ status: 200,  hassuccessed: false, message: "Something went wrong.", error: err });
+            } else {
+                res.json({
+                    status: 200,
+                    message: "Added Successfully",
+                    hassuccessed: true,
+                });
+            }
+        });
+    } else {
+        res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Authentication required.",
+        });
+    }
+} catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+router.post("/AssignTherapyToPatient", function (req, res, next) {
+    const token = req.headers.token;
+    let legit = jwtconfig.verify(token);
+    try{
+    if (legit) {
+        var adddata = new virtual_therapys(req.body)
+        adddata.save(function (err, user_data) {
+            if (err && !user_data) {
+                res.json({ status: 200, message: "Something went wrong.", error: err });
             } else {
                 res.json({
                     status: 200,

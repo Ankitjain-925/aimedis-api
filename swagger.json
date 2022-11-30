@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "virtualhospital.aidoc.io",
+    "host": "localhost:5000",
     "basePath": "/api/v5",
     "tags": [
         {
@@ -90,7 +90,7 @@
         
     ],
     "schemes": [
-        "https"
+        "http"
     ],
     "consumes": [
         "application/json"
@@ -4047,7 +4047,7 @@
                 {
                     "name": "staff_id",
                     "in": "path",
-                    "description": "disease_name of therapy"
+                    "description": "Team Group"
                 }
             ],
             "get": {
@@ -4686,7 +4686,7 @@
                 }
             }
         },
-        "/vt/Gettherapy_search/{house_id}/{disease_name}": {
+        "/vt/Gettherapy_search/{house_id}/{data}": {
             "parameters": [
                 {
                     "name": "token",
@@ -4699,7 +4699,7 @@
                     "description": "Id of house"
                 },
                 {
-                    "name": "disease_name",
+                    "name": "data",
                     "in": "path",
                     "description": "disease_name of therapy"
                 }
