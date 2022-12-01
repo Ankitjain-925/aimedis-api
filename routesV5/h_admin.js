@@ -413,6 +413,9 @@ router.delete("/assignedHouse/:userid/:house_id", function (req, res, next) {
 router.get("/GetProfessional/:house_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
+  var finalArray = []
+  var arr1 = []
+  var final = []
   if (legit) {
     User.find(
       {
@@ -428,7 +431,38 @@ router.get("/GetProfessional/:house_id", function (req, res, next) {
             error: err,
           });
         } else {
-          res.json({ status: 200, hassuccessed: true, data: userdata });
+          Institute.find({
+            'institute_groups.houses.house_id': req.params.house_id
+          })
+            .exec(function (err, data) {
+              if (data) {
+                data.forEach(function (dataa) {
+                  dataa.institute_groups.forEach(function (data1) {
+                    data1.houses.forEach(function (data2) {
+                      if (data2.house_id == req.params.house_id ) {                                          
+                            final.push(data2)
+                      }
+                    });
+                  });
+                });
+                 arr1.push(userdata) 
+                 finalArray = [...arr1, ...final];
+                res.json({
+                  status: 200,
+                  hassuccessed: true,
+                  msg: "Successfully Fetched",
+                  data: finalArray
+                });
+    
+              } else {
+                res.json({
+                  status: 200,
+                  hassuccessed: false,
+                  msg: "Something went wrong",
+                  data: final
+                });
+              }
+            })
         }
       }
     );

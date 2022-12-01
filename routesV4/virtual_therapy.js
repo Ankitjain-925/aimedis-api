@@ -55,7 +55,7 @@ router.get("/GettherapyHouse/:house_id", function (req, res, next) {
         let house_id = req.params.house_id;
         const VirtualtToSearchWith = new virtual_therapys({ house_id });
         VirtualtToSearchWith.encryptFieldsSync();
-        virtual_therapys.findOne(
+        virtual_therapys.find(
             {
                 $or: [
 
