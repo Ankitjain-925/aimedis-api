@@ -1531,7 +1531,7 @@ router.get('/refundformdetail/:UserId', function (req, res, next) {
   }
 });
 
-router.get("/refundformlist", (req, res, next) => {
+router.get('/refundList', function (req, res, next) {
   const token = (req.headers.token)
   let legit = jwtconfig.verify(token)
   try {
