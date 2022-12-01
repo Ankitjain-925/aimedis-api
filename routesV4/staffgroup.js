@@ -176,7 +176,7 @@ router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
 
 
 
-router.post("/AddGroup/:house_id", function (req, res) {
+router.post("/AddGroup", function (req, res) {
 
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -202,14 +202,14 @@ router.post("/AddGroup/:house_id", function (req, res) {
             }
             institute.updateOne(
               {
-                'institute_groups.houses.house_id': req.params.house_id
+                'institute_groups.houses.house_id': req.body.house_id
               },
               {
                 $push: {
                   'institute_groups.$.houses.$[e].teammember': userdata
                 }
               },
-              { "arrayFilters": [{ "e.house_id": req.params.house_id }] },
+              { "arrayFilters": [{ "e.house_id": req.body.house_id }] },
               function (err, data) {
                 if (err && !data) {
                   res.json({
