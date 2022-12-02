@@ -3,7 +3,7 @@ let router = express.Router();
 const institute = require("../schema/institute.js")
 var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
-
+var fullinfo = [];
 
 router.get("/GetTeam/:house_id", function (req, res) {
   const token = req.headers.token;
@@ -21,13 +21,12 @@ router.get("/GetTeam/:house_id", function (req, res) {
               data1.houses.forEach(function (data2) {
                 if (data2.house_id == req.params.house_id) {
                   data2.teammember.forEach(function (data3) {
-                    data3.staff.forEach(function (data4) {
-                      final.push(data4)
-                    });
+                      final.push(data3)
                   });
                 }
               });
             });
+            console.log('fdsfsdf', final)
             forEachPromise(final, getfull).then((result) => {
               res.json({
                 status: 200,
@@ -60,22 +59,20 @@ router.get("/GetTeam/:house_id", function (req, res) {
   }
 });
 
-
-
 router.post("/GetTeamStaff", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   fullinfo = [];
   try {
     if (legit) {
-      forEachPromise(req.body.staff, getfull).then((result) => {
-        res.json({
-          status: 200,
-          hassuccessed: true,
-          msg: "Successfully Fetched",
-          data: fullinfo
-        });
-      })
+      // getfull(req.body).then((result) => {
+      //   res.json({
+      //     status: 200,
+      //     hassuccessed: true,
+      //     msg: "Successfully Fetched",
+      //     data: fullinfo
+      //   });
+      // })
     } else {
       res.json({
         status: 200,
@@ -102,22 +99,21 @@ function forEachPromise(items, fn) {
 
 function getfull(data) {
   return new Promise((resolve, reject) => {
-    try {
       if (data) {
-        const VirtualtToSearchWith = new User({ profile_id: data });
-        VirtualtToSearchWith.encryptFieldsSync();
-        User.findOne({
-          $or: [
-
-            { profile_id: data },
-            { profile_id: VirtualtToSearchWith.profile_id },
-
-          ],
-        })
+        var staff = data.staff;
+        let patient_en = staff.map((element) => {
+          var VirtualtToSearchWith = new User({ profile_id: element });
+          VirtualtToSearchWith.encryptFieldsSync();
+          return VirtualtToSearchWith.profile_id;
+        });
+        
+        let final_house_id = [...patient_en, ...staff];
+        User.find({ profile_id: { $in: final_house_id}})
           .exec()
           .then(function (doc5) {
             if (doc5) {
-              fullinfo.push(doc5)
+              data.staff = {user_id : doc5._id, profile_id : doc5.profile_id, alies_id: doc5.alies_id, image: doc5.image, first_name: doc5.first_name, last_name: doc5.last_name}
+              fullinfo.push(data)
               resolve(fullinfo);
             }
             else {
@@ -128,17 +124,13 @@ function getfull(data) {
       else {
         resolve(fullinfo);
       }
-    } catch (error) {
-      console.log(error)
-      resolve(data);
-    }
+    
   });
 
 }
 
 
 router.post("/AddGroup", function (req, res) {
-
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
