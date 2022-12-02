@@ -78,70 +78,38 @@ router.get("/GetTeam/:house_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var final = []
-  count = 0
+  fullinfo = [];
   try {
     if (legit) {
-      institute.find({
+      institute.findOne({
         'institute_groups.houses.house_id': req.params.house_id
       })
         .exec(function (err, data) {
           if (data) {
-
-            data.forEach(function (dataa) {
-              dataa.institute_groups.forEach(function (data1) {
-                data1.houses.forEach(function (data2) {
-                  if (data2.house_id == req.params.house_id) {
-                    data2.teammember.forEach(function (data3) {
-                      data3.staff.forEach(function (data4) {
-
-                        const VirtualtToSearchWith = new User({ profile_id: data4 });
-                        VirtualtToSearchWith.encryptFieldsSync();
-                        User.findOne({
-                          $or: [
-
-                          { profile_id: data4 },
-                          { profile_id: VirtualtToSearchWith.profile_id },
-
-                        ],
-                      },
-                          function (err, userdata) {
-                            if (err && !userdata) {
-                              res.json({
-                                status: 200,
-                                hassuccessed: false,
-                                message: "Something went wrong",
-                                error: err,
-                              });
-                            } else {
-                              count++
-                              final.push(userdata)
-                              if (data3.staff.length === count) {
-                                res.json({
-                                  status: 200,
-                                  hassuccessed: true,
-                                  msg: "Successfully Fetched",
-                                  data: final
-                                });
-                              }
-                            }
-                          }
-                        );
-                      });
+            data.institute_groups.forEach(function (data1) {
+              data1.houses.forEach(function (data2) {
+                if (data2.house_id == req.params.house_id) {
+                  data2.teammember.forEach(function (data3) {
+                    data3.staff.forEach(function (data4) {
+                      final.push(data4)
                     });
-                  }
-                });
-
+                  });
+                }
               });
             });
-
-
-
+            forEachPromise(final, getfull).then((result) => {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "Successfully Fetched",
+                data: fullinfo
+              });
+            })
           } else {
             res.json({
               status: 200,
               hassuccessed: false,
               msg: "Something went wrong",
-              data: final
             });
           }
         })
@@ -160,6 +128,50 @@ router.get("/GetTeam/:house_id", function (req, res) {
     });
   }
 });
+
+function forEachPromise(items, fn) {
+  return items.reduce(function (promise, item) {
+    return promise.then(function () {
+      return fn(item);
+    });
+  }, Promise.resolve());
+}
+
+function getfull(data) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (data) {
+        const VirtualtToSearchWith = new User({ profile_id: data });
+        VirtualtToSearchWith.encryptFieldsSync();
+        User.findOne({
+          $or: [
+
+            { profile_id: data },
+            { profile_id: VirtualtToSearchWith.profile_id },
+
+          ],
+        })
+          .exec()
+          .then(function (doc5) {
+            if (doc5) {
+              fullinfo.push(doc5)
+              resolve(fullinfo);
+            }
+            else {
+              resolve(fullinfo);
+            }
+          })
+      }
+      else {
+        resolve(fullinfo);
+      }
+    } catch (error) {
+      console.log(error)
+      resolve(data);
+    }
+  });
+
+}
 
 router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
   const token = req.headers.token;

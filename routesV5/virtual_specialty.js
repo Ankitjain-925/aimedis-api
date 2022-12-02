@@ -225,7 +225,7 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
   }
 });
 
-router.post("/AddTask", CheckRole("add_task"), function (req, res, next) {
+router.post("/AddTask", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {

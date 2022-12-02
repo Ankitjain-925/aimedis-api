@@ -439,14 +439,13 @@ router.get("/GetProfessional/:house_id", function (req, res, next) {
                 data.forEach(function (dataa) {
                   dataa.institute_groups.forEach(function (data1) {
                     data1.houses.forEach(function (data2) {
-                      if (data2.house_id == req.params.house_id ) {                                          
-                            final.push(data2)
+                      if (data2.house_id == req.params.house_id ) {  
+                        final = data2.teammember;
                       }
                     });
                   });
                 });
-                 arr1.push(userdata) 
-                 finalArray = [...arr1, ...final];
+                 finalArray = [...userdata, ...final];
                 res.json({
                   status: 200,
                   hassuccessed: true,
@@ -463,6 +462,37 @@ router.get("/GetProfessional/:house_id", function (req, res, next) {
                 });
               }
             })
+        }
+      }
+    );
+  } else {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      message: "Authentication required.",
+    });
+  }
+});
+
+router.get("/GetProfessionalwstaff/:house_id", function (req, res, next) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  if (legit) {
+    User.find(
+      {
+        $or : [{type: 'doctor'}, {type : 'nurse'}],
+        houses: { $elemMatch: { value: req.params.house_id } },
+      },
+      function (err, userdata) {
+        if (err && !userdata) {
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            message: "Something went wrong",
+            error: err,
+          });
+        } else {
+          res.json({ status: 200, hassuccessed: true, data: userdata });
         }
       }
     );
