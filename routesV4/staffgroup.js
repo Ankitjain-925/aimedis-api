@@ -80,21 +80,28 @@ router.post("/GetTeamStaff", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   fullinfo = [];
-
-  if (legit) {
-    forEachPromise(req.body.staff, getfull).then((result) => {
+  try {
+    if (legit) {
+      forEachPromise(req.body.staff, getfull).then((result) => {
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          msg: "Successfully Fetched",
+          data: fullinfo
+        });
+      })
+    } else {
       res.json({
         status: 200,
-        hassuccessed: true,
-        msg: "Successfully Fetched",
-        data: fullinfo
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-    })
-  } else {
+    }
+  } catch (err) {
     res.json({
       status: 200,
       hassuccessed: false,
-      msg: "Authentication required.",
+      msg: "Some thing went wrong.",
     });
   }
 });
