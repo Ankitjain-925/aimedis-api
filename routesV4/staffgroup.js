@@ -74,6 +74,38 @@ router.get("/GetTeam/:house_id", function (req, res) {
   }
 });
 
+
+
+router.post("/GetTeamStaff", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  fullinfo = [];
+  try {
+    if (legit) {
+      forEachPromise(req.body.staff, getfull).then((result) => {
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          msg: "Successfully Fetched",
+          data: fullinfo
+        });
+      })
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
 function forEachPromise(items, fn) {
   return items.reduce(function (promise, item) {
     return promise.then(function () {
@@ -117,6 +149,7 @@ function getfull(data) {
   });
 
 }
+
 
 
 router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {

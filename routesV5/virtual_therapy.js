@@ -218,7 +218,6 @@ router.delete('/Deletetherapy/:_id', function (req, res, next) {
 });
 
 router.post("/AddTherapy", function (req, res, next) {
-
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     try{

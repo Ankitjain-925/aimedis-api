@@ -4,6 +4,139 @@ const institute = require("../schema/institute.js")
 var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
 
+
+router.get("/GetTeam/:house_id", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  var final = []
+  fullinfo = [];
+  try {
+    if (legit) {
+      institute.findOne({
+        'institute_groups.houses.house_id': req.params.house_id
+      })
+        .exec(function (err, data) {
+          if (data) {
+            data.institute_groups.forEach(function (data1) {
+              data1.houses.forEach(function (data2) {
+                if (data2.house_id == req.params.house_id) {
+                  data2.teammember.forEach(function (data3) {
+                    data3.staff.forEach(function (data4) {
+                      final.push(data4)
+                    });
+                  });
+                }
+              });
+            });
+            forEachPromise(final, getfull).then((result) => {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "Successfully Fetched",
+                data: fullinfo
+              });
+            })
+          } else {
+            res.json({
+              status: 200,
+              hassuccessed: false,
+              msg: "Something went wrong",
+            });
+          }
+        })
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+
+
+router.post("/GetTeamStaff", function (req, res) {
+  const token = req.headers.token;
+  let legit = jwtconfig.verify(token);
+  fullinfo = [];
+  try {
+    if (legit) {
+      forEachPromise(req.body.staff, getfull).then((result) => {
+        res.json({
+          status: 200,
+          hassuccessed: true,
+          msg: "Successfully Fetched",
+          data: fullinfo
+        });
+      })
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  } catch (err) {
+    res.json({
+      status: 200,
+      hassuccessed: false,
+      msg: "Some thing went wrong.",
+    });
+  }
+});
+
+function forEachPromise(items, fn) {
+  return items.reduce(function (promise, item) {
+    return promise.then(function () {
+      return fn(item);
+    });
+  }, Promise.resolve());
+}
+
+function getfull(data) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (data) {
+        const VirtualtToSearchWith = new User({ profile_id: data });
+        VirtualtToSearchWith.encryptFieldsSync();
+        User.findOne({
+          $or: [
+
+            { profile_id: data },
+            { profile_id: VirtualtToSearchWith.profile_id },
+
+          ],
+        })
+          .exec()
+          .then(function (doc5) {
+            if (doc5) {
+              fullinfo.push(doc5)
+              resolve(fullinfo);
+            }
+            else {
+              resolve(fullinfo);
+            }
+          })
+      }
+      else {
+        resolve(fullinfo);
+      }
+    } catch (error) {
+      console.log(error)
+      resolve(data);
+    }
+  });
+
+}
+
+
 router.post("/AddGroup", function (req, res) {
 
   const token = req.headers.token;
@@ -73,105 +206,6 @@ router.post("/AddGroup", function (req, res) {
     });
   }
 });
-
-router.get("/GetTeam/:house_id", function (req, res) {
-  const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  var final = []
-  fullinfo = [];
-  try {
-    if (legit) {
-      institute.findOne({
-        'institute_groups.houses.house_id': req.params.house_id
-      })
-        .exec(function (err, data) {
-          if (data) {
-            data.institute_groups.forEach(function (data1) {
-              data1.houses.forEach(function (data2) {
-                if (data2.house_id == req.params.house_id) {
-                  data2.teammember.forEach(function (data3) {
-                    data3.staff.forEach(function (data4) {
-                      final.push(data4)
-                    });
-                  });
-                }
-              });
-            });
-            forEachPromise(final, getfull).then((result) => {
-              res.json({
-                status: 200,
-                hassuccessed: true,
-                msg: "Successfully Fetched",
-                data: fullinfo
-              });
-            })
-          } else {
-            res.json({
-              status: 200,
-              hassuccessed: false,
-              msg: "Something went wrong",
-            });
-          }
-        })
-    } else {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Authentication required.",
-      });
-    }
-  } catch (err) {
-    res.json({
-      status: 200,
-      hassuccessed: false,
-      msg: "Some thing went wrong.",
-    });
-  }
-});
-
-function forEachPromise(items, fn) {
-  return items.reduce(function (promise, item) {
-    return promise.then(function () {
-      return fn(item);
-    });
-  }, Promise.resolve());
-}
-
-function getfull(data) {
-  return new Promise((resolve, reject) => {
-    try {
-      if (data) {
-        const VirtualtToSearchWith = new User({ profile_id: data });
-        VirtualtToSearchWith.encryptFieldsSync();
-        User.findOne({
-          $or: [
-
-            { profile_id: data },
-            { profile_id: VirtualtToSearchWith.profile_id },
-
-          ],
-        })
-          .exec()
-          .then(function (doc5) {
-            if (doc5) {
-              fullinfo.push(doc5)
-              resolve(fullinfo);
-            }
-            else {
-              resolve(fullinfo);
-            }
-          })
-      }
-      else {
-        resolve(fullinfo);
-      }
-    } catch (error) {
-      console.log(error)
-      resolve(data);
-    }
-  });
-
-}
 
 router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
   const token = req.headers.token;
