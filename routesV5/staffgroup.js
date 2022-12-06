@@ -64,17 +64,47 @@ router.get("/GetTeam/:house_id", function (req, res) {
 router.post("/GetTeamStaff", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
-  fullinfo = [];
   try {
     if (legit) {
-      // getfull(req.body).then((result) => {
-      //   res.json({
-      //     status: 200,
-      //     hassuccessed: true,
-      //     msg: "Successfully Fetched",
-      //     data: fullinfo
-      //   });
-      // })
+      if(req.body.staff && req.body.staff.length>0){
+        let patient_en = req.body.staff.map((element) => {
+          var VirtualtToSearchWith = new User({ profile_id: element });
+          VirtualtToSearchWith.encryptFieldsSync();
+          return VirtualtToSearchWith.profile_id;
+        });
+  
+        let final_house_id = [...patient_en, ...staff];
+        User.find({ profile_id: { $in: final_house_id } })
+          .exec()
+          .then(function (doc5) {
+            if (doc5) {
+              var userlists = doc5.map((element) => {
+                return ({user_id: element._id, profile_id: element.profile_id, alies_id: element.alies_id, image: element.image, first_name: element.first_name, last_name: element.last_name});
+              });
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "Successfully Fetched",
+                data: userlists
+              });
+            }
+            else {
+              res.json({
+                status: 200,
+                hassuccessed: true,
+                msg: "No data available",
+                data: []
+              });
+            }
+          })
+        }
+        else{
+          res.json({
+            status: 200,
+            hassuccessed: false,
+            msg: "there is no staff",
+          });
+        }
     } else {
       res.json({
         status: 200,
@@ -103,6 +133,7 @@ function getfull(data) {
   return new Promise((resolve, reject) => {
     if (data) {
       var staff = data.staff;
+      if(staff && staff.length>0){
       let patient_en = staff.map((element) => {
         var VirtualtToSearchWith = new User({ profile_id: element });
         VirtualtToSearchWith.encryptFieldsSync();
@@ -114,18 +145,23 @@ function getfull(data) {
         .exec()
         .then(function (doc5) {
           if (doc5) {
-            doc5.map((element) => {
-              var u = {user_id: element._id, profile_id: element.profile_id, alies_id: element.alies_id, image: element.image, first_name: element.first_name, last_name: element.last_name}
-              data.staff = u;
-              fullinfo.push(data)
+            var userlists = doc5.map((element) => {
+              return ({user_id: element._id, profile_id: element.profile_id, alies_id: element.alies_id, image: element.image, first_name: element.first_name, last_name: element.last_name});
             });
-      
+            data.staff = userlists;
+            fullinfo.push(data);
             resolve(fullinfo);
           }
           else {
+            fullinfo.push(data);
             resolve(fullinfo);
           }
         })
+      }
+      else{
+        fullinfo.push(data);
+        resolve(fullinfo);
+      }
     }
     else {
       resolve(fullinfo);
