@@ -66,8 +66,9 @@ router.post("/GetTeamStaff", function (req, res) {
   let legit = jwtconfig.verify(token);
   try {
     if (legit) {
-      if(req.body.staff && req.body.staff.length>0){
-        let patient_en = req.body.staff.map((element) => {
+      let staff = req.body.staff;  
+      if(staff && staff.length>0){
+        let patient_en = staff.map((element) => {
           var VirtualtToSearchWith = new User({ profile_id: element });
           VirtualtToSearchWith.encryptFieldsSync();
           return VirtualtToSearchWith.profile_id;
