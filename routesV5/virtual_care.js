@@ -893,7 +893,7 @@ router.post("/nurseafter", function (req, res) {
         error: err,
       });
     } else {
-      assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
+      assigned_Service.find({ $or:[{"assinged_to.user_id": doctor_id },{"assinged_to.staff":req.body.profile_id}] }, function (err, data2) {
         if (err) {
           res.json({
             status: 200,

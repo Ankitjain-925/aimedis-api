@@ -931,7 +931,7 @@ router.post("/nurseafter", function (req, res) {
           error: err,
         });
       } else {
-        assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
+        assigned_Service.find({ $or:[{"assinged_to.user_id": doctor_id },{"assinged_to.staff":req.body.profile_id}] }, function (err, data2) {
           if (err) {
             res.json({
               status: 200,
@@ -939,6 +939,7 @@ router.post("/nurseafter", function (req, res) {
               message: "Something went wrong",
             });
           } else {
+            console.log("data2",data2.length)
             sample_1 = [...data, ...data2];
             sample_1.forEach((element) => {
               coming_date = (element.task_name || element.title) ? new Date(element.due_on.date).setHours(0, 0, 0, 0) : new Date(element.date).setHours(0, 0, 0, 0)
