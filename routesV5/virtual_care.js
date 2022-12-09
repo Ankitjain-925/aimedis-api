@@ -264,7 +264,6 @@ router.get(
           ],
         },
         function (err, userdata) {
-          console.log("userdata",userdata.length)
           if (err && !userdata) {
             res.json({
               status: 200,
@@ -283,9 +282,7 @@ router.get(
                 });
               }
                else{
-                console.log("data",data1)
                 userdata=[...userdata,...data1]
-                console.log("userdata",userdata.length)
                  for (i = 0; i < userdata.length; i++) {
                    if (userdata[i].task_type == "sick_leave") {
                      let today = new Date().setHours(0, 0, 0, 0);
@@ -311,7 +308,6 @@ router.get(
                     arr1.push(userdata[i])
                   }
                  }
-                 console.log("arr1",arr1.length)
                  res.json({ status: 200, hassuccessed: true, data: arr1 });
                } 
           
