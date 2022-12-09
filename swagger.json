@@ -3882,20 +3882,13 @@
                 }
             }
         },
-        "/teammember/AddGroup/{house_id}":{
+        "/teammember/AddGroup":{
 
             "parameters": [
                 {
                     "name": "token",
                     "in": "header",
                     "description": "JWT token User"
-                },
-                {
-                    "name": "house_id",
-                    "in": "path",
-                    "required": true,
-                    "description": "ID",
-                    "type": "string"
                 }
             ],
             "post": {
@@ -3908,7 +3901,7 @@
                         "in": "body",
                         "description": "Team_Group",
                         "schema": {
-                            "$ref": "#/definitions/Team_Group"
+                            "$ref": "#/definitions/TeamGroup"
                         }
                     }
                 ],
@@ -6063,7 +6056,7 @@
                 }
             }
         },
-        "Team_Group":{
+        "TeamGroup":{
             "required": [
                 "house_id"
             ],
@@ -6073,6 +6066,10 @@
                     "uniqueItems": false
                 },
                 "speciality_id": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "house_id": {
                     "type": "string",
                     "uniqueItems": false
                 },

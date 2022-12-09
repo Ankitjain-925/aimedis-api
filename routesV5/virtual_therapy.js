@@ -159,27 +159,40 @@ router.put("/Updatetherapy/:_id", function (req, res, next) {
     let legit = jwtconfig.verify(token);
     try{
     if (legit) {
-        virtual_therapys.updateOne(
-            { _id: req.params._id },
-            req.body,
-            function (err, userdata) {
-                if (err) {
-                    res.json({
-                        status: 200,
-                        hassuccessed: false,
-                        message: "Something went wrong",
-                        error: err,
-                    });
-                } else {
-                    res.json({
-                        status: 200,
-                        hassuccessed: true,
-                        message: "Updated Successfully",
-                        data: userdata,
-                    });
-                }
+        virtual_therapys.findById(req.params._id )
+        .exec(function (err, userdata) {
+            if(userdata.sequence_list.length >= 2){
+                virtual_therapys.updateOne(
+                    { _id: req.params._id },
+                    req.body,
+                    function (err, userdata) {
+                        if (err) {
+                            res.json({
+                                status: 200,
+                                hassuccessed: false,
+                                message: "Something went wrong",
+                                error: err,
+                            });
+                        } else {
+                            res.json({
+                                status: 200,
+                                hassuccessed: true,
+                                message: "Updated Successfully",
+                                data: userdata,
+                            });
+                        }
+                    }
+                );
             }
-        );
+            else{
+                res.json({
+                    status: 200,
+                    hassuccessed: true,
+                    message: "therapy must have at least 2 sequence_list for update ",
+                   
+                });
+            }       
+        });
     } else {
         res.json({
             status: 200,
