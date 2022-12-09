@@ -199,7 +199,7 @@ router.get("/PresentFutureTask/:patient_profile_id",
               {
                 $or: [
                   {"assinged_to.profile_id": req.params.patient_profile_id},
-                  {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                  {'assinged_to.staff': req.params.patient_profile_id},
                 ],
               },
               { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
@@ -255,22 +255,21 @@ router.get("/PresentFutureTask/:patient_profile_id",
     }
   });
 
-router.get(
-  "/PastTask/:patient_profile_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    try {
+  router.get(
+    "/PastTask/:patient_profile_id",
+    function (req, res, next) {
+      const token = req.headers.token;
+      let legit = jwtconfig.verify(token);
       if (legit) {
         var arr1 = [];
-
+  
         virtual_Task.find(
           {
             $and: [
               {
                 $or: [
                   {"assinged_to.profile_id": req.params.patient_profile_id},
-                  {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                  {'assinged_to.staff': req.params.patient_profile_id},
                 ],
               },
               { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
@@ -278,6 +277,7 @@ router.get(
             ],
           },
           function (err, userdata) {
+            console.log("userdata",userdata.length)
             if (err && !userdata) {
               res.json({
                 status: 200,
@@ -286,35 +286,51 @@ router.get(
                 error: err,
               });
             } else {
-
-
-
-              for (i = 0; i < userdata.length; i++) {
-                if (userdata[i].task_type == "sick_leave") {
-                  let today = new Date().setHours(0, 0, 0, 0);
-
-                  let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
-
-                  if (moment(data_d).isBefore(today)) {
-                    // userdata.sort(mySorter);
-                    arr1.push(userdata[i])
-                  }
+              assigned_Service.find({ $or:[{"assinged_to.user_id": req.params.patient_profile_id},{"assinged_to.staff":req.params.patient_profile_id}] },function(err,data1){
+                if (err && !data1) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
                 }
-
-                let today = new Date().setHours(0, 0, 0, 0);
-
-                let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
-
-                if (moment(data_d).isBefore(today) && userdata[i].status == "done") {
-                  // userdata.sort(mySorter);
-                  arr1.push(userdata[i])
-                }
-              }
-
-
-              res.json({ status: 200, hassuccessed: true, data: arr1 });
-            }
+                 else{
+                  console.log("data",data1)
+                  userdata=[...userdata,...data1]
+                  console.log("userdata",userdata.length)
+                   for (i = 0; i < userdata.length; i++) {
+                     if (userdata[i].task_type == "sick_leave") {
+                       let today = new Date().setHours(0, 0, 0, 0);
+       
+                       let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
+       
+                       if (moment(data_d).isBefore(today)) {
+                         // userdata.sort(mySorter);
+                         arr1.push(userdata[i])
+                       }
+                     }
+       
+                     let today = new Date().setHours(0, 0, 0, 0);
+       
+                     let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
+       
+                     if (moment(data_d).isBefore(today) && userdata[i].status == "done") {
+                       // userdata.sort(mySorter);
+                       arr1.push(userdata[i])
+                     }
+                     if (moment(data_d).isBefore(today)) {
+                      // userdata.sort(mySorter);
+                      arr1.push(userdata[i])
+                    }
+                   }
+                   console.log("arr1",arr1.length)
+                   res.json({ status: 200, hassuccessed: true, data: arr1 });
+                 } 
+            
+          })
           }
+        }
         );
       } else {
         res.json({
@@ -323,15 +339,8 @@ router.get(
           message: "Authentication required.",
         });
       }
-
-    } catch (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Some thing went wrong.",
-      });
     }
-  });
+  );
 
 var arr1 = [];
 

@@ -223,7 +223,7 @@ router.get("/getAllactivities/:user_id/:profile_id",
                     // AppointToSearchWith1.encryptFieldsSync();
                     virtual_Task.find(
                       {
-                        "assinged_to.user_id": doctor_id,
+                        $or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}],
                         $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
                         // task_type: { $nin: ["video_conference",AppointToSearchWith1.task_type] },
                       },
