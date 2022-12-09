@@ -225,7 +225,7 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
   }
 });
 
-router.post("/AddTask", CheckRole("add_task"), function (req, res, next) {
+router.post("/AddTask", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -413,7 +413,6 @@ router.delete(
 
 router.put(
   "/AddTask/:task_id",
-  CheckRole("edit_task"),
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -623,7 +622,6 @@ router.get(
 
 router.get(
   "/AddTask/:task_ids/:house_id",
-  CheckRole("show_task"),
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);

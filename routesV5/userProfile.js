@@ -1754,6 +1754,7 @@ function emptyBucket(bucketName, foldername) {
     }
   });
 }
+
 router.delete("/Users/:User_id", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -2168,7 +2169,6 @@ router.put("/Users/update", function (req, res, next) {
                     error: err,
                   });
                 } else {
-                  console.log("test", Object.keys(patient).length)
                   if (typeof patient == 'object' && Object.keys(patient).length > 0) {
                     AllUpdate(legit.id, patient)
                   }

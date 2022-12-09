@@ -181,7 +181,7 @@ function mySorter1(a, b) {
   }
 }
 
-router.get("/getAllactivities/:user_id",
+router.get("/getAllactivities/:user_id/:profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -209,7 +209,7 @@ router.get("/getAllactivities/:user_id",
                 error: err,
               });
             } else {
-              assigned_Service.find({ "assinged_to.user_id": doctor_id },
+              assigned_Service.find({ $or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}] },
                 function (err, userdata2) {
                   if (err && !userdata2) {
                     res.json({
@@ -223,7 +223,7 @@ router.get("/getAllactivities/:user_id",
                     // AppointToSearchWith1.encryptFieldsSync();
                     virtual_Task.find(
                       {
-                        "assinged_to.user_id": doctor_id,
+                        $or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}],
                         $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
                         // task_type: { $nin: ["video_conference",AppointToSearchWith1.task_type] },
                       },

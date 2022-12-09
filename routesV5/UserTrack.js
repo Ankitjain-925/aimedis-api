@@ -744,7 +744,6 @@ router.get("/AppointmentByDate", function (req, res, next) {
     const doctor_id = legit.id;
     const messageToSearchWith = new Appointment({ doctor_id });
     messageToSearchWith.encryptFieldsSync();
-
     Appointment.aggregate(
       [
         {

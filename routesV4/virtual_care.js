@@ -199,7 +199,7 @@ router.get("/PresentFutureTask/:patient_profile_id",
               {
                 $or: [
                   {"assinged_to.profile_id": req.params.patient_profile_id},
-                  {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                  {'assinged_to.staff': req.params.patient_profile_id},
                 ],
               },
               { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
@@ -255,22 +255,21 @@ router.get("/PresentFutureTask/:patient_profile_id",
     }
   });
 
-router.get(
-  "/PastTask/:patient_profile_id",
-  function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    try {
+  router.get(
+    "/PastTask/:patient_profile_id",
+    function (req, res, next) {
+      const token = req.headers.token;
+      let legit = jwtconfig.verify(token);
       if (legit) {
         var arr1 = [];
-
+  
         virtual_Task.find(
           {
             $and: [
               {
                 $or: [
                   {"assinged_to.profile_id": req.params.patient_profile_id},
-                  {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                  {'assinged_to.staff': req.params.patient_profile_id},
                 ],
               },
               { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
@@ -286,35 +285,48 @@ router.get(
                 error: err,
               });
             } else {
-
-
-
-              for (i = 0; i < userdata.length; i++) {
-                if (userdata[i].task_type == "sick_leave") {
-                  let today = new Date().setHours(0, 0, 0, 0);
-
-                  let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
-
-                  if (moment(data_d).isBefore(today)) {
-                    // userdata.sort(mySorter);
-                    arr1.push(userdata[i])
-                  }
+              assigned_Service.find({ $or:[{"assinged_to.user_id": req.params.patient_profile_id},{"assinged_to.staff":req.params.patient_profile_id}] },function(err,data1){
+                if (err && !data1) {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: "Something went wrong",
+                    error: err,
+                  });
                 }
-
-                let today = new Date().setHours(0, 0, 0, 0);
-
-                let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
-
-                if (moment(data_d).isBefore(today) && userdata[i].status == "done") {
-                  // userdata.sort(mySorter);
-                  arr1.push(userdata[i])
-                }
-              }
-
-
-              res.json({ status: 200, hassuccessed: true, data: arr1 });
-            }
+                 else{
+                  userdata=[...userdata,...data1]
+                   for (i = 0; i < userdata.length; i++) {
+                     if (userdata[i].task_type == "sick_leave") {
+                       let today = new Date().setHours(0, 0, 0, 0);
+       
+                       let data_d = new Date(userdata[i].date).setHours(0, 0, 0, 0);
+       
+                       if (moment(data_d).isBefore(today)) {
+                         // userdata.sort(mySorter);
+                         arr1.push(userdata[i])
+                       }
+                     }
+       
+                     let today = new Date().setHours(0, 0, 0, 0);
+       
+                     let data_d = new Date(userdata[i].due_on.date).setHours(0, 0, 0, 0);
+       
+                     if (moment(data_d).isBefore(today) && userdata[i].status == "done") {
+                       // userdata.sort(mySorter);
+                       arr1.push(userdata[i])
+                     }
+                     if (moment(data_d).isBefore(today)) {
+                      // userdata.sort(mySorter);
+                      arr1.push(userdata[i])
+                    }
+                   }
+                   res.json({ status: 200, hassuccessed: true, data: arr1 });
+                 } 
+            
+          })
           }
+        }
         );
       } else {
         res.json({
@@ -323,15 +335,8 @@ router.get(
           message: "Authentication required.",
         });
       }
-
-    } catch (err) {
-      res.json({
-        status: 200,
-        hassuccessed: false,
-        msg: "Some thing went wrong.",
-      });
     }
-  });
+  );
 
 var arr1 = [];
 
@@ -931,7 +936,7 @@ router.post("/nurseafter", function (req, res) {
           error: err,
         });
       } else {
-        assigned_Service.find({ "assinged_to.user_id": doctor_id }, function (err, data2) {
+        assigned_Service.find({ $or:[{"assinged_to.user_id": doctor_id },{"assinged_to.staff":req.body.profile_id}] }, function (err, data2) {
           if (err) {
             res.json({
               status: 200,
@@ -939,6 +944,7 @@ router.post("/nurseafter", function (req, res) {
               message: "Something went wrong",
             });
           } else {
+            console.log("data2",data2.length)
             sample_1 = [...data, ...data2];
             sample_1.forEach((element) => {
               coming_date = (element.task_name || element.title) ? new Date(element.due_on.date).setHours(0, 0, 0, 0) : new Date(element.date).setHours(0, 0, 0, 0)
