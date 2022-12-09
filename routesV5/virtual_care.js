@@ -192,7 +192,7 @@ router.get("/PresentFutureTask/:patient_profile_id",
             {
               $or: [
                 {"assinged_to.profile_id": req.params.patient_profile_id},
-                {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                {'assinged_to.staff': req.params.patient_profile_id},
               ],
             },
             { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
@@ -256,7 +256,7 @@ router.get(
             {
               $or: [
                 {"assinged_to.profile_id": req.params.patient_profile_id},
-                {'assinged_to.teammember.staff': req.params.patient_profile_id},
+                {'assinged_to.staff': req.params.patient_profile_id},
               ],
             },
             { $or: [ {is_decline: {$exists: false}}, {is_decline: {$eq : false}}
