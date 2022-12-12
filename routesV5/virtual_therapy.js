@@ -291,34 +291,32 @@ router.post("/SaveTherapy", function (req, res, next) {
     let legit = jwtconfig.verify(token);
     try {
         if (legit) {
-
-            req.body.sequence_list.forEach(function (data1) {
-                if (data1.type == "tasks") {
-
+            req.body.sequence_list.forEach(function (data1, index) {
+                if (data1.type == "task") {
                     const userdata = {
                         ...data1,
                         house_id: req.body.house_id,
+                        sequence: index+1,
                         patient: req.body.patient,
                         therapy_id: req.body.therapy_id,
                         therapy_name: req.body.therapy_name,
                         status: req.body.status,
-                        due_on: req.body.due_on,
-                        assigned_to: req.body.assigned_to,
+                        speciality: req.body.speciality
                     }
 
                     var adddata = new virtual_Task(userdata)
                     adddata.save();
                 }
-                if (data1.type == "assigned_services") {
+                if (data1.type == "assigned_service") {
                     const userdata = {
                         ...data1,
                         house_id: req.body.house_id,
+                        sequence: index+1,
                         patient: req.body.patient,
                         therapy_id: req.body.therapy_id,
                         therapy_name: req.body.therapy_name,
                         status: req.body.status,
-                        due_on: req.body.due_on,
-                        assigned_to: req.body.assigned_to,
+                        speciality: req.body.speciality
                     }
                     var adddata = new assigned_Service(userdata)
                     adddata.save();

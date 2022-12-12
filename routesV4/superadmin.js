@@ -1356,7 +1356,7 @@ router.post("/allSearchusers", function (req, res) {
   if (legit) {
     try{
     if (req.body.type && req.body.search) {
-      User.find({ type: req.body.type }).then((data) => {
+      User.find({ type: req.body.type,  }).then((data) => {
         let serach_value = SearchUser(req.body.search, data)
         res.json({ status: 200, hassuccessed: true, message: "search data found", data: serach_value })
       })
