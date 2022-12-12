@@ -155,45 +155,6 @@ router.get("/Gettherapy_search/:house_id/:data", function (req, res) {
 router.put("/Updatetherapy/:_id", function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
-<<<<<<< HEAD
-    try{
-    if (legit) {
-        virtual_therapys.findById(req.params._id )
-        .exec(function (err, userdata) {
-            if(userdata.sequence_list.length >= 2){
-                virtual_therapys.updateOne(
-                    { _id: req.params._id },
-                    req.body,
-                    function (err, userdata) {
-                        if (err) {
-                            res.json({
-                                status: 200,
-                                hassuccessed: false,
-                                message: "Something went wrong",
-                                error: err,
-                            });
-                        } else {
-                            res.json({
-                                status: 200,
-                                hassuccessed: true,
-                                message: "Updated Successfully",
-                                data: userdata,
-                            });
-                        }
-                    }
-                );
-            }
-            else{
-                res.json({
-                    status: 200,
-                    hassuccessed: true,
-                    message: "therapy must have at least 2 sequence_list for update ",
-                   
-                });
-            }       
-        });
-    } else {
-=======
     try {
         if (legit) {
             virtual_therapys.updateOne(
@@ -225,7 +186,6 @@ router.put("/Updatetherapy/:_id", function (req, res, next) {
             });
         }
     } catch (err) {
->>>>>>> 7b937b7bb1ff89bb37e86dd7b11c985802a90f81
         res.json({
             status: 200,
             hassuccessed: false,

@@ -6,7 +6,7 @@ const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryp
 const applicationform = new mongoose.Schema({
     type: {
         type: String,
-        required: true,
+        required: false,
         unique: false,
     },
     subject_area: {
@@ -36,7 +36,7 @@ const applicationform = new mongoose.Schema({
     },
     institue: {
         type: String,
-        required: true,
+        required: false,
         unique: false
     },
 }, { strict: false });
