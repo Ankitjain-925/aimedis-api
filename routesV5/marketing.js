@@ -46,7 +46,6 @@ router.post("/MarketingMail", function (req, res) {
             req.body.option +
             "<div>"
         };
-
         transporter.sendMail(mailOptions).then(() => {
           res.json({
             status: 200,
@@ -362,9 +361,14 @@ router.post("/avalonMail2", function (req, res) {
 
 router.post("/Addjoinform", function (req, res, next) {
   const token = req.headers.token;
-  let legit = jwtconfig.verify(token);
-  try{
-  if (!legit) {
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+
+ axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+ 
       var adddata = new join_forms(req.body)
       adddata.save(function (err, user_data) {
           if (err && !user_data) {
@@ -377,20 +381,24 @@ router.post("/Addjoinform", function (req, res, next) {
               });
           }
       });
-  } else {
+
+    } else {
       res.json({
-          status: 200,
-          hassuccessed: false,
-          message: "Authentication required.",
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
       });
-  }
-} catch (err) {
-  res.json({
-    status: 200,
-    hassuccessed: false,
-    msg: "Some thing went wrong.",
-  });
-}
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
+  
+
 });
 
 router.delete('/deleteJoinForm/:FormId', function (req, res, next) {
@@ -405,10 +413,14 @@ router.delete('/deleteJoinForm/:FormId', function (req, res, next) {
 
 
 router.post("/Addapplicationform", function (req, res, next) {
-  // const token = req.headers.token;
-  // let legit = jwtconfig.verify(token);
-  try{
-  // if (legit) {
+  const response_key = req.headers.token;
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+
+ axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
       var adddata = new application_forms(req.body)
       adddata.save(function (err, user_data) {
           if (err && !user_data) {
@@ -421,20 +433,22 @@ router.post("/Addapplicationform", function (req, res, next) {
               });
           }
       });
-  // } else {
-  //     res.json({
-  //         status: 200,
-  //         hassuccessed: false,
-  //         message: "Authentication required.",
-  //     });
-  // }
-} catch (err) {
-  res.json({
-    status: 200,
-    hassuccessed: false,
-    msg: "Some thing went wrong.",
-  });
-}
+  } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
+
 });
 
 router.delete('/deleteApplicationForm/:FormId', function (req, res, next) {
@@ -446,6 +460,63 @@ router.delete('/deleteApplicationForm/:FormId', function (req, res, next) {
       }
   })
 })
+
+router.post("/contact", function (req, res) {
+  const response_key = req.headers.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      if (req.body.email != "") {
+        let mailOptions = {
+          from: 'contact@aimedis.com',
+          to: 'vaibhav.webnexus@gmail.com',
+          subject: "New Inquiry - Staff",
+          html:
+            "<div><b>Interested :-&nbsp;</b>" +
+            req.body.interested +
+            "</div>"+
+            "<div><b>E-mail :-&nbsp;</b>" +
+            req.body.email +
+            "</div><div><b>Message:-&nbsp;</b>"+
+            req.body.Message+
+            "</div>"
+        };
+        console.log("mailOptions",mailOptions)
+
+        transporter.sendMail(mailOptions).then(() => {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }).catch((err) => {
+      console.log("er",err)
+          res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false, data: err });
+        });
+
+      } else {
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
+});
 
 
 module.exports = router;
