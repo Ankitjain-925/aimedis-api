@@ -311,6 +311,8 @@ router.put("/UpdateTeam/:house_id/:staff_id", function (req, res, next) {
             'institute_groups.$.houses.$[e1].teammember.$[e2].ward_id': req.body.ward_id,
             'institute_groups.$.houses.$[e1].teammember.$[e2].speciality_id': req.body.speciality_id,
             'institute_groups.$.houses.$[e1].teammember.$[e2].staff': req.body.staff,
+            'institute_groups.$.houses.$[e1].teammember.$[e2].team_name': req.body.team_name,
+
           }
         },
         { "arrayFilters": [{ "e1.house_id": req.params.house_id }, { "e2.staff_id": req.params.staff_id }] },

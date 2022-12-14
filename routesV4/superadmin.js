@@ -1318,13 +1318,17 @@ router.post("/allSearchusers", function (req, res) {
       Userfirstname3.encryptFieldsSync();
       const Userlastname = new User({ last_name : req.body.search });
       Userlastname.encryptFieldsSync();
+
       const Userlastname3 = new User({ last_name : firstname});
       Userlastname3.encryptFieldsSync()
+
       const Userlastname1 = new User({ last_name : req.body.search.toUpperCase() });
       Userlastname1.encryptFieldsSync();
       const Userlastname2 = new User({ last_name : req.body.search.toLowerCase() });
       Userlastname2.encryptFieldsSync();
-
+      var email=req.body.search.charAt(0).toLowerCase() + req.body.search.slice(1);
+      const Useremail3 = new User({ email: email });
+      Useremail3.encryptFieldsSync();
         User.find({ $and: [{ type: req.body.type },
           {$or: [{ first_name:{$regex: req.body.search, $options: "i" } },
           {first_name: {$regex:req.body.search.toLowerCase(), $options: "i" } },
@@ -1337,12 +1341,13 @@ router.post("/allSearchusers", function (req, res) {
             { last_name: { $regex:req.body.search.toLowerCase(),$options: "i"}  },
             { last_name: { $regex:req.body.search.toUpperCase(),$options: "i"} },
              { last_name: { $regex:Userlastname.last_name ,$options: "i"}  },
-             { email: req.body.search },
-             { email: Useremail.email },
-             { email: Useremail1.email },
-             { email: Useremail2.email },
-             { email: req.body.search.toLowerCase() },
-             { email: req.body.search.toUpperCase() },
+             { email: {$regex:req.body.search  ,$options :"i" }},
+             { email: {$regex:Useremail.email ,$options :"i" }},
+             { email:{$regex: Useremail1.email ,$options :"i"} },
+             { email:{$regex: Useremail2.email  ,$options :"i"}},
+             { email: {$regex:req.body.search.toLowerCase() ,$options :"i"} },
+             { email: {$regex:req.body.search.toUpperCase() ,$options :"i"} },
+             { email: {$regex: Useremail3.email ,$options :"i"} },
               { last_name: {$regex: Userlastname1.last_name, $options:"i"} },
                { last_name: {$regex:Userlastname2.last_name,  $options:"i"} },
                { last_name: {$regex:Userlastname3.last_name,  $options:"i"} }

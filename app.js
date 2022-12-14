@@ -38,7 +38,9 @@ mongoose.set("debug", true);
 
 
 var app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:2879']
+  }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -58,24 +60,17 @@ appAdmin3.use(express.static(path.join(__dirname, "build/videoConf")));
 app.use(express.static(path.join(__dirname, "build/main")));
 
 
-// app.use(function (req, res, next) {
-//   //console.log('req.headers.referer', req.headers.referer)
-//   //if(req.headers.referer == 'http://localhost:2879/' || req.headers.referer == 'https://virtualhospital.aidoc.io/'){
-//     //next();
-//   //}
-//   //else{
-//    // res.send(401, 'You are not authorized user. CORS- issue')
-//  // }
-//      var source = req.headers['user-agent']
-//      var ua = useragent.parse(source);
-//    if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
-//    {
-//      res.send(401, 'You are not authorized user. CORS- issue');
-//    }
-//    else{
-//      next();
-//    }
-// });
+app.use(function (req, res, next) {
+     var source = req.headers['user-agent']
+     var ua = useragent.parse(source);
+    if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
+    {
+      res.send(401, 'You are not authorized user. CORS- issue');
+    }
+    else{
+      next();
+    }
+});
 
 ////////////admin+main+end/////////////
 
@@ -731,8 +726,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-app.listen(5001, () => {
- console.log("Server started on port 5001")
-});
-// module.exports = app;
+// app.listen(5001, () => {
+//  console.log("Server started on port 5001")
+// });
+module.exports = app;
 

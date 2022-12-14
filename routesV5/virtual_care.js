@@ -42,9 +42,6 @@ var transporter = nodemailer.createTransport({
 var mongoose = require("mongoose");
 var arr = []
 
-
-
-
 function getTimeStops(start, end, timeslots, breakstart, breakend) {
   var startTime = moment(start, "HH:mm");
   var endTime = moment(end, "HH:mm");
@@ -62,7 +59,6 @@ function getTimeStops(start, end, timeslots, breakstart, breakend) {
   }
   return timeStops;
 }
-
 
 router.post("/UpdateAddress", function (req, res) {
   const token = req.headers.token;
@@ -362,8 +358,6 @@ router.get("/infoOfPatients/:house_id",CheckRole("external_space_managemnet"), f
         });
     }
 });
-
-
 
 function getfull(data) {
   
@@ -1000,7 +994,6 @@ function forEachPromise(items, fn) {
   }, Promise.resolve());
 }
 
-
 router.post("/NurseHomeVisitMail", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1090,7 +1083,6 @@ router.post("/NurseHomeVisitMail", function (req, res, next) {
   }
 });
 
-
 router.get("/patientTaskandService/:patient_id", function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
@@ -1146,9 +1138,7 @@ router.get("/patientTaskandService/:patient_id", function (req, res) {
   }
 })
 
-
-router.get(
-  "/PastAppointmentServiceTask/:patient_profile_id",
+router.get("/PastAppointmentServiceTask/:patient_profile_id",
   function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
@@ -1454,12 +1444,8 @@ router.get("/GetUserQuerstionair/:patient_id/:house_id",CheckRole("get_questiona
           message: "Something went wrong",
         });
       } else {
-        console.log("data",data.length)
         data.sort(mySorter)
-        console.log("data",data)
         var temp= data.slice(-2)
-        console.log("temp",temp)
-        console.log("temp",temp.length)
             res.json({
               status: 200,
               hassuccessed: true,

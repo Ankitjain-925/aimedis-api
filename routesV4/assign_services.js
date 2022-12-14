@@ -143,7 +143,7 @@ router.get("/getAssignedServices/:house_id", function (req, res, next) {
               error: err,
             });
           } else {
-            res.json({ status: 200, hassuccessed: true, data: userdata });
+            res.json({ status: 200, hassuccessed: true, data: userdata,  message: "Data is fetched", });
           }
         }
       );
