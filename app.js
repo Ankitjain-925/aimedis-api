@@ -39,8 +39,8 @@ mongoose.set("debug", true);
 
 var app = express();
 app.use(cors({
-  origin: ['http://localhost:2879']
-  }));
+origin: ['http://localhost:2879', "https://icu.aidoc.io"]
+}));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -61,15 +61,22 @@ app.use(express.static(path.join(__dirname, "build/main")));
 
 
 app.use(function (req, res, next) {
+  //console.log('req.headers.referer', req.headers.referer)
+  //if(req.headers.referer == 'http://localhost:2879/' || req.headers.referer == 'https://virtualhospital.aidoc.io/'){
+    //next();
+  //}
+  //else{
+   // res.send(401, 'You are not authorized user. CORS- issue')
+ // }
      var source = req.headers['user-agent']
      var ua = useragent.parse(source);
-    if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
-    {
-      res.send(401, 'You are not authorized user. CORS- issue');
-    }
-    else{
-      next();
-    }
+   if(ua.browser === 'unknown' || ua.browser === 'PostmanRuntime' )
+   {
+     res.send(401, 'You are not authorized user. CORS- issue');
+   }
+   else{
+     next();
+   }
 });
 
 ////////////admin+main+end/////////////
@@ -552,13 +559,11 @@ var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
 var Videochat5 = require("./routesV4/videochat");
 
-
+var assignservice5 = require("./routesV5/assign_services.js");
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");
 var vcare5 = require("./routesV5/virtual_care");
 var teammember5 = require("./routesV5/staffgroup.js");
 var vtherapy5 = require("./routesV5/virtual_therapy.js");
-var joinform5 = require("./routesV5/joinform.js");
-var applicationform5 = require("./routesV5/applicationform.js");
 
 
 // app.use("/api/v1/User", UserData);
@@ -650,16 +655,14 @@ app.use("/api/v5/questionaire", questionaire5);
 app.use("/api/v5/cases", vcases5);
 app.use("/api/v5/hospitaladmin", hadmin5);
 app.use("/api/v5/cometUserList", comet5);
-app.use("/api/v5/assignservice", assignservice);
+app.use("/api/v5/assignservice", assignservice5);
 app.use("/api/v5/marketing", merketing5);
 app.use("/api/v5/vactive", vactive5);
 app.use("/api/v5/teammember",teammember5)
 app.use("/api/v5/cquestionnaire", cquestionnaire5);
 app.use("/api/v5/vc", vcare5);
 app.use("/api/v5/vt", vtherapy5);
-app.use("/api/v5/joinform", joinform5);
 app.use("/api/v5/vchat", Videochat5);
-app.use("/api/v5/AF", applicationform5);
 
 // app.use("/api/v4/bk", bk)
 
@@ -726,8 +729,8 @@ app.use(function (err, req, res, next) {
   // console.log("err", err);
 });
 
-// app.listen(5001, () => {
-//  console.log("Server started on port 5001")
-// });
-module.exports = app;
+//server.listen(5000, () => {
+ // console.log("Server started on port 5001")
+//});
+ module.exports = app;
 

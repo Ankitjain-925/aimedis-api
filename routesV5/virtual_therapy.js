@@ -126,7 +126,6 @@ router.get("/Gettherapy_search/:house_id/:data", function (req, res) {
                     if (err) {
                         res.json({ status: 200, hassuccessed: true, error: err });
                     } else {
-                        console.log(data1)
                         var final = data1.filter((element) => {
                             if (element.disease_name.includes(req.params.data) || element.therapy_name.includes(req.params.data)) {
                                 return element

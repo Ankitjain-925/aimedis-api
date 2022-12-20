@@ -4,6 +4,10 @@ const axios = require("axios");
 var nodemailer = require("nodemailer");
 const mailchimp = require("@mailchimp/mailchimp_marketing")
 const md5 = require("md5")
+var application_forms = require("../schema/applicationform.js");
+var join_forms = require("../schema/joinform.js");
+
+
 
 
 var transporter = nodemailer.createTransport({
@@ -42,7 +46,6 @@ router.post("/MarketingMail", function (req, res) {
             req.body.option +
             "<div>"
         };
-
         transporter.sendMail(mailOptions).then(() => {
           res.json({
             status: 200,
@@ -356,6 +359,161 @@ router.post("/avalonMail2", function (req, res) {
     });
 });
 
+router.post("/Addjoinform", function (req, res, next) {
+  const token = req.headers.token;
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+
+ axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+ 
+      var adddata = new join_forms(req.body)
+      adddata.save(function (err, user_data) {
+          if (err && !user_data) {
+              res.json({ status: 200,  hassuccessed: false, message: "Something went wrong.", error: err });
+          } else {
+              res.json({
+                  status: 200,
+                  message: "Added Successfully",
+                  hassuccessed: true,
+              });
+          }
+      });
+
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
+  
+
+});
+
+router.delete('/deleteJoinForm/:FormId', function (req, res, next) {
+  join_forms.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
+      if (err) {
+          res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
+      } else {
+          res.json({ status: 200, hassuccessed: true, msg: 'JoinForm is Deleted' });
+      }
+  })
+})
+
+router.post("/Addapplicationform", function (req, res, next) {
+  const response_key = req.headers.token;
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+
+ axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      var adddata = new application_forms(req.body)
+      adddata.save(function (err, user_data) {
+          if (err && !user_data) {
+              res.json({ status: 200,  hassuccessed: false, message: "Something went wrong.", error: err });
+          } else {
+              res.json({
+                  status: 200,
+                  message: "Added Successfully",
+                  hassuccessed: true,
+              });
+          }
+      });
+  } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
+
+});
+
+router.delete('/deleteApplicationForm/:FormId', function (req, res, next) {
+  application_forms.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
+      if (err) {
+          res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
+      } else {
+          res.json({ status: 200, hassuccessed: true, msg: 'ApplicationForm is Deleted' });
+      }
+  })
+})
+
+router.post("/contact", function (req, res) {
+  const response_key = req.headers.token;
+  // Making POST request to verify captcha
+  var config = {
+    method: "post",
+    url: `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchasecret_key}&response=${response_key}`,
+  };
+  axios(config).then(function (google_response) {
+    if (google_response.data.success == true) {
+      if (req.body.email != "") {
+        let mailOptions = {
+          from: 'contact@aimedis.com',
+          to: 'vaibhav.webnexus@gmail.com',
+          subject: "New Inquiry - Staff",
+          html:
+            "<div><b>Interested :-&nbsp;</b>" +
+            req.body.interested +
+            "</div>"+
+            "<div><b>E-mail :-&nbsp;</b>" +
+            req.body.email +
+            "</div><div><b>Message:-&nbsp;</b>"+
+            req.body.Message+
+            "</div>"
+        };
+
+        transporter.sendMail(mailOptions).then(() => {
+          res.json({
+            status: 200,
+            message: "Mail sent Successfully",
+            hassuccessed: true,
+          });
+        }).catch((err) => {
+          res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false, data: err });
+        });
+
+      } else {
+        res.json({ status: 200, msg: "Mail is not sent", hassuccessed: false });
+      }
+    } else {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    }
+  })
+    .catch(function (error) {
+      res.json({
+        status: 200,
+        hassuccessed: false,
+        msg: "Authentication required.",
+      });
+    });
+});
 
 
 module.exports = router;
