@@ -557,7 +557,7 @@ var hadmin5 = require("./routesV5/h_admin");
 var comet5 = require("./routesV5/cometUserList");
 var merketing5 = require("./routesV5/marketing");
 var vactive5 = require("./routesV5/virtual_active")
-var Videochat5 = require("./routesV4/videochat");
+var Videochat5 = require("./routesV5/videochat");
 
 var assignservice5 = require("./routesV5/assign_services.js");
 var cquestionnaire5 = require("./routesV5/care_questionnaires.js");

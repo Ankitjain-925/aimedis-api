@@ -200,8 +200,10 @@ router.get("/getAllactivities/:user_id/:profile_id",
                   
                   virtual_Task.find(
                     {
-                      $or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}],
-                      $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+                      $and:[
+                      {$or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}]},
+                      {$or: [{ is_decline: { $exists: false } }, { is_decline: false }]}
+                      ]
                     },
                     function (err, userdata3) {
                       if (err && !userdata3) {
