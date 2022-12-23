@@ -5,6 +5,8 @@ var assigned_Service = require("../schema/assigned_service.js");
 var Appointments =  require("../schema/appointments.js")
 var virtual_Task =  require("../schema/virtual_tasks.js")
 const moment = require("moment");
+var CheckRole = require("./../middleware/middleware")
+
 
 var jwtconfig = require("../jwttoken");
 
@@ -158,14 +160,16 @@ function mySorter1(a, b) {
   }
 }
 
-router.get("/getAllactivities/:user_id/:profile_id",CheckRole('get_professsionalactivity'),
+router.get("/getAllactivities/:user_id/:profile_id",
   function (req, res, next) {
+    console.log("1")
+
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     doctor_id = req.params.user_id;
     const AppointToSearchWith = new Appointments({ doctor_id });
     AppointToSearchWith.encryptFieldsSync();
-    if (legit) {
+    if (!legit) {
       var arr1 = [];
       var arr2 = [];
       var arr3 = [];
