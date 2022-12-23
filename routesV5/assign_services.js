@@ -5,12 +5,11 @@ var assigned_Service = require("../schema/assigned_service.js");
 var Appointments =  require("../schema/appointments.js")
 var virtual_Task =  require("../schema/virtual_tasks.js")
 const moment = require("moment");
-var CheckRole = require("./../middleware/middleware")
-
+var CheckRole = require("../middleware/middleware")
 
 var jwtconfig = require("../jwttoken");
 
-router.post("/Addassignservice",CheckRole("add_assignedservice"), function (req, res, next) {
+router.post("/Addassignservice", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -174,7 +173,7 @@ router.get("/getAllactivities/:user_id/:profile_id",
       var arr2 = [];
       var arr3 = [];
       var finalArray = [];
-
+try{
       Appointments.find({
         $or: [
           { doctor_id: doctor_id },
@@ -190,8 +189,6 @@ router.get("/getAllactivities/:user_id/:profile_id",
               error: err,
             });
           } else {
-
-
             assigned_Service.find({ $or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}] },
               function (err, userdata2) {
                 if (err && !userdata2) {
@@ -202,13 +199,15 @@ router.get("/getAllactivities/:user_id/:profile_id",
                     error: err,
                   });
                 } else {
-                  
                   virtual_Task.find(
                     {
-                      $or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}],
-                      $or: [{ is_decline: { $exists: false } }, { is_decline: false }],
+                      $and:[
+                      {$or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}]},
+                      {$or: [{ is_decline: { $exists: false } }, { is_decline: false }]},
+                      ]
                     },
                     function (err, userdata3) {
+                    
                       if (err && !userdata3) {
                         res.json({
                           status: 200,
@@ -217,7 +216,6 @@ router.get("/getAllactivities/:user_id/:profile_id",
                           error: err,
                         });
                       } else {
-                        
                         for (i = 0; i < userdata1.length; i++) {
 
                           let today = new Date().setHours(0, 0, 0, 0);
@@ -243,6 +241,7 @@ router.get("/getAllactivities/:user_id/:profile_id",
                           }
                         }
 
+                        
 
                         for (i = 0; i < userdata3.length; i++) {
                           // if (userdata3[i].task_type == "sick_leave") {
@@ -278,6 +277,13 @@ router.get("/getAllactivities/:user_id/:profile_id",
           }
         }
       );
+      } catch {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
     } else {
       res.json({
         status: 200,
@@ -287,7 +293,6 @@ router.get("/getAllactivities/:user_id/:profile_id",
     }
   }
 );
-
 
 
 module.exports = router;

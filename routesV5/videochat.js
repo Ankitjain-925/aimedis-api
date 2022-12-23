@@ -1550,13 +1550,20 @@ router.get('/refundList', function (req, res, next) {
   }
 })
 
-router.delete('/deleteRefundForm/:FormId', function (req, res, next) {
+router.delete('/deleteRefundForm/:FormId/:_id', function (req, res, next) {
   refundform.findOneAndRemove({ _id: req.params.FormId }, function (err, data12) {
     if (err) {
       res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
     } else {
+      vidchat.findOneAndRemove({ _id: req.params._id }, function (err, data12) {
+        if (err) {
+          res.json({ status: 200, hassuccessed: false, msg: 'Something went wrong.', error: err });
+        } else {
+        
       res.json({ status: 200, hassuccessed: true, msg: 'Refund Form is Deleted' });
     }
+  })
+}
   })
 })
 
