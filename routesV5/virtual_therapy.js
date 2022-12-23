@@ -126,6 +126,7 @@ router.get("/Gettherapy_search/:house_id/:data", function (req, res) {
                     if (err) {
                         res.json({ status: 200, hassuccessed: true, error: err });
                     } else {
+                        console.log(data1)
                         var final = data1.filter((element) => {
                             if (element.disease_name.includes(req.params.data) || element.therapy_name.includes(req.params.data)) {
                                 return element
@@ -224,18 +225,49 @@ router.post("/AddTherapy", function (req, res, next) {
     let legit = jwtconfig.verify(token);
     try {
         if (legit) {
-            var adddata = new virtual_therapys(req.body)
-            adddata.save(function (err, user_data) {
-                if (err && !user_data) {
-                    res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err });
-                } else {
-                    res.json({
-                        status: 200,
-                        message: "Added Successfully",
-                        hassuccessed: true,
-                    });
+            let therapy_name = req.body.therapy_name;
+            const VirtualtToSearchWith = new virtual_therapys({ therapy_name });
+            VirtualtToSearchWith.encryptFieldsSync();
+            virtual_therapys.findOne(
+                {
+                    $or: [
+                        { therapy_name: req.body.therapy_name },
+                        { therapy_name: { $exists: true, $eq: VirtualtToSearchWith.therapy_name } },
+                    ],
+                },
+
+                function (err, userdata) {
+                    if (err) {
+                        res.json({
+                            status: 200,
+                            hassuccessed: false,
+                            message: "Something went wrong",
+                            error: err,
+                        });
+                    }
+                    else if (userdata.therapy_name === req.body.therapy_name) {
+                        res.json({
+                            status: 200,
+                            hassuccessed: false,
+                            message: "Duplicate Therapy are not allowed",
+                        });
+                    }
+                    else {
+                        var adddata = new virtual_therapys(req.body)
+                        adddata.save(function (err, user_data) {
+                            if (err && !user_data) {
+                                res.json({ status: 200, hassuccessed: false, message: "Something went wrong.", error: err });
+                            } else {
+                                res.json({
+                                    status: 200,
+                                    message: "Added Successfully",
+                                    hassuccessed: true,
+                                });
+                            }
+                        });
+                    }
                 }
-            });
+            );
         } else {
             res.json({
                 status: 200,
@@ -295,7 +327,7 @@ router.post("/SaveTherapy", function (req, res, next) {
                     const userdata = {
                         ...data1,
                         house_id: req.body.house_id,
-                        sequence: index+1,
+                        sequence: index + 1,
                         patient: req.body.patient,
                         therapy_id: req.body.therapy_id,
                         therapy_name: req.body.therapy_name,
@@ -306,11 +338,11 @@ router.post("/SaveTherapy", function (req, res, next) {
                     var adddata = new virtual_Task(userdata)
                     adddata.save();
                 }
-                if (data1.type == "assign_service") {
+                if (data1.type == "assigned_service") {
                     const userdata = {
                         ...data1,
                         house_id: req.body.house_id,
-                        sequence: index+1,
+                        sequence: index + 1,
                         patient: req.body.patient,
                         therapy_id: req.body.therapy_id,
                         therapy_name: req.body.therapy_name,

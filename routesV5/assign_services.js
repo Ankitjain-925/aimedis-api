@@ -161,12 +161,14 @@ function mySorter1(a, b) {
 
 router.get("/getAllactivities/:user_id/:profile_id",
   function (req, res, next) {
+    console.log("1")
+
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     doctor_id = req.params.user_id;
     const AppointToSearchWith = new Appointments({ doctor_id });
     AppointToSearchWith.encryptFieldsSync();
-    if (legit) {
+    if (!legit) {
       var arr1 = [];
       var arr2 = [];
       var arr3 = [];
