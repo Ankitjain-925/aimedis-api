@@ -1,4 +1,4 @@
- require("dotenv").config();
+require("dotenv").config();
 var express = require("express");
 var path = require("path");
 //var cookieParser = require('cookie-parser');
@@ -733,4 +733,3 @@ app.use(function (err, req, res, next) {
  // console.log("Server started on port 5001")
 //});
  module.exports = app;
-

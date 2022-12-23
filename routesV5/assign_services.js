@@ -9,7 +9,7 @@ var CheckRole = require("../middleware/middleware")
 
 var jwtconfig = require("../jwttoken");
 
-router.post("/Addassignservice",CheckRole("add_assignedservice"), function (req, res, next) {
+router.post("/Addassignservice", function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   if (legit) {
@@ -171,7 +171,7 @@ router.get("/getAllactivities/:user_id/:profile_id",
       var arr2 = [];
       var arr3 = [];
       var finalArray = [];
-
+try{
       Appointments.find({
         $or: [
           { doctor_id: doctor_id },
@@ -197,15 +197,15 @@ router.get("/getAllactivities/:user_id/:profile_id",
                     error: err,
                   });
                 } else {
-                  
                   virtual_Task.find(
                     {
                       $and:[
                       {$or:[{"assinged_to.user_id": doctor_id},{"assinged_to.staff":req.params.profile_id}]},
-                      {$or: [{ is_decline: { $exists: false } }, { is_decline: false }]}
+                      {$or: [{ is_decline: { $exists: false } }, { is_decline: false }]},
                       ]
                     },
                     function (err, userdata3) {
+                    
                       if (err && !userdata3) {
                         res.json({
                           status: 200,
@@ -215,7 +215,9 @@ router.get("/getAllactivities/:user_id/:profile_id",
                         });
                       } else {
                         for (i = 0; i < userdata1.length; i++) {
+
                           let today = new Date().setHours(0, 0, 0, 0);
+
                           let data_d = new Date(userdata1[i].date).setHours(0, 0, 0, 0);
 
                           if (moment(data_d).isSameOrAfter(today)) {
@@ -226,7 +228,9 @@ router.get("/getAllactivities/:user_id/:profile_id",
                         }
 
                         for (i = 0; i < userdata2.length; i++) {
+
                           let today2 = new Date().setHours(0, 0, 0, 0);
+
                           let data_d2 = new Date(userdata2[i].due_on.date).setHours(0, 0, 0, 0);
 
                           if (moment(data_d2).isSameOrAfter(today2)) {
@@ -235,6 +239,7 @@ router.get("/getAllactivities/:user_id/:profile_id",
                           }
                         }
 
+                        
 
                         for (i = 0; i < userdata3.length; i++) {
                           // if (userdata3[i].task_type == "sick_leave") {
@@ -248,13 +253,17 @@ router.get("/getAllactivities/:user_id/:profile_id",
                           let today = new Date().setHours(0, 0, 0, 0);
                           let data_d = new Date(userdata3[i].due_on.date).setHours(0, 0, 0, 0);
                           if (moment(data_d).isAfter(today) || (moment(data_d).isSame(today))) {
+            
                             arr3.push(userdata3[i])
                           }
                           if (moment(data_d).isBefore(today) && userdata3[i].status !== "done") {
+            
                             arr3.push(userdata3[i])
                           }
                         }
+
                         finalArray = [...arr1, ...arr2, ...arr3];
+
                         finalArray.sort(mySorter1);
                         res.json({ status: 200, hassuccessed: true, data: finalArray });
                       }
@@ -266,6 +275,13 @@ router.get("/getAllactivities/:user_id/:profile_id",
           }
         }
       );
+      } catch {
+        res.json({
+          status: 200,
+          hassuccessed: false,
+          message: "Something went wrong.",
+        });
+      }
     } else {
       res.json({
         status: 200,
@@ -275,7 +291,6 @@ router.get("/getAllactivities/:user_id/:profile_id",
     }
   }
 );
-
 
 
 module.exports = router;

@@ -306,7 +306,7 @@ router.post("/SaveTherapy", function (req, res, next) {
                     var adddata = new virtual_Task(userdata)
                     adddata.save();
                 }
-                if (data1.type == "assigned_service") {
+                if (data1.type == "assign_service") {
                     const userdata = {
                         ...data1,
                         house_id: req.body.house_id,
