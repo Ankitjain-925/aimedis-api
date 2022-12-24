@@ -4,6 +4,7 @@ let router = express.Router();
 var Virtual_Specialty = require("../schema/virtual_specialty.js");
 var virtual_Case = require("../schema/virtual_cases.js");
 var virtual_Task = require("../schema/virtual_tasks.js");
+var assigned_Service = require("../schema/assigned_service.js");
 var virtual_Service = require("../schema/virtual_services.js");
 var virtual_Invoice = require("../schema/virtual_invoice.js");
 var picture_Evaluation = require("../schema/pictureevaluation_feedback");
@@ -58,19 +59,19 @@ var CheckRole = require("./../middleware/middleware");
 function getDate(date, dateFormat) {
   var d = new Date(date);
   var monthNames = [
-      "01",
-      "02",
-      "03",
-      "04",
-      "05",
-      "06",
-      "07",
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-    ],
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ],
     month = monthNames[d.getMonth()],
     day = d.getDate(),
     year = d.getFullYear();
@@ -199,10 +200,12 @@ router.get("/AddSpecialty/:house_id", function (req, res, next) {
     const VirtualtToSearchWith = new Virtual_Specialty({ house_id });
     VirtualtToSearchWith.encryptFieldsSync();
     Virtual_Specialty.find(
-      {  $or: [
-        { house_id: req.params.house_id },
-        { house_id: VirtualtToSearchWith.house_id },
-      ]},
+      {
+        $or: [
+          { house_id: req.params.house_id },
+          { house_id: VirtualtToSearchWith.house_id },
+        ]
+      },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -270,10 +273,10 @@ router.post("/AddTask", function (req, res, next) {
                     result === "ch"
                       ? "zh"
                       : result === "sp"
-                      ? "es"
-                      : result === "rs"
-                      ? "ru"
-                      : result;
+                        ? "es"
+                        : result === "rs"
+                          ? "ru"
+                          : result;
                   var sms1 =
                     "There was a task added on in your Aimedis profile -" +
                     req.body.task_name +
@@ -283,7 +286,7 @@ router.post("/AddTask", function (req, res, next) {
                     dateString;
                   trans(sms1, { source: "en", target: result }).then((res1) => {
                     sendSms(doc.mobile, res1)
-                      .then((result) => {})
+                      .then((result) => { })
                       .catch((e) => {
                         console.log("Message is not sent", e);
                       });
@@ -306,15 +309,15 @@ router.post("/AddTask", function (req, res, next) {
                     trans(sms2, { source: "en", target: result }).then(
                       (res1) => {
                         sendSms(doc.emergency_number, res1)
-                          .then((result) => {})
+                          .then((result) => { })
                           .catch((e) => {
                             console.log("Message is not sent", e);
                           });
                       }
                     );
                   }
-                  if(req.body.task_type === "sickleave"){
-                    ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => {})
+                  if (req.body.task_type === "sickleave") {
+                    ApproveReq(doc, req.body.start, req.body.end, req.body.date).then(() => { })
                   }
 
                 });
@@ -457,9 +460,8 @@ router.put(
                               error: err,
                             });
                           } else {
-                            var sendData = `<div> Dear ${
-                              data.first_name + " " + data.last_name
-                            },
+                            var sendData = `<div> Dear ${data.first_name + " " + data.last_name
+                              },
                         </div><br/><div>The request is declined by the hospital. Please create a new request with full detail and good quality of pictures.</div><br/>`;
 
                             generateTemplate(
@@ -558,7 +560,7 @@ router.get("/GetAllTask/:house_id", CheckRole('show_task'), function (req, res, 
           });
         } else {
           userdata.sort(mysort1);
-          res.json({ status: 200, hassuccessed: true,   message: "success", data: userdata });
+          res.json({ status: 200, hassuccessed: true, message: "success", data: userdata });
         }
       }
     );
@@ -590,12 +592,12 @@ router.get(
       virtual_Task.find(
         {
           house_id: { $in: [house_id, messageToSearchWith.house_id] },
-        archived: { $eq: true },
-        $or: [
-          { task_type: { $exists: true, $eq: "picture_evaluation" } },
-          { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
-          { task_type: { $exists: false } },
-        ],
+          archived: { $eq: true },
+          $or: [
+            { task_type: { $exists: true, $eq: "picture_evaluation" } },
+            { task_type: { $exists: true, $eq: VirtualtToSearchWith2.task_type } },
+            { task_type: { $exists: false } },
+          ],
         },
         function (err, userdata) {
           if (err && !userdata) {
@@ -2196,7 +2198,7 @@ router.post("/linkforAccepthospital", function (req, res, next) {
 
           "https://virtualhospital.aidoc.io/sys-n-authority/approveHospital/" +
 
-          req.body.case_id + "/"+ req.body.house_id+
+          req.body.case_id + "/" + req.body.house_id +
           "'>LINK</a></b>";
         ".<br/>" + "<b>Your Aimedis team </b>";
 
@@ -2214,20 +2216,20 @@ router.post("/linkforAccepthospital", function (req, res, next) {
                 html: html,
               };
               let sendmail = transporter.sendMail(mailOptions);
-              sendmail.then(()=>{
+              sendmail.then(() => {
                 res.json({
                   status: 200,
                   hassuccessed: true,
                   message: "Mail is sent",
                 });
               })
-              .catch((err)=>{
-                res.json({
-                  status: 200,
-                  hassuccessed: false,
-                  message: err,
-                });
-              })
+                .catch((err) => {
+                  res.json({
+                    status: 200,
+                    hassuccessed: false,
+                    message: err,
+                  });
+                })
             }
           }
         );
@@ -2237,17 +2239,17 @@ router.post("/linkforAccepthospital", function (req, res, next) {
           result === "ch"
             ? "zh"
             : result === "sp"
-            ? "es"
-            : result === "rs"
-            ? "ru"
-            : result;
+              ? "es"
+              : result === "rs"
+                ? "ru"
+                : result;
         var sms1 =
           "Dear, " +
           req.body.patient_name +
           "The hospital - Want to the get your information, for the addmission, For approve the request or decline the request go to the this link\n" +
           "https://virtualhospital.aidoc.io/sys-n-authority/approveHospital/" +
 
-          req.body.case_id+  "/"+ req.body.house_id+ "."
+          req.body.case_id + "/" + req.body.house_id + "."
 
         trans(sms1, { source: "en", target: result }).then((res1) => {
           sendSms(req.body.mobile, res1)
@@ -2383,15 +2385,17 @@ router.get("/getPatientFromVH/:house_id", function (req, res, next) {
     });
     messageToSearchWithlast3.encryptFieldsSync();
     virtual_Case.find(
-      {  $and: [
-        {
-          house_id: {
-            $in: [req.params.house_id, messageToSearchWithlast3.house_id],
+      {
+        $and: [
+          {
+            house_id: {
+              $in: [req.params.house_id, messageToSearchWithlast3.house_id],
+            },
           },
-        },
-        { inhospital: true },
-        { verifiedbyPatient: true },
-      ],},
+          { inhospital: true },
+          { verifiedbyPatient: true },
+        ],
+      },
       function (err, user_data) {
         if (err && !user_data) {
           res.json({
@@ -2423,7 +2427,7 @@ router.get("/getAppointTask/:House_id", function (req, res, next) {
   let legit = jwtconfig.verify(token);
   if (legit) {
     User.find(
-      { "houses.value": req.params.House_id, type:{$in:["doctor","nurse"]}  },
+      { "houses.value": req.params.House_id, type: { $in: ["doctor", "nurse"] } },
       function (err, userdata) {
         if (err && !userdata) {
           res.json({
@@ -3731,7 +3735,7 @@ router.post("/LeftInfoPatient", function (req, res) {
     let house_id = req.body.house_id;
     const VirtualtToSearchWith = new virtual_Case({ house_id });
     const VirtualtToSearchWith1 = new virtual_Case({ patient_id: req.body.patient_id });
-      VirtualtToSearchWith1.encryptFieldsSync();
+    VirtualtToSearchWith1.encryptFieldsSync();
     VirtualtToSearchWith.encryptFieldsSync();
     virtual_Case.findOne(
       {
@@ -3752,9 +3756,9 @@ router.post("/LeftInfoPatient", function (req, res) {
             leftdataPatient.data = data;
             if (data) {
               const VirtualtToSearchWith2 = new virtual_Task({ case_id: data._id.toString() });
-                VirtualtToSearchWith2.encryptFieldsSync();
-                const VirtualtToSearchWith7 = new virtual_Task({ status: 'done' });
-                VirtualtToSearchWith7.encryptFieldsSync();
+              VirtualtToSearchWith2.encryptFieldsSync();
+              const VirtualtToSearchWith7 = new virtual_Task({ status: 'done' });
+              VirtualtToSearchWith7.encryptFieldsSync();
               virtual_Task.aggregate(
                 [
                   {
@@ -3772,7 +3776,7 @@ router.post("/LeftInfoPatient", function (req, res) {
                         {
                           $match: {
                             $or: [{ case_id: data._id.toString(), case_id: VirtualtToSearchWith2.case_id }],
-                            status: {$in : ["done", VirtualtToSearchWith7.status]}
+                            status: { $in: ["done", VirtualtToSearchWith7.status] }
                           },
                         },
                         { $count: "done_task" },
@@ -5195,22 +5199,18 @@ function taskfromhouseid(item) {
         let house_id = item.house_id;
         const VirtualtToSearchWith = new virtual_Task({ house_id });
         VirtualtToSearchWith.encryptFieldsSync();
-        const VirtualtToSearchWith1 = new virtual_Task({
-          task_type: "picture_evaluation",
-        });
-        VirtualtToSearchWith1.encryptFieldsSync();
         virtual_Task
           .find({
             $or: [
               { house_id: item.house_id },
               { house_id: VirtualtToSearchWith.house_id },
             ],
-            $or: [
-              { task_type: { $ne: "picture_evaluation" } },
-              { task_type: { $ne: VirtualtToSearchWith1.task_type } },
-            ],
+            therapy_id: { $exists: true },
+
           })
           .exec(function (err, task) {
+            // console.log("task", task)
+
             if (err) {
               resolve(flatArraya);
             } else {
@@ -5226,8 +5226,29 @@ function taskfromhouseid(item) {
                 }
                 InhopspitalInvoice.push(item.house_id);
               }
-              Inhospital.push(item.house_id);
-              resolve(flatArraya);
+              const VirtualtToSearchWith = new assigned_Service({ house_id });
+              VirtualtToSearchWith.encryptFieldsSync();
+              assigned_Service
+                .find({
+                  $or: [
+                    { house_id: item.house_id },
+                    { house_id: VirtualtToSearchWith.house_id },
+                  ],
+                  therapy_id: { $exists: true },
+
+                })
+                .exec(function (err, task1) {
+                  // console.log("task1", task1)
+                  if (err) {
+                    resolve(flatArraya);
+                  } else {
+                    if (!Inhospital.includes(item.house_id)) {
+                      flatArraya.push(...task1);
+                    }
+                    Inhospital.push(item.house_id);
+                    resolve(flatArraya);
+                  }
+                });
             }
           });
       } catch (error) {
@@ -5240,9 +5261,18 @@ function taskfromhouseid(item) {
 function invoicefromhouseid(data) {
   return new Promise((resolve, reject) => {
     try {
+      let house_id = data.house_id;
+      const VirtualtToSearchWith = new virtual_Invoice({ house_id });
+      VirtualtToSearchWith.encryptFieldsSync();
       virtual_Invoice
-        .find({ $or: [{ house_id: data.house_id }] })
+        .find({
+          $or: [
+            { house_id: data.house_id },
+            { house_id: VirtualtToSearchWith.house_id },
+          ],
+        })
         .exec(function (err, invoice) {
+
           if (err) {
             resolve([]);
           } else {
