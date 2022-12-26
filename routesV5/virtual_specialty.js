@@ -5201,11 +5201,40 @@ function taskfromhouseid(item) {
         VirtualtToSearchWith.encryptFieldsSync();
         virtual_Task
           .find({
-            $or: [
-              { house_id: item.house_id },
-              { house_id: VirtualtToSearchWith.house_id },
-            ],
-            therapy_id: { $exists: true },
+            $and: [{
+              $or: [
+                { house_id: item.house_id },
+                { house_id: VirtualtToSearchWith.house_id },
+              ],
+            }, {
+              $or: [
+                { task_type: { $ne: "picture_evaluation" } },
+                { task_type: { $ne: VirtualtToSearchWith1.task_type } },
+                { task_type: { $exists: false } },
+                { therapy_id: { $exists: true } },
+
+              ]
+            },
+            {
+              $or: [
+                { task_type: { $ne: "sick_leave" } },
+                { task_type: { $ne: VirtualtToSearchWith2.task_type } },
+                { task_type: { $exists: false } },
+                { therapy_id: { $exists: true } },
+
+              ]
+            },
+            {
+              $or: [
+                { task_type: { $ne: "video_conference" } },
+                { task_type: { $ne: VirtualtToSearchWith3.task_type } },
+                { task_type: { $exists: false } },
+                { therapy_id: { $exists: true } },
+
+              ]
+            }
+            ]
+
 
           })
           .exec(function (err, task) {
@@ -5230,11 +5259,10 @@ function taskfromhouseid(item) {
               VirtualtToSearchWith.encryptFieldsSync();
               assigned_Service
                 .find({
-                  $or: [
-                    { house_id: item.house_id },
-                    { house_id: VirtualtToSearchWith.house_id },
-                  ],
-                  therapy_id: { $exists: true },
+                      $or: [
+                        { house_id: item.house_id },
+                        { house_id: VirtualtToSearchWith.house_id },
+                      ]
 
                 })
                 .exec(function (err, task1) {

@@ -54,7 +54,7 @@ router.get("/Gettherapy/:_id/", function (req, res, next) {
     }
 });
 
-router.get("/GettherapyHouse/:house_id", function (req, res, next) {
+router.get("/GettherapyHouse/:house_id", CheckRole('show_therapy'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     try {
@@ -106,7 +106,7 @@ router.get("/GettherapyHouse/:house_id", function (req, res, next) {
     }
 });
 
-router.get("/Gettherapy_search/:house_id/:data", function (req, res) {
+router.get("/Gettherapy_search/:house_id/:data", CheckRole('show_therapy'), function (req, res) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     var final
@@ -152,7 +152,7 @@ router.get("/Gettherapy_search/:house_id/:data", function (req, res) {
     }
 });
 
-router.put("/Updatetherapy/:_id", function (req, res, next) {
+router.put("/Updatetherapy/:_id", CheckRole('edit_therapy'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     try {
@@ -195,7 +195,7 @@ router.put("/Updatetherapy/:_id", function (req, res, next) {
 });
 
 //remove track record
-router.delete('/Deletetherapy/:_id', function (req, res, next) {
+router.delete('/Deletetherapy/:_id',CheckRole('delete_therapy'), function (req, res, next) {
     const token = (req.headers.token)
     let legit = jwtconfig.verify(token)
     try {
@@ -220,7 +220,7 @@ router.delete('/Deletetherapy/:_id', function (req, res, next) {
     }
 });
 
-router.post("/AddTherapy", function (req, res, next) {
+router.post("/AddTherapy", CheckRole('add_therapy'), function (req, res, next) {
     const token = req.headers.token;
     let legit = jwtconfig.verify(token);
     try {
@@ -268,39 +268,6 @@ router.post("/AddTherapy", function (req, res, next) {
                     }
                 }
             );
-        } else {
-            res.json({
-                status: 200,
-                hassuccessed: false,
-                message: "Authentication required.",
-            });
-        }
-    } catch (err) {
-        res.json({
-            status: 200,
-            hassuccessed: false,
-            msg: "Some thing went wrong.",
-        });
-    }
-});
-
-router.post("/AssignTherapyToPatient", function (req, res, next) {
-    const token = req.headers.token;
-    let legit = jwtconfig.verify(token);
-    try {
-        if (legit) {
-            var adddata = new virtual_therapys(req.body)
-            adddata.save(function (err, user_data) {
-                if (err && !user_data) {
-                    res.json({ status: 200, message: "Something went wrong.", error: err });
-                } else {
-                    res.json({
-                        status: 200,
-                        message: "Added Successfully",
-                        hassuccessed: true,
-                    });
-                }
-            });
         } else {
             res.json({
                 status: 200,

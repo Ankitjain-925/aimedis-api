@@ -2,13 +2,13 @@ var express = require("express");
 let router = express.Router();
 const institute = require("../schema/institute.js")
 var User = require("../schema/user.js");
-
+var CheckRole = require("./../middleware/middleware")
 var uuidv1 = require('uuid/v1');
 var jwtconfig = require("../jwttoken");
 var fullinfo = [];
 
 
-router.get("/GetTeam/:house_id", function (req, res) {
+router.get("/GetTeam/:house_id", CheckRole('show_staff_group'),  function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   var final = []
@@ -173,7 +173,7 @@ function getfull(data) {
 }
 
 
-router.post("/AddGroup", function (req, res) {
+router.post("/AddGroup", CheckRole('add_group_staff'), function (req, res) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
@@ -297,7 +297,7 @@ router.get("/GetTeamGroup/:house_id/:staff_id", function (req, res) {
 });
 
 
-router.put("/UpdateTeam/:house_id/:staff_id", function (req, res, next) {
+router.put("/UpdateTeam/:house_id/:staff_id", CheckRole('edit_group_staff'), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
@@ -351,7 +351,7 @@ router.put("/UpdateTeam/:house_id/:staff_id", function (req, res, next) {
   }
 });
 
-router.delete("/DeleteTeam/:house_id/:staff_id", function (req, res, next) {
+router.delete("/DeleteTeam/:house_id/:staff_id", CheckRole('delete_group_staff'), function (req, res, next) {
   const token = req.headers.token;
   let legit = jwtconfig.verify(token);
   try {
